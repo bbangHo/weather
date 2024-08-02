@@ -1,0 +1,30 @@
+package org.pknu.weather.member.domain;
+import jakarta.persistence.*;
+import lombok.*;
+import org.pknu.weather.location.domain.Location;
+
+@Entity
+@Getter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+public class Member {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "member_id")
+    private Long id;
+
+    private String email;
+
+    @Enumerated(EnumType.STRING)
+    private Sensitivity sensitivity;
+
+    private String nickname;
+
+    private String profileImage;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "location_id")
+    private Location location;
+}
