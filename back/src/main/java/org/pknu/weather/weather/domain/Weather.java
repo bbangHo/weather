@@ -1,6 +1,7 @@
 package org.pknu.weather.weather.domain;
 import jakarta.persistence.*;
 import lombok.*;
+import org.pknu.weather.common.BaseEntity;
 import org.pknu.weather.location.domain.Location;
 
 import java.time.LocalDateTime;
@@ -10,7 +11,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Weather {
+public class Weather extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

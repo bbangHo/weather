@@ -1,13 +1,14 @@
 package org.pknu.weather.location.domain;
 import jakarta.persistence.*;
 import lombok.*;
+import org.pknu.weather.common.BaseEntity;
 
 @Entity
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Location {
+public class Location extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

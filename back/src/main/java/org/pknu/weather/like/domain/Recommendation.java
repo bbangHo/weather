@@ -2,6 +2,7 @@ package org.pknu.weather.like.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.pknu.weather.common.BaseEntity;
 import org.pknu.weather.member.domain.Member;
 import org.pknu.weather.post.domain.Post;
 
@@ -10,7 +11,7 @@ import org.pknu.weather.post.domain.Post;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Recommendation {
+public class Recommendation extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
