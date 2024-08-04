@@ -1,4 +1,4 @@
-package org.pknu.weather.like.domain;
+package org.pknu.weather.recommandation.domain;
 
 import jakarta.persistence.*;
 import lombok.*;

@@ -44,4 +44,7 @@ public class Weather extends BaseEntity {
 
     private SkyType skyType;
 
+    private LocalDateTime presentationTime;
+
+
 }
