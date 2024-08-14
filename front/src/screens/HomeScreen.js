@@ -9,6 +9,7 @@ import PostButton from '../components/PostButton';
 import Posts from '../components/Posts';
 import HourlyForecast from '../components/HourlyForecast';
 import AirQuality from '../components/AirQuality';
+import WeatherGraph from '../components/WeatherGraph';
 import {useNavigation} from '@react-navigation/native';
 
 const HomeScreen = () => {
@@ -45,6 +46,7 @@ const HomeScreen = () => {
         <Posts />
         <HourlyForecast />
         <AirQuality />
+        <WeatherGraph />
       </ScrollView>
     </PanGestureHandler>
   );
