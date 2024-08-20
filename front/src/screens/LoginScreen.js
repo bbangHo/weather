@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {View, Text, Button, Alert, StyleSheet} from 'react-native';
-import {KakaoOAuthToken, login} from '@react-native-seoul/kakao-login';
+import {login, logout} from '@react-native-seoul/kakao-login';
 
 const LoginScreen = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -10,9 +10,19 @@ const LoginScreen = () => {
     try {
       const token = await login();
       setIsLoggedIn(true);
-      Alert.alert('로그인 성공', `accessToken: ${token.accessToken}`);
+      Alert.alert('로그인 성공', `토큰: ${token.accessToken}`);
     } catch (err) {
       Alert.alert('로그인 실패', err.message);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setIsLoggedIn(false);
+      Alert.alert('로그아웃 성공', '성공적으로 로그아웃되었습니다.');
+    } catch (err) {
+      Alert.alert('로그아웃 실패', err.message);
     }
   };
 
@@ -22,7 +32,10 @@ const LoginScreen = () => {
       {!isLoggedIn ? (
         <Button title="카카오 로그인" onPress={handleLogin} />
       ) : (
-        <Text style={styles.successText}>로그인 성공!</Text>
+        <View>
+          <Text style={styles.successText}>로그인 성공!</Text>
+          <Button title="로그아웃" onPress={handleLogout} />
+        </View>
       )}
     </View>
   );
@@ -41,6 +54,7 @@ const styles = StyleSheet.create({
   successText: {
     fontSize: 18,
     color: 'green',
+    marginBottom: 20,
   },
 });
 
