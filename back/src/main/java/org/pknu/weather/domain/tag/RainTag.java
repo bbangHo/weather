@@ -1,11 +1,12 @@
-package org.pknu.weather.domain.common;
+package org.pknu.weather.domain.tag;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum RainRange {
+
+public enum RainTag implements EnumTag {
     NOTHING("", "안옴", 0),
     ALMOST_NOTHING("거의", "안옴", 1),
     VERY_WEAK("매우", "약함", 2),
@@ -18,4 +19,20 @@ public enum RainRange {
     private final String Adverb;
     private final String text;
     private final Integer code;
+
+    @Override
+    public String toString() {
+        String string = getAdverb() + " " + getText();
+        return string.trim();
+    }
+
+    @Override
+    public EnumTag findByCode(int code) {
+        for(RainTag tag : RainTag.values()) {
+            if(tag.getCode().equals(code))
+                return tag;
+        }
+
+        return RainTag.NOTHING;
+    }
 }
