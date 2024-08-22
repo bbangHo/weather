@@ -8,6 +8,7 @@ import {
   Dimensions,
   TouchableOpacity,
 } from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 import {Card} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
 import globalStyles from '../globalStyles';
@@ -15,6 +16,7 @@ import globalStyles from '../globalStyles';
 const Posts = () => {
   const screenWidth = Dimensions.get('window').width;
   const scrollViewRef = useRef(null);
+  const navigation = useNavigation();
 
   useEffect(() => {
     if (scrollViewRef.current) {
@@ -35,11 +37,10 @@ const Posts = () => {
           <Text style={styles.sectionText}>외출하셨나요?</Text>
           <Text style={styles.sectionText}>우리 동네의 날씨는 어떤가요?</Text>
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.button}>
-              <Text style={styles.buttonText}>자세하게 공유하기</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.button}>
-              <Text style={styles.buttonText}>간단하게 공유하기</Text>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => navigation.navigate('PostCreationScreen')}>
+              <Text style={styles.buttonText}>날씨 공유하기</Text>
             </TouchableOpacity>
           </View>
         </Card>
