@@ -21,9 +21,7 @@ public class TokenException extends GeneralException {
 
     public void sendResponseError(HttpServletResponse response){
 
-
         Gson gson = new Gson();
-
 
         try {
             ErrorReasonDTO errorReason = this.getErrorReasonHttpStatus();

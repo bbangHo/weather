@@ -1,6 +1,5 @@
-package org.pknu.weather.security.filter;
+package org.pknu.weather.filter;
 
-import org.pknu.weather.apiPayload.code.status.ErrorStatus;
 import com.google.gson.Gson;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
@@ -10,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.pknu.weather.apiPayload.ApiResponse;
+import org.pknu.weather.apiPayload.code.status.ErrorStatus;
 import org.pknu.weather.security.exception.TokenException;
 import org.pknu.weather.security.util.JWTUtil;
 import org.springframework.http.MediaType;
@@ -26,31 +26,19 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class RefreshTokenFilter extends OncePerRequestFilter {
 
-    private final String refreshPath;
-
     private final JWTUtil jwtUtil;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        String path = request.getRequestURI();
+        log.info("Refresh Token Filter run.......................1");
 
-        if (!path.equals(refreshPath)) {
-            log.info("skip refresh token filter.....");
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        log.info("Refresh Token Filter.......................1");
-
-        //accessToken과 refreshToken을 얻어온다.
         Map<String, String> tokens = null;
         try {
             tokens = parseRequestJSON(request);
         } catch (TokenException tokenException) {
             tokenException.sendResponseError(response);
             return;
-
         }
 
         String accessToken = tokens.get("accessToken");
@@ -69,7 +57,6 @@ public class RefreshTokenFilter extends OncePerRequestFilter {
         try {
 
             refreshClaims = checkRefreshToken(refreshToken);
-            log.info(refreshClaims);
 
         }catch(TokenException TokenException){
             TokenException.sendResponseError(response);
@@ -77,7 +64,7 @@ public class RefreshTokenFilter extends OncePerRequestFilter {
         }
 
         //Refresh Token의 유효시간이 얼마 남지 않은 경우
-        Long exp = (Long)refreshClaims.get("exp");
+        Long exp = ((Number) refreshClaims.get("exp")).longValue();
 
         Date expTime = new Date(Instant.ofEpochMilli(exp).toEpochMilli() * 1000);
 
@@ -86,22 +73,17 @@ public class RefreshTokenFilter extends OncePerRequestFilter {
         //만일 3일 미만인 경우에는 Refresh Token 갱신
         long gapTime = (expTime.getTime() - current.getTime());
 
-        log.info("-----------------------------------------");
-        log.info("current: " + current);
-        log.info("expTime: " + expTime);
-        log.info("gap: " + gapTime );
-
-        String loginId = (String)refreshClaims.get("loginId");
+        String email = (String)refreshClaims.get("email");
         Long id = Long.valueOf(String.valueOf(refreshClaims.get("id")));
 
-        String accessTokenValue = jwtUtil.generateToken(Map.of("loginId", loginId,"id",id), 1);
+        String accessTokenValue = jwtUtil.generateToken(Map.of("email", email,"id",id), 3);
 
         String refreshTokenValue = tokens.get("refreshToken");
 
         //RefrshToken이 3일 이내에 만료된다면
         if(gapTime < (1000 * 60 * 60 * 24 * 3  ) ){
             log.info("new Refresh Token required...  ");
-            refreshTokenValue = jwtUtil.generateToken(Map.of("loginId", loginId,"id",id), 30);
+            refreshTokenValue = jwtUtil.generateToken(Map.of("email", email,"id",id), 30);
         }
 
         log.info("Refresh Token result....................");
