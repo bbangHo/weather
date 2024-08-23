@@ -13,6 +13,8 @@ on:
     branches:
       - dev
       - feat/**
+      - fix/**
+      - refactor/**
     # 아래 경로에서 변경점이 있다면 CI/CD 진행
     paths:
       - back/**
@@ -31,6 +33,15 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+
+      - name: Set yml value
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: "**/src/main/resources/application.yml"
+        env:
+          spring.datasource.url: ${{ secrets.DB_URL }}
+          spring.datasource.username: ${{ secrets.DB_USERNAME }}
+          spring.datasource.password: ${{ secrets.DB_PASSWORD }}
 
       # Spring Boot 애플리케이션 빌드
       - name: Grant execute permission for gradlew
@@ -54,7 +65,6 @@ jobs:
       # Docker Hub 이미지 푸시
       - name: Docker Hub push
         run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/github-actions-demo
-
   # 위 과정에서 푸시한 이미지를 ec2에서 풀받아서 실행시키는 과정
   run-docker-image-on-ec2:
     needs: build-docker-image
