@@ -32,15 +32,33 @@ public final class GeometryUtils {
 
     /**
      * xy좌표를 위경도로 변환
-     *
-     * @param x
-     * @param y
-     * @return
      */
     public static double[] pointToCoordinate(double x, double y) {
         x -= 1;
         y -= 1;
         return lamcProj(0, 0, x, y, 1);
+    }
+
+    // 각도를 라디안으로 변환
+    private static double toRadians(double degrees) {
+        return degrees * Math.PI / 180.0;
+    }
+
+    // 라디안을 각도로 변환
+    private static double toDegrees(double radians) {
+        return radians * 180.0 / Math.PI;
+    }
+
+    // 주어진 거리와 방위각에 따른 새로운 위도를 계산
+    private static double calculateLatitude(double lat, double d, double bearing) {
+        return Math.asin(Math.sin(lat) * Math.cos(d / RE) +
+                Math.cos(lat) * Math.sin(d / RE) * Math.cos(bearing));
+    }
+
+    // 주어진 거리와 방위각에 따른 새로운 경도를 계산
+    private static double calculateLongitude(double lon, double lat, double newLat, double d, double bearing) {
+        return lon + Math.atan2(Math.sin(bearing) * Math.sin(d / RE) * Math.cos(lat),
+                Math.cos(d / RE) - Math.sin(lat) * Math.sin(newLat));
     }
 
     /**
@@ -107,5 +125,4 @@ public final class GeometryUtils {
             return new double[]{lon * RADDEG, lat * RADDEG};
         }
     }
-
 }
