@@ -1,4 +1,4 @@
-package org.pknu.weather.dto.converter;
+package org.pknu.weather.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import org.pknu.weather.domain.common.SkyType;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class WeatherResponseConverter {
+public class WeatherResponse {
 
     @Getter
     @Builder

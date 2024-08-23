@@ -6,6 +6,7 @@ import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.Weather;
 import org.pknu.weather.domain.tag.RainTag;
 import org.pknu.weather.domain.tag.TemperatureTag;
+import org.pknu.weather.dto.WeatherResponse;
 
 import java.util.List;
 
@@ -28,7 +29,7 @@ public class WeatherConverter {
 //                .build();
 //    }
 
-    public static WeatherResponseConverter.MainPageWeatherData toMainPageWeatherData(List<Weather> weatherList, Member member) {
+    public static WeatherResponse.MainPageWeatherData toMainPageWeatherData(List<Weather> weatherList, Member member) {
         int max = Integer.MIN_VALUE;
         int min = Integer.MAX_VALUE;
 
@@ -37,14 +38,14 @@ public class WeatherConverter {
             min = Math.min(min, w.getTemperature());
         }
 
-        List<WeatherResponseConverter.WeatherPerHour> weatherPerHourList = weatherList.stream()
+        List<WeatherResponse.WeatherPerHour> weatherPerHourList = weatherList.stream()
                 .map(weather -> toWeatherPerHour(weather, member))
                 .toList();
 
         Location location = weatherList.get(0).getLocation();
         Weather now = weatherList.get(0);
 
-        return WeatherResponseConverter.MainPageWeatherData.builder()
+        return WeatherResponse.MainPageWeatherData.builder()
                 .location(location.getAddress())
                 .currentSkyType(now.getSkyType())
                 .currentTmp(now.getTemperature())
@@ -53,12 +54,12 @@ public class WeatherConverter {
                 .build();
     }
 
-    public static WeatherResponseConverter.WeatherPerHour toWeatherPerHour(Weather weather, Member member) {
+    public static WeatherResponse.WeatherPerHour toWeatherPerHour(Weather weather, Member member) {
         RainTag rainTag = WeatherRangeConverter.rain2Text(weather.getRain());
         TemperatureTag temperatureTag = WeatherRangeConverter.tmp2Text(
                 weather.getTemperature(), member.getSensitivity());
 
-        return WeatherResponseConverter.WeatherPerHour.builder()
+        return WeatherResponse.WeatherPerHour.builder()
                 .hour(weather.getPresentationTime())
                 .skyType(weather.getSkyType())
                 .rainAdverb(rainTag.getAdverb())
@@ -70,8 +71,8 @@ public class WeatherConverter {
                 .build();
     }
 
-    public static WeatherResponseConverter.Temperature toTemperature(Integer max, Integer min) {
-        return WeatherResponseConverter.Temperature.builder()
+    public static WeatherResponse.Temperature toTemperature(Integer max, Integer min) {
+        return WeatherResponse.Temperature.builder()
                 .maxTmp(max)
                 .minTmp(min)
                 .build();

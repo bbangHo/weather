@@ -54,6 +54,11 @@ dependencies {
 	annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
 	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
 	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
+	// Point
+	implementation "org.hibernate:hibernate-spatial:6.5.0.Final"
+	implementation "com.querydsl:querydsl-sql-spatial:5.1.0"
+	implementation "org.orbisgis:h2gis:2.2.0"
 }
 
 tasks.named('test') {

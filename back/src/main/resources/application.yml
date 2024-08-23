@@ -18,11 +18,14 @@ spring:
     hibernate:
       ddl-auto: none
     open-in-view: false   # osiv 설정
+  profiles:
+    active: local
 logging:
   level:
     root: debug
   file:
     name: log_file
+    path: /log
 api:
   weather:
     service_key: ${SHORT_TERM_FORECAST_API_KEY}

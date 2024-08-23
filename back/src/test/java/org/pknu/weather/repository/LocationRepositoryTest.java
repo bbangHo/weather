@@ -40,14 +40,14 @@ class LocationRepositoryTest {
 
         // 어제, 오늘 날씨 추가
         for(int i = 0; i <= 23; i++) {
+            LocalDateTime now = LocalDateTime.now();
             Weather weather = Weather.builder()
-                    .basetime(LocalDateTime.now())
+                    .basetime(now)
                     .presentationTime(
                             DateTimeFormaterUtils.formattedDateTime2LocalDateTime(DateTimeFormaterUtils.getFormattedDate(),
                             DateTimeFormaterUtils.getFormattedTimeByOneHour(LocalTime.of(i, 0))))
                     .build();
 
-            LocalDateTime now = LocalDateTime.now();
             Weather yesterday = Weather.builder()
                     .basetime(now)
                     .presentationTime(

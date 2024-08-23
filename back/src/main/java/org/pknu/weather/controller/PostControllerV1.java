@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.pknu.weather.apiPayload.ApiResponse;
 import org.pknu.weather.dto.PostRequest;
+import org.pknu.weather.dto.PostResponse;
 import org.pknu.weather.dto.converter.PostRequestConverter;
 import org.pknu.weather.service.PostService;
 import org.springframework.web.bind.annotation.*;
@@ -18,12 +19,13 @@ public class PostControllerV1 {
     @PostMapping("/post")
     public ApiResponse<Object> createPost(Long memberId, @Valid @RequestBody PostRequest.Params params) {
         PostRequest.CreatePost createPost = postRequestConverter.toCreatePost(params);
-        postService.createPost(memberId, createPost);
-        return ApiResponse.onSuccess();
+        boolean isSuccess = postService.createPost(memberId, createPost);
+        return ApiResponse.of(isSuccess);
     }
 
     @GetMapping("/posts")
-    public ApiResponse<Object> getPosts(Long memberId, Long lastPostId) {
-        return null;
+    public ApiResponse<PostResponse.Posts> getPosts(Long memberId, Long lastPostId, Long size) {
+        PostResponse.Posts posts = postService.getPosts(memberId, lastPostId, size);
+        return ApiResponse.onSuccess(posts);
     }
 }

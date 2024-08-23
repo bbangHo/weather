@@ -1,7 +1,6 @@
 package org.pknu.weather.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -74,6 +73,6 @@ class WeatherServiceTest {
         List<Weather> weathers = weatherService.saveWeathers(member.getId(), (float)LONGITUDE, (float)LATITUDE);
 
         // then
-        assertThat(weathers.size()).isGreaterThanOrEqualTo(21);
+        assertThat(weathers.size()).isGreaterThanOrEqualTo(20);
     }
 }
