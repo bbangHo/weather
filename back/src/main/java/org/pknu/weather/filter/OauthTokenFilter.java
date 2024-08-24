@@ -37,21 +37,41 @@ public class OauthTokenFilter extends OncePerRequestFilter {
         String authHeader = "Bearer " + accessToken;
 
         try {
-            Response result = kaKaoLoginClient.checkKakaoAccessToken(authHeader);
+            checkToken(authHeader);
+        } catch (TokenException tokenException){
+            tokenException.sendResponseError(response);
+            return;
+        }
+
+        try {
             KakaoUserResponse oauthMember = kaKaoLoginClient.getMemberData(authHeader, "application/x-www-form-urlencoded;charset=utf-8");
 
             request.setAttribute("email", oauthMember.getKakao_account().getEmail());
 
         } catch (FeignException e){
-            /**
-             * 에러 처리 - 로그로 출력하기
-             */
             log.error(e.getMessage());
-            return;
+            throw e;
         }
 
         filterChain.doFilter(request, response);
 
+    }
+
+    private void checkToken(String authHeader) throws TokenException{
+        Response result = kaKaoLoginClient.checkKakaoAccessToken(authHeader);
+        int status = result.status();
+        switch (status){
+            case 1:
+                throw new TokenException(ErrorStatus.KAKAO_SERVER_ERROR);
+            case 2:
+                throw new TokenException(ErrorStatus.KAKAO_ACCESS_TOKEN_BAT_TYPE);
+            case 401:
+                throw new TokenException(ErrorStatus.MALFORMED_KAKAO_ACCESS_TOKEN);
+            case 200:
+                break;
+            default:
+                throw new RuntimeException();
+        }
     }
 
     private Map<String, String> parseRequestJSON(HttpServletRequest request) throws TokenException {
@@ -67,7 +87,7 @@ public class OauthTokenFilter extends OncePerRequestFilter {
 
         if(!loginData.containsKey("accessToken")){
             log.info("test................");
-            throw new TokenException(ErrorStatus.MALFORMED_LOGIN_DATA);
+            throw new TokenException(ErrorStatus.ACCESS_TOKEN_NOT_ACCEPTED);
         }
 
         return loginData;

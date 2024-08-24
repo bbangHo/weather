@@ -21,18 +21,19 @@ public enum ErrorStatus implements BaseErrorCode {
 
 
     //Token
-    ACCESS_TOKEN_NOT_ACCEPTED(HttpStatus.UNAUTHORIZED, "Jwt_400_1", "Access Token이 존재하지 않습니다."),
-    ACCESS_TOKEN_BADTYPE(HttpStatus.UNAUTHORIZED, "Jwt_400_2", "Access Token의 타입이 bearer가 아닙니다."),
-    MALFORMED_ACCESS_TOKEN(HttpStatus.FORBIDDEN, "JWT_400_3", "Access Token의 값이 올바르게 설정되지 않았습니다. "),
-    BAD_SIGNED_ACCESS_TOKEN(HttpStatus.FORBIDDEN, "JWT_400_4", "Access Token의 서명이 올바르지 않습니다."),
-    EXPIRED_ACCESS_TOKEN(HttpStatus.FORBIDDEN, "JWT_400_5", "Access Token이 만료되었습니다."),
-    MALFORMED_REFRESH_TOKEN(HttpStatus.FORBIDDEN, "JWT_400_7", "Refresh Token의 값이 올바르게 설정되지 않았습니다. "),
-    EXPIRED_REFRESH_TOKEN(HttpStatus.FORBIDDEN, "JWT_400_8", "Refresh Token이 만료되었습니다."),
-    TOKENS_NOT_ACCEPTED(HttpStatus.UNAUTHORIZED, "Jwt_400_9", "Access Token과 refresh Token이 존재하지 않습니다."),
-    //Login
-    ID_AND_PASSWORD_NOT_MATCH(HttpStatus.FORBIDDEN,"LOGIN_400_1","ID 또는 비밀번호가 잘못되었습니다."),
-    LOGIN_DATA_NOT_ACCEPTED(HttpStatus.UNAUTHORIZED,"LOGIN_400_2","로그인 ID와 비밀번호가 비어있습니다."),
-    MALFORMED_LOGIN_DATA(HttpStatus.UNAUTHORIZED,"LOGIN_400_3","로그인 ID와 비밀번호을 전달하는 JSON 형식에 문제가 있습니다."),
+    ACCESS_TOKEN_NOT_ACCEPTED(HttpStatus.UNAUTHORIZED, "Jwt_401_1", "Access Token이 존재하지 않습니다."),
+    ACCESS_TOKEN_BADTYPE(HttpStatus.UNAUTHORIZED, "Jwt_401_2", "Access Token의 타입이 bearer가 아닙니다."),
+    MALFORMED_ACCESS_TOKEN(HttpStatus.FORBIDDEN, "JWT_401_3", "Access Token의 값이 올바르게 설정되지 않았습니다. "),
+    BAD_SIGNED_ACCESS_TOKEN(HttpStatus.FORBIDDEN, "JWT_401_4", "Access Token의 서명이 올바르지 않습니다."),
+    EXPIRED_ACCESS_TOKEN(HttpStatus.FORBIDDEN, "JWT_401_5", "Access Token이 만료되었습니다."),
+    MALFORMED_REFRESH_TOKEN(HttpStatus.FORBIDDEN, "JWT_401_7", "Refresh Token의 값이 올바르게 설정되지 않았습니다. "),
+    EXPIRED_REFRESH_TOKEN(HttpStatus.FORBIDDEN, "JWT_401_8", "Refresh Token이 만료되었습니다."),
+    TOKENS_NOT_ACCEPTED(HttpStatus.UNAUTHORIZED, "Jwt_401_9", "Access Token과 refresh Token이 존재하지 않습니다."),
+
+    //KaKaoAccessTokenException
+    KAKAO_SERVER_ERROR(HttpStatus.BAD_REQUEST, "Kakao_400_1", "카카오 서버의 일시적인 장애입니다."),
+    KAKAO_ACCESS_TOKEN_BAT_TYPE(HttpStatus.BAD_REQUEST, "Kakao_400_2", "주어진 액세스 토큰 정보가 잘못된 형식입니다."),
+    MALFORMED_KAKAO_ACCESS_TOKEN(HttpStatus.FORBIDDEN, "Kakao_401_3", "토큰 값이 유효하지 않습니다."),
 
     ;
 
