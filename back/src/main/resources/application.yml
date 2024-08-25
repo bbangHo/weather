@@ -18,6 +18,9 @@ spring:
     hibernate:
       ddl-auto: none
     open-in-view: false   # osiv 설정
+  jwt:
+    key: ${JWT_KEY}
+
 logging:
   level:
     root: debug
