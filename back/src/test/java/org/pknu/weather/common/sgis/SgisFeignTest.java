@@ -7,6 +7,7 @@ import org.pknu.weather.common.feignClient.dto.SgisAccessTokenResponseDTO;
 import org.pknu.weather.common.feignClient.dto.SgisLocationResponseDTO;
 import org.pknu.weather.common.feignClient.dto.SgisLocationWithCoorResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
@@ -16,9 +17,15 @@ public class SgisFeignTest {
     @Autowired
     SgisClient sgisClient;
 
+    @Value("${consumerKey}")
+    String consumerKey;
+
+    @Value("${consumerSecret}")
+    String consumerSecret;
+
     @Test
     public void getSigsAccessToken(){
-        SgisAccessTokenResponseDTO result = sgisClient.getSgisAccessToken(/*인증 키 입력*/);
+        SgisAccessTokenResponseDTO result = sgisClient.getSgisAccessToken(consumerKey,consumerSecret);
 
         log.info("\naccessToken : " + result.getResult().getAccessToken() + "\ntimeout : " + result.getResult().getAccessTimeout());
     }
@@ -26,8 +33,7 @@ public class SgisFeignTest {
     @Test
     public void getAddressInfo() {
 
-        SgisAccessTokenResponseDTO tokenResult = sgisClient.getSgisAccessToken(/*인증 키 입력*/);
-);
+        SgisAccessTokenResponseDTO tokenResult = sgisClient.getSgisAccessToken(consumerKey,consumerSecret);
 
         String accessToken = tokenResult.getResult().getAccessToken();
 
@@ -42,7 +48,7 @@ public class SgisFeignTest {
     @Test
     public void getAddressCoor() {
 
-        SgisAccessTokenResponseDTO tokenResult = sgisClient.getSgisAccessToken(/*인증 키 입력*/);
+        SgisAccessTokenResponseDTO tokenResult = sgisClient.getSgisAccessToken(consumerKey,consumerSecret);
 
         String accessToken = tokenResult.getResult().getAccessToken();
 
