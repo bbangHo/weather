@@ -1,11 +1,10 @@
 import React, {useState} from 'react';
 import {ScrollView, View, StyleSheet, StatusBar} from 'react-native';
 import {PanGestureHandler, State} from 'react-native-gesture-handler';
-// import ToggleViewButton from '../components/ToggleViewButton';
+import ToggleViewButton from '../components/ToggleViewButton';
 import WeatherInfoSlider from '../components/WeatherInfoSlider';
 import CurrentLocation from '../components/CurrentLocation';
 import TemperatureInfo from '../components/TemperatureInfo';
-import PostButton from '../components/PostButton';
 import Posts from '../components/Posts';
 import HourlyForecast from '../components/HourlyForecast';
 import AirQuality from '../components/AirQuality';
@@ -39,10 +38,9 @@ const HomeScreen = () => {
           <View style={styles.rightContainer}>
             <CurrentLocation />
             <TemperatureInfo />
-            <PostButton />
+            <ToggleViewButton />
           </View>
         </View>
-        {/* <ToggleViewButton showText={showText} setShowText={setShowText} /> */}
         <Posts />
         <HourlyForecast />
         <AirQuality />
