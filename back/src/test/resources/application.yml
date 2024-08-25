@@ -4,6 +4,10 @@ spring:
     driverClassName: org.h2.Driver
     username: sa
     password:
+    hikari:
+      connection-timeout: 3000
+      maximum-pool-size: 5
+      max-lifetime: 30000
 
   jpa:
     properties:
