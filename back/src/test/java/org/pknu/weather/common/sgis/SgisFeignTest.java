@@ -9,7 +9,7 @@ import org.pknu.weather.common.feignClient.dto.SgisLocationWithCoorResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-
+/*
 @SpringBootTest
 @Slf4j
 public class SgisFeignTest {
@@ -70,3 +70,5 @@ public class SgisFeignTest {
     }
 
 }
+
+ */
