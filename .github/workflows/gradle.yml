@@ -18,6 +18,7 @@ on:
     # 아래 경로에서 변경점이 있다면 CI/CD 진행
     paths:
       - back/**
+      - .github/**
 
 jobs:
   test:
@@ -63,6 +64,7 @@ jobs:
           spring.datasource.username: ${{ secrets.DB_USERNAME }}
           spring.datasource.password: ${{ secrets.DB_PASSWORD }}
           api.weather.service_key: ${{ secrets.SHORT_TERM_FORECAST_API_KEY }}
+          spring.jwt.key: ${{ secrets.JWT_KEY }}
 
       # Spring Boot 애플리케이션 빌드
       - name: Grant execute permission for gradlew

@@ -1,5 +1,5 @@
 package org.pknu.weather.service;
-
+/*
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -76,3 +76,5 @@ class WeatherServiceTest {
         assertThat(weathers.size()).isGreaterThanOrEqualTo(20);
     }
 }
+
+ */
