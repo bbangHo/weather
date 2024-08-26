@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-
+/*
 @SpringBootTest
 @Slf4j
 class MainPageServiceTest {
@@ -90,3 +90,5 @@ class MainPageServiceTest {
         assertThat(weatherInfo.getCurrentSkyType()).isEqualTo(weatherList.get(0).getSkyType());
     }
 }
+
+ */

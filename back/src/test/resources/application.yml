@@ -9,7 +9,7 @@ spring:
       maximum-pool-size: 5
       max-lifetime: 30000
   jwt:
-    key: testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest
+    key: ${JWT_KEY}
   jpa:
     properties:
       hibernate:
