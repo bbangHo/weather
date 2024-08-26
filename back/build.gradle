@@ -59,7 +59,6 @@ dependencies {
 	// Point
 	implementation "org.hibernate:hibernate-spatial:6.5.0.Final"
 	implementation "com.querydsl:querydsl-sql-spatial:5.1.0"
-	implementation "org.orbisgis:h2gis:2.2.0"
 
 	//jjwt
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
@@ -68,6 +67,8 @@ dependencies {
 
 	//Gson
 	implementation 'com.google.code.gson:gson:2.9.0'
+
+
 }
 tasks.named('test') {
 	useJUnitPlatform()

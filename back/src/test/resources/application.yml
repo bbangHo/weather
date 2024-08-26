@@ -26,4 +26,5 @@ logging:
         SQL: debug
     root: info
   file:
-    path: /log
+    name: log_file
+    path: .

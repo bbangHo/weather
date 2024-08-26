@@ -21,26 +21,6 @@ on:
       - .github/**
 
 jobs:
-  test:
-    name: test
-    runs-on: ubuntu-latest
-
-    services:
-      mysql:
-        image: mysql:8.0.30
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: admin
-          MYSQL_USER: admin
-          MYSQL_PASSWORD: root
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
-
   # Spring Boot 애플리케이션을 빌드하여 도커허브에 푸시하는 과정
   build-docker-image:
     runs-on: ubuntu-latest
@@ -72,7 +52,7 @@ jobs:
 
       - name: Build with Gradle Wrapper
         working-directory: back   # 해당 디렉토리에서 수행한다.
-        run: ./gradlew build
+        run: ./gradlew build -i
 
       # Docker 이미지 빌드
       - name: Build Docker image

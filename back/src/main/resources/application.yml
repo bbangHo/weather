@@ -25,7 +25,7 @@ logging:
     root: debug
   file:
     name: log_file
-    path: /log
+    path: .
 api:
   weather:
     service_key: ${SHORT_TERM_FORECAST_API_KEY}
