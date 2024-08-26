@@ -17,10 +17,10 @@ public class SgisFeignTest {
     @Autowired
     SgisClient sgisClient;
 
-    @Value("${consumerKey}")
+    @Value("${CONSUMER_KEY}")
     String consumerKey;
 
-    @Value("${consumerSecret}")
+    @Value("${CONSUMER_SECRET}")
     String consumerSecret;
 
     @Test

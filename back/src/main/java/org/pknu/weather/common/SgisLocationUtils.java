@@ -25,10 +25,10 @@ public class SgisLocationUtils {
     private String accessToken;
     private LocalDateTime expTime;
 
-    @Value("${consumerKey}")
+    @Value("${CONSUMER_KEY}")
     String consumerKey;
 
-    @Value("${consumerSecret}")
+    @Value("${CONSUMER_SECRET}")
     String consumerSecret;
 
 
