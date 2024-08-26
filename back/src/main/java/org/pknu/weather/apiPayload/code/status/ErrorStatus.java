@@ -22,6 +22,11 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // member
     _MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER_404_1", "사용자를 찾을 수 없습니다."),
+
+    //sigs
+    _SGIS_BAD_AUTHENTICATION_PARAMETER(HttpStatus.UNAUTHORIZED,"SGIS_401_1", "sigs토큰을 얻기 위한 인증 정보가 잘못 설정되어 있습니다. 서버 관리자에게 문의 바랍니다."),
+    _SGIS_NOT_FOUND_RESULT(HttpStatus.BAD_REQUEST,"SGIS_400_2", "sigs토큰을 검색 결과가 없습니다. 서버 관리자에게 문의 바랍니다.")
+
     ;
 
 
