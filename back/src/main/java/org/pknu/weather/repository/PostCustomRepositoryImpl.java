@@ -49,7 +49,7 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
     }
 
     /**
-     *
+     * distance 이내의 거리에 있는 사용자가 작성한 post인지 확인하는 메서드
      * @param latitude 위도 (-90 ~ 90)
      * @param longitude 경도 (-180 ~ 180)
      * @param distance 거리 (m단위)
