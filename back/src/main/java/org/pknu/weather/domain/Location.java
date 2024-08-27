@@ -2,13 +2,11 @@ package org.pknu.weather.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.locationtech.jts.geom.Point;
 import org.pknu.weather.common.BaseEntity;
-import org.pknu.weather.dto.Point;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Entity
 @Getter
@@ -21,6 +19,9 @@ public class Location extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "location_id")
     private Long id;
+
+    @Column(name = "POINT", columnDefinition = "POINT SRID 4326", nullable = false)
+    private Point point;
 
     private Double longitude;
 

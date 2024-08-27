@@ -2,7 +2,7 @@ package org.pknu.weather.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.pknu.weather.apiPayload.ApiResponse;
-import org.pknu.weather.dto.converter.WeatherResponseConverter;
+import org.pknu.weather.dto.WeatherResponse;
 import org.pknu.weather.service.MainPageService;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,8 +16,8 @@ public class MainPageControllerV1 {
     private final MainPageService mainPageService;
 
     @GetMapping("/weather")
-    public ApiResponse<WeatherResponseConverter.MainPageWeatherData> getMainPageResource(@RequestParam Long memberId) {
-        WeatherResponseConverter.MainPageWeatherData weatherInfo = mainPageService.getWeatherInfo(memberId);
+    public ApiResponse<WeatherResponse.MainPageWeatherData> getMainPageResource(@RequestParam Long memberId) {
+        WeatherResponse.MainPageWeatherData weatherInfo = mainPageService.getWeatherInfo(memberId);
         return ApiResponse.onSuccess(weatherInfo);
     }
 
