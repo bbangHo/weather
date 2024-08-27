@@ -44,6 +44,8 @@ jobs:
           spring.datasource.username: ${{ secrets.DB_USERNAME }}
           spring.datasource.password: ${{ secrets.DB_PASSWORD }}
           spring.jwt.key: ${{ secrets.JWT_KEY }}
+          spring.sigs.key: ${{ secret.CONSUMER_KEY }}
+          spring.sigs.secret: ${{ secret.CONSUMER_SECRET }}
 
       # Spring Boot 애플리케이션 빌드
       - name: Grant execute permission for gradlew

@@ -25,10 +25,10 @@ public class SgisLocationUtils {
     private String accessToken;
     private LocalDateTime expTime;
 
-    @Value("${CONSUMER_KEY}")
+    @Value("${spring.sigs.key}")
     String consumerKey;
 
-    @Value("${CONSUMER_SECRET}")
+    @Value("${spring.sigs.secret}")
     String consumerSecret;
 
 
