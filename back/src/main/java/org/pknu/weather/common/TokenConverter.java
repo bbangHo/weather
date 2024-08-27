@@ -13,11 +13,14 @@ import java.util.Map;
 @Component
 public class TokenConverter {
 
-    @Value("${spring.jwt.key}")
-    private String key;
+    private static String key;
+
+    public static void setKey(String jwtKey) {
+        key = jwtKey;
+    }
 
 
-    public String getEmailByToken(String auth){
+    public static String getEmailByToken(String auth){
 
         String accessToken = auth.substring(7);
 
