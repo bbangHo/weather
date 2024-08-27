@@ -45,8 +45,8 @@ jobs:
           spring.datasource.password: ${{ secrets.DB_PASSWORD }}
           api.weather.service_key: ${{ secrets.SHORT_TERM_FORECAST_API_KEY }}
           spring.jwt.key: ${{ secrets.JWT_KEY }}
-          spring.sigs.key: ${{ secret.CONSUMER_KEY }}
-          spring.sigs.secret: ${{ secret.CONSUMER_SECRET }}
+          spring.sigs.key: ${{ secrets.CONSUMER_KEY }}
+          spring.sigs.secret: ${{ secrets.CONSUMER_SECRET }}
 
       # Spring Boot 애플리케이션 빌드
       - name: Grant execute permission for gradlew
