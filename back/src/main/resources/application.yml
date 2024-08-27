@@ -20,6 +20,10 @@ spring:
     open-in-view: false   # osiv 설정
   jwt:
     key: ${JWT_KEY}
+  sigs:
+    key: ${CONSUMER_KEY}
+    secret: ${CONSUMER_SECRET}
+
 logging:
   level:
     root: debug
