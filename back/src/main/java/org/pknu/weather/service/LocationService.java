@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static org.pknu.weather.common.TokenConverter.getEmailByToken;
 import static org.pknu.weather.dto.converter.LocationConverter.toLocation;
 import static org.pknu.weather.dto.converter.LocationConverter.toLocationDTO;
 
