@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    active: local
   sql:
     init:
       mode: never
@@ -27,13 +29,16 @@ spring:
 logging:
   level:
     root: debug
-  file:
-    name: log_file
-    path: .
+log:
+  config:
+    path: /customLog
+    filename: custom
+
 api:
   weather:
     service_key: ${SHORT_TERM_FORECAST_API_KEY}
     data_type: JSON
+
 management:
   health:
     db:
