@@ -1,6 +1,5 @@
 package org.pknu.weather.controller;
 
-import io.jsonwebtoken.Header;
 import lombok.RequiredArgsConstructor;
 import org.pknu.weather.apiPayload.ApiResponse;
 import org.pknu.weather.dto.LocationDTO;
