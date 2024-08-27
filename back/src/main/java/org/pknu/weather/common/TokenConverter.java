@@ -13,7 +13,7 @@ import java.util.Map;
 @Component
 public class TokenConverter {
 
-    @Value("${JWT_KEY}")
+    @Value("${spring.jwt.key}")
     private String key;
 
 
