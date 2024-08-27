@@ -10,4 +10,7 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
     default Location safeFindById(Long id) {
         return findById(id).orElseThrow(() -> new GeneralException(ErrorStatus._LOCATION_NOT_FOUND));
     }
+
+    @Query("select loc from Location loc where loc.province = :province and loc.city = :city and loc.street = :street")
+    Optional<Location> findLocationByFullAddress(String province, String city, String street);
 }

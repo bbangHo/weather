@@ -31,4 +31,8 @@ public class Member extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "location_id")
     private Location location;
+
+    public void changeLocation(Location location){
+        this.location = location;
+    }
 }

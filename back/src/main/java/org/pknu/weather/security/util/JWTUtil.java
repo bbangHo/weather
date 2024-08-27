@@ -20,7 +20,7 @@ import java.util.Map;
 public class JWTUtil {
 
     @Value("${spring.jwt.key}")
-    private String key = "aweiogjw4oigj4oiwjgto2iw4joiw4joi234jw4j4802480";
+    private String key;
 
     public String generateToken(Map<String, Object> valueMap, int days){
 
