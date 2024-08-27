@@ -1,24 +1,5 @@
 package org.pknu.weather.service;
 
-import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.pknu.weather.domain.Location;
-import org.pknu.weather.domain.Member;
-import org.pknu.weather.domain.Weather;
-import org.pknu.weather.domain.common.Sensitivity;
-import org.pknu.weather.dto.converter.WeatherResponseConverter;
-import org.pknu.weather.repository.LocationRepository;
-import org.pknu.weather.repository.MemberRepository;
-import org.pknu.weather.repository.WeatherRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 /*
 @SpringBootTest
 @Slf4j
