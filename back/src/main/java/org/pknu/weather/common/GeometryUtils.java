@@ -1,6 +1,12 @@
 package org.pknu.weather.common;
 
-import org.pknu.weather.dto.Point;
+
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKTReader;
 
 public final class GeometryUtils {
 
@@ -14,6 +20,7 @@ public final class GeometryUtils {
     private static final float OLAT = 38.0f; // 기준점 위도
     private static final float XO = 210 / GRID; // 기준점 X좌표
     private static final float YO = 675 / GRID; // 기준점 Y좌표
+    private static final int WGS84_SRID = 4326; // 기준점 Y좌표
 
     /**
      * 위경도를 격자(nx, ny) 좌표로 변환을 해주는 메소드
@@ -23,24 +30,86 @@ public final class GeometryUtils {
      * @param lat 위도(degree)
      * @return 격자 좌표 x, y 를 가진 Point 객체
      */
-    public static Point coordinateToPoint(double lon, double lat) {
+    public static org.pknu.weather.dto.Point coordinateToPoint(double lon, double lat) {
         double[] result = lamcProj(lon, lat, 0, 0, 0);
         int x = (int) (result[0] + 1.5);
         int y = (int) (result[1] + 1.5);
-        return new Point(x, y);
+        return new org.pknu.weather.dto.Point(x, y);
     }
 
     /**
      * xy좌표를 위경도로 변환
-     *
-     * @param x
-     * @param y
-     * @return
      */
     public static double[] pointToCoordinate(double x, double y) {
         x -= 1;
         y -= 1;
         return lamcProj(0, 0, x, y, 1);
+    }
+
+    /**
+     *
+     * @param latitude 위도 (-90 ~ 90)
+     * @param longitude 경도
+     * @return org.locationtech.jts.geom.Point
+     */
+    public static Point getPoint(double latitude, double longitude) {
+        GeometryFactory gf = new GeometryFactory();
+        Point point = gf.createPoint(new Coordinate(longitude, latitude));
+        point.setSRID(WGS84_SRID);
+        return point;
+    }
+
+    private static Geometry createPoint(double latitude, double longitude) throws ParseException {
+        return new WKTReader().read("POINT(" + longitude + " " + latitude + ")");
+    }
+
+    public static Geometry getMBR(Geometry startGeometry, double distance) {
+        distance /= 111;        // 3km 입력시 111로 나눠야함. buffer의 distance는 단위가 '도' 이기 때문이다.
+        return startGeometry.buffer(distance);
+    }
+
+    public static double[] getSouthwestCoordinate(double latitude, double longitude, double distance) {
+        return calculate(latitude, longitude, distance, 225.0);
+    }
+
+    public static double[] getNortheastCoordinate(double latitude, double longitude, double distance) {
+        return calculate(latitude, longitude, distance, 45.0);
+    }
+
+    private static double[] calculate(Double baseLatitude, Double baseLongitude, Double distance,
+                                     Double bearing) {
+        Double radianLatitude = toRadian(baseLatitude);
+        Double radianLongitude = toRadian(baseLongitude);
+        Double radianAngle = toRadian(bearing);
+        Double distanceRadius = distance / 6371.01;
+
+        Double latitude = Math.asin(sin(radianLatitude) * cos(distanceRadius) +
+                cos(radianLatitude) * sin(distanceRadius) * cos(radianAngle));
+        Double longitude = radianLongitude + Math.atan2(sin(radianAngle) * sin(distanceRadius) *
+                cos(radianLatitude), cos(distanceRadius) - sin(radianLatitude) * sin(latitude));
+
+        longitude = normalizeLongitude(longitude);
+        return new double[]{toDegree(latitude), toDegree(longitude)};
+    }
+
+    private static Double toRadian(Double coordinate) {
+        return coordinate * Math.PI / 180.0;
+    }
+
+    private static Double toDegree(Double coordinate) {
+        return coordinate * 180.0 / Math.PI;
+    }
+
+    private static Double sin(Double coordinate) {
+        return Math.sin(coordinate);
+    }
+
+    private static Double cos(Double coordinate) {
+        return Math.cos(coordinate);
+    }
+
+    private static Double normalizeLongitude(Double longitude) {
+        return (longitude + 540) % 360 - 180;
     }
 
     /**
@@ -107,5 +176,4 @@ public final class GeometryUtils {
             return new double[]{lon * RADDEG, lat * RADDEG};
         }
     }
-
 }

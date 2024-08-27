@@ -23,14 +23,13 @@ spring:
   sigs:
     key: ${CONSUMER_KEY}
     secret: ${CONSUMER_SECRET}
-  profiles:
-    active: local
 
 logging:
   level:
     root: debug
   file:
     name: log_file
+    path: .
 api:
   weather:
     service_key: ${SHORT_TERM_FORECAST_API_KEY}

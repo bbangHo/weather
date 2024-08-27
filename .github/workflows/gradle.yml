@@ -43,6 +43,7 @@ jobs:
           spring.datasource.url: ${{ secrets.DB_URL }}
           spring.datasource.username: ${{ secrets.DB_USERNAME }}
           spring.datasource.password: ${{ secrets.DB_PASSWORD }}
+          api.weather.service_key: ${{ secrets.SHORT_TERM_FORECAST_API_KEY }}
           spring.jwt.key: ${{ secrets.JWT_KEY }}
           spring.sigs.key: ${{ secret.CONSUMER_KEY }}
           spring.sigs.secret: ${{ secret.CONSUMER_SECRET }}
@@ -53,7 +54,7 @@ jobs:
 
       - name: Build with Gradle Wrapper
         working-directory: back   # 해당 디렉토리에서 수행한다.
-        run: ./gradlew build
+        run: ./gradlew build -i
 
       # Docker 이미지 빌드
       - name: Build Docker image
@@ -69,6 +70,7 @@ jobs:
       # Docker Hub 이미지 푸시
       - name: Docker Hub push
         run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/github-actions-demo
+
   # 위 과정에서 푸시한 이미지를 ec2에서 풀받아서 실행시키는 과정
   run-docker-image-on-ec2:
     needs: build-docker-image

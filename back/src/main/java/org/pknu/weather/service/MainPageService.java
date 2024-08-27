@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.Weather;
 import org.pknu.weather.dto.converter.WeatherConverter;
-import org.pknu.weather.dto.converter.WeatherResponseConverter;
+import org.pknu.weather.dto.WeatherResponse;
 import org.pknu.weather.repository.MemberRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,15 +26,7 @@ public class MainPageService {
     private final MemberRepository memberRepository;
     private final WeatherService weatherService;
 
-    /**
-     * 사용자가 메인페이지에 접근했을 때 동작한다. 로직은 아래와 같다.
-     * 1. 사용자의 위도 경도 및 기타 정보를 받아와 nx, ny로 치환한다 -> c~~utils 처리 o
-     * 2. 공공데이터 API를 호출하고, 응답값을 받아온다.  o
-     * 3. 사용자의 nx, ny를 member entity에 저장한다.
-     * 4. location entity에 지역 정보를 저장한다.
-     * 5. weather entity에 날씨 예보 정보를 저장한다..
-     */
-    public WeatherResponseConverter.MainPageWeatherData getWeatherInfo(Long memberId) {
+    public WeatherResponse.MainPageWeatherData getWeatherInfo(Long memberId) {
         Member member = memberRepository.safeFindById(memberId);
         List<Weather> weatherList = weatherService.getWeathers(member);
         return WeatherConverter.toMainPageWeatherData(weatherList, member);
