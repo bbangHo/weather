@@ -1,6 +1,7 @@
 package org.pknu.weather.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.apiPayload.ApiResponse;
 import org.pknu.weather.dto.LocationDTO;
 import org.pknu.weather.service.LocationService;
@@ -10,6 +11,7 @@ import java.util.Map;
 
 import static org.pknu.weather.common.TokenConverter.getEmailByToken;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/location")
@@ -19,6 +21,7 @@ public class LocationControllerV1 {
     @PostMapping("/coor")
     public ApiResponse<LocationDTO> saveMemberLocation( @RequestHeader("Authorization") String authorization,
                                                         @RequestBody Map<String, Object> payload) {
+        log.debug("/api/v1/location/coor controller start ............");
 
         String email = getEmailByToken(authorization);
 
@@ -32,6 +35,8 @@ public class LocationControllerV1 {
 
     @GetMapping("/defaultLoc")
     public ApiResponse<LocationDTO> getMemberDefaultLocation(@RequestHeader("Authorization") String authorization) {
+
+        log.debug("/api/v1/location/defaultLoc controller start ............");
 
         String email = getEmailByToken(authorization);
 

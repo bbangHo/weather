@@ -1,6 +1,7 @@
 package org.pknu.weather.common;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
 import org.pknu.weather.common.feignClient.SgisClient;
 import org.pknu.weather.common.feignClient.dto.SgisAccessTokenResponseDTO;
@@ -16,7 +17,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class SgisLocationUtils {
@@ -34,6 +35,8 @@ public class SgisLocationUtils {
 
     public LocationDTO getAddressInfo( double x, double y){
 
+        log.debug("SgisLocationUtils - getAddressInfo method start .....................");
+
         checkAccessToken();
 
         LocationDTO locationDTO = new LocationDTO();
@@ -45,6 +48,8 @@ public class SgisLocationUtils {
 
     public void getAddressName( double x, double y, LocationDTO locationDTO){
 
+        log.debug("SgisLocationUtils - getAddressName method start .....................");
+
         SgisLocationResponseDTO location = sgisClient.convertToLocationName(accessToken, x, y, 20);
         SgisLocationResponseDTO.Result addressInfo = location.getResult().get(0);
 
@@ -55,6 +60,9 @@ public class SgisLocationUtils {
     }
 
     public void getAddressCoor(String address, LocationDTO locationDTO) {
+
+        log.debug("SgisLocationUtils - getAddressCoor method start .....................");
+
         SgisLocationWithCoorResponseDTO locationCoor = sgisClient.getLocationCoor(accessToken, address);
         SgisLocationWithCoorResponseDTO.ResultData coor = locationCoor.getResult().getResultdata().get(0);
 
@@ -63,11 +71,17 @@ public class SgisLocationUtils {
     }
 
     public void checkAccessToken(){
+
+        log.debug("SgisLocationUtils - checkAccessToken method start .....................");
+
         if (accessToken == null || accessToken.isEmpty() || expTime.isAfter(LocalDateTime.now().minusMinutes(10)))
             getSgisAccessToken();
     }
 
     public synchronized void getSgisAccessToken(){
+
+        log.debug("SgisLocationUtils - getSgisAccessToken method start .....................");
+
         SgisAccessTokenResponseDTO sgisAccessToken = sgisClient.getSgisAccessToken(consumerKey,consumerSecret);
 
         switch (sgisAccessToken.getErrCd()){
