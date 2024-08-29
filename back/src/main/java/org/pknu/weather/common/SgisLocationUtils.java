@@ -49,8 +49,13 @@ public class SgisLocationUtils {
     public void getAddressName( double x, double y, LocationDTO locationDTO){
 
         log.debug("SgisLocationUtils - getAddressName method start .....................");
+        log.debug("어세스 토큰: " + accessToken);
 
         SgisLocationResponseDTO location = sgisClient.convertToLocationName(accessToken, x, y, 20);
+        log.debug("location 객체: " + location.getResult().toString());
+
+
+
         SgisLocationResponseDTO.Result addressInfo = location.getResult().get(0);
 
         locationDTO.setProvince(addressInfo.getSido_nm());
