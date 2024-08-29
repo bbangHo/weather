@@ -19,10 +19,10 @@ public class Location extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "location_id")
     private Long id;
-/*
+
     @Column(name = "POINT", columnDefinition = "POINT SRID 4326", nullable = false)
     private Point point;
- */
+
     private Double longitude;
 
     private Double latitude;
