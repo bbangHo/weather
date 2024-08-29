@@ -50,6 +50,7 @@ public class SgisLocationUtils {
 
         log.debug("SgisLocationUtils - getAddressName method start .....................");
         log.debug("어세스 토큰: " + accessToken);
+        log.debug("만료일: " + expTime);
 
         SgisLocationResponseDTO location = sgisClient.convertToLocationName(accessToken, x, y, 20);
         log.debug("연결 결과: " + location.toString());
