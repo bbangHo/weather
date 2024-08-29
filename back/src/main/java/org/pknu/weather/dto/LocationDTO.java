@@ -20,6 +20,7 @@ public class LocationDTO {
 
     private String street;
 
+    @JsonIgnore
     private Point point;
 
     @JsonIgnore
