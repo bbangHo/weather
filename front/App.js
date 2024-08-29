@@ -8,8 +8,7 @@ import MyScreen from './src/screens/MyScreen';
 import PostCreationScreen from './src/screens/PostCreationScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {StatusBar} from 'react-native';
-import {Button} from 'react-native';
+import {StatusBar, Button} from 'react-native';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -23,6 +22,7 @@ const HomeStack = () => (
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [accessToken, setAccessToken] = useState(null);
 
   return (
     <>
@@ -61,7 +61,10 @@ const App = () => {
           </Tab.Navigator>
         ) : (
           <>
-            <LoginScreen setIsLoggedIn={setIsLoggedIn} />
+            <LoginScreen
+              setIsLoggedIn={setIsLoggedIn}
+              setAccessToken={setAccessToken}
+            />
             <Button title="Skip Login" onPress={() => setIsLoggedIn(true)} />
           </>
         )}
