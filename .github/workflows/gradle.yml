@@ -12,9 +12,9 @@ on:
     # 아래 브랜치에서 PR이 발생했을 때
     branches:
       - dev
-      - feat/**
-      - fix/**
-      - refactor/**
+    #  - feat/**
+    #  - fix/**
+    #  - refactor/**
     # 아래 경로에서 변경점이 있다면 CI/CD 진행
     paths:
       - back/**
