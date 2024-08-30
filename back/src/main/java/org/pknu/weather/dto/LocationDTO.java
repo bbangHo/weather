@@ -2,6 +2,7 @@ package org.pknu.weather.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import org.locationtech.jts.geom.Point;
 
 @Getter
 @Builder
@@ -18,6 +19,9 @@ public class LocationDTO {
     private String city;
 
     private String street;
+
+    @JsonIgnore
+    private Point point;
 
     @JsonIgnore
     public String getFullAddress() {

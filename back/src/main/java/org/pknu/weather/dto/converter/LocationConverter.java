@@ -8,6 +8,8 @@ import org.pknu.weather.domain.Tag;
 import org.pknu.weather.dto.LocationDTO;
 import org.pknu.weather.dto.PostRequest;
 
+import static org.pknu.weather.common.GeometryUtils.getPoint;
+
 @Slf4j
 public class LocationConverter {
 
@@ -18,6 +20,7 @@ public class LocationConverter {
                 .province(locationDTO.getProvince())
                 .city(locationDTO.getCity())
                 .street(locationDTO.getStreet())
+                .point(getPoint(locationDTO.getLatitude(), locationDTO.getLongitude()))
                 .build();
     }
 

@@ -2,12 +2,14 @@ package org.pknu.weather.common.feignClient.dto;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.Arrays;
 import java.util.List;
 
 @Getter
 @Setter
+@ToString
 public class SgisLocationResponseDTO {
 
     private String id;
@@ -17,6 +19,7 @@ public class SgisLocationResponseDTO {
 
     @Getter
     @Setter
+    @ToString
     public static class Result {
         private String sido_nm;
         private String sgg_nm;
