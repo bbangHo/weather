@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: local
+    active:
   sql:
     init:
       mode: never
