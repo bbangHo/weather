@@ -10,14 +10,14 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
-
 public class TokenConverter {
 
-    private static final String key;
+    private static String key;
 
-    static {
-        key = System.getenv("JWT_KEY");
+    public static void setKey(String jwtKey) {
+        key = jwtKey;
     }
+
 
     public static String getEmailByToken(String auth){
 

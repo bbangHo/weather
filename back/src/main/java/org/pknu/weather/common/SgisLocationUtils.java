@@ -1,6 +1,7 @@
 package org.pknu.weather.common;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
 import org.pknu.weather.common.feignClient.SgisClient;
 import org.pknu.weather.common.feignClient.dto.SgisAccessTokenResponseDTO;
@@ -16,7 +17,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class SgisLocationUtils {
@@ -34,6 +35,8 @@ public class SgisLocationUtils {
 
     public LocationDTO getAddressInfo( double x, double y){
 
+        log.info("SgisLocationUtils - getAddressInfo method start .....................");
+
         checkAccessToken();
 
         LocationDTO locationDTO = new LocationDTO();
@@ -45,7 +48,10 @@ public class SgisLocationUtils {
 
     public void getAddressName( double x, double y, LocationDTO locationDTO){
 
+        log.info("SgisLocationUtils - getAddressName method start .....................");
+
         SgisLocationResponseDTO location = sgisClient.convertToLocationName(accessToken, x, y, 20);
+
         SgisLocationResponseDTO.Result addressInfo = location.getResult().get(0);
 
         locationDTO.setProvince(addressInfo.getSido_nm());
@@ -55,6 +61,9 @@ public class SgisLocationUtils {
     }
 
     public void getAddressCoor(String address, LocationDTO locationDTO) {
+
+        log.info("SgisLocationUtils - getAddressCoor method start .....................");
+
         SgisLocationWithCoorResponseDTO locationCoor = sgisClient.getLocationCoor(accessToken, address);
         SgisLocationWithCoorResponseDTO.ResultData coor = locationCoor.getResult().getResultdata().get(0);
 
@@ -63,13 +72,22 @@ public class SgisLocationUtils {
     }
 
     public void checkAccessToken(){
-        if (accessToken == null || accessToken.isEmpty() || expTime.isAfter(LocalDateTime.now().minusMinutes(10)))
+
+        log.info("SgisLocationUtils - checkAccessToken method start .....................");
+
+        if (accessToken == null || accessToken.isEmpty() || expTime.isBefore(LocalDateTime.now().minusMinutes(10))) {
+
             getSgisAccessToken();
+        }
     }
 
     public synchronized void getSgisAccessToken(){
+
+        log.info("SgisLocationUtils - getSgisAccessToken method start .....................");
+
         SgisAccessTokenResponseDTO sgisAccessToken = sgisClient.getSgisAccessToken(consumerKey,consumerSecret);
 
+        log.debug(sgisAccessToken.getErrMsg());
         switch (sgisAccessToken.getErrCd()){
             case (401):
                 throw new GeneralException(ErrorStatus._SGIS_BAD_AUTHENTICATION_PARAMETER);
