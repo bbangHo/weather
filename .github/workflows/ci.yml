@@ -1,0 +1,58 @@
+name: CI - Build and Push Docker Image
+
+on:
+  workflow_run:
+    workflows: ["Run Tests"]  # This is the name of your test workflow in test.yml
+    types:
+      - completed
+
+jobs:
+  # Spring Boot 애플리케이션을 빌드하여 도커허브에 푸시하는 과정
+  build-docker-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set yml value
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: "**/src/main/resources/application.yml"
+        env:
+          spring.datasource.url: ${{ secrets.DB_URL }}
+          spring.datasource.username: ${{ secrets.DB_USERNAME }}
+          spring.datasource.password: ${{ secrets.DB_PASSWORD }}
+          api.weather.service_key: ${{ secrets.SHORT_TERM_FORECAST_API_KEY }}
+          spring.jwt.key: ${{ secrets.JWT_KEY }}
+          spring.sigs.key: ${{ secrets.CONSUMER_KEY }}
+          spring.sigs.secret: ${{ secrets.CONSUMER_SECRET }}
+
+      # Spring Boot 애플리케이션 빌드
+      - name: Grant execute permission for gradlew
+        run: chmod +x back/gradlew
+
+      - name: Build with Gradle Wrapper
+        working-directory: back   # 해당 디렉토리에서 수행한다.
+        run: ./gradlew build -i
+
+      # Docker 이미지 빌드
+      - name: Build Docker image
+        run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/github-actions-demo ./back
+
+      # DockerHub 로그인
+      - name: Docker login
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+
+      # Docker Hub 이미지 푸시
+      - name: Docker Hub push
+        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/github-actions-demo

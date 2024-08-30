@@ -1,0 +1,50 @@
+name: Run Tests
+
+on:
+  pull_request:
+    # 아래 브랜치에서 PR이 발생했을 때
+    branches:
+      - dev
+      - feat/**
+      - fix/**
+      - refactor/**
+      - bug/**
+    # 아래 경로에서 변경점이 있다면 CI/CD 진행
+    paths:
+      - back/**
+      - .github/**
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: testdb
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+        ports:
+          - 3306:3306
+        volumes:
+          - /home/runner/work/mysql:/var/lib/mysql
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x back/gradlew
+
+      - name: Run Tests with Gradle
+        working-directory: back
+        run: ./gradlew test
