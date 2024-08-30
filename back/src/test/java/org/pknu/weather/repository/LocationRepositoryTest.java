@@ -1,6 +1,25 @@
+/*
 package org.pknu.weather.repository;
 
-/*
+
+import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.pknu.weather.common.formatter.DateTimeFormatter;
+import org.pknu.weather.domain.Location;
+import org.pknu.weather.domain.Weather;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.mysema.commons.lang.Assert.assertThat;
+
 @SpringBootTest
 class LocationRepositoryTest {
 
@@ -68,4 +87,5 @@ class LocationRepositoryTest {
     }
 }
 
- */
+
+*/

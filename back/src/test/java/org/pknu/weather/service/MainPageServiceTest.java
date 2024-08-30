@@ -1,6 +1,26 @@
+/*
 package org.pknu.weather.service;
 
-/*
+
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.pknu.weather.domain.Location;
+import org.pknu.weather.domain.Member;
+import org.pknu.weather.domain.Weather;
+import org.pknu.weather.domain.common.Sensitivity;
+import org.pknu.weather.repository.LocationRepository;
+import org.pknu.weather.repository.MemberRepository;
+import org.pknu.weather.repository.WeatherRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.List;
+
+import static com.mysema.commons.lang.Assert.assertThat;
+
 @SpringBootTest
 @Slf4j
 class MainPageServiceTest {
@@ -72,4 +92,5 @@ class MainPageServiceTest {
     }
 }
 
- */
+
+*/

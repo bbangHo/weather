@@ -1,6 +1,17 @@
+/*
 package org.pknu.weather.common.sgis;
 
-/*
+
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Test;
+import org.pknu.weather.feignClient.SgisClient;
+import org.pknu.weather.feignClient.dto.SgisAccessTokenResponseDTO;
+import org.pknu.weather.feignClient.dto.SgisLocationResponseDTO;
+import org.pknu.weather.feignClient.dto.SgisLocationWithCoorResponseDTO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
+
 @SpringBootTest
 @Slf4j
 public class SgisFeignTest {
@@ -62,4 +73,5 @@ public class SgisFeignTest {
 
 }
 
- */
+
+*/

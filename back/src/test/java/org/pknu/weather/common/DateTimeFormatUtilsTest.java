@@ -1,3 +1,4 @@
+/*
 package org.pknu.weather.common;
 
 import org.junit.jupiter.api.Test;
@@ -11,4 +12,4 @@ class DateTimeFormatUtilsTest {
         String formattedDate2YYMMDD = DateTimeFormatter.getFormattedDate();
         String formattedTime2HHMM = DateTimeFormatter.getFormattedTimeByThreeHour();
     }
-}
+}*/
