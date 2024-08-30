@@ -1,4 +1,4 @@
-package org.pknu.weather.common;
+package org.pknu.weather.common.utils;
 
 
 import org.locationtech.jts.geom.Coordinate;

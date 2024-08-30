@@ -4,7 +4,7 @@
 //import org.junit.jupiter.api.BeforeEach;
 //import org.junit.jupiter.api.DisplayName;
 //import org.junit.jupiter.api.Test;
-//import org.pknu.weather.common.GeometryUtils;
+//import org.pknu.weather.common.utils.GeometryUtils;
 //import org.pknu.weather.domain.Location;
 //import org.pknu.weather.domain.Member;
 //import org.pknu.weather.domain.Post;

@@ -3,7 +3,7 @@
 //import org.junit.jupiter.api.BeforeEach;
 //import org.junit.jupiter.api.DisplayName;
 //import org.junit.jupiter.api.Test;
-//import org.pknu.weather.common.WeatherFeignClient;
+//import org.pknu.weather.common.feignClient.WeatherFeignClient;
 //import org.pknu.weather.domain.Location;
 //import org.pknu.weather.domain.Member;
 //import org.pknu.weather.domain.Weather;

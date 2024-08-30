@@ -1,5 +1,6 @@
-package org.pknu.weather.common;
+package org.pknu.weather.common.eventListener;
 
+import org.pknu.weather.common.converter.TokenConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;

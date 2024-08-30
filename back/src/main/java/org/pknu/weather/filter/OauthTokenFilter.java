@@ -10,8 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
 import org.pknu.weather.security.exception.TokenException;
-import org.pknu.weather.security.oauth.KakaoUserResponse;
-import org.pknu.weather.security.oauth.KaKaoLoginClient;
+import org.pknu.weather.security.dto.KakaoUserResponseDTO;
+import org.pknu.weather.feignClient.KaKaoLoginClient;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -44,7 +44,7 @@ public class OauthTokenFilter extends OncePerRequestFilter {
         }
 
         try {
-            KakaoUserResponse oauthMember = kaKaoLoginClient.getMemberData(authHeader, "application/x-www-form-urlencoded;charset=utf-8");
+            KakaoUserResponseDTO oauthMember = kaKaoLoginClient.getMemberData(authHeader, "application/x-www-form-urlencoded;charset=utf-8");
 
             request.setAttribute("email", oauthMember.getKakao_account().getEmail());
 

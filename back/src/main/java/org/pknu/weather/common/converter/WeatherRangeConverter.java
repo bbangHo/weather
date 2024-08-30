@@ -1,4 +1,4 @@
-package org.pknu.weather.common;
+package org.pknu.weather.common.converter;
 
 import org.pknu.weather.domain.tag.RainTag;
 import org.pknu.weather.domain.common.Sensitivity;

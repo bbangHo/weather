@@ -1,5 +1,9 @@
-package org.pknu.weather.common;
+package org.pknu.weather.feignClient;
 
+import org.pknu.weather.common.formatter.DateTimeFormatter;
+import org.pknu.weather.common.utils.GeometryUtils;
+import org.pknu.weather.feignClient.utils.WeatherApiUtils;
+import org.pknu.weather.common.WeatherParamsFactory;
 import org.pknu.weather.domain.Weather;
 import org.pknu.weather.dto.Point;
 import org.pknu.weather.dto.WeatherApiResponse;
@@ -31,8 +35,8 @@ public interface WeatherFeignClient {
      */
     default Map<String, Weather> preprocess(Float lon, Float lat) {
         Point point = GeometryUtils.coordinateToPoint(lon, lat);
-        String date = DateTimeFormaterUtils.getFormattedDate();
-        String time = DateTimeFormaterUtils.getFormattedTimeByThreeHour();
+        String date = DateTimeFormatter.getFormattedDate();
+        String time = DateTimeFormatter.getFormattedTimeByThreeHour();
         WeatherParams weatherParams = WeatherParamsFactory.create(date, time, point);
 
         WeatherApiResponse weatherApiResponse = getVillageShortTermForecast(weatherParams);

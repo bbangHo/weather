@@ -1,7 +1,7 @@
 package org.pknu.weather.dto.converter;
 
-import org.pknu.weather.common.DateTimeFormaterUtils;
-import org.pknu.weather.common.RecommendationUtils;
+import org.pknu.weather.common.formatter.DateTimeFormatter;
+import org.pknu.weather.common.utils.RecommendationUtils;
 import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.Post;
 import org.pknu.weather.domain.Recommendation;
@@ -37,7 +37,7 @@ public class PostResponseConverter {
                 .sensitivity(member.getSensitivity())
                 .city(member.getLocation().getCity())
                 .street(member.getLocation().getStreet())
-                .createdAt(DateTimeFormaterUtils.pastTimeToString(post.getCreatedAt()))
+                .createdAt(DateTimeFormatter.pastTimeToString(post.getCreatedAt()))
                 .like(RecommendationUtils.likeCount(recommendationList))
                 .likeClickable(RecommendationUtils.isClickable(recommendationList, member))
                 .content(post.getContent())

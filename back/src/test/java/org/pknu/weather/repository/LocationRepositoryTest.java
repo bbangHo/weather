@@ -1,23 +1,5 @@
 package org.pknu.weather.repository;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.pknu.weather.common.DateTimeFormaterUtils;
-import org.pknu.weather.domain.Location;
-import org.pknu.weather.domain.Weather;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.*;
-
 /*
 @SpringBootTest
 class LocationRepositoryTest {
@@ -45,17 +27,17 @@ class LocationRepositoryTest {
             Weather weather = Weather.builder()
                     .basetime(LocalDateTime.now())
                     .presentationTime(
-                            DateTimeFormaterUtils.formattedDateTime2LocalDateTime(DateTimeFormaterUtils.getFormattedDate(),
-                            DateTimeFormaterUtils.getFormattedTimeByOneHour(LocalTime.of(i, 0))))
+                            DateTimeFormatter.formattedDateTime2LocalDateTime(DateTimeFormatter.getFormattedDate(),
+                            DateTimeFormatter.getFormattedTimeByOneHour(LocalTime.of(i, 0))))
                     .build();
 
             LocalDateTime now = LocalDateTime.now();
             Weather yesterday = Weather.builder()
                     .basetime(now)
                     .presentationTime(
-                            DateTimeFormaterUtils.formattedDateTime2LocalDateTime(
-                                    DateTimeFormaterUtils.getFormattedDate(LocalDate.of(now.getYear(), now.getMonth(), now.getDayOfMonth() - 1)),
-                                    DateTimeFormaterUtils.getFormattedTimeByOneHour(LocalTime.of(i, 0))))
+                            DateTimeFormatter.formattedDateTime2LocalDateTime(
+                                    DateTimeFormatter.getFormattedDate(LocalDate.of(now.getYear(), now.getMonth(), now.getDayOfMonth() - 1)),
+                                    DateTimeFormatter.getFormattedTimeByOneHour(LocalTime.of(i, 0))))
                     .build();
 
             weather.addLocation(location);
