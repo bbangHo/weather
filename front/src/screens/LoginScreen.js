@@ -3,7 +3,7 @@ import {View, Text, Button, Alert, StyleSheet} from 'react-native';
 import {login, logout} from '@react-native-seoul/kakao-login';
 import {sendAccessTokenToBackend} from '../api/api';
 
-const LoginScreen = ({setIsLoggedIn, setAccessToken}) => {
+const LoginScreen = ({setIsLoggedIn, setAccessToken, setIsNewMember}) => {
   const handleLogin = async () => {
     try {
       const token = await login();
@@ -13,6 +13,7 @@ const LoginScreen = ({setIsLoggedIn, setAccessToken}) => {
 
       if (response.isSuccess) {
         setAccessToken(response.result.accessToken);
+        setIsNewMember(true); // 테스트를 위해 isNewMember를 true로 설정합니다.
         setIsLoggedIn(true);
       } else {
         Alert.alert(

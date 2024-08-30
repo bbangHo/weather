@@ -23,47 +23,53 @@ const HomeStack = () => (
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [accessToken, setAccessToken] = useState(null);
+  const [isNewMember, setIsNewMember] = useState(false);
 
   return (
     <>
       <StatusBar hidden={true} />
       <NavigationContainer>
         {isLoggedIn ? (
-          <Tab.Navigator screenOptions={{headerShown: false}}>
-            <Tab.Screen
-              name="Community"
-              component={CommunityScreen}
-              options={{
-                tabBarIcon: ({color, size}) => (
-                  <Icon name="people" color={color} size={size} />
-                ),
-              }}
-            />
-            <Tab.Screen
-              name="HomeStack"
-              component={HomeStack}
-              options={{
-                tabBarIcon: ({color, size}) => (
-                  <Icon name="home" color={color} size={size} />
-                ),
-                tabBarLabel: 'Home',
-              }}
-            />
-            <Tab.Screen
-              name="My"
-              component={MyScreen}
-              options={{
-                tabBarIcon: ({color, size}) => (
-                  <Icon name="person" color={color} size={size} />
-                ),
-              }}
-            />
-          </Tab.Navigator>
+          isNewMember ? (
+            <MyScreen setIsNewMember={setIsNewMember} />
+          ) : (
+            <Tab.Navigator screenOptions={{headerShown: false}}>
+              <Tab.Screen
+                name="Community"
+                component={CommunityScreen}
+                options={{
+                  tabBarIcon: ({color, size}) => (
+                    <Icon name="people" color={color} size={size} />
+                  ),
+                }}
+              />
+              <Tab.Screen
+                name="HomeStack"
+                component={HomeStack}
+                options={{
+                  tabBarIcon: ({color, size}) => (
+                    <Icon name="home" color={color} size={size} />
+                  ),
+                  tabBarLabel: 'Home',
+                }}
+              />
+              <Tab.Screen
+                name="My"
+                component={MyScreen}
+                options={{
+                  tabBarIcon: ({color, size}) => (
+                    <Icon name="person" color={color} size={size} />
+                  ),
+                }}
+              />
+            </Tab.Navigator>
+          )
         ) : (
           <>
             <LoginScreen
               setIsLoggedIn={setIsLoggedIn}
               setAccessToken={setAccessToken}
+              setIsNewMember={setIsNewMember}
             />
             <Button title="Skip Login" onPress={() => setIsLoggedIn(true)} />
           </>
