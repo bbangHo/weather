@@ -1,11 +1,32 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Text, StyleSheet, StatusBar} from 'react-native';
 import CurrentLocation from '../components/CurrentLocation';
 import TemperatureInfo from '../components/TemperatureInfo';
 import PostScroll from '../components/PostScroll';
 import WeatherShareButton from '../components/WeatherShareButton';
+import {fetchWeatherData} from '../api/api';
 
-const CommunityScreen = () => {
+const CommunityScreen = ({accessToken}) => {
+  const [weatherData, setWeatherData] = useState(null);
+  const memberId = 1;
+
+  useEffect(() => {
+    const getWeatherData = async () => {
+      try {
+        const data = await fetchWeatherData(memberId, accessToken);
+        if (data.isSuccess) {
+          setWeatherData(data.result);
+        } else {
+          console.error('Failed to fetch weather data:', data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching weather data:', error.message);
+      }
+    };
+
+    getWeatherData();
+  }, [accessToken]);
+
   return (
     <View style={styles.container}>
       <StatusBar hidden={true} />
@@ -13,12 +34,12 @@ const CommunityScreen = () => {
       <View style={styles.topContainer}>
         <WeatherShareButton />
         <View style={styles.rightContainer}>
-          <CurrentLocation />
-          <TemperatureInfo />
+          <CurrentLocation accessToken={accessToken} />
+          <TemperatureInfo accessToken={accessToken} />
         </View>
       </View>
       <Text style={styles.text}>
-        ‘추위를 많이타는’ 유형이 가장 많이 공감했어요
+        ‘추위를 많이 타는’ 유형이 가장 많이 공감했어요
       </Text>
       <PostScroll />
     </View>

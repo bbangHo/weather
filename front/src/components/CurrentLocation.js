@@ -1,15 +1,35 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
-import {Icon} from 'react-native-elements';
+import {fetchWeatherData} from '../api/api';
 
-const CurrentLocation = () => {
+const CurrentLocation = ({accessToken}) => {
+  const [location, setLocation] = useState('');
+  const memberId = 1;
+
+  useEffect(() => {
+    const fetchLocation = async () => {
+      try {
+        const weatherData = await fetchWeatherData(memberId, accessToken);
+        if (weatherData.isSuccess) {
+          setLocation(weatherData.result.location);
+        } else {
+          console.error('Failed to fetch location data:', weatherData.message);
+        }
+      } catch (error) {
+        console.error('Error fetching location data:', error.message);
+      }
+    };
+
+    fetchLocation();
+  }, [accessToken]);
+
   return (
     <View style={styles.container}>
-      <View style={styles.locationContainer}>
-        <Text style={styles.location}>사상구</Text>
-        <Text style={styles.subLocation}>모라동</Text>
-      </View>
-      <Icon name="sunny" type="ionicon" size={50} color="#FFD700" />
+      {location ? (
+        <Text style={styles.location}>{location}</Text>
+      ) : (
+        <Text style={styles.loading}>Loading...</Text>
+      )}
     </View>
   );
 };
@@ -22,19 +42,15 @@ const styles = StyleSheet.create({
     marginTop: 15,
     flexDirection: 'row',
   },
-  locationContainer: {
-    alignItems: 'flex-end',
-    marginRight: 17,
-  },
   location: {
     fontSize: 22,
     color: '#fff',
     marginTop: 10,
     marginBottom: 7,
   },
-  subLocation: {
-    fontSize: 22,
-    color: '#fff',
+  loading: {
+    fontSize: 18,
+    color: '#999',
   },
 });
 

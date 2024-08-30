@@ -29,7 +29,7 @@ export const sendAccessTokenToBackend = async accessToken => {
   }
 };
 
-export const fetchWeatherData = async memberId => {
+export const fetchWeatherData = async (memberId, accessToken) => {
   try {
     const response = await fetch(
       `http://13.125.128.147:8080/api/v1/main/weather?memberId=${memberId}`,
@@ -37,6 +37,7 @@ export const fetchWeatherData = async memberId => {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
         },
       },
     );
