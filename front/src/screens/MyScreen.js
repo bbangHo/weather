@@ -6,14 +6,31 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const MyScreen = () => {
+const MyScreen = ({setIsNewMember}) => {
+  const [nickname, setNickname] = useState('');
   const [selectedType, setSelectedType] = useState(null);
 
   const handleTypeSelection = type => {
     setSelectedType(type);
+  };
+
+  const handleSaveProfile = () => {
+    if (!nickname) {
+      Alert.alert('닉네임 필요', '닉네임을 입력해주세요.');
+      return;
+    }
+
+    if (!selectedType) {
+      Alert.alert('유형 선택 필요', '유형을 선택해주세요.');
+      return;
+    }
+
+    Alert.alert('저장 완료', '프로필이 저장되었습니다.');
+    setIsNewMember(false);
   };
 
   return (
@@ -30,9 +47,10 @@ const MyScreen = () => {
       <Text style={styles.label}>닉네임</Text>
       <TextInput
         style={styles.input}
-        value="누구누구"
+        value={nickname}
         placeholder="닉네임을 입력하세요"
-        editable={false}
+        onChangeText={setNickname}
+        editable={true}
       />
       <Text style={styles.label}>유형</Text>
       <TouchableOpacity
@@ -77,8 +95,8 @@ const MyScreen = () => {
           추위를 많이 타는 편
         </Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.submitButton}>
-        <Text style={styles.submitButtonText}>수정하기</Text>
+      <TouchableOpacity style={styles.submitButton} onPress={handleSaveProfile}>
+        <Text style={styles.submitButtonText}>저장하기</Text>
       </TouchableOpacity>
     </View>
   );
