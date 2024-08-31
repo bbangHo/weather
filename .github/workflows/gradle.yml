@@ -89,13 +89,13 @@ jobs:
       - name: Build with Gradle Wrapper
         working-directory: back
         env:
-          SPRING_DATASOURCE_URL: ${{ secrets.DB_URL }}
-          SPRING_DATASOURCE_USERNAME: ${{ secrets.DB_USERNAME }}
-          SPRING_DATASOURCE_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          JWT_KEY: ${{ secrets.JWT_KEY }}
-          CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
-          CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET }}
-          SHORT_TERM_FORECAST_API_KEY: ${{ secrets.SHORT_TERM_FORECAST_API_KEY }}
+          spring.datasource.url: ${{ secrets.DB_URL }}
+          spring.datasource.username: ${{ secrets.DB_USERNAME }}
+          spring.datasource.password: ${{ secrets.DB_PASSWORD }}
+          api.weather.service_key: ${{ secrets.SHORT_TERM_FORECAST_API_KEY }}
+          spring.jwt.key: ${{ secrets.JWT_KEY }}
+          spring.sigs.key: ${{ secrets.CONSUMER_KEY }}
+          spring.sigs.secret: ${{ secrets.CONSUMER_SECRET }}
         run: ./gradlew build -i
 
       # Docker 이미지를 빌드
