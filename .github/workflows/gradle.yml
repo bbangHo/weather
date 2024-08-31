@@ -36,25 +36,30 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Set yml value
-        uses: microsoft/variable-substitution@v1
-        with:
-          files: "**/src/main/resources/application.yml"
-        env:
-          spring.datasource.url: ${{ secrets.DB_URL }}
-          spring.datasource.username: ${{ secrets.DB_USERNAME }}
-          spring.datasource.password: ${{ secrets.DB_PASSWORD }}
-          api.weather.service_key: ${{ secrets.SHORT_TERM_FORECAST_API_KEY }}
-          spring.jwt.key: ${{ secrets.JWT_KEY_TEST }}
-          spring.sigs.key: ${{ secrets.CONSUMER_KEY }}
-          spring.sigs.secret: ${{ secrets.CONSUMER_SECRET }}
+#      - name: Set yml value
+#        uses: microsoft/variable-substitution@v1
+#        with:
+#          files: "**/src/main/resources/application.yml"
+#        env:
+#          spring.datasource.url: ${{ secrets.DB_URL }}
+#          spring.datasource.username: ${{ secrets.DB_USERNAME }}
+#          spring.datasource.password: ${{ secrets.DB_PASSWORD }}
+#          api.weather.service_key: ${{ secrets.SHORT_TERM_FORECAST_API_KEY }}
+#          spring.jwt.key: ${{ secrets.JWT_KEY_TEST }}
+#          spring.sigs.key: ${{ secrets.CONSUMER_KEY }}
+#          spring.sigs.secret: ${{ secrets.CONSUMER_SECRET }}
 
-      # Spring Boot 애플리케이션 빌드
-      - name: Grant execute permission for gradlew
-        run: chmod +x back/gradlew
-
+      # Gradle을 사용하여 빌드 실행 (환경 변수 명시적으로 전달)
       - name: Build with Gradle Wrapper
-        working-directory: back   # 해당 디렉토리에서 수행한다.
+        working-directory: back
+        env:
+          DB_URL: ${{ secrets.DB_URL }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          JWT_KEY: ${{ secrets.JWT_KEY }}
+          CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
+          CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET }}
+          SHORT_TERM_FORECAST_API_KEY: ${{ secrets.SHORT_TERM_FORECAST_API_KEY }}
         run: ./gradlew build -i
 
       # **Debugging Step**: Print out application.yml after substitution
@@ -65,7 +70,14 @@ jobs:
       - name: Show back/src/test/application.yml content
         run: cat back/src/test/resources/application.yml
 
-
+#      # Spring Boot 애플리케이션 빌드
+#      - name: Grant execute permission for gradlew
+#        run: chmod +x back/gradlew
+#
+#      - name: Build with Gradle Wrapper
+#        working-directory: back   # 해당 디렉토리에서 수행한다.
+#        run: ./gradlew build -i
+#
 #      # Docker 이미지 빌드
 #      - name: Build Docker image
 #        run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/github-actions-demo ./back
