@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-import static org.pknu.weather.common.TokenConverter.getEmailByToken;
+import static org.pknu.weather.common.converter.TokenConverter.getEmailByToken;
 
 @Slf4j
 @RestController

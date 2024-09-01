@@ -2,7 +2,6 @@ package org.pknu.weather.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.pknu.weather.common.BaseEntity;
 import org.pknu.weather.domain.common.Sensitivity;
 
 import java.util.ArrayList;

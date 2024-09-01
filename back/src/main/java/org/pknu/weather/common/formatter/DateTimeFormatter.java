@@ -1,14 +1,13 @@
-package org.pknu.weather.common;
+package org.pknu.weather.common.formatter;
 
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 
-public final class DateTimeFormaterUtils {
+public final class DateTimeFormatter {
 
     /**
      * post의 생성 시각과 현재와의 차이를 String으로 반환합니다.
@@ -35,12 +34,12 @@ public final class DateTimeFormaterUtils {
      */
     public static String getFormattedDate() {
         LocalDate currentDate = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd");
         return currentDate.format(formatter);
     }
 
     public static String getFormattedDate(LocalDate currentDate) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd");
         return currentDate.format(formatter);
     }
 
@@ -52,7 +51,7 @@ public final class DateTimeFormaterUtils {
      */
     public static String getFormattedTimeByThreeHour() {
         LocalTime currentTime = getClosestTimeToPresent(LocalTime.now());
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HHmm");
+        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("HHmm");
         return currentTime.format(formatter);
     }
 
@@ -63,7 +62,7 @@ public final class DateTimeFormaterUtils {
      */
     public static String getFormattedTimeByOneHour() {
         LocalTime currentTime = LocalTime.now().withMinute(0);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HHmm");
+        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("HHmm");
         return currentTime.format(formatter);
     }
 
@@ -74,7 +73,7 @@ public final class DateTimeFormaterUtils {
      */
     public static String getFormattedTimeByOneHour(LocalTime now) {
         LocalTime currentTime = now.withMinute(0);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HHmm");
+        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("HHmm");
         return currentTime.format(formatter);
     }
 
@@ -87,7 +86,7 @@ public final class DateTimeFormaterUtils {
      */
     public static LocalDateTime formattedDateTime2LocalDateTime(String date, String time) {
         String dateTime = date + time;
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
+        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("yyyyMMddHHmm");
         return LocalDateTime.parse(dateTime, formatter);
     }
 

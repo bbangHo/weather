@@ -1,6 +1,6 @@
 package org.pknu.weather.dto.converter;
 
-import org.pknu.weather.common.WeatherRangeConverter;
+import org.pknu.weather.common.converter.WeatherRangeConverter;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.Weather;

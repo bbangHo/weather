@@ -2,13 +2,9 @@ package org.pknu.weather.dto.converter;
 
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.domain.Location;
-import org.pknu.weather.domain.Member;
-import org.pknu.weather.domain.Post;
-import org.pknu.weather.domain.Tag;
 import org.pknu.weather.dto.LocationDTO;
-import org.pknu.weather.dto.PostRequest;
 
-import static org.pknu.weather.common.GeometryUtils.getPoint;
+import static org.pknu.weather.common.utils.GeometryUtils.getPoint;
 
 @Slf4j
 public class LocationConverter {

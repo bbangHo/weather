@@ -3,14 +3,13 @@ package org.pknu.weather.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
-import org.pknu.weather.common.SgisLocationUtils;
+import org.pknu.weather.common.utils.SgisLocationUtils;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Member;
 import org.pknu.weather.dto.LocationDTO;
 import org.pknu.weather.exception.GeneralException;
 import org.pknu.weather.repository.LocationRepository;
 import org.pknu.weather.repository.MemberRepository;
-import org.pknu.weather.security.util.JWTUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

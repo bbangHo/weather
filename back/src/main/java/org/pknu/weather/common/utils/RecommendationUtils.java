@@ -1,4 +1,4 @@
-package org.pknu.weather.common;
+package org.pknu.weather.common.utils;
 
 import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.Recommendation;

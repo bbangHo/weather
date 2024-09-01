@@ -1,12 +1,12 @@
-package org.pknu.weather.common;
+package org.pknu.weather.common.utils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
-import org.pknu.weather.common.feignClient.SgisClient;
-import org.pknu.weather.common.feignClient.dto.SgisAccessTokenResponseDTO;
-import org.pknu.weather.common.feignClient.dto.SgisLocationResponseDTO;
-import org.pknu.weather.common.feignClient.dto.SgisLocationWithCoorResponseDTO;
+import org.pknu.weather.feignClient.SgisClient;
+import org.pknu.weather.feignClient.dto.SgisAccessTokenResponseDTO;
+import org.pknu.weather.feignClient.dto.SgisLocationResponseDTO;
+import org.pknu.weather.feignClient.dto.SgisLocationWithCoorResponseDTO;
 import org.pknu.weather.dto.LocationDTO;
 import org.pknu.weather.exception.GeneralException;
 import org.springframework.beans.factory.annotation.Value;

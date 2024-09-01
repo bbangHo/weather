@@ -2,7 +2,6 @@ package org.pknu.weather.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.pknu.weather.common.BaseEntity;
 
 @Entity
 @Getter

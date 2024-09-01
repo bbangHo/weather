@@ -1,9 +1,9 @@
-package org.pknu.weather.common.feignClient;
+package org.pknu.weather.feignClient;
 
 
-import org.pknu.weather.common.feignClient.dto.SgisAccessTokenResponseDTO;
-import org.pknu.weather.common.feignClient.dto.SgisLocationResponseDTO;
-import org.pknu.weather.common.feignClient.dto.SgisLocationWithCoorResponseDTO;
+import org.pknu.weather.feignClient.dto.SgisAccessTokenResponseDTO;
+import org.pknu.weather.feignClient.dto.SgisLocationResponseDTO;
+import org.pknu.weather.feignClient.dto.SgisLocationWithCoorResponseDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;

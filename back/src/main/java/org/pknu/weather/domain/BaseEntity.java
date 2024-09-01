@@ -1,4 +1,4 @@
-package org.pknu.weather.common;
+package org.pknu.weather.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

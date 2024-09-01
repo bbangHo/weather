@@ -1,7 +1,8 @@
-package org.pknu.weather.security.oauth;
+package org.pknu.weather.feignClient;
 
 
 import feign.Response;
+import org.pknu.weather.security.dto.KakaoUserResponseDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,8 +16,8 @@ public interface KaKaoLoginClient {
     Response checkKakaoAccessToken(@RequestHeader("Authorization") String accessToken);
 
     @GetMapping("/v2/user/me")
-    KakaoUserResponse getMemberData(@RequestHeader("Authorization") String accessToken,
-                                    @RequestHeader("Content-type") String contentType
+    KakaoUserResponseDTO getMemberData(@RequestHeader("Authorization") String accessToken,
+                                       @RequestHeader("Content-type") String contentType
     );
 
 

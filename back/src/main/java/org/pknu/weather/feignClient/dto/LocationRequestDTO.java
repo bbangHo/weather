@@ -1,4 +1,4 @@
-package org.pknu.weather.common.feignClient.dto;
+package org.pknu.weather.feignClient.dto;
 
 public class LocationRequestDTO {
 

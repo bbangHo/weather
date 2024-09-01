@@ -1,4 +1,4 @@
-package org.pknu.weather.security.oauth;
+package org.pknu.weather.security.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class KakaoUserResponse {
+public class KakaoUserResponseDTO {
 
     private Long id;
     private LocalDateTime connected_at;
