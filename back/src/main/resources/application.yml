@@ -23,6 +23,8 @@ spring:
   sigs:
     key: ${CONSUMER_KEY}
     secret: ${CONSUMER_SECRET}
+  profiles:
+    active: default
 logging:
   level:
     root: debug

@@ -1,10 +1,10 @@
-/*
 package org.pknu.weather.service;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.pknu.weather.common.utils.GeometryUtils;
+import org.pknu.weather.common.GeometryUtils;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.Post;
@@ -48,7 +48,13 @@ class PostQueryServiceTest {
     @BeforeEach
     void init() {
         List<Member> memberList = new ArrayList<>();
+      
+    List<Member> memberList = new ArrayList<>();
+    List<Post> postList = new ArrayList<>();
+    List<Recommendation> recommendationList = new ArrayList<>();
 
+    @BeforeEach
+    void init() {
         for (int i = 1; i <= 30; i++) {
             Location location = Location.builder()
                     .point(GeometryUtils.getPoint(LATITUDE, LONGITUDE))
@@ -79,6 +85,7 @@ class PostQueryServiceTest {
                 .build();
 
         post = postRepository.save(post);
+        postList.add(post);
 
         for (Member m : memberList) {
             Recommendation recommendation = Recommendation.builder()
@@ -87,6 +94,7 @@ class PostQueryServiceTest {
                     .build();
 
             recommendation = recommendationRepository.save(recommendation);
+            recommendationList.add(recommendation);
         }
     }
 
@@ -106,8 +114,8 @@ class PostQueryServiceTest {
 
     @AfterEach
     void tearDown() {
-        recommendationRepository.deleteAll();
-        postRepository.deleteAll();
-        memberRepository.deleteAll();
+        recommendationRepository.deleteAll(recommendationList);
+        postRepository.deleteAll(postList);
+        memberRepository.deleteAll(memberList);
     }
-}*/
+}
