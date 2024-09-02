@@ -5,7 +5,7 @@ import org.pknu.weather.common.utils.GeometryUtils;
 import org.pknu.weather.feignClient.utils.WeatherApiUtils;
 import org.pknu.weather.common.WeatherParamsFactory;
 import org.pknu.weather.domain.Weather;
-import org.pknu.weather.dto.Point;
+import org.pknu.weather.feignClient.dto.PointDTO;
 import org.pknu.weather.dto.WeatherApiResponse;
 import org.pknu.weather.dto.WeatherParams;
 import org.pknu.weather.dto.WeatherApiResponse.Response.Body.Items.Item;
@@ -34,10 +34,10 @@ public interface WeatherFeignClient {
      * @return now ~ 24 시간의 Wether 엔티티를 담고있는 map
      */
     default Map<String, Weather> preprocess(Float lon, Float lat) {
-        Point point = GeometryUtils.coordinateToPoint(lon, lat);
+        PointDTO pointDTO = GeometryUtils.coordinateToPoint(lon, lat);
         String date = DateTimeFormatter.getFormattedDate();
         String time = DateTimeFormatter.getFormattedTimeByThreeHour();
-        WeatherParams weatherParams = WeatherParamsFactory.create(date, time, point);
+        WeatherParams weatherParams = WeatherParamsFactory.create(date, time, pointDTO);
 
         WeatherApiResponse weatherApiResponse = getVillageShortTermForecast(weatherParams);
         List<Item> itemList = weatherApiResponse.getResponse().getBody().getItems().getItemList();
