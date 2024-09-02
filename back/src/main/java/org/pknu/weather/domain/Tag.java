@@ -1,4 +1,5 @@
 package org.pknu.weather.domain;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.pknu.weather.domain.tag.*;

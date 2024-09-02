@@ -20,10 +20,12 @@ public final class DateTimeFormatter {
         LocalDateTime comparison = createdAt;
         Duration diff = Duration.between(createdAt, now);
 
-        if (comparison.plusHours(1).isBefore(now)) {
-            return diff.toMinutes() + "분 전";
+        if(comparison.plusDays(1).isBefore(now)) {
+            return diff.toDays() + "일 전";
+        } else if (comparison.plusHours(1).isBefore(now)) {
+                return diff.toHours() + "시간 전";
         } else {
-            return diff.toHours() + "시간 전";
+            return diff.toMinutes() + "분 전";
         }
     }
 
