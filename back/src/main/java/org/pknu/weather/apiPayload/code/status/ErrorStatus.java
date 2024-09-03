@@ -17,11 +17,32 @@ public enum ErrorStatus implements BaseErrorCode {
     _UNAUTHORIZED(HttpStatus.UNAUTHORIZED,"COMMON_401","인증이 필요합니다."),
     _FORBIDDEN(HttpStatus.FORBIDDEN, "COMMON_403", "금지된 요청입니다."),
 
+    //Token
+    ACCESS_TOKEN_NOT_ACCEPTED(HttpStatus.UNAUTHORIZED, "Jwt_401_1", "Access Token이 존재하지 않습니다."),
+    ACCESS_TOKEN_BADTYPE(HttpStatus.UNAUTHORIZED, "Jwt_401_2", "Access Token의 타입이 bearer가 아닙니다."),
+    MALFORMED_ACCESS_TOKEN(HttpStatus.FORBIDDEN, "JWT_401_3", "Access Token의 값이 올바르게 설정되지 않았습니다. "),
+    BAD_SIGNED_ACCESS_TOKEN(HttpStatus.FORBIDDEN, "JWT_401_4", "Access Token의 서명이 올바르지 않습니다."),
+    EXPIRED_ACCESS_TOKEN(HttpStatus.FORBIDDEN, "JWT_401_5", "Access Token이 만료되었습니다."),
+    MALFORMED_REFRESH_TOKEN(HttpStatus.FORBIDDEN, "JWT_401_7", "Refresh Token의 값이 올바르게 설정되지 않았습니다. "),
+    EXPIRED_REFRESH_TOKEN(HttpStatus.FORBIDDEN, "JWT_401_8", "Refresh Token이 만료되었습니다."),
+    TOKENS_NOT_ACCEPTED(HttpStatus.UNAUTHORIZED, "Jwt_401_9", "Access Token과 refresh Token이 존재하지 않습니다."),
+
+    //KaKaoAccessTokenException
+    KAKAO_SERVER_ERROR(HttpStatus.BAD_REQUEST, "Kakao_400_1", "카카오 서버의 일시적인 장애입니다."),
+    KAKAO_ACCESS_TOKEN_BAT_TYPE(HttpStatus.BAD_REQUEST, "Kakao_400_2", "주어진 액세스 토큰 정보가 잘못된 형식입니다."),
+    MALFORMED_KAKAO_ACCESS_TOKEN(HttpStatus.FORBIDDEN, "Kakao_401_3", "토큰 값이 유효하지 않습니다."),
+
     // location
     _LOCATION_NOT_FOUND(HttpStatus.NOT_FOUND, "LOCATION_404_1", "존재하지 않는 지역입니다. 범위에 해당하는 위도와 경도 값을 입력하세요 "),
 
     // member
     _MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER_404_1", "사용자를 찾을 수 없습니다."),
+    _MEMBER_NOT_FOUND_LOCATION(HttpStatus.NOT_FOUND, "MEMBER_404_2", "사용자의 기본 주소지가 설정되어 있지 않습니다."),
+
+    //sigs
+    _SGIS_BAD_AUTHENTICATION_PARAMETER(HttpStatus.UNAUTHORIZED,"SGIS_401_1", "sigs토큰을 얻기 위한 인증 정보가 잘못 설정되어 있습니다. 서버 관리자에게 문의 바랍니다."),
+    _SGIS_NOT_FOUND_RESULT(HttpStatus.BAD_REQUEST,"SGIS_400_2", "sigs토큰을 검색 결과가 없습니다. 서버 관리자에게 문의 바랍니다.")
+
     ;
 
 
