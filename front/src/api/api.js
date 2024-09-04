@@ -108,3 +108,30 @@ export const sendLocationToBackend = async (
     throw error;
   }
 };
+
+export const createPost = async (postData, accessToken, memberId) => {
+  const url = `${BASE_URL}/api/v1/post?memberId=${memberId}`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(postData),
+    });
+
+    if (!response.ok) {
+      const errorResponse = await response.json();
+      console.error('Failed to create post:', response.status, errorResponse);
+      throw new Error('Failed to create post');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error creating post:', error);
+    throw error;
+  }
+};

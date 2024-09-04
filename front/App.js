@@ -13,12 +13,20 @@ import {StatusBar, Button} from 'react-native';
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-const HomeStack = ({accessToken}) => (
+const HomeStack = ({accessToken, memberId}) => (
   <Stack.Navigator screenOptions={{headerShown: false}}>
     <Stack.Screen name="Home">
       {props => <HomeScreen {...props} accessToken={accessToken} />}
     </Stack.Screen>
-    <Stack.Screen name="PostCreationScreen" component={PostCreationScreen} />
+    <Stack.Screen name="PostCreationScreen">
+      {props => (
+        <PostCreationScreen
+          {...props}
+          accessToken={accessToken}
+          memberId={memberId}
+        />
+      )}
+    </Stack.Screen>
   </Stack.Navigator>
 );
 
@@ -26,6 +34,7 @@ const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [accessToken, setAccessToken] = useState(null);
   const [isNewMember, setIsNewMember] = useState(false);
+  const [memberId] = useState(1); // 임의로 설정된 memberId
 
   return (
     <>
@@ -55,7 +64,13 @@ const App = () => {
                   ),
                   tabBarLabel: 'Home',
                 }}>
-                {props => <HomeStack {...props} accessToken={accessToken} />}
+                {props => (
+                  <HomeStack
+                    {...props}
+                    accessToken={accessToken}
+                    memberId={memberId}
+                  />
+                )}
               </Tab.Screen>
               <Tab.Screen
                 name="My"
