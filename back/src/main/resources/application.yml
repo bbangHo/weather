@@ -3,7 +3,7 @@ spring:
     init:
       mode: never
   datasource:
-    url: jdbc:mysql://${DB_URL}/weather?serverTimezone=UTC&characterEncoding=UTF-8
+    url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -18,23 +18,26 @@ spring:
     hibernate:
       ddl-auto: none
     open-in-view: false   # osiv 설정
+  jwt:
+    key: ${JWT_KEY}
+  sigs:
+    key: ${CONSUMER_KEY}
+    secret: ${CONSUMER_SECRET}
+  profiles:
+    active: default
 logging:
   level:
-    org:
-      hibernate:
-        type:
-          descriptor:
-            sql: TRACE
-        sql: DEBUG
-      springframework:
-        transaction: debug
     root: debug
-  file:
-    name: log_file
+log:
+  config:
+    path: /customLog
+    filename: custom
+
 api:
   weather:
     service_key: ${SHORT_TERM_FORECAST_API_KEY}
     data_type: JSON
+
 management:
   health:
     db:

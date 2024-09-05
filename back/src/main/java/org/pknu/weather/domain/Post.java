@@ -1,7 +1,10 @@
 package org.pknu.weather.domain;
+
 import jakarta.persistence.*;
 import lombok.*;
-import org.pknu.weather.common.BaseEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -29,4 +32,6 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+    private List<Recommendation> recommendationList = new ArrayList<>();
 }
