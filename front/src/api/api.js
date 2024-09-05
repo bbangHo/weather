@@ -135,3 +135,36 @@ export const createPost = async (postData, accessToken, memberId) => {
     throw error;
   }
 };
+
+export const fetchPosts = async (
+  accessToken,
+  memberId,
+  lastPostId = 1,
+  size = 10,
+) => {
+  try {
+    const url = `${BASE_URL}/api/v1/community/posts?memberId=${memberId}&size=${size}${
+      lastPostId ? `&lastPostId=${lastPostId}` : ''
+    }`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorResponse = await response.json();
+      console.error('Failed to fetch posts:', response.status, errorResponse);
+      throw new Error('Failed to fetch posts');
+    }
+
+    const data = await response.json();
+    return data.result.postList;
+  } catch (error) {
+    console.error('Error fetching posts:', error);
+    throw error;
+  }
+};
