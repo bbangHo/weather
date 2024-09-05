@@ -16,6 +16,14 @@ public class Tag extends BaseEntity {
     @Column(name = "tag_id")
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id")
+    private Post post;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "location_id")
+    private Location location;
+
     @Enumerated(EnumType.STRING)
     private TemperatureTag temperTag;
 
