@@ -168,3 +168,29 @@ export const fetchPosts = async (
     throw error;
   }
 };
+
+export const toggleLikePost = async (accessToken, memberId, postId) => {
+  try {
+    const url = `${BASE_URL}/api/v1/post/recommendation?memberId=${memberId}&postId=${postId}`;
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorResponse = await response.json();
+      console.error('Failed to like post:', response.status, errorResponse);
+      throw new Error('Failed to like post');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error liking post:', error);
+    throw error;
+  }
+};

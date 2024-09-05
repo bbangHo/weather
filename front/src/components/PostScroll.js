@@ -1,9 +1,17 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList, Text, View, StyleSheet, Image, Alert} from 'react-native';
+import {
+  FlatList,
+  Text,
+  View,
+  StyleSheet,
+  Image,
+  Alert,
+  TouchableOpacity,
+} from 'react-native';
 import {Card} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
 import globalStyles from '../globalStyles';
-import {fetchPosts} from '../api/api';
+import {fetchPosts, toggleLikePost} from '../api/api';
 
 const PostScroll = ({accessToken, memberId}) => {
   const [posts, setPosts] = useState([]);
@@ -33,6 +41,38 @@ const PostScroll = ({accessToken, memberId}) => {
     }
   };
 
+  const handleLikePress = async postId => {
+    console.log('Like button pressed for postId:', postId);
+    try {
+      const response = await toggleLikePost(accessToken, memberId, postId);
+      console.log('Like post response:', response);
+      if (response.isSuccess) {
+        setPosts(prevPosts =>
+          prevPosts.map(post =>
+            post.postInfo.postId === postId
+              ? {
+                  ...post,
+                  postInfo: {
+                    ...post.postInfo,
+                    likeClickable: false,
+                    likeCount: post.postInfo.likeCount + 1,
+                  },
+                }
+              : post,
+          ),
+        );
+      } else {
+        Alert.alert('Error', '좋아요를 할 수 없습니다. 다시 시도해주세요.');
+      }
+    } catch (error) {
+      console.error('Failed to like post:', error.message);
+      Alert.alert(
+        'Error',
+        '서버에 문제가 발생했습니다. 나중에 다시 시도해주세요.',
+      );
+    }
+  };
+
   const renderPost = ({item}) => (
     <View style={styles.section}>
       <Card containerStyle={[styles.card, globalStyles.transparentBackground]}>
@@ -45,9 +85,7 @@ const PostScroll = ({accessToken, memberId}) => {
                   : require('../../assets/images/profile.png')
               }
               style={styles.profileImage}
-              onError={e => {
-                e.target.src = require('../../assets/images/profile.png');
-              }}
+              onError={() => {}}
             />
             <View style={styles.userInfo}>
               <View style={styles.userRow}>
@@ -64,7 +102,9 @@ const PostScroll = ({accessToken, memberId}) => {
               <Text style={styles.timeAgo}>{item.postInfo.createdAt}</Text>
             </View>
           </View>
-          <View style={styles.likeContainer}>
+          <TouchableOpacity
+            style={styles.likeContainer}
+            onPress={() => handleLikePress(item.postInfo.postId)}>
             <Icon
               name={item.postInfo.likeClickable ? 'heart-outline' : 'heart'}
               size={20}
@@ -72,7 +112,7 @@ const PostScroll = ({accessToken, memberId}) => {
               style={styles.likeIcon}
             />
             <Text style={styles.likeCount}>{item.postInfo.likeCount}</Text>
-          </View>
+          </TouchableOpacity>
         </View>
         <Text style={styles.content}>{item.postInfo.content}</Text>
       </Card>
