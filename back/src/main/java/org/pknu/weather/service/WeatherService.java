@@ -2,7 +2,7 @@ package org.pknu.weather.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.pknu.weather.common.*;
+import org.pknu.weather.feignClient.WeatherFeignClient;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.Weather;
