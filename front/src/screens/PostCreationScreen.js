@@ -18,7 +18,7 @@ const PostCreationScreen = ({navigation, accessToken, memberId}) => {
   const [description, setDescription] = useState('');
 
   const handleTagPress = (type, index) => {
-    const tagCode = index + 1;
+    const tagCode = index;
     switch (type) {
       case 'temperature':
         setTemperature(tagCode);
@@ -89,15 +89,12 @@ const PostCreationScreen = ({navigation, accessToken, memberId}) => {
           ].map((item, index) => (
             <TouchableOpacity
               key={item}
-              style={[
-                styles.tag,
-                temperature === index + 1 && styles.selectedTag,
-              ]}
+              style={[styles.tag, temperature === index && styles.selectedTag]}
               onPress={() => handleTagPress('temperature', index)}>
               <Text
                 style={[
                   styles.tagText,
-                  temperature === index + 1 && styles.selectedTagText,
+                  temperature === index && styles.selectedTagText,
                 ]}>
                 {item}
               </Text>
@@ -112,15 +109,12 @@ const PostCreationScreen = ({navigation, accessToken, memberId}) => {
             (item, index) => (
               <TouchableOpacity
                 key={item}
-                style={[
-                  styles.tag,
-                  weather === index + 1 && styles.selectedTag,
-                ]}
+                style={[styles.tag, weather === index && styles.selectedTag]}
                 onPress={() => handleTagPress('weather', index)}>
                 <Text
                   style={[
                     styles.tagText,
-                    weather === index + 1 && styles.selectedTagText,
+                    weather === index && styles.selectedTagText,
                   ]}>
                   {item}
                 </Text>
@@ -136,15 +130,12 @@ const PostCreationScreen = ({navigation, accessToken, memberId}) => {
             (item, index) => (
               <TouchableOpacity
                 key={item}
-                style={[
-                  styles.tag,
-                  humidity === index + 1 && styles.selectedTag,
-                ]}
+                style={[styles.tag, humidity === index && styles.selectedTag]}
                 onPress={() => handleTagPress('humidity', index)}>
                 <Text
                   style={[
                     styles.tagText,
-                    humidity === index + 1 && styles.selectedTagText,
+                    humidity === index && styles.selectedTagText,
                   ]}>
                   {item}
                 </Text>
@@ -159,12 +150,12 @@ const PostCreationScreen = ({navigation, accessToken, memberId}) => {
           {['안 불어요', '조금 불어요', '많이 불어요'].map((item, index) => (
             <TouchableOpacity
               key={item}
-              style={[styles.tag, wind === index + 1 && styles.selectedTag]}
+              style={[styles.tag, wind === index && styles.selectedTag]}
               onPress={() => handleTagPress('wind', index)}>
               <Text
                 style={[
                   styles.tagText,
-                  wind === index + 1 && styles.selectedTagText,
+                  wind === index && styles.selectedTagText,
                 ]}>
                 {item}
               </Text>
@@ -179,15 +170,12 @@ const PostCreationScreen = ({navigation, accessToken, memberId}) => {
             (item, index) => (
               <TouchableOpacity
                 key={item}
-                style={[
-                  styles.tag,
-                  airQuality === index + 1 && styles.selectedTag,
-                ]}
+                style={[styles.tag, airQuality === index && styles.selectedTag]}
                 onPress={() => handleTagPress('airQuality', index)}>
                 <Text
                   style={[
                     styles.tagText,
-                    airQuality === index + 1 && styles.selectedTagText,
+                    airQuality === index && styles.selectedTagText,
                   ]}>
                   {item}
                 </Text>

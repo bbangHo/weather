@@ -34,7 +34,7 @@ const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [accessToken, setAccessToken] = useState(null);
   const [isNewMember, setIsNewMember] = useState(false);
-  const [memberId] = useState(1); // 임의로 설정된 memberId
+  const [memberId] = useState(1);
 
   return (
     <>
@@ -53,7 +53,11 @@ const App = () => {
                   ),
                 }}>
                 {props => (
-                  <CommunityScreen {...props} accessToken={accessToken} />
+                  <CommunityScreen
+                    {...props}
+                    accessToken={accessToken}
+                    memberId={memberId}
+                  />
                 )}
               </Tab.Screen>
               <Tab.Screen
