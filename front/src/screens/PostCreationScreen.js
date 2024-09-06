@@ -5,9 +5,11 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
+  ScrollView,
 } from 'react-native';
+import {createPost} from '../api/api';
 
-const PostCreationScreen = ({navigation}) => {
+const PostCreationScreen = ({navigation, accessToken, memberId}) => {
   const [temperature, setTemperature] = useState(null);
   const [weather, setWeather] = useState(null);
   const [humidity, setHumidity] = useState(null);
@@ -15,30 +17,53 @@ const PostCreationScreen = ({navigation}) => {
   const [airQuality, setAirQuality] = useState(null);
   const [description, setDescription] = useState('');
 
-  const handleTagPress = (type, value) => {
+  const handleTagPress = (type, index) => {
+    const tagCode = index;
     switch (type) {
       case 'temperature':
-        setTemperature(value);
+        setTemperature(tagCode);
         break;
       case 'weather':
-        setWeather(value);
+        setWeather(tagCode);
         break;
       case 'humidity':
-        setHumidity(value);
+        setHumidity(tagCode);
         break;
       case 'wind':
-        setWind(value);
+        setWind(tagCode);
         break;
       case 'airQuality':
-        setAirQuality(value);
+        setAirQuality(tagCode);
         break;
       default:
         break;
     }
   };
 
+  const handleSubmit = async () => {
+    const postData = {
+      content: description,
+      temperatureTagCode: temperature,
+      skyTagCode: weather,
+      humidityTagCode: humidity,
+      windTagCode: wind,
+      dustTagCode: airQuality,
+    };
+
+    try {
+      const response = await createPost(postData, accessToken, memberId);
+      console.log('Post created successfully:', response);
+      navigation.navigate('Home');
+    } catch (error) {
+      console.error('Failed to create post:', error.message);
+      console.error('Error details:', error);
+    }
+  };
+
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}>
       <TextInput
         style={styles.textInput}
         placeholder="현재 날씨가 어떤지, 오늘 입은 옷 등을 공유해 주세요"
@@ -50,15 +75,26 @@ const PostCreationScreen = ({navigation}) => {
       <View style={styles.section}>
         <Text style={styles.label}>온도는 어떤가요?</Text>
         <View style={styles.tagContainer}>
-          {['더움', '조금 더움'].map(item => (
+          {[
+            '추움',
+            '추움?',
+            '조금 추움',
+            '선선',
+            '보통',
+            '따뜻',
+            '조금 따뜻',
+            '조금 더움',
+            '더움',
+            '매우 더움',
+          ].map((item, index) => (
             <TouchableOpacity
               key={item}
-              style={[styles.tag, temperature === item && styles.selectedTag]}
-              onPress={() => handleTagPress('temperature', item)}>
+              style={[styles.tag, temperature === index && styles.selectedTag]}
+              onPress={() => handleTagPress('temperature', index)}>
               <Text
                 style={[
                   styles.tagText,
-                  temperature === item && styles.selectedTagText,
+                  temperature === index && styles.selectedTagText,
                 ]}>
                 {item}
               </Text>
@@ -69,53 +105,57 @@ const PostCreationScreen = ({navigation}) => {
       <View style={styles.section}>
         <Text style={styles.label}>날씨는 어떤가요?</Text>
         <View style={styles.tagContainer}>
-          {['비와요', '흐려요', '구름이 많아요', '화창해요'].map(item => (
-            <TouchableOpacity
-              key={item}
-              style={[styles.tag, weather === item && styles.selectedTag]}
-              onPress={() => handleTagPress('weather', item)}>
-              <Text
-                style={[
-                  styles.tagText,
-                  weather === item && styles.selectedTagText,
-                ]}>
-                {item}
-              </Text>
-            </TouchableOpacity>
-          ))}
+          {['비와요', '흐려요', '맑고 구름이 많아요', '맑아요', '화창해요'].map(
+            (item, index) => (
+              <TouchableOpacity
+                key={item}
+                style={[styles.tag, weather === index && styles.selectedTag]}
+                onPress={() => handleTagPress('weather', index)}>
+                <Text
+                  style={[
+                    styles.tagText,
+                    weather === index && styles.selectedTagText,
+                  ]}>
+                  {item}
+                </Text>
+              </TouchableOpacity>
+            ),
+          )}
         </View>
       </View>
       <View style={styles.section}>
         <Text style={styles.label}>습한가요?</Text>
         <View style={styles.tagContainer}>
-          {['습함', '조금 습함', '꽉꽉함', '습하지 않음'].map(item => (
-            <TouchableOpacity
-              key={item}
-              style={[styles.tag, humidity === item && styles.selectedTag]}
-              onPress={() => handleTagPress('humidity', item)}>
-              <Text
-                style={[
-                  styles.tagText,
-                  humidity === item && styles.selectedTagText,
-                ]}>
-                {item}
-              </Text>
-            </TouchableOpacity>
-          ))}
+          {['건조함', '보통', '약간 습함', '습함', '매우 습함'].map(
+            (item, index) => (
+              <TouchableOpacity
+                key={item}
+                style={[styles.tag, humidity === index && styles.selectedTag]}
+                onPress={() => handleTagPress('humidity', index)}>
+                <Text
+                  style={[
+                    styles.tagText,
+                    humidity === index && styles.selectedTagText,
+                  ]}>
+                  {item}
+                </Text>
+              </TouchableOpacity>
+            ),
+          )}
         </View>
       </View>
       <View style={styles.section}>
         <Text style={styles.label}>바람은 어떤가요?</Text>
         <View style={styles.tagContainer}>
-          {['많이 불어요', '조금 불어요', '안불어요'].map(item => (
+          {['안 불어요', '조금 불어요', '많이 불어요'].map((item, index) => (
             <TouchableOpacity
               key={item}
-              style={[styles.tag, wind === item && styles.selectedTag]}
-              onPress={() => handleTagPress('wind', item)}>
+              style={[styles.tag, wind === index && styles.selectedTag]}
+              onPress={() => handleTagPress('wind', index)}>
               <Text
                 style={[
                   styles.tagText,
-                  wind === item && styles.selectedTagText,
+                  wind === index && styles.selectedTagText,
                 ]}>
                 {item}
               </Text>
@@ -126,35 +166,40 @@ const PostCreationScreen = ({navigation}) => {
       <View style={styles.section}>
         <Text style={styles.label}>미세먼지는 어떤가요?</Text>
         <View style={styles.tagContainer}>
-          {['안좋아요', '많이 안좋아요', '좋아요'].map(item => (
-            <TouchableOpacity
-              key={item}
-              style={[styles.tag, airQuality === item && styles.selectedTag]}
-              onPress={() => handleTagPress('airQuality', item)}>
-              <Text
-                style={[
-                  styles.tagText,
-                  airQuality === item && styles.selectedTagText,
-                ]}>
-                {item}
-              </Text>
-            </TouchableOpacity>
-          ))}
+          {['매우 좋음', '좋음', '보통', '약간 나쁨', '매우 나쁨'].map(
+            (item, index) => (
+              <TouchableOpacity
+                key={item}
+                style={[styles.tag, airQuality === index && styles.selectedTag]}
+                onPress={() => handleTagPress('airQuality', index)}>
+                <Text
+                  style={[
+                    styles.tagText,
+                    airQuality === index && styles.selectedTagText,
+                  ]}>
+                  {item}
+                </Text>
+              </TouchableOpacity>
+            ),
+          )}
         </View>
       </View>
-      <TouchableOpacity style={styles.shareButton} onPress={() => {}}>
+      <TouchableOpacity style={styles.shareButton} onPress={handleSubmit}>
         <Text style={styles.shareButtonText}>공유하기</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
     backgroundColor: '#fff',
-    paddingTop: 60,
+  },
+  contentContainer: {
+    padding: 16,
+    paddingBottom: 30,
+    paddingTop: 50,
   },
   textInput: {
     height: 100,

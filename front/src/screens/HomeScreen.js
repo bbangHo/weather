@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {ScrollView, View, StyleSheet, StatusBar} from 'react-native';
+import React from 'react';
+import {ScrollView, View, StyleSheet, StatusBar, Text} from 'react-native';
 import {PanGestureHandler, State} from 'react-native-gesture-handler';
 import ToggleViewButton from '../components/ToggleViewButton';
 import WeatherInfoSlider from '../components/WeatherInfoSlider';
@@ -11,8 +11,7 @@ import AirQuality from '../components/AirQuality';
 import WeatherGraph from '../components/WeatherGraph';
 import {useNavigation} from '@react-navigation/native';
 
-const HomeScreen = () => {
-  // const [showText, setShowText] = useState(true);
+const HomeScreen = ({accessToken}) => {
   const navigation = useNavigation();
 
   const handleGesture = event => {
@@ -36,8 +35,8 @@ const HomeScreen = () => {
         <View style={styles.topContainer}>
           <WeatherInfoSlider />
           <View style={styles.rightContainer}>
-            <CurrentLocation />
-            <TemperatureInfo />
+            <CurrentLocation accessToken={accessToken} />
+            <TemperatureInfo accessToken={accessToken} />
             <ToggleViewButton />
           </View>
         </View>

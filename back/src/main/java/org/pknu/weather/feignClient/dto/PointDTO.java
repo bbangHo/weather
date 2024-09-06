@@ -1,4 +1,4 @@
-package org.pknu.weather.dto;
+package org.pknu.weather.feignClient.dto;
 
 
 import lombok.AccessLevel;
@@ -11,7 +11,7 @@ import java.util.Objects;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Point {
+public class PointDTO {
     private Integer x;
     private Integer y;
 
@@ -19,8 +19,8 @@ public class Point {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
-        Point point = (Point) obj;
-        return Objects.equals(getX(), point.getX()) && Objects.equals(getY(), point.getY());
+        PointDTO pointDTO = (PointDTO) obj;
+        return Objects.equals(getX(), pointDTO.getX()) && Objects.equals(getY(), pointDTO.getY());
     }
 
     @Override
