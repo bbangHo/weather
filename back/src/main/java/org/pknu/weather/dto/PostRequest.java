@@ -20,24 +20,24 @@ public class PostRequest {
         @Size(max = 300)    // TODO: 최대 size 정해야함
         private String content;
 
-        @Min(value = 0, message = "temperatureTagCode 는 0 ~ 9 사이의 값이어야 합니다.")
-        @Max(value = 9, message = "temperatureTagCode 는 0 ~ 9 사이의 값이어야 합니다.")
+        @Min(value = 1, message = "temperatureTagCode 는 1 ~ 10 사이의 값이어야 합니다.")
+        @Max(value = 10, message = "temperatureTagCode 는 1 ~ 10 사이의 값이어야 합니다.")
         private Integer temperatureTagCode;
 
-        @Min(value = 0, message = "skyTagCode 는 0 ~ 4 사이의 값이어야 합니다.")
-        @Max(value = 4, message = "skyTagCode 는 0 ~ 4 사이의 값이어야 합니다.")
+        @Min(value = 1, message = "skyTagCode 는 1 ~ 5 사이의 값이어야 합니다.")
+        @Max(value = 5, message = "skyTagCode 는 1 ~ 5 사이의 값이어야 합니다.")
         private Integer skyTagCode;
 
-        @Min(value = 0, message = "humidityTagCode 는 0 ~ 4 사이의 값이어야 합니다.")
-        @Max(value = 4, message = "humidityTagCode 는 0 ~ 4 사이의 값이어야 합니다.")
+        @Min(value = 1, message = "humidityTagCode 는 1 ~ 5 사이의 값이어야 합니다.")
+        @Max(value = 5, message = "humidityTagCode 는 1 ~ 5 사이의 값이어야 합니다.")
         private Integer humidityTagCode;
 
-        @Min(value = 0, message = "windTagCode 는 0 ~ 2 사이의 값이어야 합니다.")
-        @Max(value = 2, message = "windTagCode 는 0 ~ 2 사이의 값이어야 합니다.")
+        @Min(value = 1, message = "windTagCode 는 1 ~ 3 사이의 값이어야 합니다.")
+        @Max(value = 3, message = "windTagCode 는 1 ~ 3 사이의 값이어야 합니다.")
         private Integer windTagCode;
 
-        @Min(value = 0, message = "dustTagCode 는 0 ~ 4 사이의 값이어야 합니다.")
-        @Max(value = 4, message = "dustTagCode 는 0 ~ 4 사이의 값이어야 합니다.")
+        @Min(value = 1, message = "dustTagCode 는 1 ~ 5 사이의 값이어야 합니다.")
+        @Max(value = 5, message = "dustTagCode 는 1 ~ 5 사이의 값이어야 합니다.")
         private Integer dustTagCode;
     }
 
