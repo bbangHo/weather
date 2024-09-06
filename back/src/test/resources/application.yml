@@ -26,10 +26,6 @@ spring:
 logging:
   level:
     root: debug
-log:
-  config:
-    path: /customLog
-    filename: custom
 
 api:
   weather:

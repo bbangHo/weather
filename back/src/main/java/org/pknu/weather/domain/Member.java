@@ -1,8 +1,11 @@
 package org.pknu.weather.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.pknu.weather.domain.common.Sensitivity;
+import org.pknu.weather.dto.MemberJoinDTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,12 +26,17 @@ public class Member extends BaseEntity {
     private String email;
 
     @Enumerated(EnumType.STRING)
+    @ColumnDefault("NONE")
     private Sensitivity sensitivity;
 
     @Column(unique = true)
     private String nickname;
 
+    @ColumnDefault("https://weather-pknu-bucket.s3.ap-northeast-2.amazonaws.com/basic.png")
     private String profileImage;
+
+    @ColumnDefault("basic.png")
+    private String profileImageName;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "location_id")
@@ -40,5 +48,11 @@ public class Member extends BaseEntity {
 
     public void changeLocation(Location location){
         this.location = location;
+    }
+    public void setMemberInfo(MemberJoinDTO memberJoinDTO){
+        this.nickname = memberJoinDTO.getNickname();
+        this.sensitivity = memberJoinDTO.getSensitivity();
+        this.profileImage = memberJoinDTO.getImgPath();
+        this.profileImageName = memberJoinDTO.getImgName();
     }
 }
