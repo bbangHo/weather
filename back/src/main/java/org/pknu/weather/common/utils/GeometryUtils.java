@@ -7,6 +7,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
+import org.pknu.weather.feignClient.dto.PointDTO;
 
 public final class GeometryUtils {
 
@@ -30,11 +31,11 @@ public final class GeometryUtils {
      * @param lat 위도(degree)
      * @return 격자 좌표 x, y 를 가진 Point 객체
      */
-    public static org.pknu.weather.dto.Point coordinateToPoint(double lon, double lat) {
+    public static PointDTO coordinateToPoint(double lon, double lat) {
         double[] result = lamcProj(lon, lat, 0, 0, 0);
         int x = (int) (result[0] + 1.5);
         int y = (int) (result[1] + 1.5);
-        return new org.pknu.weather.dto.Point(x, y);
+        return new PointDTO(x, y);
     }
 
     /**

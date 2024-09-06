@@ -38,10 +38,10 @@ public class ApiResponse<T> {
 
     public static <T> ApiResponse<T> of(boolean isSuccess) {
         if(isSuccess) {
-            return new ApiResponse<>(isSuccess, SuccessStatus._OK.getCode(), SuccessStatus._OK.getMessage(), null);
+            return new ApiResponse<>(true, SuccessStatus._OK.getCode(), SuccessStatus._OK.getMessage(), null);
         }
 
-        return new ApiResponse<>(isSuccess, SuccessStatus._BAD_REQUEST.getCode(), SuccessStatus._BAD_REQUEST.getMessage(), null);
+        return new ApiResponse<>(false, SuccessStatus._BAD_REQUEST.getCode(), SuccessStatus._BAD_REQUEST.getMessage(), null);
     }
 
     public static <T> ApiResponse<T> onFailure(String code, String message, T data) {

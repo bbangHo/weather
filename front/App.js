@@ -13,10 +13,20 @@ import {StatusBar, Button} from 'react-native';
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-const HomeStack = () => (
+const HomeStack = ({accessToken, memberId}) => (
   <Stack.Navigator screenOptions={{headerShown: false}}>
-    <Stack.Screen name="Home" component={HomeScreen} />
-    <Stack.Screen name="PostCreationScreen" component={PostCreationScreen} />
+    <Stack.Screen name="Home">
+      {props => <HomeScreen {...props} accessToken={accessToken} />}
+    </Stack.Screen>
+    <Stack.Screen name="PostCreationScreen">
+      {props => (
+        <PostCreationScreen
+          {...props}
+          accessToken={accessToken}
+          memberId={memberId}
+        />
+      )}
+    </Stack.Screen>
   </Stack.Navigator>
 );
 
@@ -24,6 +34,7 @@ const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [accessToken, setAccessToken] = useState(null);
   const [isNewMember, setIsNewMember] = useState(false);
+  const [memberId] = useState(1);
 
   return (
     <>
@@ -36,23 +47,35 @@ const App = () => {
             <Tab.Navigator screenOptions={{headerShown: false}}>
               <Tab.Screen
                 name="Community"
-                component={CommunityScreen}
                 options={{
                   tabBarIcon: ({color, size}) => (
                     <Icon name="people" color={color} size={size} />
                   ),
-                }}
-              />
+                }}>
+                {props => (
+                  <CommunityScreen
+                    {...props}
+                    accessToken={accessToken}
+                    memberId={memberId}
+                  />
+                )}
+              </Tab.Screen>
               <Tab.Screen
                 name="HomeStack"
-                component={HomeStack}
                 options={{
                   tabBarIcon: ({color, size}) => (
                     <Icon name="home" color={color} size={size} />
                   ),
                   tabBarLabel: 'Home',
-                }}
-              />
+                }}>
+                {props => (
+                  <HomeStack
+                    {...props}
+                    accessToken={accessToken}
+                    memberId={memberId}
+                  />
+                )}
+              </Tab.Screen>
               <Tab.Screen
                 name="My"
                 component={MyScreen}
