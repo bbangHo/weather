@@ -6,9 +6,8 @@ import PostScroll from '../components/PostScroll';
 import WeatherShareButton from '../components/WeatherShareButton';
 import {fetchWeatherData} from '../api/api';
 
-const CommunityScreen = ({accessToken}) => {
+const CommunityScreen = ({accessToken, memberId}) => {
   const [weatherData, setWeatherData] = useState(null);
-  const memberId = 1;
 
   useEffect(() => {
     const getWeatherData = async () => {
@@ -25,7 +24,7 @@ const CommunityScreen = ({accessToken}) => {
     };
 
     getWeatherData();
-  }, [accessToken]);
+  }, [accessToken, memberId]);
 
   return (
     <View style={styles.container}>
@@ -41,7 +40,7 @@ const CommunityScreen = ({accessToken}) => {
       <Text style={styles.text}>
         ‘추위를 많이 타는’ 유형이 가장 많이 공감했어요
       </Text>
-      <PostScroll />
+      <PostScroll accessToken={accessToken} memberId={memberId} />
     </View>
   );
 };
