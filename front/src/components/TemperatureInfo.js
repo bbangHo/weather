@@ -12,6 +12,19 @@ const TemperatureInfo = ({accessToken}) => {
         const weatherData = await fetchWeatherData(memberId, accessToken);
         if (weatherData.isSuccess) {
           setCurrentTmp(weatherData.result.currentTmp);
+
+          if (
+            weatherData.result.weatherPerHourList &&
+            weatherData.result.weatherPerHourList.length > 0
+          ) {
+            console.log(
+              // 테스트입니다.
+              'First item in weatherPerHourList:',
+              weatherData.result.weatherPerHourList[0],
+            );
+          } else {
+            console.log('weatherPerHourList is empty or undefined');
+          }
         } else {
           console.error('Failed to fetch weather data:', weatherData.message);
         }

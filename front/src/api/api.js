@@ -2,6 +2,10 @@ const BASE_URL = 'http://13.125.128.147:8080';
 
 export const sendAccessTokenToBackend = async accessToken => {
   try {
+    console.log('Sending access token to backend...');
+    console.log('Request URL:', `${BASE_URL}/token`);
+    console.log('Access token:', accessToken);
+
     const response = await fetch(`${BASE_URL}/token`, {
       method: 'POST',
       headers: {
@@ -10,6 +14,8 @@ export const sendAccessTokenToBackend = async accessToken => {
       body: JSON.stringify({accessToken}),
     });
 
+    console.log('Response status:', response.status);
+
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Failed to send access token:', response.status, errorText);
@@ -17,6 +23,7 @@ export const sendAccessTokenToBackend = async accessToken => {
     }
 
     const data = await response.json();
+
     console.log('Backend response:', data);
 
     if (!data.isSuccess) {
@@ -60,6 +67,13 @@ export const fetchWeatherData = async (memberId, accessToken) => {
     if (!data.isSuccess) {
       console.error('Backend error:', data.code, data.message);
       throw new Error(data.message || 'Unknown error from backend');
+    }
+
+    if (data.result && data.result.weatherPerHourList) {
+      console.log(
+        'First item in weatherPerHourList:',
+        data.result.weatherPerHourList[0],
+      );
     }
 
     return data;

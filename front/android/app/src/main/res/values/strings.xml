@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Weather2</string>
+    <string name="kakao_app_key">53650279ac97bd9bde779eba3f9f2499</string>
+    <string name="kakao_scheme">kakao536502</string>
 </resources>
