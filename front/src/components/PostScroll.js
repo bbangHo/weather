@@ -1,37 +1,75 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList, Text, View, StyleSheet, Image} from 'react-native';
+import {
+  FlatList,
+  Text,
+  View,
+  StyleSheet,
+  Image,
+  Alert,
+  TouchableOpacity,
+} from 'react-native';
 import {Card} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
 import globalStyles from '../globalStyles';
+import {fetchPosts, toggleLikePost} from '../api/api';
 
-const PostScroll = () => {
+const PostScroll = ({accessToken, memberId}) => {
   const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadPosts();
-  }, [page]);
+  }, []);
 
-  const loadPosts = () => {
-    if (loading) return;
-
-    setLoading(true);
-    const newPosts = Array.from({length: 10}).map((_, index) => ({
-      id: `post-${page}-${index}-${Date.now()}`,
-      username: '작성자 이름',
-      timeAgo: `${Math.floor(Math.random() * 60)}분 전`,
-      content: '글자 수 제한은 어떻게 하면 좋을지 고민',
-      likes: Math.floor(Math.random() * 100),
-    }));
-
-    setPosts(prevPosts => [...prevPosts, ...newPosts]);
-    setLoading(false);
+  const loadPosts = async () => {
+    try {
+      const fetchedPosts = await fetchPosts(accessToken, memberId);
+      console.log('Fetched posts:', fetchedPosts);
+      if (fetchedPosts && fetchedPosts.length > 0) {
+        setPosts(fetchedPosts);
+      } else {
+        Alert.alert('Info', '불러올 게시글이 없습니다.');
+      }
+    } catch (error) {
+      console.error('Error loading posts:', error.message);
+      Alert.alert(
+        'Error',
+        '서버에 문제가 발생했습니다. 나중에 다시 시도해주세요.',
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleLoadMore = () => {
-    if (!loading) {
-      setPage(page + 1);
+  const handleLikePress = async postId => {
+    console.log('Like button pressed for postId:', postId);
+    try {
+      const response = await toggleLikePost(accessToken, memberId, postId);
+      console.log('Like post response:', response);
+      if (response.isSuccess) {
+        setPosts(prevPosts =>
+          prevPosts.map(post =>
+            post.postInfo.postId === postId
+              ? {
+                  ...post,
+                  postInfo: {
+                    ...post.postInfo,
+                    likeClickable: false,
+                    likeCount: post.postInfo.likeCount + 1,
+                  },
+                }
+              : post,
+          ),
+        );
+      } else {
+        Alert.alert('Error', '좋아요를 할 수 없습니다. 다시 시도해주세요.');
+      }
+    } catch (error) {
+      console.error('Failed to like post:', error.message);
+      Alert.alert(
+        'Error',
+        '서버에 문제가 발생했습니다. 나중에 다시 시도해주세요.',
+      );
     }
   };
 
@@ -41,12 +79,19 @@ const PostScroll = () => {
         <View style={styles.header}>
           <View style={styles.profileInfo}>
             <Image
-              source={require('../../assets/images/profile.png')}
+              source={
+                item.memberInfo.profileImageUrl
+                  ? {uri: item.memberInfo.profileImageUrl}
+                  : require('../../assets/images/profile.png')
+              }
               style={styles.profileImage}
+              onError={() => {}}
             />
             <View style={styles.userInfo}>
               <View style={styles.userRow}>
-                <Text style={styles.username}>{item.username}</Text>
+                <Text style={styles.username}>
+                  {item.memberInfo.memberName}
+                </Text>
                 <Icon
                   name="sunny-outline"
                   size={18}
@@ -54,20 +99,22 @@ const PostScroll = () => {
                   style={styles.userIcon}
                 />
               </View>
-              <Text style={styles.timeAgo}>{item.timeAgo}</Text>
+              <Text style={styles.timeAgo}>{item.postInfo.createdAt}</Text>
             </View>
           </View>
-          <View style={styles.likeContainer}>
+          <TouchableOpacity
+            style={styles.likeContainer}
+            onPress={() => handleLikePress(item.postInfo.postId)}>
             <Icon
-              name="heart-outline"
+              name={item.postInfo.likeClickable ? 'heart-outline' : 'heart'}
               size={20}
               color="#fff"
               style={styles.likeIcon}
             />
-            <Text style={styles.likeCount}>{item.likes}</Text>
-          </View>
+            <Text style={styles.likeCount}>{item.postInfo.likeCount}</Text>
+          </TouchableOpacity>
         </View>
-        <Text style={styles.content}>{item.content}</Text>
+        <Text style={styles.content}>{item.postInfo.content}</Text>
       </Card>
     </View>
   );
@@ -76,9 +123,7 @@ const PostScroll = () => {
     <FlatList
       data={posts}
       renderItem={renderPost}
-      keyExtractor={item => item.id}
-      onEndReached={handleLoadMore}
-      onEndReachedThreshold={0.5}
+      keyExtractor={item => item.postInfo.postId.toString()}
       ListFooterComponent={
         loading ? <Text style={styles.loadingText}>Loading...</Text> : null
       }
