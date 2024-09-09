@@ -76,7 +76,7 @@ const PostCreationScreen = ({navigation, accessToken, memberId}) => {
         <Text style={styles.label}>온도는 어떤가요?</Text>
         <View style={styles.tagContainer}>
           {[
-            '추움',
+            '매우 추움',
             '추움?',
             '조금 추움',
             '선선',
