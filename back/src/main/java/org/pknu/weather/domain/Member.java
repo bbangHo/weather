@@ -50,9 +50,15 @@ public class Member extends BaseEntity {
         this.location = location;
     }
     public void setMemberInfo(MemberJoinDTO memberJoinDTO){
-        this.nickname = memberJoinDTO.getNickname();
-        this.sensitivity = memberJoinDTO.getSensitivity();
-        this.profileImage = memberJoinDTO.getImgPath();
-        this.profileImageName = memberJoinDTO.getImgName();
+        if (memberJoinDTO.getNickname() != null && !memberJoinDTO.getNickname().isEmpty())
+            this.nickname = memberJoinDTO.getNickname();
+
+        if (memberJoinDTO.getSensitivity() != null)
+            this.sensitivity = memberJoinDTO.getSensitivity();
+
+        if (memberJoinDTO.getProfileImg() != null && !memberJoinDTO.getProfileImg().isEmpty()) {
+            this.profileImage = memberJoinDTO.getImgPath();
+            this.profileImageName = memberJoinDTO.getImgName();
+        }
     }
 }

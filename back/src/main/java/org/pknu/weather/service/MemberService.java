@@ -40,16 +40,15 @@ public class MemberService {
 
     public MemberResponseDTO saveMemberInfo(String email, MemberJoinDTO memberJoinDTO){
 
-        MultipartFile profileImg = memberJoinDTO.getProfileImg();
-        
         Member member = memberRepository.findMemberByEmail(email)
                 .orElseThrow(() -> new GeneralException(ErrorStatus._MEMBER_NOT_FOUND));
+
+        MultipartFile profileImg = memberJoinDTO.getProfileImg();
 
         if (profileImg != null && profileImg.getContentType().startsWith("image")){
             uploadProfileImageToS3(memberJoinDTO, profileImg);
             removeExProfileImage(member);
         }
-
 
         member.setMemberInfo(memberJoinDTO);
         Member savedMember = memberRepository.save(member);
