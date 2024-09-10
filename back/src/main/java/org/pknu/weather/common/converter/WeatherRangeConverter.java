@@ -47,7 +47,7 @@ public class WeatherRangeConverter {
         else if (tmp >= LITTLE_HOT + adjustment + 2 * weight)
             return TemperatureTag.LITTLE_HOT;
         else if (tmp >= AVERAGE)
-            return TemperatureTag.NORMAL;
+            return TemperatureTag.COMMON;
         else if (tmp >= COOL)
             return TemperatureTag.COOL;
         else if (tmp >= LITTLE_COLD + adjustment + 2 * weight)

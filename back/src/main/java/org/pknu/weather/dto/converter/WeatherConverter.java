@@ -6,28 +6,12 @@ import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.Weather;
 import org.pknu.weather.domain.tag.RainTag;
 import org.pknu.weather.domain.tag.TemperatureTag;
+import org.pknu.weather.dto.TagDto;
 import org.pknu.weather.dto.WeatherResponse;
 
 import java.util.List;
 
 public class WeatherConverter {
-
-//    public static Weather toWeather(Item item) {
-//        return Weather.builder()
-//                .basetime(item.getBaseTime())
-//                .windSpeed(item.get)
-//                .humidity()
-//                .rainProb()
-//                .rain()
-//                .rainType()
-//                .temperature()
-//                .maxTemperature()
-//                .minTemperature()
-//                .snowCover()
-//                .skyType()
-//                .presentationTime()
-//                .build();
-//    }
 
     public static WeatherResponse.MainPageWeatherData toMainPageWeatherData(List<Weather> weatherList, Member member) {
         int max = Integer.MIN_VALUE;
@@ -75,6 +59,14 @@ public class WeatherConverter {
         return WeatherResponse.Temperature.builder()
                 .maxTmp(max)
                 .minTmp(min)
+                .build();
+    }
+
+    public static WeatherResponse.SimpleWeatherInfo toSimpleWeatherInfo(List<TagDto.SimpleTag> tagList) {
+        return WeatherResponse.SimpleWeatherInfo.builder()
+                .tags(tagList.stream().map(TagDto.SimpleTag::getText).toList())
+                .prcpProb(null)
+                .days(null)
                 .build();
     }
 }

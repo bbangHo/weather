@@ -104,10 +104,10 @@
 //        PostRequest.CreatePost createPost = PostRequest.CreatePost.builder()
 //                .content("test")
 //                .temperatureTag(TemperatureTag.HOT)
-//                .humidityTag(HumidityTag.HUMID)
-//                .skyTag(SkyTag.RAIN)
-//                .windTag(WindTag.NONE)
-//                .dustTag(DustTag.GOOD)
+//                .humidityTag(QueryHumidityTag.HUMID)
+//                .skyTag(QuerySkyTag.RAIN)
+//                .windTag(QueryWindTag.NONE)
+//                .dustTag(QueryDustTag.GOOD)
 //                .build();
 //
 //        Member member = memberRepository.findAll().stream()

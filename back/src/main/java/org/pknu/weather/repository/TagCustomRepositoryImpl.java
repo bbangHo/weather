@@ -1,13 +1,18 @@
 package org.pknu.weather.repository;
 
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.BooleanTemplate;
+import com.querydsl.core.types.dsl.EnumPath;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.pknu.weather.common.GlobalConstant;
+import org.pknu.weather.common.GlobalParams;
 import org.pknu.weather.domain.Location;
-import org.pknu.weather.domain.tag.*;
+import org.pknu.weather.domain.tag.EnumTag;
 import org.pknu.weather.dto.TagQueryResult;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.pknu.weather.domain.QLocation.location;
 import static org.pknu.weather.domain.QTag.tag;
@@ -17,79 +22,35 @@ public class TagCustomRepositoryImpl implements TagCustomRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
 
-    public TagQueryResult rankingTags(Location locationEntity) {
+    public List<TagQueryResult> rankingTags(Location locationEntity) {
+        List<TagQueryResult> tagQueryResultList = new ArrayList<>();
+
+        tagQueryResultList.add(getTagTuple(locationEntity, tag.temperTag));
+        tagQueryResultList.add(getTagTuple(locationEntity, tag.windTag));
+        tagQueryResultList.add(getTagTuple(locationEntity, tag.humidityTag));
+        tagQueryResultList.add(getTagTuple(locationEntity, tag.skyTag));
+        tagQueryResultList.add(getTagTuple(locationEntity, tag.dustTag));
+
+        return tagQueryResultList;
+    }
+
+    private TagQueryResult getTagTuple(Location locationEntity, EnumPath<? extends EnumTag> pTag) {
+        Tuple tuple = jpaQueryFactory
+                .select(pTag.count(), pTag)
+                .from(tag)
+                .join(tag.location, location)
+                .where(
+                        isContains(locationEntity)
+                )
+                .groupBy(pTag)
+                .orderBy(pTag.count().desc())
+                .fetchFirst();
+
+        assert tuple != null;
         return TagQueryResult.builder()
-                .tempCount(getTempTagCount(locationEntity))
-                .windCount(getWindTagCount(locationEntity))
-                .humidityCount(getHumidityTagCount(locationEntity))
-                .skyCount(getSkyTagCount(locationEntity))
-                .dustCount(getDustTagCount(locationEntity))
+                .tag(tuple.get(pTag))
+                .count(tuple.get(pTag.count()))
                 .build();
-    }
-
-    private TemperatureTag getTempTagCount(Location locationEntity) {
-        return jpaQueryFactory
-                .select(tag.temperTag)
-                .from(tag)
-                .join(tag.location, location)
-                .where(
-                        isContains(locationEntity)
-                )
-                .groupBy(tag.temperTag)
-                .orderBy(tag.temperTag.count().desc())
-                .fetchFirst();
-    }
-
-    private WindTag getWindTagCount(Location locationEntity) {
-        return jpaQueryFactory
-                .select(tag.windTag)
-                .from(tag)
-                .join(tag.location, location)
-                .where(
-                        isContains(locationEntity)
-                )
-                .groupBy(tag.windTag)
-                .orderBy(tag.windTag.count().desc())
-                .fetchFirst();
-    }
-
-    private HumidityTag getHumidityTagCount(Location locationEntity) {
-        return jpaQueryFactory
-                .select(tag.humidityTag)
-                .from(tag)
-                .join(tag.location, location)
-                .where(
-                        isContains(locationEntity)
-                )
-                .groupBy(tag.humidityTag)
-                .orderBy(tag.humidityTag.count().desc())
-                .fetchFirst();
-    }
-
-    private SkyTag getSkyTagCount(Location locationEntity) {
-        return jpaQueryFactory
-                .select(tag.skyTag)
-                .from(tag)
-                .join(tag.location, location)
-                .where(
-                        isContains(locationEntity)
-                )
-                .groupBy(tag.skyTag)
-                .orderBy(tag.skyTag.count().desc())
-                .fetchFirst();
-    }
-
-    private DustTag getDustTagCount(Location locationEntity) {
-        return jpaQueryFactory
-                .select(tag.dustTag)
-                .from(tag)
-                .join(tag.location, location)
-                .where(
-                        isContains(locationEntity)
-                )
-                .groupBy(tag.dustTag)
-                .orderBy(tag.dustTag.count().desc())
-                .fetchFirst();
     }
 
     private BooleanTemplate isContains(Location locationEntity) {
@@ -100,6 +61,6 @@ public class TagCustomRepositoryImpl implements TagCustomRepository {
         String geoFunction = "ST_CONTAINS(ST_BUFFER(ST_GeomFromText('%s', 4326), {0}), point)";
         String expression = String.format(geoFunction, target);
 
-        return Expressions.booleanTemplate(expression, GlobalConstant.DISTANCE);
+        return Expressions.booleanTemplate(expression, GlobalParams.DISTANCE);
     }
 }

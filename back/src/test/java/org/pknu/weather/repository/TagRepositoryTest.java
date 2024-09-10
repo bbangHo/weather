@@ -8,7 +8,6 @@ import org.pknu.weather.domain.Post;
 import org.pknu.weather.domain.Tag;
 import org.pknu.weather.domain.common.Sensitivity;
 import org.pknu.weather.domain.tag.*;
-import org.pknu.weather.dto.TagQueryResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
@@ -92,7 +91,7 @@ class TagRepositoryTest {
                                 (TemperatureTag) Arrays.stream(TemperatureTag.values())
                                         .map(t -> t.findByCode(random.nextInt(10) + 1))
                                         .findAny()
-                                        .orElse(TemperatureTag.NORMAL)
+                                        .orElse(TemperatureTag.COMMON)
                         )
                         .windTag(
                                 (WindTag) Arrays.stream(WindTag.values())
@@ -104,7 +103,7 @@ class TagRepositoryTest {
                                 (HumidityTag) Arrays.stream(HumidityTag.values())
                                         .map(t -> t.findByCode(random.nextInt(5) + 1))
                                         .findAny()
-                                        .orElse(HumidityTag.NORMAL)
+                                        .orElse(HumidityTag.COMMON_HUMID)
                         )
                         .skyTag(
                                 (SkyTag) Arrays.stream(SkyTag.values())
@@ -134,10 +133,10 @@ class TagRepositoryTest {
         List<Tag> tagList = tagRepository.findAll();
 
         // when
-        TagQueryResult tagQueryResult = tagRepository.rankingTags(location);
+//        Map<EnumTag, Long> tagQueryResultMap = tagRepository.rankingTags(location);
 
         // then
-        System.out.println(tagQueryResult.getHumidityCount());
-//        assertThat(tagQueryResult.getDustTag()).isEqualTo(400);
+//        System.out.println(tagQueryResultMap.getHumidityCount());
+//        assertThat(tagQueryResult.getQueryDustTag()).isEqualTo(400);
     }
 }

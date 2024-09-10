@@ -18,6 +18,8 @@ public enum ErrorStatus implements BaseErrorCode {
     _UNAUTHORIZED(HttpStatus.UNAUTHORIZED,"COMMON_401","인증이 필요합니다."),
     _FORBIDDEN(HttpStatus.FORBIDDEN, "COMMON_403", "금지된 요청입니다."),
 
+    // tag
+    _TAG_NOT_FOUND_FROM_CODE(HttpStatus.FORBIDDEN, "TAG_404_1", "요청하신 code로 태그를 찾을 수 없습니다."),
 
     //Token
     ACCESS_TOKEN_NOT_ACCEPTED(HttpStatus.UNAUTHORIZED, "Jwt_401_1", "Access Token이 존재하지 않습니다."),

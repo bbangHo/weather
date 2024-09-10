@@ -27,6 +27,25 @@ public class WeatherResponse {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class SimpleWeatherInfo {
+        private List<String> tags;
+        private String prcpProb;
+        private List<SimpleWeatherPerDay> days;
+
+        @Getter
+        @Builder
+        @AllArgsConstructor
+        @NoArgsConstructor
+        public static class SimpleWeatherPerDay {
+            private String day;
+            private SkyType skyType;
+        }
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Temperature {
         Integer maxTmp;
         Integer minTmp;
