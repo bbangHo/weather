@@ -1,5 +1,5 @@
-import React from 'react';
-import {ScrollView, View, StyleSheet, StatusBar, Text} from 'react-native';
+import React, {useState} from 'react';
+import {ScrollView, View, StyleSheet, StatusBar} from 'react-native';
 import {PanGestureHandler, State} from 'react-native-gesture-handler';
 import ToggleViewButton from '../components/ToggleViewButton';
 import WeatherInfoSlider from '../components/WeatherInfoSlider';
@@ -11,8 +11,9 @@ import AirQuality from '../components/AirQuality';
 import WeatherGraph from '../components/WeatherGraph';
 import {useNavigation} from '@react-navigation/native';
 
-const HomeScreen = ({accessToken}) => {
+const HomeScreen = ({accessToken, memberId}) => {
   const navigation = useNavigation();
+  const [showText, setShowText] = useState(false);
 
   const handleGesture = event => {
     if (
@@ -37,13 +38,17 @@ const HomeScreen = ({accessToken}) => {
           <View style={styles.rightContainer}>
             <CurrentLocation accessToken={accessToken} />
             <TemperatureInfo accessToken={accessToken} />
-            <ToggleViewButton />
+            <ToggleViewButton showText={showText} setShowText={setShowText} />
           </View>
         </View>
         <Posts />
-        <HourlyForecast />
+        <HourlyForecast
+          accessToken={accessToken}
+          memberId={memberId}
+          showText={showText}
+        />
         <AirQuality />
-        <WeatherGraph />
+        <WeatherGraph accessToken={accessToken} memberId={memberId} />
       </ScrollView>
     </PanGestureHandler>
   );
