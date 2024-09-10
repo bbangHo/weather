@@ -18,7 +18,7 @@ const PostCreationScreen = ({navigation, accessToken, memberId}) => {
   const [description, setDescription] = useState('');
 
   const handleTagPress = (type, index) => {
-    const tagCode = index;
+    const tagCode = index + 1;
     switch (type) {
       case 'temperature':
         setTemperature(tagCode);
@@ -77,7 +77,7 @@ const PostCreationScreen = ({navigation, accessToken, memberId}) => {
         <View style={styles.tagContainer}>
           {[
             '매우 추움',
-            '추움?',
+            '추움',
             '조금 추움',
             '선선',
             '보통',
@@ -89,12 +89,15 @@ const PostCreationScreen = ({navigation, accessToken, memberId}) => {
           ].map((item, index) => (
             <TouchableOpacity
               key={item}
-              style={[styles.tag, temperature === index && styles.selectedTag]}
+              style={[
+                styles.tag,
+                temperature === index + 1 && styles.selectedTag,
+              ]}
               onPress={() => handleTagPress('temperature', index)}>
               <Text
                 style={[
                   styles.tagText,
-                  temperature === index && styles.selectedTagText,
+                  temperature === index + 1 && styles.selectedTagText,
                 ]}>
                 {item}
               </Text>
@@ -109,12 +112,15 @@ const PostCreationScreen = ({navigation, accessToken, memberId}) => {
             (item, index) => (
               <TouchableOpacity
                 key={item}
-                style={[styles.tag, weather === index && styles.selectedTag]}
+                style={[
+                  styles.tag,
+                  weather === index + 1 && styles.selectedTag,
+                ]}
                 onPress={() => handleTagPress('weather', index)}>
                 <Text
                   style={[
                     styles.tagText,
-                    weather === index && styles.selectedTagText,
+                    weather === index + 1 && styles.selectedTagText,
                   ]}>
                   {item}
                 </Text>
@@ -130,12 +136,15 @@ const PostCreationScreen = ({navigation, accessToken, memberId}) => {
             (item, index) => (
               <TouchableOpacity
                 key={item}
-                style={[styles.tag, humidity === index && styles.selectedTag]}
+                style={[
+                  styles.tag,
+                  humidity === index + 1 && styles.selectedTag,
+                ]}
                 onPress={() => handleTagPress('humidity', index)}>
                 <Text
                   style={[
                     styles.tagText,
-                    humidity === index && styles.selectedTagText,
+                    humidity === index + 1 && styles.selectedTagText,
                   ]}>
                   {item}
                 </Text>
@@ -150,12 +159,12 @@ const PostCreationScreen = ({navigation, accessToken, memberId}) => {
           {['안 불어요', '조금 불어요', '많이 불어요'].map((item, index) => (
             <TouchableOpacity
               key={item}
-              style={[styles.tag, wind === index && styles.selectedTag]}
+              style={[styles.tag, wind === index + 1 && styles.selectedTag]}
               onPress={() => handleTagPress('wind', index)}>
               <Text
                 style={[
                   styles.tagText,
-                  wind === index && styles.selectedTagText,
+                  wind === index + 1 && styles.selectedTagText,
                 ]}>
                 {item}
               </Text>
@@ -170,12 +179,15 @@ const PostCreationScreen = ({navigation, accessToken, memberId}) => {
             (item, index) => (
               <TouchableOpacity
                 key={item}
-                style={[styles.tag, airQuality === index && styles.selectedTag]}
+                style={[
+                  styles.tag,
+                  airQuality === index + 1 && styles.selectedTag,
+                ]}
                 onPress={() => handleTagPress('airQuality', index)}>
                 <Text
                   style={[
                     styles.tagText,
-                    airQuality === index && styles.selectedTagText,
+                    airQuality === index + 1 && styles.selectedTagText,
                   ]}>
                   {item}
                 </Text>

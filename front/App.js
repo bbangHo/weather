@@ -16,7 +16,9 @@ const Stack = createStackNavigator();
 const HomeStack = ({accessToken, memberId}) => (
   <Stack.Navigator screenOptions={{headerShown: false}}>
     <Stack.Screen name="Home">
-      {props => <HomeScreen {...props} accessToken={accessToken} />}
+      {props => (
+        <HomeScreen {...props} accessToken={accessToken} memberId={memberId} />
+      )}
     </Stack.Screen>
     <Stack.Screen name="PostCreationScreen">
       {props => (
@@ -34,7 +36,7 @@ const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [accessToken, setAccessToken] = useState(null);
   const [isNewMember, setIsNewMember] = useState(false);
-  const [memberId] = useState(1);
+  const [memberId] = useState(1); // 임의의 memberId 설정
 
   return (
     <>

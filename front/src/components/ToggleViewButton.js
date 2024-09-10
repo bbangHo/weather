@@ -8,19 +8,12 @@ const ToggleViewButton = ({showText, setShowText}) => {
     <View style={styles.container}>
       <Card containerStyle={[globalStyles.transparentBackground, styles.card]}>
         <Button
-          title="텍스트로 보기"
-          onPress={() => setShowText(true)}
+          title={showText ? '수치로 보기' : '텍스트로 보기'}
+          onPress={() => setShowText(prev => !prev)}
           buttonStyle={styles.button}
           titleStyle={styles.buttonTitle}
         />
       </Card>
-      {/* 
-      <Button
-        title="수치로 보기"
-        onPress={() => setShowText(false)}
-        color="#fff"
-      />
-      */}
     </View>
   );
 };

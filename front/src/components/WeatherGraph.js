@@ -1,138 +1,142 @@
-import React from 'react';
-import {View, StyleSheet, Dimensions} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {View, StyleSheet, Dimensions, ActivityIndicator} from 'react-native';
 import Svg, {Path, Line, Text as SvgText} from 'react-native-svg';
 import globalStyles from '../globalStyles';
+import {fetchWeatherData} from '../api/api';
 
-const WeatherGraph = () => {
+const WeatherGraph = ({accessToken, memberId}) => {
   const {width} = Dimensions.get('window');
   const graphWidth = width - 40;
   const graphHeight = 200;
   const paddingLeft = 60;
 
-  const temperatureData = [23, 24, 26, 28, 30, 29, 27, 25, 23, 24, 26, 25, 24];
-  const maxTemperature = Math.max(...temperatureData);
-  const minTemperature = Math.min(...temperatureData);
+  const [temperatureData, setTemperatureData] = useState([]);
+  const [maxTmp, setMaxTmp] = useState(null);
+  const [minTmp, setMinTmp] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const getWeatherData = async () => {
+      try {
+        const weatherData = await fetchWeatherData(memberId, accessToken);
+        if (weatherData.isSuccess) {
+          setMaxTmp(weatherData.result.temperature.maxTmp);
+          setMinTmp(weatherData.result.temperature.minTmp);
+
+          const tempData = weatherData.result.weatherPerHourList
+            .slice(0, 12)
+            .map(item => ({
+              hour: item.hour,
+              tmp: item.tmp,
+            }));
+          setTemperatureData(tempData);
+        } else {
+          console.error('Failed to fetch weather data:', weatherData.message);
+        }
+      } catch (error) {
+        console.error('Error fetching weather data:', error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getWeatherData();
+  }, [accessToken]);
 
   const getX = index => {
+    if (temperatureData.length === 0) return 0;
     const interval = (graphWidth - paddingLeft) / (temperatureData.length - 1);
     return paddingLeft + interval * index;
   };
 
   const getY = temperature => {
-    const scale = (graphHeight - 40) / (maxTemperature - minTemperature);
-    return graphHeight - (temperature - minTemperature) * scale - 20;
+    if (maxTmp === null || minTmp === null || temperature === null) return 0;
+    const scale = (graphHeight - 40) / (maxTmp - minTmp);
+    return graphHeight - (temperature - minTmp) * scale - 20;
   };
 
-  const pathData = temperatureData
-    .map((temp, index) => {
-      const x = getX(index);
-      const y = getY(temp);
-      return `${index === 0 ? 'M' : 'L'} ${x} ${y}`;
-    })
-    .join(' ');
+  const pathData =
+    temperatureData.length > 0
+      ? temperatureData
+          .map((tempData, index) => {
+            const x = getX(index);
+            const y = getY(tempData.tmp);
+            return `${index === 0 ? 'M' : 'L'} ${x} ${y}`;
+          })
+          .join(' ')
+      : '';
 
-  const generateHours = () => {
-    const hours = [];
-    const currentHour = new Date().getHours();
-    for (let i = 0; i < 13; i++) {
-      // 12시간 후까지
-      hours.push((currentHour + i) % 24);
-    }
-    return hours;
+  const formatHour = isoString => {
+    const date = new Date(isoString);
+    const hours = date.getHours().toString().padStart(2, '0');
+    return `${hours}시`;
   };
 
-  const hours = generateHours();
+  if (loading) {
+    return <ActivityIndicator size="large" color="#fff" />;
+  }
 
   return (
     <View style={[styles.container, globalStyles.transparentBackground]}>
       <Svg height={graphHeight} width={graphWidth}>
-        <Line
-          x1={paddingLeft}
-          y1={getY(maxTemperature)}
-          x2={graphWidth}
-          y2={getY(maxTemperature)}
-          stroke="white"
-          strokeWidth="0.5"
-        />
-        <SvgText
-          x="0"
-          y={getY(maxTemperature) + 5}
-          fill="white"
-          fontSize="10"
-          fontWeight="bold">
-          최고({maxTemperature}°C)
-        </SvgText>
+        {maxTmp !== null && (
+          <>
+            <Line
+              x1={paddingLeft}
+              y1={getY(maxTmp)}
+              x2={graphWidth}
+              y2={getY(maxTmp)}
+              stroke="white"
+              strokeWidth="0.5"
+            />
+            <SvgText
+              x="0"
+              y={getY(maxTmp) + 5}
+              fill="white"
+              fontSize="10"
+              fontWeight="bold">
+              최고({maxTmp}°C)
+            </SvgText>
+          </>
+        )}
 
-        <Line
-          x1={paddingLeft}
-          y1={getY(maxTemperature - 2)}
-          x2={graphWidth}
-          y2={getY(maxTemperature - 2)}
-          stroke="white"
-          strokeWidth="0.5"
-        />
-        <SvgText
-          x="0"
-          y={getY(maxTemperature - 1) + 5}
-          fill="white"
-          fontSize="10">
-          더움
-        </SvgText>
+        {minTmp !== null && (
+          <>
+            <Line
+              x1={paddingLeft}
+              y1={getY(minTmp)}
+              x2={graphWidth}
+              y2={getY(minTmp)}
+              stroke="white"
+              strokeWidth="0.5"
+            />
+            <SvgText
+              x="0"
+              y={getY(minTmp) + 5}
+              fill="white"
+              fontSize="10"
+              fontWeight="bold">
+              최저({minTmp}°C)
+            </SvgText>
+          </>
+        )}
 
-        <SvgText
-          x="0"
-          y={getY((maxTemperature + minTemperature) / 2) + 5}
-          fill="white"
-          fontSize="10">
-          보통
-        </SvgText>
+        {temperatureData.length > 0 &&
+          temperatureData.map((item, index) => (
+            <SvgText
+              key={index}
+              x={getX(index)}
+              y={graphHeight - 5}
+              fill="white"
+              fontSize="10"
+              textAnchor="middle">
+              {formatHour(item.hour)}
+            </SvgText>
+          ))}
 
-        <Line
-          x1={paddingLeft}
-          y1={getY(minTemperature + 2)}
-          x2={graphWidth}
-          y2={getY(minTemperature + 2)}
-          stroke="white"
-          strokeWidth="0.5"
-        />
-        <SvgText
-          x="0"
-          y={getY(minTemperature + 1) + 5}
-          fill="white"
-          fontSize="10">
-          선선
-        </SvgText>
-
-        <Line
-          x1={paddingLeft}
-          y1={getY(minTemperature)}
-          x2={graphWidth}
-          y2={getY(minTemperature)}
-          stroke="white"
-          strokeWidth="0.5"
-        />
-        <SvgText
-          x="0"
-          y={getY(minTemperature) + 5}
-          fill="white"
-          fontSize="10"
-          fontWeight="bold">
-          최저({minTemperature}°C)
-        </SvgText>
-
-        {hours.map((hour, index) => (
-          <SvgText
-            key={index}
-            x={getX(index)}
-            y={graphHeight - 5}
-            fill="white"
-            fontSize="10"
-            textAnchor="middle">
-            {hour}
-          </SvgText>
-        ))}
-
-        <Path d={pathData} fill="none" stroke="white" strokeWidth="2" />
+        {temperatureData.length > 0 && (
+          <Path d={pathData} fill="none" stroke="white" strokeWidth="2" />
+        )}
       </Svg>
     </View>
   );
