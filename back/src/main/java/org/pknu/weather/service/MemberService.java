@@ -2,7 +2,7 @@ package org.pknu.weather.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.pknu.weather.apiPayload.ApiResponse;
+import org.hibernate.exception.ConstraintViolationException;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
 import org.pknu.weather.common.utils.LocalUploaderUtils;
 import org.pknu.weather.common.utils.S3UploaderUtils;
@@ -11,11 +11,13 @@ import org.pknu.weather.dto.MemberJoinDTO;
 import org.pknu.weather.dto.MemberResponseDTO;
 import org.pknu.weather.exception.GeneralException;
 import org.pknu.weather.repository.MemberRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.sql.SQLException;
 import java.util.Optional;
 
 import static org.pknu.weather.dto.converter.MemberResponseConverter.toMemberResponseDTO;
@@ -38,23 +40,48 @@ public class MemberService {
         return memberRepository.findMemberByEmail(email);
     }
 
-    public MemberResponseDTO saveMemberInfo(String email, MemberJoinDTO memberJoinDTO){
+    @Transactional
+    public MemberResponseDTO checkNicknameAndSave(String email, MemberJoinDTO memberJoinDTO){
 
-        MultipartFile profileImg = memberJoinDTO.getProfileImg();
-        
         Member member = memberRepository.findMemberByEmail(email)
                 .orElseThrow(() -> new GeneralException(ErrorStatus._MEMBER_NOT_FOUND));
+
+        MultipartFile profileImg = memberJoinDTO.getProfileImg();
 
         if (profileImg != null && profileImg.getContentType().startsWith("image")){
             uploadProfileImageToS3(memberJoinDTO, profileImg);
             removeExProfileImage(member);
         }
 
-
         member.setMemberInfo(memberJoinDTO);
-        Member savedMember = memberRepository.save(member);
+
+        Member savedMember = checkNicknameAndSave(member);
 
         return toMemberResponseDTO(savedMember);
+    }
+
+    private Member checkNicknameAndSave(Member member) {
+        Member savedMember = null;
+        try {
+            savedMember = memberRepository.saveAndFlush(member);
+        } catch (DataIntegrityViolationException e) {
+
+            Throwable cause = e.getCause();
+
+            if (cause instanceof ConstraintViolationException constraintViolationException) {
+
+                SQLException sqlException = (SQLException) constraintViolationException.getCause();
+                int errorCode = sqlException.getErrorCode();
+
+                if (errorCode == 1062) {
+                    // 유니크 제약 조건 위반일 때만 예외 처리
+                    throw new GeneralException(ErrorStatus._DUPILICATED_NICKNAME);
+                }
+            } else {
+                throw e;
+            }
+        }
+        return savedMember;
     }
 
     private void removeExProfileImage(Member member) {
