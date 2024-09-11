@@ -32,4 +32,5 @@ public enum SkyTag implements EnumTag {
     public String getKey() {
         return name();
     }
+
 }

@@ -29,5 +29,4 @@ public enum WindTag implements EnumTag {
     public String getKey() {
         return name();
     }
-
 }

@@ -2,17 +2,21 @@ package org.pknu.weather.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.pknu.weather.common.utils.TagUtils;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Member;
+import org.pknu.weather.domain.tag.EnumTag;
 import org.pknu.weather.domain.tag.HumidityTag;
 import org.pknu.weather.domain.tag.TemperatureTag;
 import org.pknu.weather.dto.TagDto;
 import org.pknu.weather.dto.TagQueryResult;
+import org.pknu.weather.dto.converter.TagResponseConverter;
 import org.pknu.weather.repository.MemberRepository;
 import org.pknu.weather.repository.TagRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -33,25 +37,25 @@ public class TagQueryService {
         Member member = memberRepository.safeFindById(memberId);
         Location location = member.getLocation();
 
-        List<TagQueryResult> tagQueryResultList = tagRepository.rankingTags(location)
-                .stream()
-                .sorted((o1, o2) -> Math.toIntExact(o1.getCount() - o2.getCount()))
-                .toList();
+        List<TagQueryResult> tagQueryResultList = tagRepository.rankingTags(location);
+        List<EnumTag> tempAndHumidList = new ArrayList<>();
+        List<String> result = new ArrayList<>();
 
-        List<TagQueryResult> subList = tagQueryResultList.subList(0, 3);
-
-        for (TagQueryResult tagQueryResult : subList) {
-            // 온도, 습도 태그가 1~3 순위에 못 들어가는 경우
-            if (tagQueryResult.getTag().equals(TemperatureTag.class) || tagQueryResult.getTag().equals(HumidityTag.class)) {
-                subList.remove(tagQueryResult);
+        for (int i = 0; i < tagQueryResultList.size(); i++) {
+            EnumTag tag =  tagQueryResultList.get(i).getTag();
+            if (TagUtils.isTempTagOrHumdiTag(tag)) {
+                tempAndHumidList.add(tag);
+            } else {
+                result.add(TagUtils.tag2Text(tag));
             }
         }
 
-//        if(subList.size() == 1) {
-//
-//        }
+        String th = TagUtils.temperatureAndHumidityTag2Text(tempAndHumidList);
+        result.add(0, th);
 
-        return null;
+        return result.stream()
+                .map(TagResponseConverter::toSimpleTag)
+                .toList();
 
     }
 }

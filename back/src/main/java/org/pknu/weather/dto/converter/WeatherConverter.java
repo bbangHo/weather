@@ -1,6 +1,6 @@
 package org.pknu.weather.dto.converter;
 
-import org.pknu.weather.common.converter.WeatherRangeConverter;
+import org.pknu.weather.common.utils.TagUtils;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.Weather;
@@ -39,8 +39,8 @@ public class WeatherConverter {
     }
 
     public static WeatherResponse.WeatherPerHour toWeatherPerHour(Weather weather, Member member) {
-        RainTag rainTag = WeatherRangeConverter.rain2Text(weather.getRain());
-        TemperatureTag temperatureTag = WeatherRangeConverter.tmp2Text(
+        RainTag rainTag = TagUtils.rain2Text(weather.getRain());
+        TemperatureTag temperatureTag = TagUtils.tmp2Text(
                 weather.getTemperature(), member.getSensitivity());
 
         return WeatherResponse.WeatherPerHour.builder()
@@ -62,8 +62,8 @@ public class WeatherConverter {
                 .build();
     }
 
-    public static WeatherResponse.SimpleWeatherInfo toSimpleWeatherInfo(List<TagDto.SimpleTag> tagList) {
-        return WeatherResponse.SimpleWeatherInfo.builder()
+    public static WeatherResponse.WeatherSimpleInfo toSimpleWeatherInfo(List<TagDto.SimpleTag> tagList) {
+        return WeatherResponse.WeatherSimpleInfo.builder()
                 .tags(tagList.stream().map(TagDto.SimpleTag::getText).toList())
                 .prcpProb(null)
                 .days(null)

@@ -37,4 +37,5 @@ public enum TemperatureTag implements EnumTag {
     public String getKey() {
         return name();
     }
+
 }

@@ -27,7 +27,7 @@ public class WeatherResponse {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class SimpleWeatherInfo {
+    public static class WeatherSimpleInfo {
         private List<String> tags;
         private String prcpProb;
         private List<SimpleWeatherPerDay> days;

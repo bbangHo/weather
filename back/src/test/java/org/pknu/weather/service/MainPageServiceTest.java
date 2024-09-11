@@ -1,4 +1,3 @@
-/*
 package org.pknu.weather.service;
 
 
@@ -11,6 +10,7 @@ import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.Weather;
 import org.pknu.weather.domain.common.Sensitivity;
+import org.pknu.weather.dto.WeatherResponse;
 import org.pknu.weather.repository.LocationRepository;
 import org.pknu.weather.repository.MemberRepository;
 import org.pknu.weather.repository.WeatherRepository;
@@ -19,7 +19,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 
-import static com.mysema.commons.lang.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 @SpringBootTest
 @Slf4j
@@ -74,13 +75,13 @@ class MainPageServiceTest {
         List<Weather> weatherList = weatherService.getWeathers(member);
 
         // when
-        WeatherResponseConverter.MainPageWeatherData weatherInfo = mainPageService.getWeatherInfo(member.getId());
+        WeatherResponse.MainPageWeatherData weatherInfo = mainPageService.getWeatherInfo(member.getId());
 
         for (Weather w : weatherList) {
             log.info(w.getPresentationTime() + " " + w.getTemperature());
         }
 
-        for (WeatherResponseConverter.WeatherPerHour wph : weatherInfo.getWeatherPerHourList()) {
+        for (WeatherResponse.WeatherPerHour wph : weatherInfo.getWeatherPerHourList()) {
             log.info(wph.getHour() + " " + wph.getSkyType() + " " + wph.getRainAdverb() + " " + wph.getRainText() + " " + wph.getRain()
                     + " " + wph.getTmpAdverb() + " " + wph.getTmpText() + " " + wph.getTmp());
         }
@@ -91,6 +92,3 @@ class MainPageServiceTest {
         assertThat(weatherInfo.getCurrentSkyType()).isEqualTo(weatherList.get(0).getSkyType());
     }
 }
-
-
-*/

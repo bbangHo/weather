@@ -31,7 +31,9 @@ public class TagCustomRepositoryImpl implements TagCustomRepository {
         tagQueryResultList.add(getTagTuple(locationEntity, tag.skyTag));
         tagQueryResultList.add(getTagTuple(locationEntity, tag.dustTag));
 
-        return tagQueryResultList;
+        return tagQueryResultList.stream()
+                .sorted((o1, o2) -> Math.toIntExact(o1.getCount() - o2.getCount()))
+                .toList();
     }
 
     private TagQueryResult getTagTuple(Location locationEntity, EnumPath<? extends EnumTag> pTag) {

@@ -1,4 +1,3 @@
-/*
 package org.pknu.weather.repository;
 
 
@@ -18,7 +17,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.mysema.commons.lang.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 class LocationRepositoryTest {
@@ -86,6 +85,3 @@ class LocationRepositoryTest {
         assertThat(weathers.get(0).getLocation().getId()).isEqualTo(location.getId());
     }
 }
-
-
-*/

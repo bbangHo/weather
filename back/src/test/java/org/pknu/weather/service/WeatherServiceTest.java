@@ -1,4 +1,3 @@
-/*
 package org.pknu.weather.service;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -75,4 +74,3 @@ class WeatherServiceTest {
         assertThat(weathers.size()).isGreaterThanOrEqualTo(20);
     }
 }
-*/
