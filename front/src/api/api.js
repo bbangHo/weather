@@ -183,6 +183,45 @@ export const fetchPosts = async (
   }
 };
 
+export const fetchPopularPosts = async (
+  accessToken,
+  memberId,
+  lastPostId = null,
+  size = 10,
+) => {
+  try {
+    let url = `${BASE_URL}/api/v1/main/posts/popular?memberId=${memberId}&size=${size}`;
+
+    if (lastPostId) {
+      url += `&lastPostId=${lastPostId}`;
+    }
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorResponse = await response.json();
+      console.error(
+        'Failed to fetch popular posts:',
+        response.status,
+        errorResponse,
+      );
+      throw new Error('Failed to fetch popular posts');
+    }
+
+    const data = await response.json();
+    return data.result;
+  } catch (error) {
+    console.error('Error fetching popular posts:', error);
+    throw error;
+  }
+};
+
 export const toggleLikePost = async (accessToken, memberId, postId) => {
   try {
     const url = `${BASE_URL}/api/v1/post/recommendation?memberId=${memberId}&postId=${postId}`;

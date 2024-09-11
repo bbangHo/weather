@@ -41,7 +41,7 @@ const HomeScreen = ({accessToken, memberId}) => {
             <ToggleViewButton showText={showText} setShowText={setShowText} />
           </View>
         </View>
-        <Posts />
+        <Posts accessToken={accessToken} memberId={memberId} />
         <HourlyForecast
           accessToken={accessToken}
           memberId={memberId}
