@@ -7,28 +7,67 @@ import {
   Image,
   Dimensions,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {Card} from 'react-native-elements';
-import Icon from 'react-native-vector-icons/Ionicons';
 import globalStyles from '../globalStyles';
+import {fetchPopularPosts, toggleLikePost} from '../api/api';
 
-const Posts = () => {
+const Posts = ({accessToken, memberId}) => {
   const screenWidth = Dimensions.get('window').width;
   const navigation = useNavigation();
   const [newPosts, setNewPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const handleLikePress = async postId => {
+    console.log('Like button pressed for postId:', postId);
+    try {
+      const response = await toggleLikePost(accessToken, memberId, postId);
+      console.log('Like post response:', response);
+
+      if (response.isSuccess) {
+        setNewPosts(prevPosts =>
+          prevPosts.map(post =>
+            post.postInfo.postId === postId
+              ? {
+                  ...post,
+                  postInfo: {
+                    ...post.postInfo,
+                    likeClickable: false,
+                    likeCount: post.postInfo.likeCount + 1,
+                  },
+                }
+              : post,
+          ),
+        );
+      } else {
+        Alert.alert('Error', '좋아요를 할 수 없습니다. 다시 시도해주세요.');
+      }
+    } catch (error) {
+      console.error('Failed to like post:', error.message);
+      Alert.alert(
+        'Error',
+        '서버에 문제가 발생했습니다. 나중에 다시 시도해주세요.',
+      );
+    }
+  };
 
   useEffect(() => {
-    const posts = Array.from({length: 5}).map((_, i) => ({
-      id: i.toString(),
-      username: '작성자 이름',
-      timeAgo: '1시간 전',
-      content: '글자 수 제한은 어떻게 하면 좋을지 고민',
-      likes: Math.floor(Math.random() * 100),
-    }));
+    const loadPosts = async () => {
+      try {
+        const posts = await fetchPopularPosts(accessToken, memberId);
+        console.log('Fetched posts:', posts);
+        setNewPosts(posts);
+      } catch (error) {
+        console.error('Error fetching popular posts:', error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    setNewPosts(posts);
-  }, []);
+    loadPosts();
+  }, [accessToken, memberId]);
 
   const renderPost = ({item}) => (
     <View style={[styles.section, {width: screenWidth}]}>
@@ -36,33 +75,49 @@ const Posts = () => {
         <View style={styles.header}>
           <View style={styles.profileInfo}>
             <Image
-              source={require('../../assets/images/profile.png')}
+              source={
+                item.memberInfo.profileImageUrl
+                  ? {uri: item.memberInfo.profileImageUrl}
+                  : require('../../assets/images/profile.png')
+              }
               style={styles.profileImage}
             />
             <View style={styles.userInfo}>
               <View style={styles.userRow}>
-                <Text style={styles.username}>{item.username}</Text>
-                <Icon
-                  name="sunny-outline"
-                  size={18}
-                  color="#fff"
+                <Text style={styles.username}>
+                  {item.memberInfo.memberName}
+                </Text>
+                <Image
+                  source={require('../../assets/images/icon_clear.png')}
                   style={styles.userIcon}
                 />
               </View>
-              <Text style={styles.timeAgo}>{item.timeAgo}</Text>
+              <Text style={styles.timeAgo}>{item.postInfo.createdAt}</Text>
             </View>
           </View>
-          <View style={styles.likeContainer}>
-            <Icon
-              name="heart-outline"
-              size={20}
-              color="#fff"
+
+          <TouchableOpacity
+            style={styles.likeContainer}
+            onPress={() => {
+              console.log(
+                'TouchableOpacity pressed, postId:',
+                item.postInfo.postId,
+              );
+              handleLikePress(item.postInfo.postId);
+            }}
+            disabled={!item.postInfo.likeClickable}>
+            <Image
+              source={
+                item.postInfo.likeClickable
+                  ? require('../../assets/images/icon_nonheart.png')
+                  : require('../../assets/images/icon_heart2.png')
+              }
               style={styles.likeIcon}
             />
-            <Text style={styles.likeCount}>{item.likes}</Text>
-          </View>
+            <Text style={styles.likeCount}>{item.postInfo.likeCount}</Text>
+          </TouchableOpacity>
         </View>
-        <Text style={styles.content}>{item.content}</Text>
+        <Text style={styles.content}>{item.postInfo.content}</Text>
       </Card>
     </View>
   );
@@ -70,7 +125,7 @@ const Posts = () => {
   return (
     <FlatList
       data={newPosts}
-      keyExtractor={item => item.id}
+      keyExtractor={item => item.postInfo.postId.toString()}
       renderItem={renderPost}
       horizontal
       pagingEnabled
@@ -106,13 +161,6 @@ const Posts = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    marginTop: 2,
-  },
-  contentContainer: {
-    alignItems: 'center',
-  },
   section: {
     justifyContent: 'center',
     alignItems: 'center',
@@ -154,6 +202,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   userIcon: {
+    width: 18,
+    height: 18,
     marginLeft: 7,
   },
   timeAgo: {
@@ -168,7 +218,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   likeIcon: {
-    marginBottom: 1,
+    width: 20,
+    height: 20,
   },
   likeCount: {
     color: '#fff',
