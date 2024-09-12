@@ -1,12 +1,10 @@
 package org.pknu.weather.repository;
 
 import com.querydsl.core.Tuple;
-import com.querydsl.core.types.dsl.BooleanTemplate;
 import com.querydsl.core.types.dsl.EnumPath;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.pknu.weather.common.GlobalParams;
+import org.pknu.weather.common.utils.QueryUtils;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.tag.EnumTag;
 import org.pknu.weather.dto.TagQueryResult;
@@ -42,7 +40,7 @@ public class TagCustomRepositoryImpl implements TagCustomRepository {
                 .from(tag)
                 .join(tag.location, location)
                 .where(
-                        isContains(locationEntity)
+                        QueryUtils.isContains(locationEntity)
                 )
                 .groupBy(pTag)
                 .orderBy(pTag.count().desc())
@@ -53,16 +51,5 @@ public class TagCustomRepositoryImpl implements TagCustomRepository {
                 .tag(tuple.get(pTag))
                 .count(tuple.get(pTag.count()))
                 .build();
-    }
-
-    private BooleanTemplate isContains(Location locationEntity) {
-        Double latitude = locationEntity.getLatitude();
-        Double longitude = locationEntity.getLongitude();
-
-        String target = "Point(%f %f)".formatted(latitude, longitude);
-        String geoFunction = "ST_CONTAINS(ST_BUFFER(ST_GeomFromText('%s', 4326), {0}), point)";
-        String expression = String.format(geoFunction, target);
-
-        return Expressions.booleanTemplate(expression, GlobalParams.DISTANCE);
     }
 }
