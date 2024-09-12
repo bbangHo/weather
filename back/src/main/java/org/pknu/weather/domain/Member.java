@@ -1,6 +1,5 @@
 package org.pknu.weather.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -10,7 +9,7 @@ import org.pknu.weather.dto.MemberJoinDTO;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
+@Entity(name = "member")
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -26,16 +25,17 @@ public class Member extends BaseEntity {
     private String email;
 
     @Enumerated(EnumType.STRING)
-    @ColumnDefault("NONE")
+    @ColumnDefault("'NONE'")
     private Sensitivity sensitivity;
 
     @Column(unique = true)
     private String nickname;
 
-    @ColumnDefault("https://weather-pknu-bucket.s3.ap-northeast-2.amazonaws.com/basic.png")
+    //
+    @ColumnDefault("'https://weather-pknu-bucket.s3.ap-northeast-2.amazonaws.com/basic.png'")
     private String profileImage;
 
-    @ColumnDefault("basic.png")
+    @ColumnDefault("'basic.png'")
     private String profileImageName;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
