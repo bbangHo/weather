@@ -6,8 +6,6 @@ import org.pknu.weather.common.utils.TagUtils;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.tag.EnumTag;
-import org.pknu.weather.domain.tag.HumidityTag;
-import org.pknu.weather.domain.tag.TemperatureTag;
 import org.pknu.weather.dto.TagDto;
 import org.pknu.weather.dto.TagQueryResult;
 import org.pknu.weather.dto.converter.TagResponseConverter;
@@ -50,8 +48,9 @@ public class TagQueryService {
             }
         }
 
-        String th = TagUtils.temperatureAndHumidityTag2Text(tempAndHumidList);
-        result.add(0, th);
+        String text = TagUtils.temperatureAndHumidityTag2Text(tempAndHumidList);
+        result.add(0, text);
+        result.remove(result.size() - 1);
 
         return result.stream()
                 .map(TagResponseConverter::toSimpleTag)
