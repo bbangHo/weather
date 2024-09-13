@@ -36,8 +36,8 @@ const HomeScreen = ({accessToken, memberId}) => {
         <View style={styles.topContainer}>
           <WeatherInfoSlider />
           <View style={styles.rightContainer}>
-            <CurrentLocation accessToken={accessToken} />
-            <TemperatureInfo accessToken={accessToken} />
+            <CurrentLocation accessToken={accessToken} memberId={memberId} />
+            <TemperatureInfo accessToken={accessToken} memberId={memberId} />
             <ToggleViewButton showText={showText} setShowText={setShowText} />
           </View>
         </View>
