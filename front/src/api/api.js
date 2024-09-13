@@ -84,18 +84,22 @@ export const fetchWeatherData = async (memberId, accessToken) => {
 };
 
 export const sendLocationToBackend = async (
-  latitude,
   longitude,
+  latitude,
   accessToken,
 ) => {
   try {
+    const postData = {latitude, longitude};
+
+    console.log('Sending location data:', postData);
+
     const response = await fetch(`${BASE_URL}/api/v1/location/coor`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`,
       },
-      body: JSON.stringify({latitude, longitude}),
+      body: JSON.stringify(postData),
     });
 
     if (!response.ok) {
