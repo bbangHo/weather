@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.pknu.weather.common.formatter.DateTimeFormatter;
+import org.pknu.weather.common.utils.GeometryUtils;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Weather;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,10 +28,13 @@ class LocationRepositoryTest {
 
     @Autowired
     LocationRepository locationRepository;
+    private final double LATITUDE = 35.1845361111111;
+    private final double LONGITUDE = 128.989688888888;
 
     @BeforeEach
     void init() {
         Location location = Location.builder()
+                .point(GeometryUtils.getPoint(LATITUDE, LONGITUDE))
                 .city("city")
                 .province("province")
                 .street("street")

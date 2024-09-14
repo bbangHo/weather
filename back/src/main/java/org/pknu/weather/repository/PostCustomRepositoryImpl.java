@@ -35,7 +35,7 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
      * @param distance   거리 (m단위)
      * @return size + 1 개의 Post
      */
-    public List<Post> findAllWithinDistance(Long lastPostId, Long size, Location locationEntity, Integer distance) {
+    public List<Post> findAllWithinDistance(Long lastPostId, Long size, Location locationEntity) {
         return jpaQueryFactory.selectFrom(post)
                 .join(post.location, location).fetchJoin()
                 .join(post.member, member).fetchJoin()

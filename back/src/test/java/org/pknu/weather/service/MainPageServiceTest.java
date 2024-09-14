@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.pknu.weather.common.utils.GeometryUtils;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.Weather;
@@ -47,6 +48,7 @@ class MainPageServiceTest {
     @BeforeEach
     void init() {
         Location location = Location.builder()
+                .point(GeometryUtils.getPoint(LATITUDE, LONGITUDE))
                 .city("사상구")
                 .province("province")
                 .street("모라동")

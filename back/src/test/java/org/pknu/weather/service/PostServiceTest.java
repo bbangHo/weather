@@ -144,7 +144,7 @@ class PostServiceTest {
         // when
         Member member = memberList.get(0);
         Location location = member.getLocation();
-        List<Post> postList = postRepository.findAllWithinDistance(1L, 5L, location, 10000);
+        List<Post> postList = postRepository.findAllWithinDistance(1L, 5L, location);
 
         // then
         assertThat(postList.size()).isEqualTo(4);

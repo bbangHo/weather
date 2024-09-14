@@ -36,9 +36,15 @@ public class MainPageControllerV1 {
         return ApiResponse.onSuccess(popularPosts);
     }
 
-    @GetMapping("/weather/simple")
+    @GetMapping("/weather/simple/tags")
     public ApiResponse<List<TagDto.SimpleTag>> getMostSelectedTags(@RequestParam Long memberId) {
         List<TagDto.SimpleTag> mostTags = tagQueryService.getMostSelectedTags(memberId);
         return ApiResponse.onSuccess(mostTags);
     }
+
+//    @GetMapping("/weather/simple/rainprob")
+//    public ApiResponse<Object> getRainProbability(@RequestParam Long memberId) {
+//        List<TagDto.SimpleTag> mostTags = tagQueryService.getMostSelectedTags(memberId);
+//        return ApiResponse.onSuccess(mostTags);
+//    }
 }
