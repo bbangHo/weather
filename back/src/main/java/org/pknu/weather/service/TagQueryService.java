@@ -31,8 +31,8 @@ public class TagQueryService {
      * @param memberId
      * @return
      */
-    public List<TagDto.SimpleTag> getMostSelectedTags(Long memberId) {
-        Member member = memberRepository.safeFindById(memberId);
+    public List<TagDto.SimpleTag> getMostSelectedTags(String memberEmail) {
+        Member member = memberRepository.SafeFindByEmail(memberEmail);
         Location location = member.getLocation();
 
         List<TagQueryResult> tagQueryResultList = tagRepository.rankingTags(location);

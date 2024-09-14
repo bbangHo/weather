@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 메인페이지에서 사용되는 API를 위한 서비스 즉, 화면에 맞춰진 로직을 관리한다.
@@ -29,6 +30,7 @@ public class MainPageService {
     private final WeatherService weatherService;
     private final PostService postService;
     private final PostQueryService postQueryService;
+    private final TagQueryService tagQueryService;
 
     /**
      * 메인 페이지에 날씨와 관련된 데이터를 반환한다.
@@ -51,4 +53,8 @@ public class MainPageService {
         return postQueryService.getPopularPosts(memberId);
     }
 
-}
+//    public void getMostSelectedTags(String memberEmail) {
+//        Member member = memberRepository.SafeFindByEmail(memberEmail);
+//        Location location = member.getLocation();
+//
+//    }
