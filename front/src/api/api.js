@@ -1,4 +1,5 @@
 const BASE_URL = 'http://13.125.128.147:8080';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const sendAccessTokenToBackend = async accessToken => {
   try {
@@ -35,6 +36,42 @@ export const sendAccessTokenToBackend = async accessToken => {
   } catch (error) {
     console.error('Error sending access token:', error.message);
     throw error;
+  }
+};
+
+export const refreshAccessToken = async () => {
+  try {
+    const accessToken = await AsyncStorage.getItem('accessToken');
+    const refreshToken = await AsyncStorage.getItem('refreshToken');
+
+    console.log('Retrieved accessToken:', accessToken);
+    console.log('Retrieved refreshToken:', refreshToken);
+
+    if (!accessToken || !refreshToken) {
+      throw new Error('No access token or refresh token found');
+    }
+
+    const response = await fetch(`${BASE_URL}/refreshToken`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({accessToken, refreshToken}),
+    });
+
+    const result = await response.json();
+
+    console.log('Refresh Token API response:', JSON.stringify(result, null, 2));
+
+    if (result.isSuccess) {
+      await AsyncStorage.setItem('accessToken', result.result.accessToken);
+      return result.result.accessToken;
+    } else {
+      throw new Error(result.message || 'Failed to refresh access token');
+    }
+  } catch (err) {
+    console.error('Failed to refresh access token:', err);
+    throw err;
   }
 };
 
