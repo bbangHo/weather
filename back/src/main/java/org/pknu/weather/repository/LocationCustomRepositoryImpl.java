@@ -15,7 +15,7 @@ import static org.pknu.weather.domain.QWeather.weather;
 public class LocationCustomRepositoryImpl implements LocationCustomRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
-    public List<Location> getNearbyLocationWithTagsAndWeathers(Location locationEntity) {
+    public List<Location> getRainProbability(Location locationEntity) {
         return jpaQueryFactory
                 .selectFrom(location)
                 .join(location.TagList, tag).fetchJoin()

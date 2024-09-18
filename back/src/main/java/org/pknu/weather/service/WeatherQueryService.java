@@ -22,7 +22,7 @@ public class WeatherQueryService {
     public void getNearbyLocationWithTagsAndWeathers(Long memberId){
         Member member = memberRepository.safeFindById(memberId);
         Location location = member.getLocation();
-        List<Location> nearbyLocationList = locationRepository.getNearbyLocationWithTagsAndWeathers(location);
+        List<Location> nearbyLocationList = locationRepository.getRainProbability(location);
 
     }
 
