@@ -16,16 +16,6 @@ public class TagConverter {
         return tag.findByCode(code);
     }
 
-//    public static Tag toTag(PostRequest.CreatePost createPost) {
-//        return Tag.builder()
-//                .temperTag(createPost.getTemperatureTag().toString())
-//                .skyTag(createPost.getSkyTag().toString())
-//                .humidityTag(createPost.getHumidityTag().toString())
-//                .windTag(createPost.getWindTag().toString())
-//                .dustTag(createPost.getDustTag().toString())
-//                .build();
-//    }
-
     public static Tag toTag(PostRequest.CreatePost createPost) {
         return Tag.builder()
                 .temperTag(createPost.getTemperatureTag())

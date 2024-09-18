@@ -1,5 +1,4 @@
 package org.pknu.weather.repository;
-/*
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -106,5 +105,3 @@ class PostRepositoryTest {
 //        Assertions.assertThat(popularPostList.get(4).getContent()).isEqualTo("content1");
     }
 }
-
- */

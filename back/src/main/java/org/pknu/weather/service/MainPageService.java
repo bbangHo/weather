@@ -2,10 +2,10 @@ package org.pknu.weather.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.Weather;
 import org.pknu.weather.dto.PostResponse;
+import org.pknu.weather.dto.TagDto;
 import org.pknu.weather.dto.WeatherResponse;
 import org.pknu.weather.dto.converter.WeatherConverter;
 import org.pknu.weather.repository.MemberRepository;
@@ -29,9 +29,11 @@ public class MainPageService {
     private final WeatherService weatherService;
     private final PostService postService;
     private final PostQueryService postQueryService;
+    private final TagQueryService tagQueryService;
 
     /**
      * 메인 페이지에 날씨와 관련된 데이터를 반환한다.
+     *
      * @param memberId
      * @return
      */
@@ -44,6 +46,7 @@ public class MainPageService {
 
     /**
      * 사용자의 지역에서 가장 좋아요를 많이 받은 글 5개를 반환한다.
+     *
      * @param memberId
      * @return
      */
@@ -51,4 +54,7 @@ public class MainPageService {
         return postQueryService.getPopularPosts(memberId);
     }
 
+    public List<TagDto.SimpleTag> getMostSelectedTags(Long memberId) {
+        return tagQueryService.getMostSelectedTags(memberId);
+    }
 }
