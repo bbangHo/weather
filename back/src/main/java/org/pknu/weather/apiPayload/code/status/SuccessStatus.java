@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum SuccessStatus implements BaseCode {
     _OK(HttpStatus.OK, "200", "정상적인 요청."),
-    _BAD_REQUEST(HttpStatus.BAD_REQUEST, "400", "잘못된 요청"),
+    _REDIRECT(HttpStatus.SEE_OTHER, "303", "다른 URL로 대체됩니다."),
     ;
 
     private final HttpStatus httpStatus;

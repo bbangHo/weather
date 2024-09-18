@@ -68,9 +68,10 @@ class WeatherServiceTest {
     void shortTermForecastSaveTest() {
         // given
         Member member = memberRepository.findAll().get(0);
+        Location location = member.getLocation();
 
         // when
-        List<Weather> weathers = weatherService.saveWeathers(member.getId(), (float)LONGITUDE, (float)LATITUDE);
+        List<Weather> weathers = weatherService.saveWeathers(location);
 
         // then
         assertThat(weathers.size()).isGreaterThanOrEqualTo(20);

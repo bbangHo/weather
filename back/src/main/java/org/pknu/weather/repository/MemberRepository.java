@@ -17,6 +17,13 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
         return findById(id).orElseThrow(() -> new GeneralException(ErrorStatus._MEMBER_NOT_FOUND));
     }
 
+    // true = location이 있다.
+    default Boolean hasRegisteredLocation(/*String email*/ Long id) {
+        Member member = safeFindById(id);
+//        Member member = safeFindByEmail(email);
+        return member.getLocation() != null;
+    }
+
     Optional<Member> findByNickname(String name);
 
     Optional<Member> findMemberByEmail(@Param("email") String email);

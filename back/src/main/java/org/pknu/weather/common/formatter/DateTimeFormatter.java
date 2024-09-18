@@ -92,7 +92,7 @@ public final class DateTimeFormatter {
         return LocalDateTime.parse(dateTime, formatter);
     }
 
-    private static LocalTime getClosestTimeToPresent(LocalTime currentTime) {
+    public static LocalTime getClosestTimeToPresent(LocalTime currentTime) {
         List<LocalTime> predefinedTimes = Arrays.asList(
                 LocalTime.of(2, 0),
                 LocalTime.of(5, 0),

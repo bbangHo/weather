@@ -22,7 +22,9 @@ import java.util.List;
 @RequestMapping("/api/v1/main")
 public class MainPageControllerV1 {
     private final MainPageService mainPageService;
-    private final TagQueryService tagQueryService;
+
+
+    // TODO: AOP 사용, 사용자가 location을 등록했는지 안 했다면 리다이렉션 시키는 공통 로직 작성
 
     @GetMapping("/weather")
     public ApiResponse<WeatherResponse.MainPageWeatherData> getMainPageResource(@RequestParam Long memberId) {
