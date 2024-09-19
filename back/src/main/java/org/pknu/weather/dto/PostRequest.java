@@ -24,8 +24,8 @@ public class PostRequest {
         @Max(value = 10, message = "temperatureTagCode 는 1 ~ 10 사이의 값이어야 합니다.")
         private Integer temperatureTagCode;
 
-        @Min(value = 1, message = "skyTagCode 는 1 ~ 5 사이의 값이어야 합니다.")
-        @Max(value = 5, message = "skyTagCode 는 1 ~ 5 사이의 값이어야 합니다.")
+        @Min(value = 1, message = "skyTagCode 는 1 ~ 4 사이의 값이어야 합니다.")
+        @Max(value = 4, message = "skyTagCode 는 1 ~ 4 사이의 값이어야 합니다.")
         private Integer skyTagCode;
 
         @Min(value = 1, message = "humidityTagCode 는 1 ~ 5 사이의 값이어야 합니다.")
