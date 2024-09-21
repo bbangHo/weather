@@ -35,19 +35,27 @@ public class MainPageService {
 
     /**
      * 메인 페이지에 날씨와 관련된 데이터를 반환한다.
-     * 만약 날씨의 갱신 시간이 지났다면, 갱신을 시도하고 반환한다.
+     * 만약 해당 지역의 날씨의 갱신 시간이 지났다면 갱신을 시도하고 반환한다.
+     * 만약 해당 지역의 날씨 정보가 없다면 저장하고 반환한다.
      *
      * @param memberId
      * @return
      */
+    @Transactional
     public WeatherResponse.MainPageWeatherData getWeatherInfo(Long memberId) {
         Member member = memberRepository.safeFindById(memberId);
         Location location = member.getLocation();
 
-        if(!weatherQueryService.weatherHasBeenUpdated(location)) {
-            // 갱신 로직
-            List<Weather> weathers = weatherService.saveWeathers(location);
-            return WeatherConverter.toMainPageWeatherData(weathers, member);
+        // 예보를 갱신할 시간이 되었는지 체크
+        if (!weatherQueryService.weatherHasBeenUpdated(location)) {
+            List<Weather> weatherList = weatherService.updateWeathers(location);
+            return WeatherConverter.toMainPageWeatherData(weatherList, member);
+        }
+
+        // 해당 지역에 날씨 예보가 있는지 체크
+        if(!weatherQueryService.weatherHasBeenCreated(location)) {
+            List<Weather> weatherList = weatherService.saveWeathers(location);
+            return WeatherConverter.toMainPageWeatherData(weatherList, member);
         }
 
         List<Weather> weatherList = weatherService.getWeathers(location);

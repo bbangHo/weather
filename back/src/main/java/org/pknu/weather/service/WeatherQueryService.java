@@ -3,14 +3,11 @@ package org.pknu.weather.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.domain.Location;
-import org.pknu.weather.domain.Member;
 import org.pknu.weather.repository.LocationRepository;
 import org.pknu.weather.repository.MemberRepository;
 import org.pknu.weather.repository.WeatherRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +31,10 @@ public class WeatherQueryService {
      */
     public boolean weatherHasBeenUpdated(Location location) {
         return weatherRepository.weatherHasBeenUpdated(location);
+    }
+
+    public boolean weatherHasBeenCreated(Location location) {
+        return weatherRepository.weatherHasBeenCreated(location);
     }
 
 }

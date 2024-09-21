@@ -54,6 +54,19 @@ public class Weather extends BaseEntity {
         this.location = location;
     }
 
+    public void updateWeather(Weather newWeather) {
+        if(!this.rainProb.equals(newWeather.getRainProb())) setRainProb(newWeather.getRainProb());
+        if(!this.rainType.equals(newWeather.getRainType())) setRainType(newWeather.getRainType());
+        if(!this.rain.equals(newWeather.getRain())) setRain(newWeather.getRain());
+        if(!this.humidity.equals(newWeather.getHumidity())) setHumidity(newWeather.getHumidity());
+        if(!this.snowCover.equals(newWeather.getSnowCover())) setSnowCover(newWeather.getSnowCover());
+        if(!this.skyType.equals(newWeather.getSkyType())) setSkyType(newWeather.getSkyType());
+        if(!this.temperature.equals(newWeather.getTemperature())) setTemperature(newWeather.getTemperature());
+        if(!this.windSpeed.equals(newWeather.getWindSpeed())) setWindSpeed(newWeather.getWindSpeed());
+        if(!this.basetime.equals(newWeather.getBasetime())) setBasetime(newWeather.getBasetime());
+        if(!this.presentationTime.equals(newWeather.getPresentationTime())) setPresentationTime(newWeather.getPresentationTime());
+    }
+
     public void categoryClassify(WeatherApiResponse.Response.Body.Items.Item item) {
         String val = item.getFcstValue();
         switch (item.getCategory()) {
@@ -144,5 +157,12 @@ public class Weather extends BaseEntity {
 
     private void setSkyType(SkyType skyType) {
         this.skyType = skyType;
+    }
+    private void setBasetime(LocalDateTime basetime) {
+        this.basetime = basetime;
+    }
+
+    private void setPresentationTime(LocalDateTime presentationTime) {
+        this.presentationTime = presentationTime;
     }
 }

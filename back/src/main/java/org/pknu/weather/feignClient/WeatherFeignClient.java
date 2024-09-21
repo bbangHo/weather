@@ -1,21 +1,20 @@
 package org.pknu.weather.feignClient;
 
+import org.pknu.weather.common.WeatherParamsFactory;
 import org.pknu.weather.common.formatter.DateTimeFormatter;
 import org.pknu.weather.common.utils.GeometryUtils;
-import org.pknu.weather.feignClient.utils.WeatherApiUtils;
-import org.pknu.weather.common.WeatherParamsFactory;
 import org.pknu.weather.domain.Weather;
-import org.pknu.weather.feignClient.dto.PointDTO;
 import org.pknu.weather.dto.WeatherApiResponse;
-import org.pknu.weather.dto.WeatherParams;
 import org.pknu.weather.dto.WeatherApiResponse.Response.Body.Items.Item;
+import org.pknu.weather.dto.WeatherParams;
+import org.pknu.weather.feignClient.dto.PointDTO;
+import org.pknu.weather.feignClient.utils.WeatherApiUtils;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.List;
-import java.util.Map;
 
 @FeignClient(value = "weather", url = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0")
 public interface WeatherFeignClient {
@@ -33,7 +32,7 @@ public interface WeatherFeignClient {
      * @param lat 위도
      * @return now ~ 24 시간의 Wether 엔티티를 담고있는 map
      */
-    default Map<String, Weather> preprocess(Float lon, Float lat) {
+    default List<Weather> preprocess(Float lon, Float lat) {
         PointDTO pointDTO = GeometryUtils.coordinateToPoint(lon, lat);
         String date = DateTimeFormatter.getFormattedDate();
         String time = DateTimeFormatter.getFormattedTimeByThreeHour();

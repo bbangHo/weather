@@ -52,7 +52,7 @@ public final class DateTimeFormatter {
      * @return HHmm, String 형태의 formatted time
      */
     public static String getFormattedTimeByThreeHour() {
-        LocalTime currentTime = getClosestTimeToPresent(LocalTime.now());
+        LocalTime currentTime = getTimeClosestToPresent(LocalTime.now());
         java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("HHmm");
         return currentTime.format(formatter);
     }
@@ -92,7 +92,7 @@ public final class DateTimeFormatter {
         return LocalDateTime.parse(dateTime, formatter);
     }
 
-    public static LocalTime getClosestTimeToPresent(LocalTime currentTime) {
+    public static LocalTime getTimeClosestToPresent(LocalTime currentTime) {
         List<LocalTime> predefinedTimes = Arrays.asList(
                 LocalTime.of(2, 0),
                 LocalTime.of(5, 0),
