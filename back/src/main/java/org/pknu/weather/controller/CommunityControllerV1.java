@@ -6,6 +6,7 @@ import org.pknu.weather.dto.PostResponse;
 import org.pknu.weather.service.PostQueryService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -15,7 +16,9 @@ public class CommunityControllerV1 {
     private final PostQueryService postQueryService;
 
     @GetMapping("/posts")
-    public ApiResponse<PostResponse.PostList> getPosts(Long memberId, Long lastPostId, Long size) {
+    public ApiResponse<PostResponse.PostList> getPosts(Long memberId,
+                                                       @RequestParam(defaultValue = "1L") Long lastPostId,
+                                                       @RequestParam(defaultValue = "6L") Long size) {
         PostResponse.PostList postList = postQueryService.getPosts(memberId, lastPostId, size);
         return ApiResponse.onSuccess(postList);
     }
