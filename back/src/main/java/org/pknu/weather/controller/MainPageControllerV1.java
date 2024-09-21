@@ -6,7 +6,6 @@ import org.pknu.weather.dto.PostResponse;
 import org.pknu.weather.dto.TagDto;
 import org.pknu.weather.dto.WeatherResponse;
 import org.pknu.weather.service.MainPageService;
-import org.pknu.weather.service.TagQueryService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -48,7 +47,6 @@ public class MainPageControllerV1 {
     @GetMapping("/weather/simple/rainprob")
     public ApiResponse<Object> getRainProbability(@RequestParam Long memberId) {
 //        String email = TokenConverter.getEmailByToken(authorization);
-
         return null;
     }
 }
