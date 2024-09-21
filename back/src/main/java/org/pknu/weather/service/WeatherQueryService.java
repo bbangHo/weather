@@ -33,6 +33,11 @@ public class WeatherQueryService {
         return weatherRepository.weatherHasBeenUpdated(location);
     }
 
+    /**
+     * 해당 지역의 날씨 데이터가 존재하는지 확인하는 메서드
+     * @param location
+     * @return true = 존재함, false = 존재 하지 않음
+     */
     public boolean weatherHasBeenCreated(Location location) {
         return weatherRepository.weatherHasBeenCreated(location);
     }

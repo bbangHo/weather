@@ -5,8 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Weather;
 import org.pknu.weather.feignClient.WeatherFeignClient;
-import org.pknu.weather.repository.MemberRepository;
+import org.pknu.weather.repository.LocationRepository;
 import org.pknu.weather.repository.WeatherRepository;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,11 +23,12 @@ import java.util.List;
 public class WeatherService {
     private final WeatherFeignClient weatherFeignClient;
     private final WeatherRepository weatherRepository;
-    private final MemberRepository memberRepository;
+    private final LocationRepository locationRepository;
 
     /**
      * TODO: 성능 개선 필요
      * 현재 ~ +24시간 까지의 날씨 정보를 불러옵니다.
+     *
      * @param location
      * @return
      */
@@ -38,6 +40,7 @@ public class WeatherService {
 
     /**
      * 위도와 경도에 해당하는 지역(읍면동)의 24시간치 날씨 단기 예보 정보를 저장합니다.
+     *
      * @return 위도와 경도에 해당하는 Location의 Weather list를 반환
      */
     // TODO: 비동기 처리
@@ -55,12 +58,15 @@ public class WeatherService {
 
     /**
      * 단기 날씨 예보 API가 3시간 마다 갱신되기 때문에, 날씨 데이터 갱신을 위한 메서드
-     * @param location API를 호출한 사용자의 Location 엔티티
+     *
+     * @param loc API를 호출한 사용자의 Location 엔티티
      * @return 해당 위치의 날씨 데이터 List
      */
-    // TODO: 비동기 처리
+    @Async("threadPoolTaskExecutor")
     @Transactional
-    public List<Weather> updateWeathers(Location location) {
+    public void updateWeathers(Location loc) {
+        Location location = locationRepository.safeFindById(loc.getId());
+
         float lon = location.getLongitude().floatValue();
         float lat = location.getLatitude().floatValue();
 
@@ -79,11 +85,11 @@ public class WeatherService {
             orderWeather.updateWeather(newWeather);
         }
 
-        for(int i = minLen; i < maxLen; i++) {
-            orderWeatherList.add(newWeatherList.get(i));
-        }
+        List<Weather> subList = new ArrayList<>(newWeatherList.subList(minLen, maxLen));
+        subList.forEach(weather -> weather.addLocation(location));
+        orderWeatherList.addAll(subList);
 
-        return weatherRepository.saveAll(orderWeatherList);
+        weatherRepository.saveAll(orderWeatherList);
     }
 
     /**

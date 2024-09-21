@@ -54,7 +54,7 @@ public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
                         weather.basetime.lt(LocalDateTime.of(now.toLocalDate(), baseTime)),
                         weather.location.eq(location)
                 )
-                .fetchOne() == null;
+                .fetchFirst() == null;
     }
 
     /**
@@ -76,6 +76,6 @@ public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
                         weather.presentationTime.after(now),
                         weather.location.eq(location)
                 )
-                .fetchOne() != null;
+                .fetchFirst() != null;
     }
 }

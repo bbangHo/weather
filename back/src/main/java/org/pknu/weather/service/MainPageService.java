@@ -13,6 +13,7 @@ import org.pknu.weather.repository.MemberRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -45,20 +46,20 @@ public class MainPageService {
     public WeatherResponse.MainPageWeatherData getWeatherInfo(Long memberId) {
         Member member = memberRepository.safeFindById(memberId);
         Location location = member.getLocation();
+        List<Weather> weatherList = new ArrayList<>();
+
+        // 해당 지역에 날씨 예보가 있는지 없는지 체크
+        if (!weatherQueryService.weatherHasBeenCreated(location)) {
+            weatherList = weatherService.saveWeathers(location);
+            return WeatherConverter.toMainPageWeatherData(weatherList, member);
+        }
 
         // 예보를 갱신할 시간이 되었는지 체크
         if (!weatherQueryService.weatherHasBeenUpdated(location)) {
-            List<Weather> weatherList = weatherService.updateWeathers(location);
-            return WeatherConverter.toMainPageWeatherData(weatherList, member);
+            weatherService.updateWeathers(location);
         }
 
-        // 해당 지역에 날씨 예보가 있는지 체크
-        if(!weatherQueryService.weatherHasBeenCreated(location)) {
-            List<Weather> weatherList = weatherService.saveWeathers(location);
-            return WeatherConverter.toMainPageWeatherData(weatherList, member);
-        }
-
-        List<Weather> weatherList = weatherService.getWeathers(location);
+        weatherList = weatherService.getWeathers(location);
         return WeatherConverter.toMainPageWeatherData(weatherList, member);
     }
 
