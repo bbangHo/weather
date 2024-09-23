@@ -8,14 +8,15 @@ import org.pknu.weather.domain.Post;
 import org.pknu.weather.domain.Recommendation;
 import org.pknu.weather.dto.PostResponse;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PostResponseConverter {
 
     public static PostResponse.PostList toPostList(Member member, List<Post> postList, boolean hasNext) {
-        List<PostResponse.Post> list = postList.stream()
+        List<PostResponse.Post> list = new ArrayList<>(postList.stream()
                 .map(p -> toPost(member, p))
-                .toList();
+                .toList());
 
         if(hasNext) {
             list.remove(list.size() - 1);
