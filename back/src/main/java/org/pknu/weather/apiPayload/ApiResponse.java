@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.pknu.weather.apiPayload.code.BaseCode;
+import org.pknu.weather.apiPayload.code.status.ErrorStatus;
 import org.pknu.weather.apiPayload.code.status.SuccessStatus;
 
 @Getter
@@ -41,7 +42,7 @@ public class ApiResponse<T> {
             return new ApiResponse<>(true, SuccessStatus._OK.getCode(), SuccessStatus._OK.getMessage(), null);
         }
 
-        return new ApiResponse<>(false, SuccessStatus._BAD_REQUEST.getCode(), SuccessStatus._BAD_REQUEST.getMessage(), null);
+        return new ApiResponse<>(false, ErrorStatus._BAD_REQUEST.getCode(), ErrorStatus._BAD_REQUEST.getMessage(), null);
     }
 
     public static <T> ApiResponse<T> onFailure(String code, String message, T data) {

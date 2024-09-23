@@ -63,9 +63,9 @@ class MainPageServiceTest {
                 .sensitivity(Sensitivity.NONE)
                 .build();
 
-        locationRepository.save(location);
+        location = locationRepository.save(location);
         member = memberRepository.save(member);
-        weatherService.saveWeathers(member.getId(), (float)LONGITUDE, (float)LATITUDE);
+        weatherService.saveWeathers(location);
     }
 
     @Test
@@ -74,7 +74,8 @@ class MainPageServiceTest {
     void mainPageWeatherApiTest(){
         // given
         Member member = memberRepository.findAll().get(0);
-        List<Weather> weatherList = weatherService.getWeathers(member);
+        Location location = member.getLocation();
+        List<Weather> weatherList = weatherService.getWeathers(location);
 
         // when
         WeatherResponse.MainPageWeatherData weatherInfo = mainPageService.getWeatherInfo(member.getId());

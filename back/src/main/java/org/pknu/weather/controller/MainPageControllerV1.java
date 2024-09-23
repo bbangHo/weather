@@ -6,7 +6,6 @@ import org.pknu.weather.dto.PostResponse;
 import org.pknu.weather.dto.TagDto;
 import org.pknu.weather.dto.WeatherResponse;
 import org.pknu.weather.service.MainPageService;
-import org.pknu.weather.service.TagQueryService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,7 +21,9 @@ import java.util.List;
 @RequestMapping("/api/v1/main")
 public class MainPageControllerV1 {
     private final MainPageService mainPageService;
-    private final TagQueryService tagQueryService;
+
+
+    // TODO: AOP 사용, 사용자가 location을 등록했는지 안 했다면 리다이렉션 시키는 공통 로직 작성
 
     @GetMapping("/weather")
     public ApiResponse<WeatherResponse.MainPageWeatherData> getMainPageResource(@RequestParam Long memberId) {
@@ -46,7 +47,6 @@ public class MainPageControllerV1 {
     @GetMapping("/weather/simple/rainprob")
     public ApiResponse<Object> getRainProbability(@RequestParam Long memberId) {
 //        String email = TokenConverter.getEmailByToken(authorization);
-
         return null;
     }
 }

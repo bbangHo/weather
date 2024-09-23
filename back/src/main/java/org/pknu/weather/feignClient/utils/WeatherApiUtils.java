@@ -5,12 +5,21 @@ import org.pknu.weather.domain.Weather;
 import org.pknu.weather.dto.WeatherApiResponse.Response.Body.Items.Item;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class WeatherApiUtils {
-    public static Map<String, Weather> responseProcess(List<Item> itemList, String date, String time) {
+
+    /**
+     * 단기 날씨 예보 API 에서 얻은 데이터를 Weather 데이터로 가공하는 메서드
+     * @param itemList 단기 날씨 예보 API 에서 얻은 데이터
+     * @param date ex. "202409"
+     * @param time ex. "0500"
+     * @return
+     */
+    public static List<Weather> responseProcess(List<Item> itemList, String date, String time) {
         Map<String, Weather> weatherMap = new HashMap<>();
         LocalDateTime baseTime = DateTimeFormatter.formattedDateTime2LocalDateTime(date, time);
 
@@ -36,6 +45,9 @@ public class WeatherApiUtils {
             weatherMap.put(fcstTime, weather);
         }
 
-        return weatherMap;
+        return weatherMap.values().stream()
+                .filter(weather -> weather.getPresentationTime().isAfter(LocalDateTime.now()))
+                .sorted(Comparator.comparing(Weather::getPresentationTime))
+                .toList();
     }
 }

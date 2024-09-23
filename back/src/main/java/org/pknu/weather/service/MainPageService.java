@@ -2,6 +2,7 @@ package org.pknu.weather.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.Weather;
 import org.pknu.weather.dto.PostResponse;
@@ -12,6 +13,7 @@ import org.pknu.weather.repository.MemberRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,22 +29,39 @@ import java.util.List;
 public class MainPageService {
     private final MemberRepository memberRepository;
     private final WeatherService weatherService;
+    private final WeatherQueryService weatherQueryService;
     private final PostService postService;
     private final PostQueryService postQueryService;
     private final TagQueryService tagQueryService;
 
     /**
      * 메인 페이지에 날씨와 관련된 데이터를 반환한다.
+     * 만약 해당 지역의 날씨의 갱신 시간이 지났다면 갱신을 시도하고 반환한다.
+     * 만약 해당 지역의 날씨 정보가 없다면 저장하고 반환한다.
      *
      * @param memberId
      * @return
      */
+    @Transactional
     public WeatherResponse.MainPageWeatherData getWeatherInfo(Long memberId) {
         Member member = memberRepository.safeFindById(memberId);
-        List<Weather> weatherList = weatherService.getWeathers(member);
+        Location location = member.getLocation();
+        List<Weather> weatherList = new ArrayList<>();
+
+        // 해당 지역에 날씨 예보가 있는지 없는지 체크
+        if (!weatherQueryService.weatherHasBeenCreated(location)) {
+            weatherList = weatherService.saveWeathers(location);
+            return WeatherConverter.toMainPageWeatherData(weatherList, member);
+        }
+
+        // 예보를 갱신할 시간이 되었는지 체크
+        if (!weatherQueryService.weatherHasBeenUpdated(location)) {
+            weatherService.updateWeathers(location);
+        }
+
+        weatherList = weatherService.getWeathers(location);
         return WeatherConverter.toMainPageWeatherData(weatherList, member);
     }
-
 
     /**
      * 사용자의 지역에서 가장 좋아요를 많이 받은 글 5개를 반환한다.

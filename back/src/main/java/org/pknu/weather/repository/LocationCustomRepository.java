@@ -7,4 +7,5 @@ import java.util.List;
 public interface LocationCustomRepository {
     List<Location> getRainProbability(Location locationEntity);
 
+
 }

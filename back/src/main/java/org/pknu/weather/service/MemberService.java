@@ -32,6 +32,7 @@ public class MemberService {
     private final LocalUploaderUtils localUploaderUtils;
     private final S3UploaderUtils s3UploaderUtils;
 
+
     public Member saveMember(Member member){
         return memberRepository.save(member);
     }
