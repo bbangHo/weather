@@ -71,6 +71,7 @@ class WeatherServiceTest {
         Location location = member.getLocation();
 
         // when
+        // TODO: WeatherFeignClient.test 에서 API가 호출되는지 테스트를 하기 때문에 Mock으로 변경
         List<Weather> weathers = weatherService.saveWeathers(location);
 
         // then

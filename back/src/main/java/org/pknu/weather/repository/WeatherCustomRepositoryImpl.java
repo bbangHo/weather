@@ -5,7 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.pknu.weather.common.formatter.DateTimeFormatter;
 import org.pknu.weather.common.utils.QueryUtils;
 import org.pknu.weather.domain.Location;
+import org.pknu.weather.domain.Weather;
+import org.springframework.cglib.core.Local;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -40,21 +43,22 @@ public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
      */
     @Override
     public boolean weatherHasBeenUpdated(Location location) {
-        LocalDateTime now = LocalDateTime.now();
-        now = now.withMinute(0);
-        now = now.withSecond(0);
-        now = now.withNano(0);
-        LocalTime baseTime = DateTimeFormatter.getTimeClosestToPresent(now.toLocalTime());
+        LocalDateTime now = LocalDateTime.now().withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime baseTime = LocalDateTime.of(
+                now.toLocalDate(),
+                DateTimeFormatter.getTimeClosestToPresent(now.toLocalTime()));
 
-        return jpaQueryFactory
-                .select(weather)
+        LocalDateTime weatherBaseTime = jpaQueryFactory
+                .select(weather.basetime)
                 .from(weather)
                 .where(
                         weather.presentationTime.after(now),
-                        weather.basetime.lt(LocalDateTime.of(now.toLocalDate(), baseTime)),
                         weather.location.eq(location)
                 )
-                .fetchFirst() == null;
+                .fetchFirst();
+
+        assert weatherBaseTime != null;
+        return weatherBaseTime.isEqual(baseTime);
     }
 
     /**
@@ -64,18 +68,17 @@ public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
      */
     @Override
     public boolean weatherHasBeenCreated(Location location) {
-        LocalDateTime now = LocalDateTime.now();
-        now = now.withMinute(0);
-        now = now.withSecond(0);
-        now = now.withNano(0);
+        LocalDateTime now = LocalDateTime.now().withMinute(0).withSecond(0).withNano(0);
 
-        return jpaQueryFactory
+        Weather w = jpaQueryFactory
                 .select(weather)
                 .from(weather)
                 .where(
                         weather.presentationTime.after(now),
                         weather.location.eq(location)
                 )
-                .fetchFirst() != null;
+                .fetchFirst();
+
+        return w != null;
     }
 }
