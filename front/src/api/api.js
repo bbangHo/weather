@@ -191,16 +191,13 @@ export const createPost = async (postData, accessToken, memberId) => {
   }
 };
 
-export const fetchPosts = async (
-  accessToken,
-  memberId,
-  lastPostId = 1,
-  size = 10,
-) => {
+export const fetchPosts = async (accessToken, memberId, lastPostId = null) => {
   try {
-    const url = `${BASE_URL}/api/v1/community/posts?memberId=${memberId}&size=${size}${
-      lastPostId ? `&lastPostId=${lastPostId}` : ''
-    }`;
+    let url = `${BASE_URL}/api/v1/community/posts?memberId=${memberId}&size=6`;
+
+    if (lastPostId !== null) {
+      url += `&lastPostId=${lastPostId}`;
+    }
 
     const response = await fetch(url, {
       method: 'GET',
@@ -211,13 +208,13 @@ export const fetchPosts = async (
     });
 
     if (!response.ok) {
-      const errorResponse = await response.json();
-      console.error('Failed to fetch posts:', response.status, errorResponse);
+      const errorText = await response.text();
+      console.error('Failed to fetch posts:', response.status, errorText);
       throw new Error('Failed to fetch posts');
     }
 
     const data = await response.json();
-    return data.result.postList;
+    return data.result?.postList || [];
   } catch (error) {
     console.error('Error fetching posts:', error);
     throw error;
@@ -285,6 +282,36 @@ export const toggleLikePost = async (accessToken, memberId, postId) => {
     return data;
   } catch (error) {
     console.error('Error liking post:', error);
+    throw error;
+  }
+};
+
+export const fetchWeatherTags = async (accessToken, memberId) => {
+  try {
+    const url = `${BASE_URL}/api/v1/main/weather/simple/tags?memberId=${memberId}`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(
+        'Failed to fetch weather tags:',
+        response.status,
+        errorText,
+      );
+      throw new Error('Failed to fetch weather tags');
+    }
+
+    const data = await response.json();
+    return data.result;
+  } catch (error) {
+    console.error('Error fetching weather tags:', error);
     throw error;
   }
 };

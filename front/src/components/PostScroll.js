@@ -15,19 +15,24 @@ import {fetchPosts, toggleLikePost} from '../api/api';
 
 const PostScroll = ({accessToken, memberId}) => {
   const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [lastPostId, setLastPostId] = useState(null);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   useEffect(() => {
     loadPosts();
   }, []);
 
   const loadPosts = async () => {
+    if (loading || loadingMore) return;
+    setLoading(true);
     try {
-      const fetchedPosts = await fetchPosts(accessToken, memberId);
+      const fetchedPosts = await fetchPosts(accessToken, memberId, lastPostId);
       console.log('Fetched posts:', fetchedPosts);
       if (fetchedPosts && fetchedPosts.length > 0) {
-        setPosts(fetchedPosts);
-      } else {
+        setPosts(prevPosts => [...prevPosts, ...fetchedPosts]);
+        setLastPostId(fetchedPosts[fetchedPosts.length - 1].postInfo.postId);
+      } else if (lastPostId === null) {
         Alert.alert('Info', '불러올 게시글이 없습니다.');
       }
     } catch (error) {
@@ -38,6 +43,7 @@ const PostScroll = ({accessToken, memberId}) => {
       );
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   };
 
@@ -119,15 +125,24 @@ const PostScroll = ({accessToken, memberId}) => {
     </View>
   );
 
+  const loadMorePosts = () => {
+    if (!loading && !loadingMore) {
+      setLoadingMore(true);
+      loadPosts();
+    }
+  };
+
   return (
     <FlatList
       data={posts}
       renderItem={renderPost}
       keyExtractor={item => item.postInfo.postId.toString()}
       ListFooterComponent={
-        loading ? <Text style={styles.loadingText}>Loading...</Text> : null
+        loadingMore ? <Text style={styles.loadingText}>Loading...</Text> : null
       }
       contentContainerStyle={styles.contentContainer}
+      onEndReached={loadMorePosts}
+      onEndReachedThreshold={0.5}
     />
   );
 };

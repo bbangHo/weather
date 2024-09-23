@@ -1,10 +1,27 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {ScrollView, View, Text, StyleSheet, Dimensions} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import globalStyles from '../globalStyles';
+import {fetchWeatherTags} from '../api/api';
 
-const WeatherInfoSlider = () => {
+const WeatherInfoSlider = ({accessToken, memberId}) => {
   const [activeSlide, setActiveSlide] = useState(0);
+  const [weatherTags, setWeatherTags] = useState([]);
+
+  useEffect(() => {
+    const loadWeatherTags = async () => {
+      try {
+        const fetchedTags = await fetchWeatherTags(accessToken, memberId);
+        setWeatherTags(fetchedTags);
+      } catch (error) {
+        console.error('Error loading weather tags:', error);
+      }
+    };
+
+    if (accessToken && memberId) {
+      loadWeatherTags();
+    }
+  }, [accessToken, memberId]);
 
   const handleScroll = event => {
     const contentOffsetX = event.nativeEvent.contentOffset.x;
@@ -16,9 +33,9 @@ const WeatherInfoSlider = () => {
   return (
     <View style={styles.sliderContainer}>
       <View style={styles.indicatorContainer}>
-        {[0, 1, 2].map(index => (
+        {[0, 1, 2].map((_, index) => (
           <View
-            key={index}
+            key={`indicator-${index}`}
             style={[
               styles.indicator,
               {opacity: index === activeSlide ? 1 : 0.5},
@@ -36,15 +53,11 @@ const WeatherInfoSlider = () => {
         <View style={[styles.slide, globalStyles.transparentBackground]}>
           <Text style={styles.title}>우리 동네 날씨</Text>
           <View style={styles.infoContainer}>
-            <View style={styles.innerBox}>
-              <Text style={styles.info}>습하고 조금 더워요</Text>
-            </View>
-            <View style={styles.innerBox}>
-              <Text style={styles.info}>바람 많이 불어요</Text>
-            </View>
-            <View style={styles.innerBox}>
-              <Text style={styles.info}>강풍주의보 발령</Text>
-            </View>
+            {weatherTags.map((tag, index) => (
+              <View key={`tag-${index}`} style={styles.innerBox}>
+                <Text style={styles.info}>{tag.text}</Text>
+              </View>
+            ))}
           </View>
         </View>
         <View style={[styles.slide, globalStyles.transparentBackground]}>
