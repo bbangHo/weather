@@ -8,7 +8,7 @@ import org.pknu.weather.domain.Weather;
 import org.pknu.weather.dto.PostResponse;
 import org.pknu.weather.dto.TagDto;
 import org.pknu.weather.dto.WeatherResponse;
-import org.pknu.weather.dto.converter.WeatherConverter;
+import org.pknu.weather.dto.converter.WeatherResponseConverter;
 import org.pknu.weather.repository.MemberRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,7 +51,7 @@ public class MainPageService {
         // 해당 지역에 날씨 예보가 있는지 없는지 체크
         if (!weatherQueryService.weatherHasBeenCreated(location)) {
             weatherList = weatherService.saveWeathers(location);
-            return WeatherConverter.toMainPageWeatherData(weatherList, member);
+            return WeatherResponseConverter.toMainPageWeatherData(weatherList, member);
         }
 
         // 예보를 갱신할 시간이 되었는지 체크
@@ -60,7 +60,7 @@ public class MainPageService {
         }
 
         weatherList = weatherService.getWeathers(location);
-        return WeatherConverter.toMainPageWeatherData(weatherList, member);
+        return WeatherResponseConverter.toMainPageWeatherData(weatherList, member);
     }
 
     /**
@@ -75,5 +75,9 @@ public class MainPageService {
 
     public List<TagDto.SimpleTag> getMostSelectedTags(Long memberId) {
         return tagQueryService.getMostSelectedTags(memberId);
+    }
+
+    public WeatherResponse.SimpleRainInformation getSimpleRainInfo(Long memberId) {
+        return weatherQueryService.getSimpleRainInfo(memberId);
     }
 }
