@@ -1,16 +1,15 @@
 package org.pknu.weather.repository;
 
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.pknu.weather.common.formatter.DateTimeFormatter;
 import org.pknu.weather.common.utils.QueryUtils;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Weather;
-import org.springframework.cglib.core.Local;
+import org.pknu.weather.dto.WeatherQueryResult;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 import static org.pknu.weather.domain.QLocation.location;
 import static org.pknu.weather.domain.QWeather.weather;
@@ -20,24 +19,32 @@ public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
 
-    public void getPrcpProb(Location locationEntity) {
-        // Projections.constructor
-        LocalDateTime startDt = LocalDateTime.now();
-        LocalDateTime endDt = startDt.plusHours(24);
 
-        jpaQueryFactory
-                .select(location)
-                .from(location)
-                .join(location.weatherList, weather).fetchJoin()
+    /**
+     * 24시간 이내에 비소식이 있는지 확인합니다.
+     *
+     * @param locationEntity
+     * @return 비소식이 없으면 null을 반환.
+     */
+    public WeatherQueryResult.SimpleRainInfo getSimpleRainInfo(Location locationEntity) {
+        return jpaQueryFactory
+                .select(Projections.constructor(WeatherQueryResult.SimpleRainInfo.class,
+                        weather.presentationTime,
+                        weather.rainProb,
+                        weather.rain
+                ))
+                .from(weather)
                 .where(
-                        QueryUtils.isContains(locationEntity)
-                        
+                        QueryUtils.isSameLocation(locationEntity, weather),
+                        QueryUtils.presentationTimeWithinLast24Hours(weather),
+                        weather.rain.gt(0)
                 )
-                .fetchOne();
+                .fetchFirst();
     }
 
     /**
      * 해당 지역의 날씨가 갱신되었는지 확인하는 메서드
+     *
      * @param location
      * @return true = 갱신되었음(3시간 안지남), false = 갱신되지 않았음(3시간 지남)
      */
@@ -63,6 +70,7 @@ public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
 
     /**
      * 해당 지역의 날씨 데이터가 존재하는지 확인하는 메서드
+     *
      * @param location
      * @return true = 존재함, false = 존재 하지 않음
      */

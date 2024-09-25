@@ -65,4 +65,14 @@ public class WeatherResponse {
         String tmpText;         // 온도의 텍스트화
         Integer tmp;       // 온도
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SimpleRainInformation{
+        String comment;
+        Boolean willRain;
+        String rainfallAmount;
+    }
 }

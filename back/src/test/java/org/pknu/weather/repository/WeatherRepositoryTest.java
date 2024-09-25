@@ -1,14 +1,13 @@
 package org.pknu.weather.repository;
 
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.pknu.weather.common.TestGlobalParams;
 import org.pknu.weather.common.formatter.DateTimeFormatter;
 import org.pknu.weather.common.utils.GeometryUtils;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Weather;
+import org.pknu.weather.dto.WeatherQueryResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
@@ -122,6 +121,52 @@ class WeatherRepositoryTest {
 
         // then
         assertThat(result).isTrue();
+    }
+
+    @Test
+    @Transactional
+    void 간단_강수_정보_테스트_강수_확률이_있을_때() {
+        // given
+        Location location = createLocation();
+        LocalDateTime presentationTime = LocalDateTime.now().withMinute(0).withSecond(0).withNano(0).plusHours(1);
+        Weather weather = Weather.builder()
+                .presentationTime(presentationTime)
+                .location(location)
+                .rain(1.0F)
+                .rainProb(10)
+                .build();
+
+        weatherRepository.save(weather);
+
+        // when
+        WeatherQueryResult.SimpleRainInfo simpleRainInfo = weatherRepository.getSimpleRainInfo(location);
+
+        // thne
+        assertThat(simpleRainInfo.getRainProbability()).isEqualTo(weather.getRainProb());
+        assertThat(simpleRainInfo.getTime()).isEqualTo(presentationTime);
+        assertThat(simpleRainInfo.getRain()).isEqualTo(weather.getRain());
+    }
+
+    @Test
+    @Transactional
+    void 간단_강수_정보_테스트_강수_확률이_없을_때() {
+        // given
+        Location location = createLocation();
+        LocalDateTime presentationTime = LocalDateTime.now().withMinute(0).withSecond(0).withNano(0).plusHours(1);
+        Weather weather = Weather.builder()
+                .presentationTime(presentationTime)
+                .location(location)
+                .rain(0.0F)
+                .rainProb(0)
+                .build();
+
+        weatherRepository.save(weather);
+
+        // when
+        WeatherQueryResult.SimpleRainInfo simpleRainInfo = weatherRepository.getSimpleRainInfo(location);
+
+        // thne
+        assertThat(simpleRainInfo).isNull();
     }
 
 

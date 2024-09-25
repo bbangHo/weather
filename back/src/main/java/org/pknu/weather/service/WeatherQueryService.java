@@ -3,6 +3,10 @@ package org.pknu.weather.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.domain.Location;
+import org.pknu.weather.domain.Member;
+import org.pknu.weather.dto.WeatherQueryResult;
+import org.pknu.weather.dto.WeatherResponse;
+import org.pknu.weather.dto.converter.WeatherResponseConverter;
 import org.pknu.weather.repository.LocationRepository;
 import org.pknu.weather.repository.MemberRepository;
 import org.pknu.weather.repository.WeatherRepository;
@@ -23,6 +27,13 @@ public class WeatherQueryService {
 //        Location location = member.getLocation();
 //        List<Location> nearbyLocationList = locationRepository.getRainProbability(location);
 //    }
+
+    public WeatherResponse.SimpleRainInformation getSimpleRainInfo(Long memberId) {
+        Member member = memberRepository.safeFindById(memberId);
+        Location location = member.getLocation();
+        WeatherQueryResult.SimpleRainInfo simpleRainInfo = weatherRepository.getSimpleRainInfo(location);
+        return WeatherResponseConverter.toSimpleRainInformation(simpleRainInfo);
+    }
 
     /**
      * 해당 지역의 날씨가 갱신되었는지 확인하는 메서드

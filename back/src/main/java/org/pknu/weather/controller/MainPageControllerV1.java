@@ -44,9 +44,9 @@ public class MainPageControllerV1 {
         return ApiResponse.onSuccess(mostTags);
     }
 
-    @GetMapping("/weather/simple/rainprob")
+    @GetMapping("/weather/simple/rain")
     public ApiResponse<Object> getRainProbability(@RequestParam Long memberId) {
-//        String email = TokenConverter.getEmailByToken(authorization);
-        return null;
+        WeatherResponse.SimpleRainInformation rainProb = mainPageService.getSimpleRainInfo(memberId);
+        return ApiResponse.onSuccess(rainProb);
     }
 }
