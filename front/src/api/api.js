@@ -315,3 +315,29 @@ export const fetchWeatherTags = async (accessToken, memberId) => {
     throw error;
   }
 };
+
+export const fetchPostTags = async accessToken => {
+  const url = `${BASE_URL}/api/v1/tags`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorResponse = await response.text();
+      console.error('Failed to fetch tags:', response.status, errorResponse);
+      throw new Error('Failed to fetch tags');
+    }
+
+    const data = await response.json();
+    return data.result;
+  } catch (error) {
+    console.error('Error fetching tags:', error);
+    throw error;
+  }
+};

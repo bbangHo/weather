@@ -111,9 +111,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   icon: {
-    width: 30,
-    height: 30,
-    marginBottom: 5,
+    width: 40,
+    height: 40,
+    marginBottom: 0,
   },
   rainAdverb: {
     color: 'skyblue',
