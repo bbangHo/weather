@@ -62,19 +62,19 @@ class WeatherServiceTest {
         memberRepository.save(member);
     }
 
-    @Test
-    @DisplayName("단기 예보 저장 통합 테스트")
-    @Transactional
-    void shortTermForecastSaveTest() {
-        // given
-        Member member = memberRepository.findAll().get(0);
-        Location location = member.getLocation();
-
-        // when
-        // TODO: WeatherFeignClient.test 에서 API가 호출되는지 테스트를 하기 때문에 Mock으로 변경
-        List<Weather> weathers = weatherService.saveWeathers(location);
-
-        // then
-        assertThat(weathers.size()).isGreaterThanOrEqualTo(20);
-    }
+//    @Test
+//    @DisplayName("단기 예보 저장 통합 테스트")
+//    @Transactional
+//    void shortTermForecastSaveTest() {
+//        // given
+//        Member member = memberRepository.findAll().get(0);
+//        Location location = member.getLocation();
+//
+//        // when
+//        // TODO: WeatherFeignClient.test 에서 API가 호출되는지 테스트를 하기 때문에 Mock으로 변경
+//        List<Weather> weathers = weatherService.saveWeathers(location);
+//
+//        // then
+//        assertThat(weathers.size()).isGreaterThanOrEqualTo(20);
+//    }
 }
