@@ -341,3 +341,38 @@ export const fetchPostTags = async accessToken => {
     throw error;
   }
 };
+
+export const fetchRainForecast = async (accessToken, memberId) => {
+  try {
+    const url = `${BASE_URL}/api/v1/main/weather/simple/rain?memberId=${memberId}`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(
+        'Failed to fetch rain forecast:',
+        response.status,
+        errorText,
+      );
+      throw new Error('Failed to fetch rain forecast');
+    }
+
+    const data = await response.json();
+    if (!data.isSuccess) {
+      console.error('Backend error:', data.code, data.message);
+      throw new Error(data.message || 'Unknown error from backend');
+    }
+
+    return data.result;
+  } catch (error) {
+    console.error('Error fetching rain forecast:', error.message);
+    throw error;
+  }
+};

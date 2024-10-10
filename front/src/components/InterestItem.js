@@ -44,7 +44,6 @@ const InterestItem = ({
     }
   };
 
-  // 취미 카테고리 구체화 후, 변경할 예정입니다.
   const hobbies = [
     {id: 1, name: '산책', icon: 'paw-outline'},
     {id: 2, name: '스키', icon: 'snow-outline'},
@@ -73,7 +72,11 @@ const InterestItem = ({
       </View>
       <View style={styles.hobbyContainer}>
         <TouchableOpacity onPress={() => setModalVisible(true)}>
-          <Text style={styles.hobbyText}>취미 선택 ▼</Text>
+          <View style={styles.hobbyTextContainer}>
+            <Text style={styles.hobbyText}>
+              {selectedHobby ? selectedHobby.name : '취미 선택 ▼'}
+            </Text>
+          </View>
         </TouchableOpacity>
       </View>
       <Modal
@@ -83,7 +86,7 @@ const InterestItem = ({
         onRequestClose={() => setModalVisible(false)}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>취미</Text>
+            <Text style={styles.modalTitle}>취미 선택</Text>
             <FlatList
               data={hobbies}
               numColumns={2}
@@ -95,7 +98,13 @@ const InterestItem = ({
                   ]}
                   onPress={() => handleHobbyPress(item)}>
                   <Icon name={item.icon} size={30} color="#3f51b5" />
-                  <Text style={styles.hobbyButtonText}>{item.name}</Text>
+                  <Text
+                    style={[
+                      styles.hobbyButtonText,
+                      selectedHobby?.id === item.id && styles.selectedHobbyText,
+                    ]}>
+                    {item.name}
+                  </Text>
                 </TouchableOpacity>
               )}
               keyExtractor={item => item.id.toString()}
@@ -148,9 +157,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginVertical: 20,
   },
+  hobbyTextContainer: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 10,
+    width: width * 0.25,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
+  },
   hobbyText: {
     fontSize: 20,
     color: '#fff',
+    textAlign: 'center',
   },
   modalOverlay: {
     flex: 1,
@@ -160,7 +178,7 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     backgroundColor: '#fff',
-    width: width * 0.9,
+    width: width * 1,
     borderRadius: 10,
     padding: 20,
     alignItems: 'center',
@@ -168,30 +186,32 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     marginBottom: 20,
-    color: '#000',
+    color: '#3f51b5',
   },
   hobbyList: {
     alignItems: 'center',
   },
   hobbyButton: {
-    flex: 1,
-    padding: 15,
+    paddingVertical: 20,
     margin: 10,
     borderWidth: 1,
     borderColor: '#3f51b5',
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    width: width * 0.4 - 30,
+    width: width * 0.4,
   },
   hobbyButtonText: {
     fontSize: 14,
-    color: '#000',
+    color: '#3f51b5',
     marginTop: 5,
     textAlign: 'center',
   },
   selectedHobby: {
     backgroundColor: '#3f51b5',
+  },
+  selectedHobbyText: {
+    color: '#fff',
   },
   applyButton: {
     backgroundColor: '#3f51b5',
