@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -9,16 +9,38 @@ import {
   Image,
   Dimensions,
   ScrollView,
+  TextInput,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {fetchUserLocation} from '../api/api';
 
 const InterestItem = ({
-  weatherData,
+  accessToken,
   selectedHobby,
   setSelectedHobby,
   modalVisible,
   setModalVisible,
 }) => {
+  const [userLocation, setUserLocation] = useState(null);
+  const [addressModalVisible, setAddressModalVisible] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+
+  useEffect(() => {
+    const loadUserLocation = async () => {
+      try {
+        const locationData = await fetchUserLocation(accessToken);
+        setUserLocation(locationData);
+      } catch (error) {
+        console.error('위치 정보를 불러오는 중 오류가 발생했습니다:', error);
+      }
+    };
+
+    if (accessToken) {
+      loadUserLocation();
+    }
+  }, [accessToken]);
+
   const handleHobbyPress = hobby => {
     setSelectedHobby(hobby);
   };
@@ -28,7 +50,24 @@ const InterestItem = ({
   };
 
   const handleLocationPress = () => {
-    console.log('Location pressed!');
+    setAddressModalVisible(true);
+  };
+
+  const handleSearch = () => {
+    // 주소 검색 API 호출 로직 추가 예정입니다.
+    setSearchResults([
+      {id: 1, address: 'test입니다.'},
+      {id: 2, address: 'test입니다.'},
+    ]);
+  };
+
+  const handleAddressSelect = address => {
+    setUserLocation({
+      province: address.split(' ')[0],
+      city: address.split(' ')[1],
+      street: address.split(' ')[2],
+    });
+    setAddressModalVisible(false);
   };
 
   const getWeatherIcon = skyType => {
@@ -64,8 +103,13 @@ const InterestItem = ({
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={handleLocationPress}>
-        <Text style={styles.locationText}>강원도 정선군 ▼</Text>
+        <Text style={styles.locationText}>
+          {userLocation
+            ? `${userLocation.province} ${userLocation.city} ${userLocation.street}`
+            : '위치 정보를 불러오는 중...'}
+        </Text>
       </TouchableOpacity>
+
       <View style={styles.weatherIconContainer}>
         <Icon name="cloud-outline" size={50} color="#fff" />
         <Text style={styles.weatherText}>보통</Text>
@@ -79,6 +123,7 @@ const InterestItem = ({
           </View>
         </TouchableOpacity>
       </View>
+
       <Modal
         visible={modalVisible}
         transparent={true}
@@ -112,6 +157,42 @@ const InterestItem = ({
             />
             <TouchableOpacity style={styles.applyButton} onPress={handleApply}>
               <Text style={styles.applyText}>적용하기</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        visible={addressModalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setAddressModalVisible(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>주소 검색</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="주소를 입력하세요"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              onSubmitEditing={handleSearch}
+            />
+            <FlatList
+              data={searchResults}
+              renderItem={({item}) => (
+                <TouchableOpacity
+                  style={styles.addressItem}
+                  onPress={() => handleAddressSelect(item.address)}>
+                  <Text style={styles.addressText}>{item.address}</Text>
+                </TouchableOpacity>
+              )}
+              keyExtractor={item => item.id.toString()}
+              contentContainerStyle={styles.addressList}
+            />
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setAddressModalVisible(false)}>
+              <Text style={styles.closeButtonText}>닫기</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -160,7 +241,7 @@ const styles = StyleSheet.create({
   hobbyTextContainer: {
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     borderRadius: 10,
-    width: width * 0.25,
+    width: width * 0.32,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 10,
@@ -187,6 +268,38 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginBottom: 20,
     color: '#3f51b5',
+  },
+  input: {
+    width: '100%',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 20,
+  },
+  addressList: {
+    alignItems: 'center',
+  },
+  addressItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderColor: '#ddd',
+    width: '100%',
+  },
+  addressText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  closeButton: {
+    backgroundColor: '#3f51b5',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    marginTop: 20,
+  },
+  closeButtonText: {
+    color: '#fff',
+    fontSize: 16,
   },
   hobbyList: {
     alignItems: 'center',
