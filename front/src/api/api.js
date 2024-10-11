@@ -376,3 +376,36 @@ export const fetchRainForecast = async (accessToken, memberId) => {
     throw error;
   }
 };
+
+export const fetchUserLocation = async accessToken => {
+  try {
+    const response = await fetch(`${BASE_URL}/api/v1/location/defaultLoc`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(
+        'Failed to fetch user location:',
+        response.status,
+        errorText,
+      );
+      throw new Error(`Failed to fetch user location: ${errorText}`);
+    }
+
+    const data = await response.json();
+    if (!data.isSuccess) {
+      console.error('Backend error:', data.message);
+      throw new Error(data.message || 'Unknown error from backend');
+    }
+
+    return data.result;
+  } catch (error) {
+    console.error('Error fetching user location:', error.message);
+    throw error;
+  }
+};

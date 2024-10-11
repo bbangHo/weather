@@ -99,6 +99,7 @@ const InterestScreen = ({accessToken, memberId}) => {
         <Animated.View
           style={[styles.animatedContainer, {transform: [{translateY}]}]}>
           <InterestItem
+            accessToken={accessToken}
             weatherData={weatherData}
             selectedHobby={selectedHobby}
             setSelectedHobby={setSelectedHobby}
