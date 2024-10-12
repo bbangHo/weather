@@ -98,6 +98,7 @@ class PostServiceTest {
     }
 
     @Test
+    @Transactional
     @DisplayName("post 저장 테스트")
     void postSaveTest() {
         // given
