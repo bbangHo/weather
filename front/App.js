@@ -7,6 +7,7 @@ import CommunityScreen from './src/screens/CommunityScreen';
 import MyScreen from './src/screens/MyScreen';
 import PostCreationScreen from './src/screens/PostCreationScreen';
 import LoginScreen from './src/screens/LoginScreen';
+import InterestScreen from './src/screens/InterestScreen';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {StatusBar, Button} from 'react-native';
 
@@ -56,6 +57,22 @@ const App = () => {
                 }}>
                 {props => (
                   <CommunityScreen
+                    {...props}
+                    accessToken={accessToken}
+                    memberId={memberId}
+                  />
+                )}
+              </Tab.Screen>
+              <Tab.Screen
+                name="Interest"
+                options={{
+                  tabBarIcon: ({color, size}) => (
+                    <Icon name="book" color={color} size={size} />
+                  ),
+                  tabBarLabel: 'Interest',
+                }}>
+                {props => (
+                  <InterestScreen
                     {...props}
                     accessToken={accessToken}
                     memberId={memberId}

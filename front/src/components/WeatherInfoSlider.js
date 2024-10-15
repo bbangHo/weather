@@ -1,10 +1,49 @@
-import React, {useState} from 'react';
-import {ScrollView, View, Text, StyleSheet, Dimensions} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {
+  ScrollView,
+  View,
+  Text,
+  StyleSheet,
+  Dimensions,
+  Image,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import globalStyles from '../globalStyles';
+import {fetchWeatherTags, fetchRainForecast} from '../api/api';
 
-const WeatherInfoSlider = () => {
+const WeatherInfoSlider = ({accessToken, memberId}) => {
   const [activeSlide, setActiveSlide] = useState(0);
+  const [weatherTags, setWeatherTags] = useState([]);
+  const [rainForecast, setRainForecast] = useState(null);
+
+  useEffect(() => {
+    const loadWeatherTags = async () => {
+      try {
+        const fetchedTags = await fetchWeatherTags(accessToken, memberId);
+        setWeatherTags(fetchedTags);
+      } catch (error) {
+        console.error('Error loading weather tags:', error);
+      }
+    };
+
+    const loadRainForecast = async () => {
+      try {
+        const fetchedRainForecast = await fetchRainForecast(
+          accessToken,
+          memberId,
+        );
+        console.log('Fetched rain forecast:', fetchedRainForecast);
+        setRainForecast(fetchedRainForecast);
+      } catch (error) {
+        console.error('Error loading rain forecast:', error);
+      }
+    };
+
+    if (accessToken && memberId) {
+      loadWeatherTags();
+      loadRainForecast();
+    }
+  }, [accessToken, memberId]);
 
   const handleScroll = event => {
     const contentOffsetX = event.nativeEvent.contentOffset.x;
@@ -16,9 +55,9 @@ const WeatherInfoSlider = () => {
   return (
     <View style={styles.sliderContainer}>
       <View style={styles.indicatorContainer}>
-        {[0, 1, 2].map(index => (
+        {[0, 1, 2].map((_, index) => (
           <View
-            key={index}
+            key={`indicator-${index}`}
             style={[
               styles.indicator,
               {opacity: index === activeSlide ? 1 : 0.5},
@@ -36,23 +75,31 @@ const WeatherInfoSlider = () => {
         <View style={[styles.slide, globalStyles.transparentBackground]}>
           <Text style={styles.title}>우리 동네 날씨</Text>
           <View style={styles.infoContainer}>
-            <View style={styles.innerBox}>
-              <Text style={styles.info}>습하고 조금 더워요</Text>
-            </View>
-            <View style={styles.innerBox}>
-              <Text style={styles.info}>바람 많이 불어요</Text>
-            </View>
-            <View style={styles.innerBox}>
-              <Text style={styles.info}>강풍주의보 발령</Text>
-            </View>
+            {weatherTags.map((tag, index) => (
+              <View key={`tag-${index}`} style={styles.innerBox}>
+                <Text style={styles.info}>{tag.text}</Text>
+              </View>
+            ))}
           </View>
         </View>
         <View style={[styles.slide, globalStyles.transparentBackground]}>
           <Text style={styles.title}>비 올 확률</Text>
           <View style={styles.infoContainer}>
-            <Text style={styles.info}>6시간 뒤 비 예보</Text>
-            <Icon name="rainy" style={styles.icon} />
-            <Text style={styles.info}>우산 챙겨서 외출하세요!</Text>
+            {rainForecast ? (
+              <>
+                <Image
+                  source={
+                    rainForecast.willRain
+                      ? require('../../assets/images/icon_umbrella.png')
+                      : require('../../assets/images/icon_clear.png')
+                  }
+                  style={styles.icon}
+                />
+                <Text style={styles.info}>{rainForecast.comment}</Text>
+              </>
+            ) : (
+              <Text style={styles.info}>비 정보를 불러오는 중...</Text>
+            )}
           </View>
         </View>
         <View style={[styles.slide, globalStyles.transparentBackground]}>
@@ -135,10 +182,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   icon: {
-    fontSize: 40,
-    marginBottom: 10,
-    color: '#fff',
+    width: 50,
+    height: 50,
+    marginVertical: 10,
     alignSelf: 'center',
+    tintColor: '#fff',
   },
   weeklyForecast: {
     flexDirection: 'row',

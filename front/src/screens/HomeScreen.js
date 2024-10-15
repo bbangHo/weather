@@ -34,10 +34,10 @@ const HomeScreen = ({accessToken, memberId}) => {
         <StatusBar hidden={true} />
         <View style={styles.topSpacer} />
         <View style={styles.topContainer}>
-          <WeatherInfoSlider />
+          <WeatherInfoSlider accessToken={accessToken} memberId={memberId} />
           <View style={styles.rightContainer}>
-            <CurrentLocation accessToken={accessToken} />
-            <TemperatureInfo accessToken={accessToken} />
+            <CurrentLocation accessToken={accessToken} memberId={memberId} />
+            <TemperatureInfo accessToken={accessToken} memberId={memberId} />
             <ToggleViewButton showText={showText} setShowText={setShowText} />
           </View>
         </View>

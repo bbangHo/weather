@@ -38,6 +38,11 @@ public class Location extends BaseEntity {
             cascade = CascadeType.ALL)
     private List<Weather> weatherList = new ArrayList<>();
 
+    @Builder.Default
+    @OneToMany(mappedBy = "location",
+            fetch = FetchType.LAZY)
+    private List<Tag> TagList = new ArrayList<>();
+
     public String getAddress() {
         return getCity() + getStreet();
     }

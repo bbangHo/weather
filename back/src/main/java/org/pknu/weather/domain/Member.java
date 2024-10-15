@@ -1,6 +1,5 @@
 package org.pknu.weather.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -10,7 +9,7 @@ import org.pknu.weather.dto.MemberJoinDTO;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
+@Entity(name = "member")
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

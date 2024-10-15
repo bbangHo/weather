@@ -3,6 +3,7 @@ package org.pknu.weather.controller;
 import lombok.RequiredArgsConstructor;
 import org.pknu.weather.apiPayload.ApiResponse;
 import org.pknu.weather.dto.PostResponse;
+import org.pknu.weather.dto.TagDto;
 import org.pknu.weather.dto.WeatherResponse;
 import org.pknu.weather.service.MainPageService;
 import org.pknu.weather.service.WeatherService;
@@ -19,6 +20,9 @@ import static org.pknu.weather.common.converter.TokenConverter.getEmailByToken;
 public class MainPageControllerV1 {
     private final MainPageService mainPageService;
     private final WeatherService weatherService;
+
+
+    // TODO: AOP 사용, 사용자가 location을 등록했는지 안 했다면 리다이렉션 시키는 공통 로직 작성
 
     @GetMapping("/weather")
     public ApiResponse<WeatherResponse.MainPageWeatherData> getMainPageResource(@RequestParam Long memberId) {
@@ -39,5 +43,17 @@ public class MainPageControllerV1 {
         WeatherResponse.ExtraWeatherInfo extraWeatherInfo = weatherService.extraWeatherInfo(email);
 
         return ApiResponse.onSuccess(extraWeatherInfo);
+
+      @GetMapping("/weather/simple/tags")
+    public ApiResponse<List<TagDto.SimpleTag>> getMostSelectedTags(/*@RequestHeader("Authorization") String authorization*/@RequestParam Long memberId) {
+//        String email = TokenConverter.getEmailByToken(authorization);
+        List<TagDto.SimpleTag> mostTags = mainPageService.getMostSelectedTags(memberId);
+        return ApiResponse.onSuccess(mostTags);
+    }
+
+    @GetMapping("/weather/simple/rain")
+    public ApiResponse<Object> getRainProbability(@RequestParam Long memberId) {
+        WeatherResponse.SimpleRainInformation rainProb = mainPageService.getSimpleRainInfo(memberId);
+        return ApiResponse.onSuccess(rainProb);
     }
 }

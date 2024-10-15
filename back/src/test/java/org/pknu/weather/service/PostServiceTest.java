@@ -1,54 +1,53 @@
-//package org.pknu.weather.service;
-//
-//import lombok.extern.slf4j.Slf4j;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.DisplayName;
-//import org.junit.jupiter.api.Test;
-//import org.pknu.weather.common.utils.GeometryUtils;
-//import org.pknu.weather.domain.Location;
-//import org.pknu.weather.domain.Member;
-//import org.pknu.weather.domain.Post;
-//import org.pknu.weather.domain.common.Sensitivity;
-//import org.pknu.weather.domain.tag.*;
-//import org.pknu.weather.dto.PostRequest;
-//import org.pknu.weather.dto.converter.PostRequestConverter;
-//import org.pknu.weather.repository.LocationRepository;
-//import org.pknu.weather.repository.MemberRepository;
-//import org.pknu.weather.repository.PostRepository;
-//import org.pknu.weather.repository.RecommendationRepository;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.transaction.annotation.Transactional;
-//
-//import java.util.List;
-//
-//import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-//
-//@SpringBootTest
-//@Slf4j
-//class PostServiceTest {
-//
-//    @Autowired
-//    PostService postService;
-//
-//    @Autowired
-//    MemberRepository memberRepository;
-//
-//    @Autowired
-//    PostRepository postRepository;
-//
-//    @Autowired
-//    LocationRepository locationRepository;
-//
-//    @Autowired
-//    RecommendationRepository recommendationRepository;
-//
-//    @Autowired
-//    PostRequestConverter postRequestConverter;
-//
-//    private final double LATITUDE = 35.1845361111111;
-//    private final double LONGITUDE = 128.989688888888;
-//
+package org.pknu.weather.service;
+
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.pknu.weather.common.TestDataCreator;
+import org.pknu.weather.common.utils.GeometryUtils;
+import org.pknu.weather.domain.Location;
+import org.pknu.weather.domain.Member;
+import org.pknu.weather.domain.Post;
+import org.pknu.weather.domain.common.Sensitivity;
+import org.pknu.weather.domain.tag.*;
+import org.pknu.weather.dto.PostRequest;
+import org.pknu.weather.dto.converter.PostRequestConverter;
+import org.pknu.weather.repository.LocationRepository;
+import org.pknu.weather.repository.MemberRepository;
+import org.pknu.weather.repository.PostRepository;
+import org.pknu.weather.repository.RecommendationRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@SpringBootTest
+@Slf4j
+class PostServiceTest {
+
+    @Autowired
+    PostService postService;
+
+    @Autowired
+    MemberRepository memberRepository;
+
+    @Autowired
+    PostRepository postRepository;
+
+    @Autowired
+    LocationRepository locationRepository;
+
+    @Autowired
+    RecommendationRepository recommendationRepository;
+
+    @Autowired
+    PostRequestConverter postRequestConverter;
+
+
 //    @BeforeEach
 //    void init() {
 //        String[][] list = {
@@ -96,57 +95,63 @@
 //            memberRepository.save(member);
 //        }
 //    }
-//
-//    @Test
-//    @DisplayName("post 저장 테스트")
-//    void postSaveTest() {
-//        // given
-//        PostRequest.CreatePost createPost = PostRequest.CreatePost.builder()
-//                .content("test")
-//                .temperatureTag(TemperatureTag.HOT)
-//                .humidityTag(HumidityTag.HUMID)
-//                .skyTag(SkyTag.RAIN)
-//                .windTag(WindTag.NONE)
-//                .dustTag(DustTag.GOOD)
-//                .build();
-//
-//        Member member = memberRepository.findAll().stream()
-//                .filter(m -> m.getNickname().equals("1user"))
-//                .findFirst()
-//                .get();
-//
-//        // when
-//        postService.createPost(member.getId(), createPost);
-//        Post post = postRepository.findAll().get(0);
-//
-//        // then
-//        assertThat(post.getContent()).isEqualTo("test");
-//        assertThat(post.getMember().getId()).isEqualTo(member.getId());
-//    }
-//
-//    @Test
-//    @Transactional
-//    void 같은_동네의_글만_조회하는_테스트() {
-//        // given
-//        List<Member> memberList = memberRepository.findAll();
-//        for (Member member : memberList) {
-//            Location location = member.getLocation();
-//
-//            Post post = Post.builder()
-//                    .location(location)
-//                    .content("내용")
-//                    .member(member)
-//                    .build();
-//
-//            postRepository.save(post);
-//        }
-//
-//        // when
-//        Member member = memberList.get(0);
-//        Location location = member.getLocation();
-//        List<Post> postList = postRepository.findAllWithinDistance(1L, 5L, location, 10000);
-//
-//        // then
-//        assertThat(postList.size()).isEqualTo(4);
-//    }
-//}
+
+    @Test
+    @DisplayName("post 저장 테스트")
+    @Transactional
+    void postSaveTest() {
+        // given
+        PostRequest.CreatePost createPost = PostRequest.CreatePost.builder()
+                .content("test")
+                .temperatureTag(TemperatureTag.HOT)
+                .humidityTag(HumidityTag.HUMID)
+                .skyTag(SkyTag.RAIN)
+                .windTag(WindTag.NONE)
+                .dustTag(DustTag.GOOD)
+                .build();
+
+        Member member = memberRepository.save(Member.builder()
+                .location(TestDataCreator.getBusanLocation())
+                .nickname("member")
+                .build());
+
+        // when
+        boolean result = postService.createPost(member.getId(), createPost);
+
+        // then
+        Post post = postRepository.findAll().get(0);
+        assertThat(post.getContent()).isEqualTo("test");
+        assertThat(post.getMember().getId()).isEqualTo(member.getId());
+    }
+
+    @Test
+    @Transactional
+    void 같은_동네의_글만_조회하는_테스트() {
+        // given
+        Member busanMember = memberRepository.save(Member.builder()
+                .location(TestDataCreator.getBusanLocation())
+                .nickname("busan member")
+                .build());
+
+        Member seoulMember = memberRepository.save(Member.builder()
+                .location(TestDataCreator.getSeoulLocation())
+                .nickname("seoul member")
+                .build());
+
+        Post busanPost = postRepository.save(Post.builder()
+                .member(busanMember)
+                .location(busanMember.getLocation())
+                .build());
+
+        Post seoulPost = postRepository.save(Post.builder()
+                .member(seoulMember)
+                .location(seoulMember.getLocation())
+                .build());
+
+        // when
+        List<Post> postList = postRepository.findAllWithinDistance(1L, 5L, busanMember.getLocation());
+
+        // then
+        assertThat(postList.size()).isEqualTo(1);
+    }
+}

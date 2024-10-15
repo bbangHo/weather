@@ -1,4 +1,5 @@
 const BASE_URL = 'http://13.125.128.147:8080';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const sendAccessTokenToBackend = async accessToken => {
   try {
@@ -35,6 +36,42 @@ export const sendAccessTokenToBackend = async accessToken => {
   } catch (error) {
     console.error('Error sending access token:', error.message);
     throw error;
+  }
+};
+
+export const refreshAccessToken = async () => {
+  try {
+    const accessToken = await AsyncStorage.getItem('accessToken');
+    const refreshToken = await AsyncStorage.getItem('refreshToken');
+
+    console.log('Retrieved accessToken:', accessToken);
+    console.log('Retrieved refreshToken:', refreshToken);
+
+    if (!accessToken || !refreshToken) {
+      throw new Error('No access token or refresh token found');
+    }
+
+    const response = await fetch(`${BASE_URL}/refreshToken`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({accessToken, refreshToken}),
+    });
+
+    const result = await response.json();
+
+    console.log('Refresh Token API response:', JSON.stringify(result, null, 2));
+
+    if (result.isSuccess) {
+      await AsyncStorage.setItem('accessToken', result.result.accessToken);
+      return result.result.accessToken;
+    } else {
+      throw new Error(result.message || 'Failed to refresh access token');
+    }
+  } catch (err) {
+    console.error('Failed to refresh access token:', err);
+    throw err;
   }
 };
 
@@ -84,18 +121,22 @@ export const fetchWeatherData = async (memberId, accessToken) => {
 };
 
 export const sendLocationToBackend = async (
-  latitude,
   longitude,
+  latitude,
   accessToken,
 ) => {
   try {
+    const postData = {latitude, longitude};
+
+    console.log('Sending location data:', postData);
+
     const response = await fetch(`${BASE_URL}/api/v1/location/coor`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`,
       },
-      body: JSON.stringify({latitude, longitude}),
+      body: JSON.stringify(postData),
     });
 
     if (!response.ok) {
@@ -150,16 +191,13 @@ export const createPost = async (postData, accessToken, memberId) => {
   }
 };
 
-export const fetchPosts = async (
-  accessToken,
-  memberId,
-  lastPostId = 1,
-  size = 10,
-) => {
+export const fetchPosts = async (accessToken, memberId, lastPostId = null) => {
   try {
-    const url = `${BASE_URL}/api/v1/community/posts?memberId=${memberId}&size=${size}${
-      lastPostId ? `&lastPostId=${lastPostId}` : ''
-    }`;
+    let url = `${BASE_URL}/api/v1/community/posts?memberId=${memberId}&size=6`;
+
+    if (lastPostId !== null) {
+      url += `&lastPostId=${lastPostId}`;
+    }
 
     const response = await fetch(url, {
       method: 'GET',
@@ -170,13 +208,13 @@ export const fetchPosts = async (
     });
 
     if (!response.ok) {
-      const errorResponse = await response.json();
-      console.error('Failed to fetch posts:', response.status, errorResponse);
+      const errorText = await response.text();
+      console.error('Failed to fetch posts:', response.status, errorText);
       throw new Error('Failed to fetch posts');
     }
 
     const data = await response.json();
-    return data.result.postList;
+    return data.result?.postList || [];
   } catch (error) {
     console.error('Error fetching posts:', error);
     throw error;
@@ -244,6 +282,130 @@ export const toggleLikePost = async (accessToken, memberId, postId) => {
     return data;
   } catch (error) {
     console.error('Error liking post:', error);
+    throw error;
+  }
+};
+
+export const fetchWeatherTags = async (accessToken, memberId) => {
+  try {
+    const url = `${BASE_URL}/api/v1/main/weather/simple/tags?memberId=${memberId}`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(
+        'Failed to fetch weather tags:',
+        response.status,
+        errorText,
+      );
+      throw new Error('Failed to fetch weather tags');
+    }
+
+    const data = await response.json();
+    return data.result;
+  } catch (error) {
+    console.error('Error fetching weather tags:', error);
+    throw error;
+  }
+};
+
+export const fetchPostTags = async accessToken => {
+  const url = `${BASE_URL}/api/v1/tags`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorResponse = await response.text();
+      console.error('Failed to fetch tags:', response.status, errorResponse);
+      throw new Error('Failed to fetch tags');
+    }
+
+    const data = await response.json();
+    return data.result;
+  } catch (error) {
+    console.error('Error fetching tags:', error);
+    throw error;
+  }
+};
+
+export const fetchRainForecast = async (accessToken, memberId) => {
+  try {
+    const url = `${BASE_URL}/api/v1/main/weather/simple/rain?memberId=${memberId}`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(
+        'Failed to fetch rain forecast:',
+        response.status,
+        errorText,
+      );
+      throw new Error('Failed to fetch rain forecast');
+    }
+
+    const data = await response.json();
+    if (!data.isSuccess) {
+      console.error('Backend error:', data.code, data.message);
+      throw new Error(data.message || 'Unknown error from backend');
+    }
+
+    return data.result;
+  } catch (error) {
+    console.error('Error fetching rain forecast:', error.message);
+    throw error;
+  }
+};
+
+export const fetchUserLocation = async accessToken => {
+  try {
+    const response = await fetch(`${BASE_URL}/api/v1/location/defaultLoc`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(
+        'Failed to fetch user location:',
+        response.status,
+        errorText,
+      );
+      throw new Error(`Failed to fetch user location: ${errorText}`);
+    }
+
+    const data = await response.json();
+    if (!data.isSuccess) {
+      console.error('Backend error:', data.message);
+      throw new Error(data.message || 'Unknown error from backend');
+    }
+
+    return data.result;
+  } catch (error) {
+    console.error('Error fetching user location:', error.message);
     throw error;
   }
 };

@@ -16,7 +16,7 @@ spring:
         use_sql_comments: true
         default_batch_fetch_size: 500
     hibernate:
-      ddl-auto: create    #
+      ddl-auto: create-drop
     open-in-view: false   # osiv 설정
   jwt:
     key: ${JWT_KEY}
@@ -25,11 +25,14 @@ spring:
     secret: ${CONSUMER_SECRET}
   weather:
     key: ${METEOROLOGICAL_ADMIN_KEY}
+  profiles:
+    active: default
   servlet:
     multipart:
       enabled: true
       location: /uploadImg
-
+      max-request-size: 30MB
+      max-file-size: 10MB
 
 logging:
   level:
@@ -58,3 +61,4 @@ cloud:
       static: ap-northeast-2
     stack:
       auto: false
+

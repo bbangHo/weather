@@ -32,7 +32,7 @@ public class PostService {
     public List<Post> getPosts(Long memberId, Long lastPostId, Long size) {
         Member member = memberRepository.safeFindById(memberId);
         Location location = member.getLocation();
-        List<Post> postList = postRepository.findAllWithinDistance(lastPostId, size, location, DISTANCE);
+        List<Post> postList = postRepository.findAllWithinDistance(lastPostId, size, location);
 
         return postList;
     }

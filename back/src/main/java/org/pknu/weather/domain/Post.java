@@ -24,7 +24,7 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "location_id")
     private Location location;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "post", fetch = FetchType.LAZY)
     @JoinColumn(name = "tag_id")
     private Tag tag;
 
@@ -32,6 +32,7 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    @Builder.Default
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
     private List<Recommendation> recommendationList = new ArrayList<>();
 }
