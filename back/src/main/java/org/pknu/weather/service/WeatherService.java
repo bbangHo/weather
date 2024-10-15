@@ -126,23 +126,16 @@ public class WeatherService {
 
         Optional<ExtraWeather> searchedExtraWeather = extraWeatherRepository.findById(location.getId());
 
-        if(searchedExtraWeather.isEmpty()){
+        if (searchedExtraWeather.isEmpty()){
             WeatherResponse.ExtraWeatherInfo extraWeatherInfo = extraWeatherApiUtils.getExtraWeatherInfo(toLocationDTO(location));
 
-            ExtraWeather result = ExtraWeather.builder()
-                    .location(location)
-                    .basetime(extraWeatherInfo.getBaseTime())
-                    .uv(extraWeatherInfo.getUvGrade())
-                    .o3(extraWeatherInfo.getO3Grade())
-                    .pm10(extraWeatherInfo.getPm10Grade())
-                    .pm25(extraWeatherInfo.getPm25Grade())
-                    .build();
-            extraWeatherRepository.save(result);
+            saveExtraWeatherInfo(location, extraWeatherInfo);
 
             return extraWeatherInfo;
         }
 
         ExtraWeather extraWeather = searchedExtraWeather.get();
+
         if (extraWeather.getBasetime().isBefore(LocalDateTime.now().minusHours(3))){
 
             WeatherResponse.ExtraWeatherInfo extraWeatherInfo = extraWeatherApiUtils.getExtraWeatherInfo(toLocationDTO(location),extraWeather.getBasetime());
@@ -159,5 +152,18 @@ public class WeatherService {
                     .pm25Grade(extraWeather.getPm25())
                     .build();
         }
+    }
+
+    private void saveExtraWeatherInfo(Location location, WeatherResponse.ExtraWeatherInfo extraWeatherInfo) {
+        ExtraWeather result = ExtraWeather.builder()
+                .location(location)
+                .basetime(extraWeatherInfo.getBaseTime())
+                .uv(extraWeatherInfo.getUvGrade())
+                .o3(extraWeatherInfo.getO3Grade())
+                .pm10(extraWeatherInfo.getPm10Grade())
+                .pm25(extraWeatherInfo.getPm25Grade())
+                .build();
+
+        extraWeatherRepository.save(result);
     }
 }
