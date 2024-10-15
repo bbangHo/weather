@@ -124,7 +124,7 @@ public class WeatherService {
         Member member = memberRepository.findMemberByEmail(email).orElseThrow(() -> new GeneralException(ErrorStatus._MEMBER_NOT_FOUND));
         Location location = member.getLocation();
 
-        Optional<ExtraWeather> searchedExtraWeather = extraWeatherRepository.findById(location.getId());
+        Optional<ExtraWeather> searchedExtraWeather = extraWeatherRepository.findByLocationId(location.getId());
 
         if (searchedExtraWeather.isEmpty()){
             WeatherResponse.ExtraWeatherInfo extraWeatherInfo = extraWeatherApiUtils.getExtraWeatherInfo(toLocationDTO(location));
