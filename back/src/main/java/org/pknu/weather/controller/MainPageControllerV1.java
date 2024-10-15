@@ -43,6 +43,7 @@ public class MainPageControllerV1 {
         WeatherResponse.ExtraWeatherInfo extraWeatherInfo = weatherService.extraWeatherInfo(email);
 
         return ApiResponse.onSuccess(extraWeatherInfo);
+    }
 
       @GetMapping("/weather/simple/tags")
     public ApiResponse<List<TagDto.SimpleTag>> getMostSelectedTags(/*@RequestHeader("Authorization") String authorization*/@RequestParam Long memberId) {
