@@ -1,10 +1,10 @@
-package org.pknu.weather.common.aspect;
+package org.pknu.weather.aop;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
 import org.pknu.weather.apiPayload.ApiResponse;
 import org.pknu.weather.apiPayload.code.status.SuccessStatus;
 import org.pknu.weather.common.GlobalParams;
@@ -18,7 +18,7 @@ import java.util.Map;
 @Aspect
 @Component
 @RequiredArgsConstructor
-public class MainPageControllerAspect {
+public class LocationCheckAspect {
     private final MemberQueryService memberQueryService;
 
     /**
@@ -29,9 +29,8 @@ public class MainPageControllerAspect {
      * @return
      * @throws Throwable
      */
-    @Around(value = "execution(* org.pknu.weather.controller.MainPageControllerV1.*(..)) && args(memberId)",
-            argNames = "pjp,memberId")
-    public Object around(ProceedingJoinPoint pjp, Long memberId) throws Throwable {
+    @Around("org.pknu.weather.aop.Pointcuts.doCheckLocationPointcut() && args(memberId)")
+    public Object locationCheck(ProceedingJoinPoint pjp, Long memberId) throws Throwable {
         if (!memberQueryService.hasRegisteredLocation(memberId)) {
             String address = "http://" + InetAddress.getLocalHost().getHostAddress();
             Map<String, String> result = Map.of("url", address + GlobalParams.LOCATION_REDIRECT_URL);
