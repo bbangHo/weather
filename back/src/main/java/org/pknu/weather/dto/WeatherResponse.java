@@ -46,4 +46,16 @@ public class WeatherResponse {
         String tmpText;         // 온도의 텍스트화
         Integer tmp;       // 온도
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ExtraWeatherInfo {
+        LocalDateTime baseTime;
+        Integer o3Grade;
+        Integer pm10Grade;
+        Integer pm25Grade;
+        Integer uvGrade;
+    }
 }

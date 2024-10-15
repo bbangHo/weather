@@ -23,6 +23,8 @@ spring:
   sigs:
     key: ${CONSUMER_KEY}
     secret: ${CONSUMER_SECRET}
+  weather:
+    key: ${METEOROLOGICAL_ADMIN_KEY}
   profiles:
     active: default
   servlet:
