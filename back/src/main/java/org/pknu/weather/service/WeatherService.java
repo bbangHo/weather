@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
 import org.pknu.weather.domain.ExtraWeather;
+import org.pknu.weather.domain.Member;
 import org.pknu.weather.dto.LocationDTO;
 import org.pknu.weather.dto.WeatherResponse;
 import org.pknu.weather.exception.GeneralException;
@@ -26,6 +27,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import static org.pknu.weather.dto.converter.LocationConverter.toLocationDTO;
 
