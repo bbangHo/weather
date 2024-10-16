@@ -28,7 +28,7 @@ public class AirConditionResponseDTO {
     @Setter
     @ToString
     public static class Header {
-        private String resultCode;
+        private int resultCode;
         private String resultMsg;
     }
 

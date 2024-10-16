@@ -51,7 +51,10 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // post
     _POST_NOT_FOUND(HttpStatus.NOT_FOUND, "POST_404_1", "게시글이 존재하지 않습니다."),
-    _RECOMMENDATION_BAD_REQUEST(HttpStatus.BAD_REQUEST, "RECOMMENDATION_400_1", "이미 좋아요를 눌렀습니다.")
+    _RECOMMENDATION_BAD_REQUEST(HttpStatus.BAD_REQUEST, "RECOMMENDATION_400_1", "이미 좋아요를 눌렀습니다."),
+
+    //feignClient
+    _API_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"API_500_1", "외부 API 서버에 문제가 발생했습니다.")
     ;
 
 

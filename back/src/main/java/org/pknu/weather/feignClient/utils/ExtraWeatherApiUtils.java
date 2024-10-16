@@ -92,6 +92,11 @@ public class ExtraWeatherApiUtils {
 
         UVResponseDTO result = uvClient.getUVInfo(weatherKey, locationCode, date, DATATYPE);
 
+        int resultCode = result.getResponse().getHeader().getResultCode();
+
+        if(resultCode != 0)
+            throw new GeneralException(ErrorStatus._API_SERVER_ERROR);
+
         return result.getResponse().getBody().getItems().getItem().get(0);
     }
 
@@ -167,7 +172,12 @@ public class ExtraWeatherApiUtils {
         String stationName = getAirConditionObservatory(locationDTO);
         AirConditionResponseDTO result = airConditionClient.getAirConditionInfo(weatherKey, DATATYPE, stationName, DATATERM, 1.5);
 
-        return result;
+        int resultCode = result.getResponse().getHeader().getResultCode();
+
+        if(resultCode == 0)
+            return result;
+        else
+            throw new GeneralException(ErrorStatus._API_SERVER_ERROR);
     }
 
 
