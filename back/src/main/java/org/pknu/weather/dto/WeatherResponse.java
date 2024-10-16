@@ -16,7 +16,8 @@ public class WeatherResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class MainPageWeatherData {
-        String location;
+        String city;    // 시군구
+        String street;  // 읍면동
         SkyType currentSkyType;
         Integer currentTmp;
         List<WeatherPerHour> weatherPerHourList;

@@ -33,7 +33,8 @@ public class WeatherResponseConverter {
         Weather now = weatherList.get(0);
 
         return WeatherResponse.MainPageWeatherData.builder()
-                .location(location.getAddress())
+                .city(location.getCity())
+                .street(location.getStreet())
                 .currentSkyType(now.getSkyType())
                 .currentTmp(now.getTemperature())
                 .weatherPerHourList(weatherPerHourList)
