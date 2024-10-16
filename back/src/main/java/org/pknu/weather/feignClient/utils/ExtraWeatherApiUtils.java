@@ -52,8 +52,8 @@ public class ExtraWeatherApiUtils {
         return WeatherResponse.ExtraWeatherInfo.builder()
                 .baseTime(convertToLocalDateTime(uvResult.getDate()))
                 .o3Grade(airConditionInfo.getO3Grade())
-                .pm10Grade(airConditionInfo.getPm10Grade())
-                .pm25Grade(airConditionInfo.getPm25Grade())
+                .pm10Grade(airConditionInfo.getPm10Grade1h())
+                .pm25Grade(airConditionInfo.getPm25Grade1h())
                 .uvGrade(uvResult.getH0())
                 .build();
     }
