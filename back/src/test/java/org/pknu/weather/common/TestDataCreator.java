@@ -7,8 +7,8 @@ import org.pknu.weather.domain.Member;
 import java.time.LocalDateTime;
 
 public class TestDataCreator {
-    private static int locationIdx = 0;
-    private static int memberIdx = 0;
+    private static int locationIdx = 1;
+    private static int memberIdx = 1;
 
     public static LocalDateTime getLocalDateTime() {
         return LocalDateTime.now()
@@ -24,8 +24,8 @@ public class TestDataCreator {
     public static Location getBusanLocation() {
         return Location.builder()
                 .point(GeometryUtils.getPoint(TestGlobalParams.BusanGeometry.LATITUDE, TestGlobalParams.BusanGeometry.LONGITUDE))
-                .city("부산광역시" + locationIdx++)
-                .province("시군구")
+                .city("시군구")
+                .province("부산광역시" + locationIdx++)
                 .street("읍면동")
                 .latitude(TestGlobalParams.BusanGeometry.LATITUDE)
                 .longitude(TestGlobalParams.BusanGeometry.LONGITUDE)
@@ -35,8 +35,8 @@ public class TestDataCreator {
     public static Location getSeoulLocation() {
         return Location.builder()
                 .point(GeometryUtils.getPoint(TestGlobalParams.SeoulGeometry.LATITUDE, TestGlobalParams.SeoulGeometry.LONGITUDE))
-                .city("서울광력시" + locationIdx++)
-                .province("시군구")
+                .city("시군구")
+                .province("서울광역시" + locationIdx++)
                 .street("읍면동")
                 .latitude(TestGlobalParams.SeoulGeometry.LATITUDE)
                 .longitude(TestGlobalParams.SeoulGeometry.LONGITUDE)
