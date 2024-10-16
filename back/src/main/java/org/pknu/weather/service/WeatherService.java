@@ -5,18 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
 import org.pknu.weather.domain.ExtraWeather;
 import org.pknu.weather.domain.Member;
-import org.pknu.weather.dto.LocationDTO;
 import org.pknu.weather.dto.WeatherResponse;
 import org.pknu.weather.exception.GeneralException;
-import org.pknu.weather.feignClient.AirConditionClient;
-import org.pknu.weather.feignClient.UVClient;
 import org.pknu.weather.feignClient.WeatherFeignClient;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Weather;
 import org.pknu.weather.feignClient.utils.ExtraWeatherApiUtils;
 import org.pknu.weather.repository.ExtraWeatherRepository;
 import org.pknu.weather.repository.MemberRepository;
-import org.pknu.weather.feignClient.WeatherFeignClient;
 import org.pknu.weather.repository.LocationRepository;
 import org.pknu.weather.repository.WeatherRepository;
 import org.springframework.scheduling.annotation.Async;
@@ -144,14 +140,18 @@ public class WeatherService {
             return extraWeatherInfo;
 
         } else {
-            return WeatherResponse.ExtraWeatherInfo.builder()
-                    .baseTime(extraWeather.getBasetime())
-                    .uvGrade(extraWeather.getUv())
-                    .o3Grade(extraWeather.getO3())
-                    .pm10Grade(extraWeather.getPm10())
-                    .pm25Grade(extraWeather.getPm25())
-                    .build();
+            return transferToExtraWeatherInfo(extraWeather);
         }
+    }
+
+    private WeatherResponse.ExtraWeatherInfo transferToExtraWeatherInfo(ExtraWeather extraWeather) {
+        return WeatherResponse.ExtraWeatherInfo.builder()
+                .baseTime(extraWeather.getBasetime())
+                .uvGrade(extraWeather.getUv())
+                .o3Grade(extraWeather.getO3())
+                .pm10Grade(extraWeather.getPm10())
+                .pm25Grade(extraWeather.getPm25())
+                .build();
     }
 
     private void saveExtraWeatherInfo(Location location, WeatherResponse.ExtraWeatherInfo extraWeatherInfo) {
