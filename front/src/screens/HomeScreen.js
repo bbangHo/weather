@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {ScrollView, View, StyleSheet, StatusBar} from 'react-native';
 import {PanGestureHandler, State} from 'react-native-gesture-handler';
 import ToggleViewButton from '../components/ToggleViewButton';
@@ -14,6 +14,16 @@ import {useNavigation} from '@react-navigation/native';
 const HomeScreen = ({accessToken, memberId}) => {
   const navigation = useNavigation();
   const [showText, setShowText] = useState(false);
+  const [backgroundColor, setBackgroundColor] = useState('#2f5af4');
+
+  useEffect(() => {
+    const currentHour = new Date().getHours();
+    if (currentHour >= 6 && currentHour < 18) {
+      setBackgroundColor('#2f5af4');
+    } else {
+      setBackgroundColor('#1D2837');
+    }
+  }, []);
 
   const handleGesture = event => {
     if (
@@ -29,7 +39,7 @@ const HomeScreen = ({accessToken, memberId}) => {
       onGestureEvent={handleGesture}
       onHandlerStateChange={handleGesture}>
       <ScrollView
-        style={styles.container}
+        style={[styles.container, {backgroundColor: backgroundColor}]}
         contentContainerStyle={styles.contentContainer}>
         <StatusBar hidden={true} />
         <View style={styles.topSpacer} />
@@ -41,13 +51,13 @@ const HomeScreen = ({accessToken, memberId}) => {
             <ToggleViewButton showText={showText} setShowText={setShowText} />
           </View>
         </View>
-        <Posts accessToken={accessToken} memberId={memberId} />
         <HourlyForecast
           accessToken={accessToken}
           memberId={memberId}
           showText={showText}
         />
-        <AirQuality />
+        <AirQuality accessToken={accessToken} memberId={memberId} />
+        <Posts accessToken={accessToken} memberId={memberId} />
         <WeatherGraph accessToken={accessToken} memberId={memberId} />
       </ScrollView>
     </PanGestureHandler>
@@ -57,7 +67,6 @@ const HomeScreen = ({accessToken, memberId}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#2f5af4',
   },
   contentContainer: {
     paddingBottom: 20,

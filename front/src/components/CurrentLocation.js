@@ -7,6 +7,7 @@ import {
   Alert,
   PermissionsAndroid,
   Platform,
+  Image,
 } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
 import {check, PERMISSIONS, request, RESULTS} from 'react-native-permissions';
@@ -81,7 +82,13 @@ const CurrentLocation = ({accessToken}) => {
     <View style={styles.container}>
       {backendResponse ? (
         <View>
-          <Text style={styles.location}>{backendResponse.province}</Text>
+          <View style={styles.locationContainer}>
+            <Text style={styles.location}>{backendResponse.province}</Text>
+            <Image
+              source={require('../../assets/images/icon_partlycloudy.png')}
+              style={styles.weatherIcon}
+            />
+          </View>
           <Text style={styles.location}>{backendResponse.street}</Text>
         </View>
       ) : (
@@ -100,14 +107,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 10,
-    marginTop: 15,
+    marginTop: -10,
+    marginLeft: 10,
     flexDirection: 'column',
   },
+  locationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: -30,
+  },
   location: {
-    fontSize: 18,
+    fontSize: 20,
     color: '#fff',
-    marginBottom: 7,
     textAlign: 'left',
+  },
+  weatherIcon: {
+    width: 80,
+    height: 80,
+    marginLeft: 10,
+    marginTop: 20,
   },
   button: {
     backgroundColor: 'rgba(255, 255, 255, 0.3)',

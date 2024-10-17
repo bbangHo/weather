@@ -30,6 +30,7 @@ const InterestItem = ({
     const loadUserLocation = async () => {
       try {
         const locationData = await fetchUserLocation(accessToken);
+        console.log('Fetched user location:', locationData);
         setUserLocation(locationData);
       } catch (error) {
         console.error('위치 정보를 불러오는 중 오류가 발생했습니다:', error);
@@ -84,12 +85,10 @@ const InterestItem = ({
   };
 
   const hobbies = [
-    {id: 1, name: '산책', icon: 'paw-outline'},
-    {id: 2, name: '스키', icon: 'snow-outline'},
-    {id: 3, name: '테니스', icon: 'tennisball-outline'},
-    {id: 4, name: '낚시', icon: 'fish-outline'},
-    {id: 5, name: '등산', icon: 'walk-outline'},
-    {id: 6, name: '등등', icon: 'ellipsis-horizontal'},
+    {id: 1, name: '런닝', icon: 'paw-outline'},
+    {id: 2, name: '등산', icon: 'snow-outline'},
+    {id: 3, name: '반려동물 산책', icon: 'tennisball-outline'},
+    {id: 4, name: '등등', icon: 'fish-outline'},
   ];
 
   const hobbiesWeatherData = [

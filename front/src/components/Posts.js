@@ -171,9 +171,10 @@ const styles = StyleSheet.create({
     padding: 15,
     marginHorizontal: 5,
     width: 350,
-    height: 130,
+    height: 150,
     justifyContent: 'space-between',
     position: 'relative',
+    marginBottom: 12,
   },
   header: {
     flexDirection: 'row',
@@ -233,7 +234,8 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     textAlign: 'center',
-    marginBottom: 5,
+    marginBottom: 7,
+    marginTop: 5,
   },
   buttonContainer: {
     flexDirection: 'row',

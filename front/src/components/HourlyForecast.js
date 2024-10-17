@@ -97,6 +97,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderColor: 'rgba(255, 255, 255, 0)',
     padding: 10,
+    paddingVertical: 20,
     marginHorizontal: 5,
     alignItems: 'center',
   },

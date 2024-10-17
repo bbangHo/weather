@@ -8,6 +8,16 @@ import {fetchWeatherData} from '../api/api';
 
 const CommunityScreen = ({accessToken, memberId}) => {
   const [weatherData, setWeatherData] = useState(null);
+  const [backgroundColor, setBackgroundColor] = useState('#2f5af4');
+
+  useEffect(() => {
+    const currentHour = new Date().getHours();
+    if (currentHour >= 6 && currentHour < 18) {
+      setBackgroundColor('#2f5af4');
+    } else {
+      setBackgroundColor('#1D2837');
+    }
+  }, []);
 
   useEffect(() => {
     const getWeatherData = async () => {
@@ -27,13 +37,13 @@ const CommunityScreen = ({accessToken, memberId}) => {
   }, [accessToken, memberId]);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {backgroundColor: backgroundColor}]}>
       <StatusBar hidden={true} />
       <View style={styles.topSpacer} />
       <View style={styles.topContainer}>
         <WeatherShareButton />
         <View style={styles.rightContainer}>
-          <CurrentLocation accessToken={accessToken} />
+          <CurrentLocation accessToken={accessToken} memberId={memberId} />
           <TemperatureInfo accessToken={accessToken} />
         </View>
       </View>
@@ -48,7 +58,6 @@ const CommunityScreen = ({accessToken, memberId}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#2f5af4',
   },
   topSpacer: {
     height: 50,

@@ -57,7 +57,8 @@ const styles = StyleSheet.create({
   temperature: {
     fontSize: 22,
     color: '#fff',
-    marginLeft: 27,
+    marginLeft: 23,
+    marginTop: 10,
   },
 });
 

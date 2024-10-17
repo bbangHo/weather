@@ -22,8 +22,18 @@ const InterestScreen = ({accessToken, memberId}) => {
   const [weatherData, setWeatherData] = useState(null);
   const [showPostScroll, setShowPostScroll] = useState(false);
   const [currentIcon, setCurrentIcon] = useState(arrowDownIcon);
+  const [backgroundColor, setBackgroundColor] = useState('#2f5af4');
   const scrollViewRef = useRef(null);
   const translateY = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const currentHour = new Date().getHours();
+    if (currentHour >= 6 && currentHour < 18) {
+      setBackgroundColor('#2f5af4');
+    } else {
+      setBackgroundColor('#1D2837');
+    }
+  }, []);
 
   useEffect(() => {
     const getWeatherData = async () => {
@@ -82,7 +92,7 @@ const InterestScreen = ({accessToken, memberId}) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {backgroundColor: backgroundColor}]}>
       <StatusBar hidden={true} />
 
       <View style={styles.fixedArrowContainer}>
@@ -123,7 +133,6 @@ const {height} = Dimensions.get('window');
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#2f5af4',
   },
   fixedArrowContainer: {
     position: 'absolute',
@@ -152,12 +161,10 @@ const styles = StyleSheet.create({
   },
   animatedContainer: {
     flex: 1,
-    backgroundColor: '#2f5af4',
   },
   postScrollContainer: {
     flex: 1,
     paddingTop: 0,
-    backgroundColor: '#2f5af4',
   },
 });
 
