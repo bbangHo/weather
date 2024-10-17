@@ -48,6 +48,6 @@ public class Location extends BaseEntity {
     }
 
     public String getFullAddress() {
-        return getProvince() + getCity() + getStreet();
+        return getProvince()+" " + getCity() +" " + getStreet();
     }
 }

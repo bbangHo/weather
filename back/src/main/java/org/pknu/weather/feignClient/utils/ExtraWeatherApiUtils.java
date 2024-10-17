@@ -44,6 +44,7 @@ public class ExtraWeatherApiUtils {
 
 
         UVResponseDTO.Item uvResult = getUV(locationDTO);
+        transferUvGrade(uvResult);
 
         AirConditionResponseDTO result = getAirConditionInfo(locationDTO);
         AirConditionResponseDTO.Item airConditionInfo = result.getResponse().getBody().getItems().get(0);
@@ -56,6 +57,17 @@ public class ExtraWeatherApiUtils {
                 .pm25Grade(airConditionInfo.getPm25Grade1h())
                 .uvGrade(uvResult.getH0())
                 .build();
+    }
+
+    private static void transferUvGrade(UVResponseDTO.Item uvResult) {
+        if(uvResult.getH0() <3)
+            uvResult.setH0(1);
+        else if (uvResult.getH0() <6)
+            uvResult.setH0(2);
+        else if (uvResult.getH0() <9)
+            uvResult.setH0(3);
+        else
+            uvResult.setH0(4);
     }
 
     public WeatherResponse.ExtraWeatherInfo getExtraWeatherInfo(LocationDTO locationDTO, LocalDateTime baseTime){

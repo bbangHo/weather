@@ -1,7 +1,6 @@
 package org.pknu.weather.dto.converter;
 
 import lombok.extern.slf4j.Slf4j;
-import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Member;
 import org.pknu.weather.dto.MemberResponse;
 
@@ -19,7 +18,9 @@ public class MemberResponseConverter {
 
     public static MemberResponse.MemberResponseWithAddressDTO toMemberResponseWithAddressDTO(Member member) {
         return MemberResponse.MemberResponseWithAddressDTO.builder()
-                .location(member.getLocation().getFullAddress())
+                .province(member.getLocation().getProvince())
+                .city(member.getLocation().getCity())
+                .street(member.getLocation().getStreet())
                 .locationId(member.getLocation().getId())
                 .email(member.getEmail())
                 .sensitivity(member.getSensitivity())

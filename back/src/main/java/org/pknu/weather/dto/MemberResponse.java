@@ -40,7 +40,12 @@ public class MemberResponse {
 
         private Long locationId;
 
-        private String location;
+        private String province;
+
+        private String city;
+
+        private String street;
+
     }
 
 }
