@@ -409,3 +409,25 @@ export const fetchUserLocation = async accessToken => {
     throw error;
   }
 };
+
+export const fetchExtraWeatherInfo = async accessToken => {
+  try {
+    const response = await fetch(`${BASE_URL}/api/v1/main/extraWeatherInfo`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const result = await response.json();
+    if (result.isSuccess) {
+      return result.result;
+    } else {
+      throw new Error(result.message);
+    }
+  } catch (error) {
+    console.error('Error fetching extra weather info:', error);
+    throw error;
+  }
+};
