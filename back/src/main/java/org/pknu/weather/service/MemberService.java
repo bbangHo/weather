@@ -8,7 +8,7 @@ import org.pknu.weather.common.utils.LocalUploaderUtils;
 import org.pknu.weather.common.utils.S3UploaderUtils;
 import org.pknu.weather.domain.Member;
 import org.pknu.weather.dto.MemberJoinDTO;
-import org.pknu.weather.dto.MemberResponseDTO;
+import org.pknu.weather.dto.MemberResponse;
 import org.pknu.weather.exception.GeneralException;
 import org.pknu.weather.repository.MemberRepository;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -21,6 +21,7 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 import static org.pknu.weather.dto.converter.MemberResponseConverter.toMemberResponseDTO;
+import static org.pknu.weather.dto.converter.MemberResponseConverter.toMemberResponseWithAddressDTO;
 
 @Service
 @Slf4j
@@ -40,9 +41,13 @@ public class MemberService {
     public Optional<Member> findMemberByEmail(String email){
         return memberRepository.findMemberByEmail(email);
     }
+    public MemberResponse.MemberResponseWithAddressDTO findFullMemberInfoByEmail(String email){
+        Member member = memberRepository.findMemberByEmail(email).orElseThrow(() -> new GeneralException(ErrorStatus._MEMBER_NOT_FOUND));
+        return toMemberResponseWithAddressDTO(member);
+    }
 
     @Transactional
-    public MemberResponseDTO checkNicknameAndSave(String email, MemberJoinDTO memberJoinDTO){
+    public MemberResponse.MemberResponseDTO checkNicknameAndSave(String email, MemberJoinDTO memberJoinDTO){
 
         Member member = memberRepository.findMemberByEmail(email)
                 .orElseThrow(() -> new GeneralException(ErrorStatus._MEMBER_NOT_FOUND));
@@ -63,23 +68,21 @@ public class MemberService {
 
     private Member checkNicknameAndSave(Member member) {
         Member savedMember = null;
+
         try {
             savedMember = memberRepository.saveAndFlush(member);
+
         } catch (DataIntegrityViolationException e) {
 
             Throwable cause = e.getCause();
 
             if (cause instanceof ConstraintViolationException constraintViolationException) {
 
-                SQLException sqlException = (SQLException) constraintViolationException.getCause();
-                int errorCode = sqlException.getErrorCode();
+                Throwable sqlCause = constraintViolationException.getCause();
 
-                if (errorCode == 1062) {
-                    // 유니크 제약 조건 위반일 때만 예외 처리
+                if (sqlCause instanceof SQLException sqlException && sqlException.getErrorCode() == 1062) {
                     throw new GeneralException(ErrorStatus._DUPILICATED_NICKNAME);
                 }
-            } else {
-                throw e;
             }
         }
         return savedMember;

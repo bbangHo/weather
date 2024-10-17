@@ -71,7 +71,19 @@ public class WeatherResponse {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class SimpleRainInformation{
+    public static class ExtraWeatherInfo {
+        LocalDateTime baseTime;
+        Integer o3Grade;
+        Integer pm10Grade;
+        Integer pm25Grade;
+        Integer uvGrade;
+    }
+      
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SimpleRainInformation {
         String comment;
         Boolean willRain;
         String rainfallAmount;

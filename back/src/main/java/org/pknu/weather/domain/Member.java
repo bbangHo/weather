@@ -31,7 +31,6 @@ public class Member extends BaseEntity {
     @Column(unique = true)
     private String nickname;
 
-    //
     @ColumnDefault("'https://weather-pknu-bucket.s3.ap-northeast-2.amazonaws.com/basic.png'")
     private String profileImage;
 
