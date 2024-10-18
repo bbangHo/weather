@@ -431,3 +431,114 @@ export const fetchExtraWeatherInfo = async accessToken => {
     throw error;
   }
 };
+
+export const fetchMemberInfo = async accessToken => {
+  try {
+    const response = await fetch(`${BASE_URL}/api/v1/member/info`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const result = await response.json();
+    if (result.isSuccess) {
+      return result.result;
+    } else {
+      throw new Error(result.message);
+    }
+  } catch (error) {
+    console.error('Error fetching member info:', error);
+    throw error;
+  }
+};
+
+/*
+// sensitivity 값 에러로 인해 주석 처리합니다.
+export const registerProfile = async (
+  nickname,
+  sensitivity,
+  profileImage,
+  accessToken,
+  memberId,
+) => {
+  const formData = new FormData();
+  formData.append('nickname', nickname);
+  formData.append('sensitivity', sensitivity);
+
+  if (profileImage) {
+    formData.append('profileImage', {
+      uri: profileImage.uri,
+      type: profileImage.type,
+      name: profileImage.fileName,
+    });
+  }
+
+  try {
+    const response = await fetch(`${BASE_URL}/api/v1/member/info`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${accessToken}`,
+        memberId: memberId,
+      },
+      body: formData,
+    });
+
+    const responseData = await response.json();
+
+    if (!response.ok) {
+      console.error('Backend error:', responseData);
+      throw new Error(responseData.message || '프로필 저장 실패');
+    }
+
+    return responseData;
+  } catch (error) {
+    console.error('API 요청 실패:', error);
+    throw error;
+  }
+};
+*/
+
+export const registerProfile = async (
+  nickname,
+  profileImage,
+  accessToken,
+  memberId,
+) => {
+  const formData = new FormData();
+  formData.append('nickname', nickname);
+
+  if (profileImage) {
+    formData.append('profileImage', {
+      uri: profileImage.uri,
+      name: profileImage.fileName,
+      type: profileImage.type,
+    });
+  }
+
+  try {
+    const response = await fetch(`${BASE_URL}/api/v1/member/info`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${accessToken}`,
+        memberId: memberId,
+      },
+      body: formData,
+    });
+
+    const responseData = await response.json();
+
+    if (!response.ok) {
+      console.error('Backend error:', responseData);
+      throw new Error(responseData.message || '프로필 저장 실패');
+    }
+
+    return responseData;
+  } catch (error) {
+    console.error('API 요청 실패:', error);
+    throw error;
+  }
+};

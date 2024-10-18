@@ -5,6 +5,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import HomeScreen from './src/screens/HomeScreen';
 import CommunityScreen from './src/screens/CommunityScreen';
 import MyScreen from './src/screens/MyScreen';
+import RegisterProfileScreen from './src/screens/RegisterProfileScreen';
 import PostCreationScreen from './src/screens/PostCreationScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import InterestScreen from './src/screens/InterestScreen';
@@ -45,7 +46,11 @@ const App = () => {
       <NavigationContainer>
         {isLoggedIn ? (
           isNewMember ? (
-            <MyScreen setIsNewMember={setIsNewMember} />
+            <RegisterProfileScreen
+              accessToken={accessToken}
+              memberId={memberId}
+              setIsNewMember={setIsNewMember}
+            />
           ) : (
             <Tab.Navigator screenOptions={{headerShown: false}}>
               <Tab.Screen
@@ -97,13 +102,20 @@ const App = () => {
               </Tab.Screen>
               <Tab.Screen
                 name="My"
-                component={MyScreen}
                 options={{
                   tabBarIcon: ({color, size}) => (
                     <Icon name="person" color={color} size={size} />
                   ),
-                }}
-              />
+                }}>
+                {props => (
+                  <MyScreen
+                    {...props}
+                    accessToken={accessToken}
+                    memberId={memberId}
+                    setIsNewMember={setIsNewMember}
+                  />
+                )}
+              </Tab.Screen>
             </Tab.Navigator>
           )
         ) : (

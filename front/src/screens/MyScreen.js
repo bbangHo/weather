@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -9,10 +9,48 @@ import {
   Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {fetchMemberInfo} from '../api/api';
+import profilePlaceholder from '../../assets/images/profile.png';
 
-const MyScreen = ({setIsNewMember}) => {
+const MyScreen = ({accessToken, setIsNewMember}) => {
   const [nickname, setNickname] = useState('');
   const [selectedType, setSelectedType] = useState(null);
+  const [address, setAddress] = useState('');
+  const [profileImage, setProfileImage] = useState(profilePlaceholder);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadMemberInfo = async () => {
+      try {
+        const memberInfo = await fetchMemberInfo(accessToken);
+        console.log('Fetched member info:', memberInfo);
+
+        setProfileImage(memberInfo.profileImage || profilePlaceholder);
+
+        setNickname(memberInfo.nickname || '');
+
+        if (memberInfo.sensitivity === 'HOT') {
+          setSelectedType('hot');
+        } else if (memberInfo.sensitivity === 'COLD') {
+          setSelectedType('cold');
+        } else {
+          setSelectedType('normal');
+        }
+
+        setAddress(
+          `${memberInfo.province} ${memberInfo.city} ${memberInfo.street}`,
+        );
+        setLoading(false);
+      } catch (error) {
+        console.error('회원 정보 불러오는 중 오류 발생:', error);
+        setLoading(false);
+      }
+    };
+
+    if (accessToken) {
+      loadMemberInfo();
+    }
+  }, [accessToken]);
 
   const handleTypeSelection = type => {
     setSelectedType(type);
@@ -33,13 +71,14 @@ const MyScreen = ({setIsNewMember}) => {
     setIsNewMember(false);
   };
 
+  if (loading) {
+    return <Text>회원 정보를 불러오는 중...</Text>;
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.profileContainer}>
-        <Image
-          source={{uri: 'https://via.placeholder.com/100'}}
-          style={styles.profileImage}
-        />
+        <Image source={{uri: profileImage}} style={styles.profileImage} />
         <TouchableOpacity style={styles.editIconContainer}>
           <Icon name="add-circle-outline" size={30} color="#2f5af4" />
         </TouchableOpacity>
@@ -52,6 +91,7 @@ const MyScreen = ({setIsNewMember}) => {
         onChangeText={setNickname}
         editable={true}
       />
+
       <Text style={styles.label}>유형</Text>
       <TouchableOpacity
         style={[
@@ -129,7 +169,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 18,
     marginTop: 30,
-    marginBottom: 20,
+    marginBottom: 10,
     color: '#333',
     fontWeight: 'bold',
   },
@@ -140,7 +180,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ccc',
     fontSize: 16,
     color: '#333',
-    marginBottom: 30,
+    marginBottom: 20,
   },
   typeButton: {
     width: '100%',
