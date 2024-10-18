@@ -2,6 +2,7 @@ package org.pknu.weather.repository;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
+import org.pknu.weather.common.utils.AddressFinder;
 import org.pknu.weather.dto.LocationDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,14 +10,19 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-/*
+
 @SpringBootTest
 @Slf4j
 public class LocationCodeRepositoryTest {
 
     @Autowired
     NamedParameterJdbcTemplate jdbcTemplate;
+
+    @Autowired
+    AddressFinder addressFinder;
 
     @Test
     public void getLocationCode() {
@@ -67,5 +73,34 @@ public class LocationCodeRepositoryTest {
         }
 
     }
+
+    @Test
+    public void findProvinceList(){
+        List<String> provinceList = addressFinder.getLocation();
+
+        for (String province : provinceList) {
+            log.info(province);
+        }
+    }
+
+    @Test
+    public void findCityList(){
+        List<String> cityList = addressFinder.getLocation("경상남도");
+
+        for (String city : cityList) {
+            log.info(city);
+        }
+    }
+
+    @Test
+    public void findStreetList(){
+        List<String> streetList = addressFinder.getLocation("경상남도", "창원시마산합포구");
+
+        for (String street : streetList) {
+            log.info(street);
+        }
+    }
+
 }
-*/
+
+
