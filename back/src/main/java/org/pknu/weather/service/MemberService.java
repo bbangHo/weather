@@ -54,7 +54,7 @@ public class MemberService {
 
         MultipartFile profileImg = memberJoinDTO.getProfileImg();
 
-        if (profileImg != null && profileImg.getContentType().startsWith("image")){
+        if (!profileImg.isEmpty() && profileImg.getContentType().startsWith("image")){
             uploadProfileImageToS3(memberJoinDTO, profileImg);
             removeExProfileImage(member);
         }
