@@ -10,8 +10,9 @@ import {
   Dimensions,
 } from 'react-native';
 import InterestItem from '../components/InterestItem';
-import PostScroll from '../components/PostScroll';
+import InterestPostScroll from '../components/InterestPostScroll';
 import {fetchWeatherData} from '../api/api';
+import {useNavigation} from '@react-navigation/native';
 
 const arrowDownIcon = require('../../assets/images/icon_arrowDown.png');
 const shareIcon = require('../../assets/images/icon_share2.png');
@@ -25,6 +26,8 @@ const InterestScreen = ({accessToken, memberId}) => {
   const [backgroundColor, setBackgroundColor] = useState('#2f5af4');
   const scrollViewRef = useRef(null);
   const translateY = useRef(new Animated.Value(0)).current;
+
+  const navigation = useNavigation();
 
   useEffect(() => {
     const currentHour = new Date().getHours();
@@ -81,7 +84,7 @@ const InterestScreen = ({accessToken, memberId}) => {
 
   const handleIconPress = () => {
     if (showPostScroll) {
-      console.log('Share button pressed');
+      navigation.navigate('InterestPostCreationScreen');
     } else {
       scrollViewRef.current.scrollToEnd({animated: true});
     }
@@ -120,7 +123,11 @@ const InterestScreen = ({accessToken, memberId}) => {
 
         {showPostScroll && (
           <View style={styles.postScrollContainer}>
-            <PostScroll accessToken={accessToken} memberId={memberId} />
+            <InterestPostScroll
+              accessToken={accessToken}
+              memberId={memberId}
+              selectedHobby={selectedHobby}
+            />
           </View>
         )}
       </ScrollView>

@@ -1,20 +1,17 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {View, Text, Button, Alert, StyleSheet} from 'react-native';
 import {login, logout} from '@react-native-seoul/kakao-login';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {sendAccessTokenToBackend} from '../api/api';
+import {sendAccessTokenToBackend, refreshAccessToken} from '../api/api';
 
 const LoginScreen = ({setIsLoggedIn, setAccessToken, setIsNewMember}) => {
   const handleLogin = async () => {
     try {
       console.log('Starting Kakao login...');
       const token = await login();
-
       console.log('Kakao login successful, token:', token.accessToken);
       Alert.alert('로그인 성공', `토큰: ${token.accessToken}`);
-
       const response = await sendAccessTokenToBackend(token.accessToken);
-
       if (response.isSuccess) {
         console.log('Login successful, server response:', response);
 
@@ -41,17 +38,14 @@ const LoginScreen = ({setIsLoggedIn, setAccessToken, setIsNewMember}) => {
       Alert.alert('로그인 실패', err.message);
     }
   };
-
   const handleLogout = async () => {
     try {
       console.log('Starting Kakao logout...');
       await logout();
       setIsLoggedIn(false);
       setAccessToken(null);
-
       await AsyncStorage.removeItem('accessToken');
       await AsyncStorage.removeItem('refreshToken');
-
       console.log('Logout successful');
       Alert.alert('로그아웃 성공', '성공적으로 로그아웃되었습니다.');
     } catch (err) {
@@ -59,6 +53,42 @@ const LoginScreen = ({setIsLoggedIn, setAccessToken, setIsNewMember}) => {
       Alert.alert('로그아웃 실패', err.message);
     }
   };
+
+  /*
+  // 회원 정보 관련 기능 구현을 위해 주석 처리합니다.
+  useEffect(() => {
+    const refreshTokenImmediately = async () => {
+      try {
+        console.log('Attempting to refresh token immediately...');
+        const newAccessToken = await refreshAccessToken();
+        console.log('Refreshed access token immediately:', newAccessToken);
+
+        setAccessToken(newAccessToken);
+        setIsLoggedIn(true);
+      } catch (err) {
+        console.error('Failed to refresh token immediately:', err);
+        handleLogout();
+      }
+    };
+
+    refreshTokenImmediately();
+
+    const interval = setInterval(async () => {
+      try {
+        console.log('Attempting to refresh token...');
+        const newAccessToken = await refreshAccessToken();
+
+        console.log('Refreshed access token:', newAccessToken);
+        setAccessToken(newAccessToken);
+      } catch (err) {
+        console.error('Failed to refresh token:', err);
+        handleLogout();
+      }
+    }, 15 * 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+  */
 
   return (
     <View style={styles.container}>
@@ -68,7 +98,6 @@ const LoginScreen = ({setIsLoggedIn, setAccessToken, setIsNewMember}) => {
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -80,5 +109,4 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
 });
-
 export default LoginScreen;

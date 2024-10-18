@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
   hobbyTextContainer: {
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     borderRadius: 10,
-    width: width * 0.32,
+    width: width * 0.35,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 10,
