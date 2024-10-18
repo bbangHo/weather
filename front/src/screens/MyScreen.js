@@ -28,15 +28,9 @@ const MyScreen = ({accessToken, setIsNewMember}) => {
         setProfileImage(memberInfo.profileImage || profilePlaceholder);
 
         setNickname(memberInfo.nickname || '');
-
-        if (memberInfo.sensitivity === 'HOT') {
-          setSelectedType('hot');
-        } else if (memberInfo.sensitivity === 'COLD') {
-          setSelectedType('cold');
-        } else {
+        if (memberInfo.sensitivity === 'NONE') {
           setSelectedType('normal');
         }
-
         setAddress(
           `${memberInfo.province} ${memberInfo.city} ${memberInfo.street}`,
         );
@@ -91,6 +85,9 @@ const MyScreen = ({accessToken, setIsNewMember}) => {
         onChangeText={setNickname}
         editable={true}
       />
+
+      <Text style={styles.label}>대표 주소</Text>
+      <Text style={styles.addressText}>{address}</Text>
 
       <Text style={styles.label}>유형</Text>
       <TouchableOpacity
@@ -180,6 +177,11 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ccc',
     fontSize: 16,
     color: '#333',
+    marginBottom: 20,
+  },
+  addressText: {
+    fontSize: 16,
+    color: '#555',
     marginBottom: 20,
   },
   typeButton: {

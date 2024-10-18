@@ -1,102 +1,76 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
   Alert,
-  PermissionsAndroid,
-  Platform,
   Image,
 } from 'react-native';
-import Geolocation from 'react-native-geolocation-service';
-import {check, PERMISSIONS, request, RESULTS} from 'react-native-permissions';
-import {sendLocationToBackend} from '../api/api';
+import {fetchUserLocation, fetchWeatherData} from '../api/api';
 
-const CurrentLocation = ({accessToken}) => {
-  const [location, setLocation] = useState(null);
-  const [backendResponse, setBackendResponse] = useState(null);
+const CurrentLocation = ({accessToken, memberId}) => {
+  const [userLocation, setUserLocation] = useState(null);
+  const [weatherData, setWeatherData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const requestLocationPermission = async () => {
-    try {
-      if (Platform.OS === 'ios') {
-        let status = await check(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
-        console.log('iOS Current permission status:', status);
+  useEffect(() => {
+    const loadUserData = async () => {
+      try {
+        const location = await fetchUserLocation(accessToken);
+        console.log('Fetched user location:', location);
+        setUserLocation(location);
 
-        if (status === RESULTS.DENIED || status === RESULTS.BLOCKED) {
-          status = await request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
-          console.log('iOS Request result:', status);
-        }
-
-        if (status === RESULTS.GRANTED) {
-          getCurrentLocation();
-        } else {
-          Alert.alert('위치 권한 필요', '위치 권한을 허용해주세요.');
-        }
-      } else {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-        );
-        console.log('Android Location permission:', granted);
-
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          getCurrentLocation();
-        } else {
-          Alert.alert('위치 권한 필요', '위치 권한을 허용해주세요.');
-        }
+        const weather = await fetchWeatherData(memberId, accessToken);
+        console.log('Fetched weather data:', weather);
+        setWeatherData(weather.result);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        Alert.alert('데이터를 불러오는 중 오류가 발생했습니다.', error.message);
+        setLoading(false);
       }
-    } catch (error) {
-      console.error('Error requesting location permission:', error);
+    };
+
+    loadUserData();
+  }, [accessToken, memberId]);
+
+  const getWeatherIcon = currentSkyType => {
+    switch (currentSkyType) {
+      case 'CLEAR':
+        return require('../../assets/images/icon_clear.png');
+      case 'PARTLYCLOUDY':
+        return require('../../assets/images/icon_partlycloudy.png');
+      case 'CLOUDY':
+        return require('../../assets/images/icon_cloudy.png');
+      default:
+        return require('../../assets/images/icon_cloudy.png');
     }
   };
 
-  const getCurrentLocation = () => {
-    Geolocation.getCurrentPosition(
-      position => {
-        const {longitude, latitude} = position.coords;
-
-        console.log('현재 위치:', {latitude, longitude});
-        setLocation({latitude, longitude});
-
-        sendLocationToBackend(longitude, latitude, accessToken)
-          .then(response => {
-            console.log('Backend response:', response);
-            setBackendResponse(response.result);
-          })
-          .catch(error => {
-            console.error('Error sending location data:', error);
-          });
-      },
-      error => {
-        console.error('Error getting current position:', error);
-        Alert.alert(
-          '위치 정보를 가져올 수 없습니다.',
-          '위치 권한을 확인해주세요.',
-        );
-      },
-      {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.loadingText}>데이터를 불러오는 중...</Text>
+      </View>
     );
-  };
+  }
 
   return (
     <View style={styles.container}>
-      {backendResponse ? (
+      {userLocation && weatherData ? (
         <View>
           <View style={styles.locationContainer}>
-            <Text style={styles.location}>{backendResponse.province}</Text>
+            <Text style={styles.location}>{userLocation.city}</Text>
             <Image
-              source={require('../../assets/images/icon_partlycloudy.png')}
+              source={getWeatherIcon(weatherData.currentSkyType)}
               style={styles.weatherIcon}
             />
           </View>
-          <Text style={styles.location}>{backendResponse.street}</Text>
+          <Text style={styles.location}>{userLocation.street}</Text>
         </View>
       ) : (
-        <TouchableOpacity
-          style={styles.button}
-          onPress={requestLocationPermission}>
-          <Text style={styles.buttonText}>위치 정보를 등록해주세요</Text>
-        </TouchableOpacity>
+        <Text style={styles.errorText}>데이터를 불러오지 못했습니다.</Text>
       )}
     </View>
   );
@@ -107,7 +81,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 10,
-    marginTop: -10,
+    marginTop: -15,
     marginLeft: 10,
     flexDirection: 'column',
   },
@@ -139,6 +113,16 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  loadingText: {
+    color: '#fff',
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  errorText: {
+    color: 'red',
     fontSize: 16,
     textAlign: 'center',
   },

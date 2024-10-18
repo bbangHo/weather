@@ -9,6 +9,7 @@ import RegisterProfileScreen from './src/screens/RegisterProfileScreen';
 import PostCreationScreen from './src/screens/PostCreationScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import InterestScreen from './src/screens/InterestScreen';
+import InterestPostCreationScreen from './src/screens/InterestPostCreationScreen';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {StatusBar, Button} from 'react-native';
 
@@ -34,6 +35,44 @@ const HomeStack = ({accessToken, memberId}) => (
   </Stack.Navigator>
 );
 
+const InterestStack = ({accessToken, memberId}) => (
+  <Stack.Navigator screenOptions={{headerShown: false}}>
+    <Stack.Screen name="InterestScreen">
+      {props => (
+        <InterestScreen
+          {...props}
+          accessToken={accessToken}
+          memberId={memberId}
+        />
+      )}
+    </Stack.Screen>
+    <Stack.Screen name="InterestPostCreationScreen">
+      {props => (
+        <InterestPostCreationScreen
+          {...props}
+          accessToken={accessToken}
+          memberId={memberId}
+        />
+      )}
+    </Stack.Screen>
+  </Stack.Navigator>
+);
+
+const RegisterProfileStack = ({accessToken, memberId, setIsNewMember}) => (
+  <Stack.Navigator screenOptions={{headerShown: false}}>
+    <Stack.Screen name="RegisterProfileScreen">
+      {props => (
+        <RegisterProfileScreen
+          {...props}
+          accessToken={accessToken}
+          memberId={memberId}
+          setIsNewMember={setIsNewMember}
+        />
+      )}
+    </Stack.Screen>
+  </Stack.Navigator>
+);
+
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [accessToken, setAccessToken] = useState(null);
@@ -46,13 +85,15 @@ const App = () => {
       <NavigationContainer>
         {isLoggedIn ? (
           isNewMember ? (
-            <RegisterProfileScreen
+            <RegisterProfileStack
               accessToken={accessToken}
               memberId={memberId}
               setIsNewMember={setIsNewMember}
             />
           ) : (
-            <Tab.Navigator screenOptions={{headerShown: false}}>
+            <Tab.Navigator
+              screenOptions={{headerShown: false}}
+              initialRouteName="HomeStack">
               <Tab.Screen
                 name="Community"
                 options={{
@@ -69,7 +110,7 @@ const App = () => {
                 )}
               </Tab.Screen>
               <Tab.Screen
-                name="Interest"
+                name="InterestStack"
                 options={{
                   tabBarIcon: ({color, size}) => (
                     <Icon name="book" color={color} size={size} />
@@ -77,7 +118,7 @@ const App = () => {
                   tabBarLabel: 'Interest',
                 }}>
                 {props => (
-                  <InterestScreen
+                  <InterestStack
                     {...props}
                     accessToken={accessToken}
                     memberId={memberId}
