@@ -28,7 +28,7 @@ const AirQuality = ({accessToken}) => {
     const loadExtraWeatherInfo = async () => {
       try {
         const data = await fetchExtraWeatherInfo(accessToken);
-        console.log('fetch extra weather info:', data);
+        console.log('fetched extra weather info:', data);
         setExtraWeatherInfo(data);
         setLoading(false);
       } catch (error) {

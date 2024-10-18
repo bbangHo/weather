@@ -1,8 +1,8 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {View, Text, Button, Alert, StyleSheet} from 'react-native';
 import {login, logout} from '@react-native-seoul/kakao-login';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {sendAccessTokenToBackend, refreshAccessToken} from '../api/api';
+import {sendAccessTokenToBackend} from '../api/api';
 
 const LoginScreen = ({setIsLoggedIn, setAccessToken, setIsNewMember}) => {
   const handleLogin = async () => {
@@ -19,7 +19,9 @@ const LoginScreen = ({setIsLoggedIn, setAccessToken, setIsNewMember}) => {
         console.log('Login successful, server response:', response);
 
         setAccessToken(response.result.accessToken);
-        setIsNewMember(response.result.isNewMember === 'true');
+        // 테스트를 위해 false 값으로 설정합니다.
+        // 구현 완료 후 true 값으로 변경해야 합니다.
+        setIsNewMember(response.result.isNewMember === 'false');
         setIsLoggedIn(true);
 
         await AsyncStorage.setItem('accessToken', response.result.accessToken);
@@ -57,39 +59,6 @@ const LoginScreen = ({setIsLoggedIn, setAccessToken, setIsNewMember}) => {
       Alert.alert('로그아웃 실패', err.message);
     }
   };
-
-  useEffect(() => {
-    const refreshTokenImmediately = async () => {
-      try {
-        console.log('Attempting to refresh token immediately...');
-        const newAccessToken = await refreshAccessToken();
-        console.log('Refreshed access token immediately:', newAccessToken);
-
-        setAccessToken(newAccessToken);
-        setIsLoggedIn(true);
-      } catch (err) {
-        console.error('Failed to refresh token immediately:', err);
-        handleLogout();
-      }
-    };
-
-    refreshTokenImmediately();
-
-    const interval = setInterval(async () => {
-      try {
-        console.log('Attempting to refresh token...');
-        const newAccessToken = await refreshAccessToken();
-
-        console.log('Refreshed access token:', newAccessToken);
-        setAccessToken(newAccessToken);
-      } catch (err) {
-        console.error('Failed to refresh token:', err);
-        handleLogout();
-      }
-    }, 15 * 60 * 1000);
-
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <View style={styles.container}>
