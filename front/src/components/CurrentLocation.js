@@ -122,9 +122,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   errorText: {
-    color: 'red',
+    color: '#fff',
     fontSize: 16,
     textAlign: 'center',
+    marginTop: 35,
+    marginRight: 15,
   },
 });
 

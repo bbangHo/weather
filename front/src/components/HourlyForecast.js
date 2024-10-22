@@ -1,5 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {ScrollView, Text, View, StyleSheet, Image} from 'react-native';
+import {
+  ScrollView,
+  Text,
+  View,
+  StyleSheet,
+  Image,
+  Platform,
+} from 'react-native';
 import {Card} from 'react-native-elements';
 import globalStyles from '../globalStyles';
 import {fetchWeatherData} from '../api/api';
@@ -96,7 +103,7 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: 10,
     borderColor: 'rgba(255, 255, 255, 0)',
-    padding: 10,
+    padding: Platform.OS === 'ios' ? 10 : 8.5,
     paddingVertical: 20,
     marginHorizontal: 5,
     alignItems: 'center',

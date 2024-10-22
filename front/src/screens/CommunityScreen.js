@@ -1,10 +1,19 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, StyleSheet, StatusBar} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  StatusBar,
+  Dimensions,
+  Platform,
+} from 'react-native';
 import CurrentLocation from '../components/CurrentLocation';
 import TemperatureInfo from '../components/TemperatureInfo';
 import PostScroll from '../components/PostScroll';
 import WeatherShareButton from '../components/WeatherShareButton';
 import {fetchWeatherData} from '../api/api';
+
+const {height} = Dimensions.get('window');
 
 const CommunityScreen = ({accessToken, memberId}) => {
   const [weatherData, setWeatherData] = useState(null);
@@ -60,7 +69,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   topSpacer: {
-    height: 50,
+    height: Platform.OS === 'ios' ? height * 0.05 : height * 0.03,
   },
   topContainer: {
     flexDirection: 'row',

@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Dimensions,
   Image,
+  Platform,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import globalStyles from '../globalStyles';
@@ -87,6 +88,7 @@ const WeatherInfoSlider = ({accessToken, memberId}) => {
           <View style={styles.infoContainer}>
             {rainForecast ? (
               <>
+                <Text style={styles.rainInfo}>{rainForecast.rainComment}</Text>
                 <Image
                   source={
                     rainForecast.willRain
@@ -95,7 +97,7 @@ const WeatherInfoSlider = ({accessToken, memberId}) => {
                   }
                   style={styles.icon}
                 />
-                <Text style={styles.info}>{rainForecast.comment}</Text>
+                <Text style={styles.rainInfo}>{rainForecast.addComment}</Text>
               </>
             ) : (
               <Text style={styles.info}>비 정보를 불러오는 중...</Text>
@@ -138,10 +140,10 @@ const styles = StyleSheet.create({
   },
   container: {
     width: width / 2,
-    height: 180,
+    height: 190,
   },
   slide: {
-    width: width / 2.1,
+    width: width / 2.05,
     alignItems: 'center',
     paddingVertical: 5,
     paddingHorizontal: 20,
@@ -170,6 +172,13 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginVertical: 5,
   },
+  rainInfo: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#fff',
+    marginVertical: Platform.OS === 'ios' ? 0 : -2,
+  },
   innerBox: {
     backgroundColor: 'rgba(255, 255, 255, 0.3)',
     shadowColor: 'transparent',
@@ -182,8 +191,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   icon: {
-    width: 50,
-    height: 50,
+    width: 40,
+    height: 40,
     marginVertical: 10,
     alignSelf: 'center',
     tintColor: '#fff',
