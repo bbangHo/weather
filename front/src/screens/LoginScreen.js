@@ -18,7 +18,7 @@ const LoginScreen = ({setIsLoggedIn, setAccessToken, setIsNewMember}) => {
         setAccessToken(response.result.accessToken);
         // 테스트를 위해 false 값으로 설정합니다.
         // 구현 완료 후 true 값으로 변경해야 합니다.
-        setIsNewMember(response.result.isNewMember === 'false');
+        setIsNewMember(response.result.isNewMember === 'true');
         setIsLoggedIn(true);
 
         await AsyncStorage.setItem('accessToken', response.result.accessToken);

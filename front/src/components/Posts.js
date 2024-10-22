@@ -14,6 +14,8 @@ import {Card} from 'react-native-elements';
 import globalStyles from '../globalStyles';
 import {fetchPopularPosts, toggleLikePost} from '../api/api';
 
+const {width: windowWidth} = Dimensions.get('window');
+
 const Posts = ({accessToken, memberId}) => {
   const screenWidth = Dimensions.get('window').width;
   const navigation = useNavigation();
@@ -170,7 +172,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0)',
     padding: 15,
     marginHorizontal: 5,
-    width: 350,
+    width: windowWidth * 0.94,
     height: 150,
     justifyContent: 'space-between',
     position: 'relative',

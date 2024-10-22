@@ -7,11 +7,14 @@ import {
   Image,
   Alert,
   TouchableOpacity,
+  Dimensions,
 } from 'react-native';
 import {Card} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
 import globalStyles from '../globalStyles';
 import {fetchPosts, toggleLikePost} from '../api/api';
+
+const {width: windowWidth} = Dimensions.get('window');
 
 const PostScroll = ({accessToken, memberId}) => {
   const [posts, setPosts] = useState([]);
@@ -161,7 +164,7 @@ const styles = StyleSheet.create({
     padding: 15,
     marginTop: 0,
     marginBottom: 10,
-    width: 350,
+    width: windowWidth * 0.93,
     height: 130,
     justifyContent: 'space-between',
     position: 'relative',

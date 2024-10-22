@@ -19,6 +19,7 @@ import {registerProfile, sendLocationToBackend} from '../api/api';
 const RegisterProfileScreen = ({setIsNewMember, accessToken, memberId}) => {
   const [nickname, setNickname] = useState('');
   const [profileImage, setProfileImage] = useState(null);
+  const [selectedType, setSelectedType] = useState(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -42,9 +43,9 @@ const RegisterProfileScreen = ({setIsNewMember, accessToken, memberId}) => {
       } else {
         const selectedImage = response.assets[0];
         setProfileImage({
-          uri: selectedImage.uri,
-          name: selectedImage.fileName,
-          type: selectedImage.type,
+          uri: selectedImage.uri.replace('file://', ''),
+          name: selectedImage.fileName || 'profile.jpg',
+          type: selectedImage.type || 'image/jpeg',
         });
       }
     });
@@ -61,14 +62,37 @@ const RegisterProfileScreen = ({setIsNewMember, accessToken, memberId}) => {
       return;
     }
 
+    if (!selectedType) {
+      Alert.alert('유형 선택 필요', '날씨 체감 유형을 선택해주세요.');
+      return;
+    }
+
+    const sensitivityMap = {
+      hot: 'HOT',
+      none: 'NONE',
+      cold: 'COLD',
+    };
+
+    let imageUri = profileImage.uri;
+    if (Platform.OS === 'ios' && imageUri.startsWith('file://')) {
+      imageUri = imageUri.replace('file://', '');
+    }
+
     try {
       setLoading(true);
+
       const result = await registerProfile(
         nickname,
-        profileImage,
+        sensitivityMap[selectedType],
+        {
+          uri: imageUri,
+          type: profileImage.type || 'image/jpeg',
+          name: profileImage.name || 'profile.jpg',
+        },
         accessToken,
         memberId,
       );
+
       console.log('registered new member info:', result);
 
       const permissionGranted = await requestLocationPermission();
@@ -163,6 +187,7 @@ const RegisterProfileScreen = ({setIsNewMember, accessToken, memberId}) => {
           <Icon name="add-circle-outline" size={30} color="#2f5af4" />
         </TouchableOpacity>
       </View>
+
       <Text style={styles.label}>닉네임</Text>
       <TextInput
         style={styles.input}
@@ -171,6 +196,51 @@ const RegisterProfileScreen = ({setIsNewMember, accessToken, memberId}) => {
         onChangeText={setNickname}
         editable={true}
       />
+
+      <Text style={styles.label}>날씨 체감 유형</Text>
+      <TouchableOpacity
+        style={[
+          styles.typeButton,
+          selectedType === 'hot' && styles.selectedButton,
+        ]}
+        onPress={() => setSelectedType('hot')}>
+        <Text
+          style={[
+            styles.typeButtonText,
+            selectedType === 'hot' && styles.selectedButtonText,
+          ]}>
+          더위를 많이 타는 편
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[
+          styles.typeButton,
+          selectedType === 'none' && styles.selectedButton,
+        ]}
+        onPress={() => setSelectedType('none')}>
+        <Text
+          style={[
+            styles.typeButtonText,
+            selectedType === 'none' && styles.selectedButtonText,
+          ]}>
+          평범한 편
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[
+          styles.typeButton,
+          selectedType === 'cold' && styles.selectedButton,
+        ]}
+        onPress={() => setSelectedType('cold')}>
+        <Text
+          style={[
+            styles.typeButtonText,
+            selectedType === 'cold' && styles.selectedButtonText,
+          ]}>
+          추위를 많이 타는 편
+        </Text>
+      </TouchableOpacity>
+
       <TouchableOpacity style={styles.submitButton} onPress={handleSaveProfile}>
         <Text style={styles.submitButtonText}>
           {loading ? '저장 중...' : '저장하기'}
@@ -239,6 +309,26 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
     marginBottom: 30,
+  },
+  typeButton: {
+    width: '100%',
+    padding: 15,
+    borderWidth: 1,
+    borderColor: '#2f5af4',
+    borderRadius: 5,
+    alignItems: 'center',
+    marginVertical: 5,
+    backgroundColor: '#fff',
+  },
+  typeButtonText: {
+    color: '#2f5af4',
+    fontSize: 16,
+  },
+  selectedButton: {
+    backgroundColor: '#2f5af4',
+  },
+  selectedButtonText: {
+    color: '#fff',
   },
   submitButton: {
     width: '100%',

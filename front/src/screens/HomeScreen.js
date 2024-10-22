@@ -1,6 +1,12 @@
 import React, {useState, useEffect} from 'react';
-import {ScrollView, View, StyleSheet, StatusBar} from 'react-native';
-import {PanGestureHandler, State} from 'react-native-gesture-handler';
+import {
+  ScrollView,
+  View,
+  StyleSheet,
+  StatusBar,
+  Dimensions,
+  Platform,
+} from 'react-native';
 import ToggleViewButton from '../components/ToggleViewButton';
 import WeatherInfoSlider from '../components/WeatherInfoSlider';
 import CurrentLocation from '../components/CurrentLocation';
@@ -10,6 +16,8 @@ import HourlyForecast from '../components/HourlyForecast';
 import AirQuality from '../components/AirQuality';
 import WeatherGraph from '../components/WeatherGraph';
 import {useNavigation} from '@react-navigation/native';
+
+const {height} = Dimensions.get('window');
 
 const HomeScreen = ({accessToken, memberId}) => {
   const navigation = useNavigation();
@@ -25,42 +33,32 @@ const HomeScreen = ({accessToken, memberId}) => {
     }
   }, []);
 
-  const handleGesture = event => {
-    if (
-      event.nativeEvent.translationX > 200 &&
-      event.nativeEvent.state === State.END
-    ) {
-      navigation.navigate('PostCreationScreen');
-    }
-  };
-
   return (
-    <PanGestureHandler
-      onGestureEvent={handleGesture}
-      onHandlerStateChange={handleGesture}>
-      <ScrollView
-        style={[styles.container, {backgroundColor: backgroundColor}]}
-        contentContainerStyle={styles.contentContainer}>
-        <StatusBar hidden={true} />
-        <View style={styles.topSpacer} />
-        <View style={styles.topContainer}>
-          <WeatherInfoSlider accessToken={accessToken} memberId={memberId} />
-          <View style={styles.rightContainer}>
-            <CurrentLocation accessToken={accessToken} memberId={memberId} />
-            <TemperatureInfo accessToken={accessToken} memberId={memberId} />
-            <ToggleViewButton showText={showText} setShowText={setShowText} />
-          </View>
+    <ScrollView
+      style={[styles.container, {backgroundColor: backgroundColor}]}
+      contentContainerStyle={styles.contentContainer}
+      scrollEnabled={true}
+      nestedScrollEnabled={true}>
+      <StatusBar hidden={true} />
+      <View style={styles.topSpacer} />
+      <View style={styles.topContainer}>
+        <WeatherInfoSlider accessToken={accessToken} memberId={memberId} />
+        <View style={styles.rightContainer}>
+          <CurrentLocation accessToken={accessToken} memberId={memberId} />
+          <TemperatureInfo accessToken={accessToken} memberId={memberId} />
+          <ToggleViewButton showText={showText} setShowText={setShowText} />
         </View>
-        <HourlyForecast
-          accessToken={accessToken}
-          memberId={memberId}
-          showText={showText}
-        />
-        <AirQuality accessToken={accessToken} memberId={memberId} />
-        <Posts accessToken={accessToken} memberId={memberId} />
-        <WeatherGraph accessToken={accessToken} memberId={memberId} />
-      </ScrollView>
-    </PanGestureHandler>
+      </View>
+
+      <HourlyForecast
+        accessToken={accessToken}
+        memberId={memberId}
+        showText={showText}
+      />
+      <AirQuality accessToken={accessToken} memberId={memberId} />
+      <Posts accessToken={accessToken} memberId={memberId} />
+      <WeatherGraph accessToken={accessToken} memberId={memberId} />
+    </ScrollView>
   );
 };
 
@@ -73,7 +71,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   topSpacer: {
-    height: 50,
+    height: Platform.OS === 'ios' ? height * 0.06 : height * 0.03,
   },
   topContainer: {
     flexDirection: 'row',

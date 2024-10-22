@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
   },
   sectionText: {
     color: '#fff',
-    fontSize: 13,
+    fontSize: 12,
     textAlign: 'center',
     marginBottom: 5,
   },
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
-    fontSize: 14,
+    fontSize: 13,
   },
 });
 

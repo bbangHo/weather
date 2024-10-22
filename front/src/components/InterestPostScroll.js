@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
     padding: 15,
     marginTop: 0,
     marginBottom: 10,
-    width: 350,
+    width: width * 0.93,
     height: 130,
     justifyContent: 'space-between',
     position: 'relative',
