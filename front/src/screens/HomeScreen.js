@@ -15,6 +15,7 @@ import Posts from '../components/Posts';
 import HourlyForecast from '../components/HourlyForecast';
 import AirQuality from '../components/AirQuality';
 import WeatherGraph from '../components/WeatherGraph';
+import KakaoShareButton from '../components/KakaoShareButton';
 import {useNavigation} from '@react-navigation/native';
 
 const {height} = Dimensions.get('window');
@@ -57,6 +58,11 @@ const HomeScreen = ({accessToken, memberId}) => {
       />
       <AirQuality accessToken={accessToken} memberId={memberId} />
       <Posts accessToken={accessToken} memberId={memberId} />
+
+      <View style={styles.shareButtonContainer}>
+        <KakaoShareButton accessToken={accessToken} memberId={memberId} />
+      </View>
+
       <WeatherGraph accessToken={accessToken} memberId={memberId} />
     </ScrollView>
   );
@@ -81,6 +87,10 @@ const styles = StyleSheet.create({
   rightContainer: {
     width: '50%',
     justifyContent: 'space-between',
+  },
+  shareButtonContainer: {
+    marginVertical: 10,
+    alignItems: 'center',
   },
 });
 

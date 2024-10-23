@@ -25,7 +25,14 @@ const MyScreen = ({accessToken, setIsNewMember}) => {
         const memberInfo = await fetchMemberInfo(accessToken);
         console.log('Fetched member info:', memberInfo);
 
-        setProfileImage(memberInfo.profileImage || profilePlaceholder);
+        if (
+          memberInfo.profileImage &&
+          memberInfo.profileImage.startsWith('http')
+        ) {
+          setProfileImage({uri: memberInfo.profileImage});
+        } else {
+          setProfileImage(profilePlaceholder);
+        }
 
         setNickname(memberInfo.nickname || '');
         if (memberInfo.sensitivity === 'NONE') {
@@ -72,7 +79,7 @@ const MyScreen = ({accessToken, setIsNewMember}) => {
   return (
     <View style={styles.container}>
       <View style={styles.profileContainer}>
-        <Image source={{uri: profileImage}} style={styles.profileImage} />
+        <Image source={profileImage} style={styles.profileImage} />
         <TouchableOpacity style={styles.editIconContainer}>
           <Icon name="add-circle-outline" size={30} color="#2f5af4" />
         </TouchableOpacity>
