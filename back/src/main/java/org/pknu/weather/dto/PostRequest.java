@@ -7,10 +7,24 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.pknu.weather.domain.tag.*;
+import org.pknu.weather.domain.tag.DustTag;
+import org.pknu.weather.domain.tag.HumidityTag;
+import org.pknu.weather.domain.tag.SkyTag;
+import org.pknu.weather.domain.tag.TemperatureTag;
+import org.pknu.weather.domain.tag.WindTag;
 
 public class PostRequest {
 
+    @Builder
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class HobbyParams {
+        Long memberId;
+        Long locationId;
+        String content;
+        String postType;
+    }
 
     @Builder
     @Getter

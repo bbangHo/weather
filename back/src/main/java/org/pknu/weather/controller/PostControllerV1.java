@@ -24,9 +24,15 @@ public class PostControllerV1 {
     private final PostQueryService postQueryService;
 
     @PostMapping("/post")
-    public ApiResponse<Object> createPost(Long memberId, @Valid @RequestBody PostRequest.Params params) {
+    public ApiResponse<Object> createWeatherPost(Long memberId, @Valid @RequestBody PostRequest.Params params) {
         PostRequest.CreatePost createPost = postRequestConverter.toCreatePost(params);
-        boolean isSuccess = postService.createPost(memberId, createPost);
+        boolean isSuccess = postService.createWeatherPost(memberId, createPost);
+        return ApiResponse.of(isSuccess);
+    }
+
+    @PostMapping("/post/hobby")
+    public ApiResponse<Object> createHobbyPost(Long memberId, @RequestBody PostRequest.HobbyParams params) {
+        boolean isSuccess = postService.createHobbyPost(params);
         return ApiResponse.of(isSuccess);
     }
 

@@ -18,8 +18,9 @@ public class CommunityControllerV1 {
     @GetMapping("/posts")
     public ApiResponse<PostResponse.PostList> getPosts(Long memberId,
                                                        @RequestParam(defaultValue = "1") Long lastPostId,
-                                                       @RequestParam(defaultValue = "6") Long size) {
-        PostResponse.PostList postList = postQueryService.getPosts(memberId, lastPostId, size);
+                                                       @RequestParam(defaultValue = "6") Long size,
+                                                       @RequestParam(defaultValue = "WEATHER") String postType) {
+        PostResponse.PostList postList = postQueryService.getWeatherPosts(memberId, lastPostId, size, postType);
         return ApiResponse.onSuccess(postList);
     }
 }
