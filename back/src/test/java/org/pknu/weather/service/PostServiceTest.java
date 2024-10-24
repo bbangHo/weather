@@ -1,8 +1,5 @@
 package org.pknu.weather.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,11 +7,7 @@ import org.pknu.weather.common.TestDataCreator;
 import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.Post;
 import org.pknu.weather.domain.common.PostType;
-import org.pknu.weather.domain.tag.DustTag;
-import org.pknu.weather.domain.tag.HumidityTag;
-import org.pknu.weather.domain.tag.SkyTag;
-import org.pknu.weather.domain.tag.TemperatureTag;
-import org.pknu.weather.domain.tag.WindTag;
+import org.pknu.weather.domain.tag.*;
 import org.pknu.weather.dto.PostRequest;
 import org.pknu.weather.dto.PostRequest.HobbyParams;
 import org.pknu.weather.dto.converter.PostRequestConverter;
@@ -25,6 +18,10 @@ import org.pknu.weather.repository.RecommendationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Slf4j
@@ -102,18 +99,18 @@ class PostServiceTest {
         // given
         Member member = memberRepository.save(Member.builder()
                 .location(TestDataCreator.getBusanLocation())
+                .email("test@naver.com")
                 .nickname("member")
                 .build());
 
         HobbyParams hobbyParams = HobbyParams.builder()
                 .postType("PET")
                 .locationId(1L)
-                .memberId(member.getId())
                 .content("test")
                 .build();
 
         // when
-        boolean hobbyPost = postService.createHobbyPost(hobbyParams);
+        boolean hobbyPost = postService.createHobbyPost(member.getEmail(), hobbyParams);
         Post post = postRepository.findAll().get(0);
 
         // then
@@ -138,10 +135,11 @@ class PostServiceTest {
         Member member = memberRepository.save(Member.builder()
                 .location(TestDataCreator.getBusanLocation())
                 .nickname("member")
+                .email("test@naver.com")
                 .build());
 
         // when
-        boolean result = postService.createWeatherPost(member.getId(), createPost);
+        boolean result = postService.createWeatherPost(member.getEmail(), createPost);
 
         // then
         Post post = postRepository.findAll().get(0);
@@ -177,7 +175,7 @@ class PostServiceTest {
         List<Post> postList = postRepository.findAllWithinDistance(1L, 5L, busanMember.getLocation(), PostType.WEATHER);
 
         // then
-        assertThat(postList.size()).isEqualTo(1);
+        assertThat(postList.get(0)).isEqualTo(busanPost);
     }
 
     @Test

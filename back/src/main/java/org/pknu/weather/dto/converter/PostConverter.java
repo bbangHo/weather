@@ -24,7 +24,7 @@ public class PostConverter {
                 .location(location)
                 .tag(tag)
                 .content(params.getContent())
-                .postType(PostType.valueOf(params.getPostType()))
+                .postType(PostType.toPostType(params.getPostType()))
                 .build();
     }
 }

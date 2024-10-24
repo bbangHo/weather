@@ -20,7 +20,6 @@ public class PostRequest {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class HobbyParams {
-        Long memberId;
         Long locationId;
         String content;
         String postType;
