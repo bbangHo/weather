@@ -18,11 +18,10 @@ public class PostConverter {
                 .build();
     }
 
-    public static Post toPost(Member member, Location location, Tag tag, PostRequest.HobbyParams params) {
+    public static Post toPost(Member member, Location location, PostRequest.HobbyParams params) {
         return Post.builder()
                 .member(member)
                 .location(location)
-                .tag(tag)
                 .content(params.getContent())
                 .postType(PostType.toPostType(params.getPostType()))
                 .build();

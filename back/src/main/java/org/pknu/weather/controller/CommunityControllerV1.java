@@ -19,8 +19,9 @@ public class CommunityControllerV1 {
     public ApiResponse<PostResponse.PostList> getPosts(Long memberId,
                                                        @RequestParam(defaultValue = "1") Long lastPostId,
                                                        @RequestParam(defaultValue = "6") Long size,
-                                                       @RequestParam(defaultValue = "WEATHER") String postType) {
-        PostResponse.PostList postList = postQueryService.getWeatherPosts(memberId, lastPostId, size, postType);
+                                                       @RequestParam(defaultValue = "WEATHER") String postType,
+                                                       @RequestParam(defaultValue = "0") Long locationId) {
+        PostResponse.PostList postList = postQueryService.getWeatherPosts(memberId, lastPostId, size, postType, locationId);
         return ApiResponse.onSuccess(postList);
     }
 }

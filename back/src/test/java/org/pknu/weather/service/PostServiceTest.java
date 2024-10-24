@@ -197,7 +197,8 @@ class PostServiceTest {
                 .build());
 
         // when
-        List<Post> postList = postService.getPosts(member.getId(), 1L, 5L, PostType.HIKING.toString());
+        List<Post> postList = postService.getPosts(member.getId(), 1L, 5L, PostType.HIKING.toString(),
+                member.getLocation().getId());
 
         // then
         assertThat(postList.get(0)).isEqualTo(hPost);

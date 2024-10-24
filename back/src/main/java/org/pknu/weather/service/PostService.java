@@ -10,10 +10,7 @@ import org.pknu.weather.dto.converter.PostConverter;
 import org.pknu.weather.dto.converter.RecommendationConverter;
 import org.pknu.weather.dto.converter.TagConverter;
 import org.pknu.weather.exception.GeneralException;
-import org.pknu.weather.repository.MemberRepository;
-import org.pknu.weather.repository.PostRepository;
-import org.pknu.weather.repository.RecommendationRepository;
-import org.pknu.weather.repository.TagRepository;
+import org.pknu.weather.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,12 +24,20 @@ public class PostService {
     private final MemberRepository memberRepository;
     private final RecommendationRepository recommendationRepository;
     private final TagRepository tagRepository;
+    private final LocationRepository locationRepository;
     private static final int DISTANCE = 3000;
 
     @Transactional(readOnly = true)
-    public List<Post> getPosts(Long memberId, Long lastPostId, Long size, String postType) {
+    public List<Post> getPosts(Long memberId, Long lastPostId, Long size, String postType, Long locationId) {
         Member member = memberRepository.safeFindById(memberId);
-        Location location = member.getLocation();
+        Location location = null;
+
+        if (locationId == 0) {
+            location = member.getLocation();
+        } else {
+            location = locationRepository.safeFindById(locationId);
+        }
+
         List<Post> postList = postRepository.findAllWithinDistance(lastPostId, size, location,
                 PostType.toPostType(postType));
 
@@ -56,8 +61,8 @@ public class PostService {
 
     public boolean createHobbyPost(String email, PostRequest.HobbyParams params) {
         Member member = memberRepository.safeFindByEmail(email);
-        Location location = member.getLocation();   // TODO: target location 으로 변경
-        Post post = PostConverter.toPost(member, location, null, params);
+        Location location = locationRepository.safeFindById(params.getLocationId());
+        Post post = PostConverter.toPost(member, location, params);
         postRepository.save(post);
         return true;
     }
