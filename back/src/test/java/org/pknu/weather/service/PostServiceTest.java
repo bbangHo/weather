@@ -105,7 +105,7 @@ class PostServiceTest {
 
         HobbyParams hobbyParams = HobbyParams.builder()
                 .postType("PET")
-                .locationId(1L)
+                .locationId(member.getLocation().getId())
                 .content("test")
                 .build();
 
@@ -172,7 +172,8 @@ class PostServiceTest {
                 .build());
 
         // when
-        List<Post> postList = postRepository.findAllWithinDistance(1L, 5L, busanMember.getLocation(), PostType.WEATHER);
+        List<Post> postList = postRepository.findAllWithinDistance(1L, 5L, busanMember.getLocation(),
+                PostType.WEATHER);
 
         // then
         assertThat(postList.get(0)).isEqualTo(busanPost);
