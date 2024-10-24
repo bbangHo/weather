@@ -1,17 +1,15 @@
 package org.pknu.weather.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.pknu.weather.common.TestDataCreator;
-import org.pknu.weather.common.utils.GeometryUtils;
-import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.Post;
-import org.pknu.weather.domain.common.Sensitivity;
+import org.pknu.weather.domain.common.PostType;
 import org.pknu.weather.domain.tag.*;
 import org.pknu.weather.dto.PostRequest;
+import org.pknu.weather.dto.PostRequest.HobbyParams;
 import org.pknu.weather.dto.converter.PostRequestConverter;
 import org.pknu.weather.repository.LocationRepository;
 import org.pknu.weather.repository.MemberRepository;
@@ -46,7 +44,6 @@ class PostServiceTest {
 
     @Autowired
     PostRequestConverter postRequestConverter;
-
 
 //    @BeforeEach
 //    void init() {
@@ -97,6 +94,31 @@ class PostServiceTest {
 //    }
 
     @Test
+    @Transactional
+    public void 취미_글_저장_테스트() {
+        // given
+        Member member = memberRepository.save(Member.builder()
+                .location(TestDataCreator.getBusanLocation())
+                .email("test@naver.com")
+                .nickname("member")
+                .build());
+
+        HobbyParams hobbyParams = HobbyParams.builder()
+                .postType("PET")
+                .locationId(member.getLocation().getId())
+                .content("test")
+                .build();
+
+        // when
+        boolean hobbyPost = postService.createHobbyPost(member.getEmail(), hobbyParams);
+        Post post = postRepository.findAll().get(0);
+
+        // then
+        assertThat(hobbyPost).isTrue();
+        assertThat(post.getMember().getId()).isEqualTo(member.getId());
+    }
+
+    @Test
     @DisplayName("post 저장 테스트")
     @Transactional
     void postSaveTest() {
@@ -113,10 +135,11 @@ class PostServiceTest {
         Member member = memberRepository.save(Member.builder()
                 .location(TestDataCreator.getBusanLocation())
                 .nickname("member")
+                .email("test@naver.com")
                 .build());
 
         // when
-        boolean result = postService.createPost(member.getId(), createPost);
+        boolean result = postService.createWeatherPost(member.getEmail(), createPost);
 
         // then
         Post post = postRepository.findAll().get(0);
@@ -149,9 +172,36 @@ class PostServiceTest {
                 .build());
 
         // when
-        List<Post> postList = postRepository.findAllWithinDistance(1L, 5L, busanMember.getLocation());
+        List<Post> postList = postRepository.findAllWithinDistance(1L, 5L, busanMember.getLocation(),
+                PostType.WEATHER);
 
         // then
-        assertThat(postList.size()).isEqualTo(1);
+        assertThat(postList.get(0)).isEqualTo(busanPost);
+    }
+
+    @Test
+    @Transactional
+    void postType이_다르면_게시글이_조회되지_않습니다() {
+        // given
+        Member member = memberRepository.save(TestDataCreator.getMember());
+
+        Post hPost = postRepository.save(Post.builder()
+                .postType(PostType.HIKING)
+                .location(member.getLocation())
+                .member(member)
+                .build());
+
+        Post wPost = postRepository.save(Post.builder()
+                .postType(PostType.WEATHER)
+                .location(member.getLocation())
+                .member(member)
+                .build());
+
+        // when
+        List<Post> postList = postService.getPosts(member.getId(), 1L, 5L, PostType.HIKING.toString(),
+                member.getLocation().getId());
+
+        // then
+        assertThat(postList.get(0)).isEqualTo(hPost);
     }
 }

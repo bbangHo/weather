@@ -22,9 +22,9 @@ public class PostQueryService {
     private final MemberRepository memberRepository;
     private final PostService postService;
 
-    public PostResponse.PostList getPosts(Long memberId, Long lastPostId, Long size) {
+    public PostResponse.PostList getWeatherPosts(Long memberId, Long lastPostId, Long size, String postType, Long locationId) {
         Member member = memberRepository.safeFindById(memberId);
-        List<Post> postList = postService.getPosts(memberId, lastPostId, size);
+        List<Post> postList = postService.getPosts(memberId, lastPostId, size, postType, locationId);
         return PostResponseConverter.toPostList(member, postList, postList.size() > size);
     }
 

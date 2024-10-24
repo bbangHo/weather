@@ -4,15 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
 import org.pknu.weather.domain.*;
+import org.pknu.weather.domain.common.PostType;
 import org.pknu.weather.dto.PostRequest;
 import org.pknu.weather.dto.converter.PostConverter;
 import org.pknu.weather.dto.converter.RecommendationConverter;
 import org.pknu.weather.dto.converter.TagConverter;
 import org.pknu.weather.exception.GeneralException;
-import org.pknu.weather.repository.MemberRepository;
-import org.pknu.weather.repository.PostRepository;
-import org.pknu.weather.repository.RecommendationRepository;
-import org.pknu.weather.repository.TagRepository;
+import org.pknu.weather.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,29 +24,46 @@ public class PostService {
     private final MemberRepository memberRepository;
     private final RecommendationRepository recommendationRepository;
     private final TagRepository tagRepository;
+    private final LocationRepository locationRepository;
     private static final int DISTANCE = 3000;
 
     @Transactional(readOnly = true)
-    public List<Post> getPosts(Long memberId, Long lastPostId, Long size) {
+    public List<Post> getPosts(Long memberId, Long lastPostId, Long size, String postType, Long locationId) {
         Member member = memberRepository.safeFindById(memberId);
-        Location location = member.getLocation();
-        List<Post> postList = postRepository.findAllWithinDistance(lastPostId, size, location);
+        Location location = null;
+
+        if (locationId == 0) {
+            location = member.getLocation();
+        } else {
+            location = locationRepository.safeFindById(locationId);
+        }
+
+        List<Post> postList = postRepository.findAllWithinDistance(lastPostId, size, location,
+                PostType.toPostType(postType));
 
         return postList;
     }
 
     @Transactional
-    public boolean createPost(Long memberId, PostRequest.CreatePost createPost) {
-        Member member = memberRepository.safeFindById(memberId);
+    public boolean createWeatherPost(String email, PostRequest.CreatePost createPost) {
+        Member member = memberRepository.safeFindByEmail(email);
         Location location = member.getLocation();
         Tag tag = TagConverter.toTag(createPost);
         Post post = PostConverter.toPost(member, location, tag, createPost);
-        Recommendation recommendation = RecommendationConverter.toRecommendation(member, post);
+//        Recommendation recommendation = RecommendationConverter.toRecommendation(member, post);
 
-        recommendationRepository.save(recommendation);
+//        recommendationRepository.save(recommendation);
         postRepository.save(post);
         tagRepository.save(tag);
 
+        return true;
+    }
+
+    public boolean createHobbyPost(String email, PostRequest.HobbyParams params) {
+        Member member = memberRepository.safeFindByEmail(email);
+        Location location = locationRepository.safeFindById(params.getLocationId());
+        Post post = PostConverter.toPost(member, location, params);
+        postRepository.save(post);
         return true;
     }
 

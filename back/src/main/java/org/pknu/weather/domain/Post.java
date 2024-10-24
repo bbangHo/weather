@@ -40,5 +40,6 @@ public class Post extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @ColumnDefault("'WEATHER'")
-    private PostType postType;
+    @Builder.Default
+    private PostType postType = PostType.WEATHER;
 }

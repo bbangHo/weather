@@ -8,6 +8,7 @@ import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.Post;
 import org.pknu.weather.domain.Recommendation;
+import org.pknu.weather.domain.common.PostType;
 import org.pknu.weather.domain.common.Sensitivity;
 import org.pknu.weather.dto.PostResponse;
 import org.pknu.weather.repository.LocationRepository;
@@ -100,7 +101,8 @@ class PostQueryServiceTest {
         // given
 
         // when
-        PostResponse.PostList posts = postQueryService.getPosts(member.getId(), 1L, 5L);
+        PostResponse.PostList posts = postQueryService.getWeatherPosts(member.getId(), 1L, 5L,
+                PostType.WEATHER.toString(), 0L);
         PostResponse.Post post = posts.getPostList().get(0);
 
         // then
