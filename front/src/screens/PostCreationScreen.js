@@ -213,6 +213,8 @@ const styles = StyleSheet.create({
     paddingTop: 50,
   },
   textInput: {
+    paddingTop: 12,
+    paddingLeft: 12,
     height: 100,
     borderColor: '#ccc',
     borderWidth: 1,

@@ -34,7 +34,7 @@ const HomeStack = ({accessToken, memberId}) => (
   </Stack.Navigator>
 );
 
-const InterestStack = ({accessToken, memberId}) => (
+const InterestStack = ({accessToken, memberId, locationId}) => (
   <Stack.Navigator screenOptions={{headerShown: false}}>
     <Stack.Screen name="InterestScreen">
       {props => (
@@ -51,6 +51,7 @@ const InterestStack = ({accessToken, memberId}) => (
           {...props}
           accessToken={accessToken}
           memberId={memberId}
+          locationId={locationId}
         />
       )}
     </Stack.Screen>
@@ -76,6 +77,7 @@ const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [accessToken, setAccessToken] = useState(null);
   const [isNewMember, setIsNewMember] = useState(false);
+  const [locationId, setLocationId] = useState(null);
   const [memberId] = useState(1); // 임의의 memberId 설정
 
   return (
@@ -147,6 +149,7 @@ const App = () => {
                     {...props}
                     accessToken={accessToken}
                     memberId={memberId}
+                    locationId={locationId}
                   />
                 )}
               </Tab.Screen>
@@ -174,6 +177,7 @@ const App = () => {
                     accessToken={accessToken}
                     memberId={memberId}
                     setIsNewMember={setIsNewMember}
+                    setLocationId={setLocationId}
                   />
                 )}
               </Tab.Screen>

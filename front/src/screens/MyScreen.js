@@ -12,7 +12,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {fetchMemberInfo} from '../api/api';
 import profilePlaceholder from '../../assets/images/profile.png';
 
-const MyScreen = ({accessToken, setIsNewMember}) => {
+const MyScreen = ({accessToken, setIsNewMember, setLocationId}) => {
   const [nickname, setNickname] = useState('');
   const [selectedType, setSelectedType] = useState(null);
   const [address, setAddress] = useState('');
@@ -41,6 +41,7 @@ const MyScreen = ({accessToken, setIsNewMember}) => {
         setAddress(
           `${memberInfo.province} ${memberInfo.city} ${memberInfo.street}`,
         );
+        setLocationId(memberInfo.locationId);
         setLoading(false);
       } catch (error) {
         console.error('회원 정보 불러오는 중 오류 발생:', error);
