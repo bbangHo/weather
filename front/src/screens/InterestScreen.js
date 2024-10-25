@@ -56,7 +56,7 @@ const InterestScreen = ({accessToken, memberId}) => {
   }, [accessToken, memberId]);
 
   const handleScroll = event => {
-    const {layoutMeasurement, contentOffset, contentSize} = event.nativeEvent;
+    const {layoutMeasurement, contentOffset} = event.nativeEvent;
     const scrollThreshold = layoutMeasurement.height / 2;
 
     if (contentOffset.y >= scrollThreshold) {
@@ -113,7 +113,6 @@ const InterestScreen = ({accessToken, memberId}) => {
           style={[styles.animatedContainer, {transform: [{translateY}]}]}>
           <InterestItem
             accessToken={accessToken}
-            weatherData={weatherData}
             selectedHobby={selectedHobby}
             setSelectedHobby={setSelectedHobby}
             modalVisible={modalVisible}
@@ -121,7 +120,7 @@ const InterestScreen = ({accessToken, memberId}) => {
           />
         </Animated.View>
 
-        {showPostScroll && (
+        {showPostScroll && selectedHobby && (
           <View style={styles.postScrollContainer}>
             <InterestPostScroll
               accessToken={accessToken}
@@ -160,8 +159,6 @@ const styles = StyleSheet.create({
     height: 30,
     resizeMode: 'contain',
     tintColor: '#c4c4c4',
-    backgroundColor: '#fff',
-    borderRadius: 50,
   },
   scrollViewContent: {
     minHeight: height * 1.5,

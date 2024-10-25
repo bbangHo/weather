@@ -10,186 +10,106 @@ import {
   Dimensions,
 } from 'react-native';
 import {Card} from 'react-native-elements';
-import Icon from 'react-native-vector-icons/Ionicons';
 import globalStyles from '../globalStyles';
+import {fetchPosts, toggleLikePost} from '../api/api';
 
 const {width} = Dimensions.get('window');
 
-const dummyPosts = [
-  {
-    postInfo: {
-      postId: 1,
-      content: '오늘은 런닝하기 좋은 날입니다!',
-      createdAt: '1시간 전',
-      likeCount: 34,
-      likeClickable: true,
-    },
-    memberInfo: {
-      memberName: '유저1',
-      profileImageUrl: null,
-    },
-    hobby: '런닝',
-  },
-  {
-    postInfo: {
-      postId: 2,
-      content: '등산하기에 최적의 날씨네요!',
-      createdAt: '2시간 전',
-      likeCount: 12,
-      likeClickable: true,
-    },
-    memberInfo: {
-      memberName: '유저2',
-      profileImageUrl: null,
-    },
-    hobby: '등산',
-  },
-  {
-    postInfo: {
-      postId: 3,
-      content: '반려동물 산책을 즐기기에 좋은 날입니다!',
-      createdAt: '3시간 전',
-      likeCount: 22,
-      likeClickable: true,
-    },
-    memberInfo: {
-      memberName: '유저3',
-      profileImageUrl: null,
-    },
-    hobby: '반려동물 산책',
-  },
-  {
-    postInfo: {
-      postId: 4,
-      content: '반려동물 산책을 즐기기에 좋은 날입니다!',
-      createdAt: '3시간 전',
-      likeCount: 22,
-      likeClickable: true,
-    },
-    memberInfo: {
-      memberName: '유저3',
-      profileImageUrl: null,
-    },
-    hobby: '반려동물 산책',
-  },
-  {
-    postInfo: {
-      postId: 5,
-      content: '반려동물 산책을 즐기기에 좋은 날입니다!',
-      createdAt: '3시간 전',
-      likeCount: 22,
-      likeClickable: true,
-    },
-    memberInfo: {
-      memberName: '유저3',
-      profileImageUrl: null,
-    },
-    hobby: '반려동물 산책',
-  },
-  {
-    postInfo: {
-      postId: 6,
-      content: '반려동물 산책을 즐기기에 좋은 날입니다!',
-      createdAt: '3시간 전',
-      likeCount: 22,
-      likeClickable: true,
-    },
-    memberInfo: {
-      memberName: '유저3',
-      profileImageUrl: null,
-    },
-    hobby: '반려동물 산책',
-  },
-  {
-    postInfo: {
-      postId: 7,
-      content: '반려동물 산책을 즐기기에 좋은 날입니다!',
-      createdAt: '3시간 전',
-      likeCount: 22,
-      likeClickable: true,
-    },
-    memberInfo: {
-      memberName: '유저3',
-      profileImageUrl: null,
-    },
-    hobby: '반려동물 산책',
-  },
-  {
-    postInfo: {
-      postId: 8,
-      content: '반려동물 산책을 즐기기에 좋은 날입니다!',
-      createdAt: '3시간 전',
-      likeCount: 22,
-      likeClickable: true,
-    },
-    memberInfo: {
-      memberName: '유저3',
-      profileImageUrl: null,
-    },
-    hobby: '반려동물 산책',
-  },
-  {
-    postInfo: {
-      postId: 9,
-      content: '반려동물 산책을 즐기기에 좋은 날입니다!',
-      createdAt: '3시간 전',
-      likeCount: 22,
-      likeClickable: true,
-    },
-    memberInfo: {
-      memberName: '유저3',
-      profileImageUrl: null,
-    },
-    hobby: '반려동물 산책',
-  },
-];
-
 const hobbies = [
-  {id: 1, name: '런닝'},
-  {id: 2, name: '등산'},
-  {id: 3, name: '반려동물 산책'},
+  {
+    id: 1,
+    name: '런닝',
+    postType: 'RUN',
+    icon: require('../../assets/images/icon_interest_run.png'),
+  },
+  {
+    id: 2,
+    name: '등산',
+    postType: 'HIKING',
+    icon: require('../../assets/images/icon_interest_hiking.png'),
+  },
+  {
+    id: 3,
+    name: '반려동물 산책',
+    postType: 'PET',
+    icon: require('../../assets/images/icon_interest_pet.png'),
+  },
 ];
 
-const InterestPostScroll = ({selectedHobby}) => {
+const InterestPostScroll = ({accessToken, memberId, selectedHobby}) => {
   const [posts, setPosts] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [currentHobby, setCurrentHobby] = useState(selectedHobby);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadPosts();
+    if (currentHobby) {
+      loadPosts();
+    }
   }, [currentHobby]);
 
-  const loadPosts = () => {
-    if (!currentHobby) {
-      setPosts(dummyPosts);
-    } else {
-      const filteredPosts = dummyPosts.filter(
-        post => post.hobby === currentHobby.name,
+  const loadPosts = async () => {
+    try {
+      setLoading(true);
+      const fetchedPosts = await fetchPosts(
+        accessToken,
+        memberId,
+        currentHobby.postType,
       );
-      setPosts(filteredPosts);
+      setPosts(fetchedPosts);
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleLikePress = postId => {
-    setPosts(prevPosts =>
-      prevPosts.map(post =>
-        post.postInfo.postId === postId
-          ? {
-              ...post,
-              postInfo: {
-                ...post.postInfo,
-                likeClickable: false,
-                likeCount: post.postInfo.likeCount + 1,
-              },
-            }
-          : post,
-      ),
-    );
+  const handleLikePress = async postId => {
+    try {
+      const response = await toggleLikePost(accessToken, memberId, postId);
+      if (response.isSuccess) {
+        setPosts(prevPosts =>
+          prevPosts.map(post =>
+            post.postInfo.postId === postId
+              ? {
+                  ...post,
+                  postInfo: {
+                    ...post.postInfo,
+                    likeClickable: false,
+                    likeCount: post.postInfo.likeCount + 1,
+                  },
+                }
+              : post,
+          ),
+        );
+      } else {
+        Alert.alert('Error', '좋아요를 할 수 없습니다. 다시 시도해주세요.');
+      }
+    } catch (error) {
+      console.error('Failed to like post:', error.message);
+      Alert.alert(
+        'Error',
+        '서버에 문제가 발생했습니다. 나중에 다시 시도해주세요.',
+      );
+    }
   };
 
   const handleHobbySelect = hobby => {
     setCurrentHobby(hobby);
     setModalVisible(false);
+  };
+
+  const getUserIcon = sensitivity => {
+    switch (sensitivity) {
+      case 'HOT':
+        return require('../../assets/images/icon_clear.png');
+      case 'NONE':
+        return require('../../assets/images/icon_partlycloudy.png');
+      case 'COLD':
+        return require('../../assets/images/icon_snow2.png');
+      default:
+        return null;
+    }
   };
 
   const renderPost = ({item}) => (
@@ -204,19 +124,18 @@ const InterestPostScroll = ({selectedHobby}) => {
                   : require('../../assets/images/profile.png')
               }
               style={styles.profileImage}
-              onError={() => {}}
             />
             <View style={styles.userInfo}>
               <View style={styles.userRow}>
                 <Text style={styles.username}>
                   {item.memberInfo.memberName}
                 </Text>
-                <Icon
-                  name="sunny-outline"
-                  size={18}
-                  color="#fff"
-                  style={styles.userIcon}
-                />
+                {item.memberInfo.sensitivity && (
+                  <Image
+                    source={getUserIcon(item.memberInfo.sensitivity)}
+                    style={styles.userIcon}
+                  />
+                )}
               </View>
               <Text style={styles.timeAgo}>{item.postInfo.createdAt}</Text>
             </View>
@@ -224,10 +143,12 @@ const InterestPostScroll = ({selectedHobby}) => {
           <TouchableOpacity
             style={styles.likeContainer}
             onPress={() => handleLikePress(item.postInfo.postId)}>
-            <Icon
-              name={item.postInfo.likeClickable ? 'heart-outline' : 'heart'}
-              size={20}
-              color="#fff"
+            <Image
+              source={
+                item.postInfo.likeClickable
+                  ? require('../../assets/images/icon_heart0.png')
+                  : require('../../assets/images/icon_heart2.png')
+              }
               style={styles.likeIcon}
             />
             <Text style={styles.likeCount}>{item.postInfo.likeCount}</Text>
@@ -250,17 +171,23 @@ const InterestPostScroll = ({selectedHobby}) => {
         </TouchableOpacity>
       </View>
 
-      <FlatList
-        data={posts}
-        renderItem={renderPost}
-        keyExtractor={item => item.postInfo.postId.toString()}
-        ListEmptyComponent={
-          <Text style={styles.noPostText}>
-            아직 작성된 게시글이 없습니다.{'\n'}첫 번째 글을 작성해 주세요!
-          </Text>
-        }
-        contentContainerStyle={styles.contentContainer}
-      />
+      {loading ? (
+        <Text style={styles.noPostText}>
+          아직 작성된 게시글이 없습니다.{'\n'}첫 번째 글을 작성해 주세요!
+        </Text>
+      ) : (
+        <FlatList
+          data={posts}
+          renderItem={renderPost}
+          keyExtractor={item => item.postInfo.postId.toString()}
+          ListEmptyComponent={
+            <Text style={styles.noPostText}>
+              아직 작성된 게시글이 없습니다.{'\n'}첫 번째 글을 작성해 주세요!
+            </Text>
+          }
+          contentContainerStyle={styles.contentContainer}
+        />
+      )}
 
       <Modal
         visible={modalVisible}
@@ -280,7 +207,16 @@ const InterestPostScroll = ({selectedHobby}) => {
                     currentHobby?.id === item.id && styles.selectedHobby,
                   ]}
                   onPress={() => handleHobbySelect(item)}>
-                  <Icon name="paw-outline" size={30} color="#3f51b5" />
+                  <Image
+                    source={item.icon}
+                    style={[
+                      styles.hobbyIcon,
+                      {
+                        tintColor:
+                          currentHobby?.id === item.id ? '#fff' : '#3f51b5',
+                      },
+                    ]}
+                  />
                   <Text
                     style={[
                       styles.hobbyButtonText,
@@ -351,6 +287,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   userIcon: {
+    width: 18,
+    height: 18,
     marginLeft: 7,
   },
   timeAgo: {
@@ -365,6 +303,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   likeIcon: {
+    width: 20,
+    height: 20,
     marginBottom: 1,
   },
   likeCount: {
@@ -439,6 +379,11 @@ const styles = StyleSheet.create({
   },
   selectedHobbyText: {
     color: '#fff',
+  },
+  hobbyIcon: {
+    width: 30,
+    height: 30,
+    marginBottom: 5,
   },
   applyButton: {
     backgroundColor: '#3f51b5',
