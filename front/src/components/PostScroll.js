@@ -10,7 +10,6 @@ import {
   Dimensions,
 } from 'react-native';
 import {Card} from 'react-native-elements';
-import Icon from 'react-native-vector-icons/Ionicons';
 import globalStyles from '../globalStyles';
 import {fetchPosts, toggleLikePost} from '../api/api';
 
@@ -21,6 +20,7 @@ const PostScroll = ({accessToken, memberId}) => {
   const [loading, setLoading] = useState(false);
   const [lastPostId, setLastPostId] = useState(null);
   const [loadingMore, setLoadingMore] = useState(false);
+  const postType = 'WEATHER';
 
   useEffect(() => {
     loadPosts();
@@ -30,7 +30,12 @@ const PostScroll = ({accessToken, memberId}) => {
     if (loading || loadingMore) return;
     setLoading(true);
     try {
-      const fetchedPosts = await fetchPosts(accessToken, memberId, lastPostId);
+      const fetchedPosts = await fetchPosts(
+        accessToken,
+        memberId,
+        postType,
+        lastPostId,
+      );
       console.log('Fetched posts:', fetchedPosts);
       if (fetchedPosts && fetchedPosts.length > 0) {
         setPosts(prevPosts => [...prevPosts, ...fetchedPosts]);
@@ -82,6 +87,19 @@ const PostScroll = ({accessToken, memberId}) => {
     }
   };
 
+  const getUserIcon = sensitivity => {
+    switch (sensitivity) {
+      case 'HOT':
+        return require('../../assets/images/icon_clear.png');
+      case 'NONE':
+        return require('../../assets/images/icon_partlycloudy.png');
+      case 'COLD':
+        return require('../../assets/images/icon_snow2.png');
+      default:
+        return null;
+    }
+  };
+
   const renderPost = ({item}) => (
     <View style={styles.section}>
       <Card containerStyle={[styles.card, globalStyles.transparentBackground]}>
@@ -101,10 +119,8 @@ const PostScroll = ({accessToken, memberId}) => {
                 <Text style={styles.username}>
                   {item.memberInfo.memberName}
                 </Text>
-                <Icon
-                  name="sunny-outline"
-                  size={18}
-                  color="#fff"
+                <Image
+                  source={getUserIcon(item.memberInfo.sensitivity)}
                   style={styles.userIcon}
                 />
               </View>
@@ -114,10 +130,12 @@ const PostScroll = ({accessToken, memberId}) => {
           <TouchableOpacity
             style={styles.likeContainer}
             onPress={() => handleLikePress(item.postInfo.postId)}>
-            <Icon
-              name={item.postInfo.likeClickable ? 'heart-outline' : 'heart'}
-              size={20}
-              color="#fff"
+            <Image
+              source={
+                item.postInfo.likeClickable
+                  ? require('../../assets/images/icon_heart0.png')
+                  : require('../../assets/images/icon_heart2.png')
+              }
               style={styles.likeIcon}
             />
             <Text style={styles.likeCount}>{item.postInfo.likeCount}</Text>
@@ -196,6 +214,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   userIcon: {
+    width: 18,
+    height: 18,
     marginLeft: 7,
   },
   timeAgo: {
@@ -210,6 +230,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   likeIcon: {
+    width: 20,
+    height: 20,
     marginBottom: 1,
   },
   likeCount: {

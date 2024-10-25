@@ -10,8 +10,7 @@ import PostCreationScreen from './src/screens/PostCreationScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import InterestScreen from './src/screens/InterestScreen';
 import InterestPostCreationScreen from './src/screens/InterestPostCreationScreen';
-import Icon from 'react-native-vector-icons/Ionicons';
-import {StatusBar, Button} from 'react-native';
+import {StatusBar, Image, Button} from 'react-native';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -92,14 +91,43 @@ const App = () => {
             />
           ) : (
             <Tab.Navigator
-              screenOptions={{headerShown: false}}
+              screenOptions={({route}) => ({
+                headerShown: false,
+                tabBarIcon: ({focused, color, size}) => {
+                  let iconSource;
+
+                  if (route.name === 'HomeStack') {
+                    iconSource = require('./assets/images/icon_tab_home.png');
+                  } else if (route.name === 'Community') {
+                    iconSource = require('./assets/images/icon_tab_community.png');
+                  } else if (route.name === 'InterestStack') {
+                    iconSource = require('./assets/images/icon_interest_run.png');
+                  } else if (route.name === 'My') {
+                    iconSource = require('./assets/images/icon_tab_my.png');
+                  }
+
+                  return (
+                    <Image
+                      source={iconSource}
+                      style={{
+                        width: size,
+                        height: size,
+                        tintColor: focused ? '#3f51b5' : color,
+                      }}
+                    />
+                  );
+                },
+                tabBarActiveTintColor: '#3f51b5',
+                tabBarInactiveTintColor: 'gray',
+                tabBarStyle: {
+                  paddingTop: 5,
+                },
+              })}
               initialRouteName="HomeStack">
               <Tab.Screen
                 name="Community"
                 options={{
-                  tabBarIcon: ({color, size}) => (
-                    <Icon name="people" color={color} size={size} />
-                  ),
+                  tabBarLabel: 'Community',
                 }}>
                 {props => (
                   <CommunityScreen
@@ -112,9 +140,6 @@ const App = () => {
               <Tab.Screen
                 name="InterestStack"
                 options={{
-                  tabBarIcon: ({color, size}) => (
-                    <Icon name="book" color={color} size={size} />
-                  ),
                   tabBarLabel: 'Interest',
                 }}>
                 {props => (
@@ -128,9 +153,6 @@ const App = () => {
               <Tab.Screen
                 name="HomeStack"
                 options={{
-                  tabBarIcon: ({color, size}) => (
-                    <Icon name="home" color={color} size={size} />
-                  ),
                   tabBarLabel: 'Home',
                 }}>
                 {props => (
@@ -144,9 +166,7 @@ const App = () => {
               <Tab.Screen
                 name="My"
                 options={{
-                  tabBarIcon: ({color, size}) => (
-                    <Icon name="person" color={color} size={size} />
-                  ),
+                  tabBarLabel: 'My',
                 }}>
                 {props => (
                   <MyScreen

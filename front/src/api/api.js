@@ -190,9 +190,14 @@ export const createPost = async (postData, accessToken, memberId) => {
   }
 };
 
-export const fetchPosts = async (accessToken, memberId, lastPostId = null) => {
+export const fetchPosts = async (
+  accessToken,
+  memberId,
+  postType = 'WEATHER',
+  lastPostId = null,
+) => {
   try {
-    let url = `${BASE_URL}/api/v1/community/posts?memberId=${memberId}&size=6`;
+    let url = `${BASE_URL}/api/v1/community/posts?memberId=${memberId}&size=6&postType=${postType}`;
 
     if (lastPostId !== null) {
       url += `&lastPostId=${lastPostId}`;

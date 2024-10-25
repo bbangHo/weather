@@ -11,7 +11,6 @@ import {
   ScrollView,
   TextInput,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
 import {fetchUserLocation} from '../api/api';
 
 const InterestItem = ({
@@ -30,7 +29,6 @@ const InterestItem = ({
     const loadUserLocation = async () => {
       try {
         const locationData = await fetchUserLocation(accessToken);
-        console.log('Fetched user location:', locationData);
         setUserLocation(locationData);
       } catch (error) {
         console.error('위치 정보를 불러오는 중 오류가 발생했습니다:', error);
@@ -44,9 +42,6 @@ const InterestItem = ({
 
   const handleHobbyPress = hobby => {
     setSelectedHobby(hobby);
-  };
-
-  const handleApply = () => {
     setModalVisible(false);
   };
 
@@ -55,7 +50,6 @@ const InterestItem = ({
   };
 
   const handleSearch = () => {
-    // 주소 검색 API 호출 로직 추가 예정입니다.
     setSearchResults([
       {id: 1, address: 'test입니다.'},
       {id: 2, address: 'test입니다.'},
@@ -85,10 +79,24 @@ const InterestItem = ({
   };
 
   const hobbies = [
-    {id: 1, name: '런닝', icon: 'paw-outline'},
-    {id: 2, name: '등산', icon: 'snow-outline'},
-    {id: 3, name: '반려동물 산책', icon: 'tennisball-outline'},
-    {id: 4, name: '등등', icon: 'fish-outline'},
+    {
+      id: 1,
+      name: '런닝',
+      postType: 'RUN',
+      icon: require('../../assets/images/icon_interest_run.png'),
+    },
+    {
+      id: 2,
+      name: '등산',
+      postType: 'HIKING',
+      icon: require('../../assets/images/icon_interest_hiking.png'),
+    },
+    {
+      id: 3,
+      name: '반려동물 산책',
+      postType: 'PET',
+      icon: require('../../assets/images/icon_interest_pet.png'),
+    },
   ];
 
   const hobbiesWeatherData = [
@@ -96,7 +104,6 @@ const InterestItem = ({
     {hour: '13시', skyType: 'PARTLYCLOUDY', tmp: '26', rain: '0'},
     {hour: '14시', skyType: 'CLOUDY', tmp: '24', rain: '1'},
     {hour: '15시', skyType: 'CLEAR', tmp: '25', rain: '0'},
-    {hour: '등등', skyType: 'PARTLYCLOUDY', tmp: '26', rain: '0'},
   ];
 
   return (
@@ -110,7 +117,7 @@ const InterestItem = ({
       </TouchableOpacity>
 
       <View style={styles.weatherIconContainer}>
-        <Icon name="cloud-outline" size={50} color="#fff" />
+        <Image source={getWeatherIcon('CLEAR')} style={styles.weatherIcon} />
         <Text style={styles.weatherText}>보통</Text>
       </View>
       <View style={styles.hobbyContainer}>
@@ -141,7 +148,16 @@ const InterestItem = ({
                     selectedHobby?.id === item.id && styles.selectedHobby,
                   ]}
                   onPress={() => handleHobbyPress(item)}>
-                  <Icon name={item.icon} size={30} color="#3f51b5" />
+                  <Image
+                    source={item.icon}
+                    style={[
+                      styles.hobbyIcon,
+                      {
+                        tintColor:
+                          selectedHobby?.id === item.id ? '#fff' : '#3f51b5',
+                      },
+                    ]}
+                  />
                   <Text
                     style={[
                       styles.hobbyButtonText,
@@ -154,44 +170,10 @@ const InterestItem = ({
               keyExtractor={item => item.id.toString()}
               contentContainerStyle={styles.hobbyList}
             />
-            <TouchableOpacity style={styles.applyButton} onPress={handleApply}>
-              <Text style={styles.applyText}>적용하기</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-
-      <Modal
-        visible={addressModalVisible}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setAddressModalVisible(false)}>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>주소 검색</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="주소를 입력하세요"
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              onSubmitEditing={handleSearch}
-            />
-            <FlatList
-              data={searchResults}
-              renderItem={({item}) => (
-                <TouchableOpacity
-                  style={styles.addressItem}
-                  onPress={() => handleAddressSelect(item.address)}>
-                  <Text style={styles.addressText}>{item.address}</Text>
-                </TouchableOpacity>
-              )}
-              keyExtractor={item => item.id.toString()}
-              contentContainerStyle={styles.addressList}
-            />
             <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setAddressModalVisible(false)}>
-              <Text style={styles.closeButtonText}>닫기</Text>
+              style={styles.applyButton}
+              onPress={() => setModalVisible(false)}>
+              <Text style={styles.applyText}>닫기</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -227,6 +209,11 @@ const styles = StyleSheet.create({
   weatherIconContainer: {
     alignItems: 'center',
     marginVertical: 30,
+  },
+  weatherIcon: {
+    width: 50,
+    height: 50,
+    tintColor: '#fff',
   },
   weatherText: {
     color: '#fff',
@@ -268,41 +255,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     color: '#3f51b5',
   },
-  input: {
-    width: '100%',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 20,
-  },
-  addressList: {
-    alignItems: 'center',
-  },
-  addressItem: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderColor: '#ddd',
-    width: '100%',
-  },
-  addressText: {
-    fontSize: 16,
-    color: '#333',
-  },
-  closeButton: {
-    backgroundColor: '#3f51b5',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    marginTop: 20,
-  },
-  closeButtonText: {
-    color: '#fff',
-    fontSize: 16,
-  },
-  hobbyList: {
-    alignItems: 'center',
-  },
   hobbyButton: {
     paddingVertical: 20,
     margin: 10,
@@ -324,6 +276,10 @@ const styles = StyleSheet.create({
   },
   selectedHobbyText: {
     color: '#fff',
+  },
+  hobbyIcon: {
+    width: 30,
+    height: 30,
   },
   applyButton: {
     backgroundColor: '#3f51b5',

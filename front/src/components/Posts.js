@@ -23,11 +23,8 @@ const Posts = ({accessToken, memberId}) => {
   const [loading, setLoading] = useState(true);
 
   const handleLikePress = async postId => {
-    console.log('Like button pressed for postId:', postId);
     try {
       const response = await toggleLikePost(accessToken, memberId, postId);
-      console.log('Like post response:', response);
-
       if (response.isSuccess) {
         setNewPosts(prevPosts =>
           prevPosts.map(post =>
@@ -59,8 +56,8 @@ const Posts = ({accessToken, memberId}) => {
     const loadPosts = async () => {
       try {
         const posts = await fetchPopularPosts(accessToken, memberId);
-        console.log('Fetched posts:', posts);
         setNewPosts(posts);
+        console.log('Fetched popular posts:', posts);
       } catch (error) {
         console.error('Error fetching popular posts:', error.message);
       } finally {
@@ -70,6 +67,19 @@ const Posts = ({accessToken, memberId}) => {
 
     loadPosts();
   }, [accessToken, memberId]);
+
+  const getUserIcon = sensitivity => {
+    switch (sensitivity) {
+      case 'HOT':
+        return require('../../assets/images/icon_clear.png');
+      case 'NONE':
+        return require('../../assets/images/icon_partlycloudy.png');
+      case 'COLD':
+        return require('../../assets/images/icon_snow2.png');
+      default:
+        return null;
+    }
+  };
 
   const renderPost = ({item}) => (
     <View style={[styles.section, {width: screenWidth}]}>
@@ -90,7 +100,7 @@ const Posts = ({accessToken, memberId}) => {
                   {item.memberInfo.memberName}
                 </Text>
                 <Image
-                  source={require('../../assets/images/icon_clear.png')}
+                  source={getUserIcon(item.memberInfo.sensitivity)}
                   style={styles.userIcon}
                 />
               </View>
@@ -100,18 +110,12 @@ const Posts = ({accessToken, memberId}) => {
 
           <TouchableOpacity
             style={styles.likeContainer}
-            onPress={() => {
-              console.log(
-                'TouchableOpacity pressed, postId:',
-                item.postInfo.postId,
-              );
-              handleLikePress(item.postInfo.postId);
-            }}
+            onPress={() => handleLikePress(item.postInfo.postId)}
             disabled={!item.postInfo.likeClickable}>
             <Image
               source={
                 item.postInfo.likeClickable
-                  ? require('../../assets/images/icon_nonheart.png')
+                  ? require('../../assets/images/icon_heart0.png')
                   : require('../../assets/images/icon_heart2.png')
               }
               style={styles.likeIcon}
