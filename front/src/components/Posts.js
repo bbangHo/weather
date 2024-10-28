@@ -87,6 +87,28 @@ const Posts = ({accessToken, memberId}) => {
         <View style={styles.header}>
           <View style={styles.profileInfo}>
             <Image
+              source={{uri: item.memberInfo.profileImageUrl}}
+              style={styles.profileImage}
+              onError={e => {
+                console.warn(
+                  `Image load failed for ${item.memberInfo.profileImageUrl}`,
+                );
+                setNewPosts(prevPosts =>
+                  prevPosts.map(post =>
+                    post.memberInfo.memberId === item.memberInfo.memberId
+                      ? {
+                          ...post,
+                          memberInfo: {
+                            ...post.memberInfo,
+                            profileImageUrl: null,
+                          },
+                        }
+                      : post,
+                  ),
+                );
+              }}
+            />
+            <Image
               source={
                 item.memberInfo.profileImageUrl
                   ? {uri: item.memberInfo.profileImageUrl}
@@ -190,12 +212,14 @@ const styles = StyleSheet.create({
   profileInfo: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'flex-start',
   },
   profileImage: {
     width: 35,
     height: 35,
     borderRadius: 20,
     marginRight: 10,
+    marginLeft: -20,
   },
   userInfo: {
     flex: 1,

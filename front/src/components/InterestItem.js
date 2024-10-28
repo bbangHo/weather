@@ -11,7 +11,7 @@ import {
   ScrollView,
   TextInput,
 } from 'react-native';
-import {fetchUserLocation} from '../api/api';
+import {fetchUserLocation, fetchLocationInfo} from '../api/api';
 
 const InterestItem = ({
   accessToken,
@@ -22,8 +22,10 @@ const InterestItem = ({
 }) => {
   const [userLocation, setUserLocation] = useState(null);
   const [addressModalVisible, setAddressModalVisible] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
+  const [province, setProvince] = useState('');
+  const [city, setCity] = useState('');
+  const [step, setStep] = useState(1);
 
   useEffect(() => {
     const loadUserLocation = async () => {
@@ -31,7 +33,7 @@ const InterestItem = ({
         const locationData = await fetchUserLocation(accessToken);
         setUserLocation(locationData);
       } catch (error) {
-        console.error('위치 정보를 불러오는 중 오류가 발생했습니다:', error);
+        console.error('위치 정보를 불러오는 중 에러가 발생했습니다:', error);
       }
     };
 
@@ -40,30 +42,58 @@ const InterestItem = ({
     }
   }, [accessToken]);
 
+  const handleSearchLocation = async () => {
+    let query = `province=${province}&city=${city}`;
+    try {
+      const results = await fetchLocationInfo(accessToken, query);
+      setSearchResults(results.result);
+    } catch (error) {
+      console.error('주소 검색 중 에러:', error);
+    }
+  };
+
+  const handleAddressSelect = selected => {
+    if (step === 1) {
+      setProvince(selected);
+      setCity('');
+      setStep(2);
+    } else if (step === 2) {
+      setCity(selected);
+      setUserLocation({province, city: selected, street: ''});
+      setAddressModalVisible(false);
+    }
+  };
+
+  const handleLocationPress = () => {
+    setAddressModalVisible(true);
+    setStep(1);
+    setProvince('');
+    setCity('');
+    handleSearchLocation();
+  };
+
   const handleHobbyPress = hobby => {
     setSelectedHobby(hobby);
     setModalVisible(false);
   };
 
-  const handleLocationPress = () => {
-    setAddressModalVisible(true);
-  };
-
-  const handleSearch = () => {
-    setSearchResults([
-      {id: 1, address: 'test입니다.'},
-      {id: 2, address: 'test입니다.'},
-    ]);
-  };
-
-  const handleAddressSelect = address => {
-    setUserLocation({
-      province: address.split(' ')[0],
-      city: address.split(' ')[1],
-      street: address.split(' ')[2],
-    });
-    setAddressModalVisible(false);
-  };
+  const renderSearchInput = () => (
+    <View style={styles.searchInputContainer}>
+      <TextInput
+        style={styles.input}
+        placeholder={
+          step === 1 ? '도(광역시)를 입력하세요' : '시군구를 입력하세요'
+        }
+        value={step === 1 ? province : city}
+        onChangeText={step === 1 ? setProvince : setCity}
+      />
+      <TouchableOpacity
+        style={styles.searchButton}
+        onPress={handleSearchLocation}>
+        <Text style={styles.searchButtonText}>검색</Text>
+      </TouchableOpacity>
+    </View>
+  );
 
   const getWeatherIcon = skyType => {
     switch (skyType) {
@@ -173,6 +203,35 @@ const InterestItem = ({
             <TouchableOpacity
               style={styles.applyButton}
               onPress={() => setModalVisible(false)}>
+              <Text style={styles.applyText}>닫기</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        visible={addressModalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setAddressModalVisible(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>주소 검색</Text>
+
+            {renderSearchInput()}
+
+            <FlatList
+              data={searchResults}
+              renderItem={({item}) => (
+                <TouchableOpacity onPress={() => handleAddressSelect(item)}>
+                  <Text style={styles.addressItem}>{item}</Text>
+                </TouchableOpacity>
+              )}
+              keyExtractor={(item, index) => index.toString()}
+            />
+            <TouchableOpacity
+              style={styles.applyButton}
+              onPress={() => setAddressModalVisible(false)}>
               <Text style={styles.applyText}>닫기</Text>
             </TouchableOpacity>
           </View>
@@ -291,6 +350,40 @@ const styles = StyleSheet.create({
   applyText: {
     color: '#fff',
     fontSize: 16,
+  },
+  searchInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 10,
+    marginVertical: 10,
+    flex: 1,
+  },
+  searchButton: {
+    backgroundColor: '#3f51b5',
+    padding: 10,
+    marginLeft: 10,
+    borderRadius: 5,
+  },
+  searchButtonText: {
+    color: '#fff',
+  },
+  addressItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  closeButton: {
+    backgroundColor: '#3f51b5',
+    paddingVertical: 10,
+    paddingHorizontal: 40,
+    borderRadius: 5,
+    marginTop: 20,
+    alignItems: 'center',
   },
   hourlyContainer: {
     flexDirection: 'row',

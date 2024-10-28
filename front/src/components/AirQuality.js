@@ -47,7 +47,7 @@ const AirQuality = ({accessToken}) => {
   }
 
   if (error) {
-    return <Text>오류: {error}</Text>;
+    return <Text>error: {error}</Text>;
   }
 
   return (
