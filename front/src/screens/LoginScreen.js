@@ -54,8 +54,6 @@ const LoginScreen = ({setIsLoggedIn, setAccessToken, setIsNewMember}) => {
     }
   };
 
-  /*
-  // 회원 정보 관련 기능 구현을 위해 주석 처리합니다.
   useEffect(() => {
     const refreshTokenImmediately = async () => {
       try {
@@ -88,7 +86,6 @@ const LoginScreen = ({setIsLoggedIn, setAccessToken, setIsNewMember}) => {
 
     return () => clearInterval(interval);
   }, []);
-  */
 
   return (
     <View style={styles.container}>

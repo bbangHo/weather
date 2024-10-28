@@ -502,7 +502,7 @@ export const registerProfile = async (
   formData.append('sensitivity', sensitivity);
 
   if (profileImage) {
-    formData.append('profileImage', {
+    formData.append('profileImg', {
       uri: profileImage.uri,
       type: profileImage.type || 'image/jpeg',
       name: profileImage.name || 'profile.jpg',
@@ -532,7 +532,6 @@ export const registerProfile = async (
     const responseData = await response.json();
 
     if (!response.ok) {
-      ㅋ;
       console.error('Backend error:', responseData);
       throw new Error(responseData.message || '프로필 저장 실패');
     }
@@ -587,3 +586,38 @@ export const registerProfile = async (
   }
 };
 */
+
+export const fetchLocationInfo = async (
+  accessToken,
+  memberId,
+  province = '',
+  city = '',
+) => {
+  const url = `${BASE_URL}/api/v1/location/locationInfo?province=${province}&city=${city}`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorResponse = await response.json();
+      console.error(
+        'Failed to fetch location info:',
+        response.status,
+        errorResponse,
+      );
+      throw new Error('Failed to fetch location info');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching location info:', error);
+    throw error;
+  }
+};
