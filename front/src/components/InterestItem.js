@@ -9,7 +9,6 @@ import {
   Image,
   Dimensions,
   ScrollView,
-  TextInput,
 } from 'react-native';
 import {fetchUserLocation, fetchLocationInfo} from '../api/api';
 
@@ -25,7 +24,8 @@ const InterestItem = ({
   const [searchResults, setSearchResults] = useState([]);
   const [province, setProvince] = useState('');
   const [city, setCity] = useState('');
-  const [step, setStep] = useState(1);
+  const [street, setStreet] = useState('');
+  const [step, setStep] = useState(0);
 
   useEffect(() => {
     const loadUserLocation = async () => {
@@ -42,26 +42,47 @@ const InterestItem = ({
     }
   }, [accessToken]);
 
-  const handleSearchLocation = async () => {
-    let query = `province=${province}&city=${city}`;
+  const fetchLocationData = async currentStep => {
+    let query = '';
+    if (currentStep === 1) {
+      query = `province=&city=`;
+    } else if (currentStep === 2) {
+      query = `province=${province}&city=`;
+    } else if (currentStep === 3) {
+      query = `province=${province}&city=${city}`;
+    }
+
+    console.log('Fetching data for step:', currentStep, 'with query:', query);
+
     try {
-      const results = await fetchLocationInfo(accessToken, query);
+      const results = await fetchLocationInfo(accessToken, '', province, city);
       setSearchResults(results.result);
     } catch (error) {
       console.error('주소 검색 중 에러:', error);
     }
   };
 
+  const handleDropdownPress = newStep => {
+    setStep(newStep);
+    fetchLocationData(newStep);
+  };
+
   const handleAddressSelect = selected => {
     if (step === 1) {
       setProvince(selected);
       setCity('');
+      setStreet('');
       setStep(2);
     } else if (step === 2) {
       setCity(selected);
-      setUserLocation({province, city: selected, street: ''});
+      setStreet('');
+      setStep(3);
+    } else if (step === 3) {
+      setStreet(selected);
+      setUserLocation({province, city, street: selected});
       setAddressModalVisible(false);
     }
+    setSearchResults([]);
   };
 
   const handleLocationPress = () => {
@@ -69,29 +90,29 @@ const InterestItem = ({
     setStep(1);
     setProvince('');
     setCity('');
-    handleSearchLocation();
+    setStreet('');
   };
 
-  const handleHobbyPress = hobby => {
-    setSelectedHobby(hobby);
-    setModalVisible(false);
-  };
-
-  const renderSearchInput = () => (
-    <View style={styles.searchInputContainer}>
-      <TextInput
-        style={styles.input}
-        placeholder={
-          step === 1 ? '도(광역시)를 입력하세요' : '시군구를 입력하세요'
-        }
-        value={step === 1 ? province : city}
-        onChangeText={step === 1 ? setProvince : setCity}
-      />
-      <TouchableOpacity
-        style={styles.searchButton}
-        onPress={handleSearchLocation}>
-        <Text style={styles.searchButtonText}>검색</Text>
+  const renderDropdown = (placeholder, value, onPress, visible) => (
+    <View style={styles.dropdownContainer}>
+      <TouchableOpacity onPress={onPress} style={styles.dropdown}>
+        <Text
+          style={[styles.dropdownText, value && styles.selectedDropdownText]}>
+          {value || placeholder}
+        </Text>
       </TouchableOpacity>
+      {visible && (
+        <FlatList
+          data={searchResults}
+          renderItem={({item}) => (
+            <TouchableOpacity onPress={() => handleAddressSelect(item)}>
+              <Text style={styles.addressItem}>{item}</Text>
+            </TouchableOpacity>
+          )}
+          keyExtractor={(item, index) => index.toString()}
+          style={styles.dropdownFlatList}
+        />
+      )}
     </View>
   );
 
@@ -150,6 +171,7 @@ const InterestItem = ({
         <Image source={getWeatherIcon('CLEAR')} style={styles.weatherIcon} />
         <Text style={styles.weatherText}>보통</Text>
       </View>
+
       <View style={styles.hobbyContainer}>
         <TouchableOpacity onPress={() => setModalVisible(true)}>
           <View style={styles.hobbyTextContainer}>
@@ -218,17 +240,25 @@ const InterestItem = ({
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>주소 검색</Text>
 
-            {renderSearchInput()}
+            {renderDropdown(
+              '도(광역시)',
+              province,
+              () => handleDropdownPress(1),
+              step === 1,
+            )}
+            {renderDropdown(
+              '시군구',
+              city,
+              () => handleDropdownPress(2),
+              step === 2 && province,
+            )}
+            {renderDropdown(
+              '읍면동',
+              street,
+              () => handleDropdownPress(3),
+              step === 3 && city,
+            )}
 
-            <FlatList
-              data={searchResults}
-              renderItem={({item}) => (
-                <TouchableOpacity onPress={() => handleAddressSelect(item)}>
-                  <Text style={styles.addressItem}>{item}</Text>
-                </TouchableOpacity>
-              )}
-              keyExtractor={(item, index) => index.toString()}
-            />
             <TouchableOpacity
               style={styles.applyButton}
               onPress={() => setAddressModalVisible(false)}>
@@ -253,8 +283,28 @@ const InterestItem = ({
 };
 
 const {width} = Dimensions.get('window');
-
 const styles = StyleSheet.create({
+  dropdownContainer: {
+    width: '100%',
+    paddingVertical: 10,
+  },
+  dropdown: {
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    backgroundColor: '#fff',
+  },
+  dropdownText: {
+    fontSize: 16,
+    color: '#888',
+  },
+  selectedDropdownText: {
+    color: '#333',
+  },
+  dropdownFlatList: {
+    maxHeight: 300,
+  },
   container: {
     alignItems: 'center',
     paddingTop: 20,
