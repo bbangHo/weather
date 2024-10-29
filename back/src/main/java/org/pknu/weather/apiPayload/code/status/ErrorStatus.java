@@ -38,6 +38,8 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // location
     _LOCATION_NOT_FOUND(HttpStatus.NOT_FOUND, "LOCATION_404_1", "존재하지 않는 지역입니다. 범위에 해당하는 위도와 경도 값을 입력하세요 "),
+    _PROVINCE_NOT_FOUND(HttpStatus.BAD_REQUEST, "LOCATION_400_2", "도(광역시)의 정보가 필요합니다."),
+
 
     // member
     _MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER_404_1", "사용자를 찾을 수 없습니다."),

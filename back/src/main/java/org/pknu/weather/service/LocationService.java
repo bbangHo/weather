@@ -3,6 +3,7 @@ package org.pknu.weather.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
+import org.pknu.weather.common.utils.AddressFinder;
 import org.pknu.weather.common.utils.SgisLocationUtils;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Member;
@@ -13,6 +14,7 @@ import org.pknu.weather.repository.MemberRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.pknu.weather.dto.converter.LocationConverter.toLocation;
@@ -27,6 +29,7 @@ public class LocationService {
     private final SgisLocationUtils sgisLocationUtils;
     private final LocationRepository locationRepository;
     private final MemberRepository memberRepository;
+    private final AddressFinder addressFinder;
 
     public LocationDTO saveLocation(String email, double x, double y) {
 
@@ -62,6 +65,17 @@ public class LocationService {
         log.debug("LocationService - findDefaultLocation  method end......");
 
         return toLocationDTO(location);
+
+    }
+
+    public List<String> getLocation(String province, String city) {
+
+        if (province == null || province.isEmpty())
+            return addressFinder.getLocation();
+        else if (city == null || city.isEmpty())
+            return addressFinder.getLocation(province);
+        else
+            return addressFinder.getLocation(province, city);
 
     }
 }
