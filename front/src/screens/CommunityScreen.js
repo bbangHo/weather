@@ -11,13 +11,14 @@ import CurrentLocation from '../components/CurrentLocation';
 import TemperatureInfo from '../components/TemperatureInfo';
 import PostScroll from '../components/PostScroll';
 import WeatherShareButton from '../components/WeatherShareButton';
-import {fetchWeatherData} from '../api/api';
+import {fetchWeatherData, fetchMemberInfo} from '../api/api';
 
 const {height} = Dimensions.get('window');
 
 const CommunityScreen = ({accessToken, memberId}) => {
   const [weatherData, setWeatherData] = useState(null);
   const [backgroundColor, setBackgroundColor] = useState('#2f5af4');
+  const [sensitivityText, setSensitivityText] = useState('');
 
   useEffect(() => {
     const currentHour = new Date().getHours();
@@ -45,6 +46,36 @@ const CommunityScreen = ({accessToken, memberId}) => {
     getWeatherData();
   }, [accessToken, memberId]);
 
+  useEffect(() => {
+    const getMemberInfo = async () => {
+      try {
+        const memberInfo = await fetchMemberInfo(accessToken);
+        console.log('Fetched member info:', memberInfo);
+
+        if (memberInfo && memberInfo.sensitivity) {
+          switch (memberInfo.sensitivity) {
+            case 'HOT':
+              setSensitivityText('더위를 많이 타는');
+              break;
+            case 'NONE':
+              setSensitivityText('평범한');
+              break;
+            case 'COLD':
+              setSensitivityText('추위를 많이 타는');
+              break;
+            default:
+              setSensitivityText('알 수 없는');
+              break;
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching member info:', error.message);
+      }
+    };
+
+    getMemberInfo();
+  }, [accessToken]);
+
   return (
     <View style={[styles.container, {backgroundColor: backgroundColor}]}>
       <StatusBar hidden={true} />
@@ -57,7 +88,7 @@ const CommunityScreen = ({accessToken, memberId}) => {
         </View>
       </View>
       <Text style={styles.text}>
-        ‘추위를 많이 타는’ 유형이 가장 많이 공감했어요
+        ‘{sensitivityText}’ 유형이 가장 많이 공감했어요
       </Text>
       <PostScroll accessToken={accessToken} memberId={memberId} />
     </View>
