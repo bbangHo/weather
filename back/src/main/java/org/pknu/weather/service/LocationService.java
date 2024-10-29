@@ -31,21 +31,37 @@ public class LocationService {
     private final MemberRepository memberRepository;
     private final AddressFinder addressFinder;
 
-    public LocationDTO saveLocation(String email, double x, double y) {
+    public LocationDTO saveLocation(LocationDTO locationDTO, String email, double x, double y) {
 
-        log.debug("LocationService - save Location service start......");
+        log.debug("LocationService - save Location with coordinate service start......");
 
-        LocationDTO locationDTO = sgisLocationUtils.getAddressInfo(x, y);
+        sgisLocationUtils.getAddressInfo(locationDTO, x, y);
 
         Optional<Location> locationByFullAddress = locationRepository.findLocationByFullAddress(locationDTO.getProvince(), locationDTO.getCity(), locationDTO.getStreet());
 
         Location savedLocation = locationByFullAddress.orElseGet(() -> locationRepository.save(toLocation(locationDTO)));
 
-        Member member = memberRepository.findMemberByEmail(email).orElseThrow();
+        Member member = memberRepository.findMemberByEmail(email).orElseThrow(() -> new GeneralException(ErrorStatus._MEMBER_NOT_FOUND));
         member.changeLocation(savedLocation);
         memberRepository.save(member);
 
         log.debug("LocationService - saveLocation method end......");
+
+        return toLocationDTO(savedLocation);
+    }
+
+    public LocationDTO saveLocation(LocationDTO locationDTO) {
+
+        Optional<Location> locationByFullAddress = locationRepository.findLocationByFullAddress(locationDTO.getProvince(), locationDTO.getCity(), locationDTO.getStreet());
+        Location savedLocation = null;
+
+        if(locationByFullAddress.isEmpty()){
+            sgisLocationUtils.getAddressInfo(locationDTO);
+            savedLocation = locationByFullAddress.orElseGet(() -> locationRepository.save(toLocation(locationDTO)));
+        }
+
+        if(locationByFullAddress.isPresent())
+            savedLocation = locationByFullAddress.get();
 
         return toLocationDTO(savedLocation);
     }

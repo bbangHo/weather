@@ -31,7 +31,9 @@ public class LocationControllerV1 {
         double longitude = Double.parseDouble(String.valueOf(payload.get("longitude")));
         double latitude = Double.parseDouble(String.valueOf(payload.get("latitude")));
 
-        LocationDTO savedLocation = locationService.saveLocation(email,longitude, latitude);
+        LocationDTO savedLocation= new LocationDTO();
+
+        locationService.saveLocation(savedLocation,email,longitude, latitude);
 
         return ApiResponse.onSuccess(savedLocation);
     }
@@ -57,5 +59,24 @@ public class LocationControllerV1 {
         List<String> locationInfo = locationService.getLocation(province, city);
 
         return ApiResponse.onSuccess(locationInfo);
+    }
+
+    @PostMapping("/locationInfo")
+    public ApiResponse<LocationDTO> createLocation(@RequestBody LocationDTO locationDTO) {
+
+        checkLocationInfo(locationDTO);
+
+        LocationDTO savedLocationDTO = locationService.saveLocation(locationDTO);
+
+        return ApiResponse.onSuccess(savedLocationDTO);
+    }
+
+    private void checkLocationInfo(LocationDTO locationDTO) {
+        if(locationDTO.getProvince() == null || locationDTO.getCity() == null || locationDTO.getStreet() == null) {
+            throw new GeneralException(ErrorStatus._MALFORMED_ADDRESS_INFORMATION);
+        }
+        if(locationDTO.getProvince().isEmpty() || locationDTO.getCity().isEmpty() || locationDTO.getStreet().isEmpty()) {
+            throw new GeneralException(ErrorStatus._MALFORMED_ADDRESS_INFORMATION);
+        }
     }
 }

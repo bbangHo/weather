@@ -33,16 +33,24 @@ public class SgisLocationUtils {
     String consumerSecret;
 
 
-    public LocationDTO getAddressInfo( double x, double y){
+    public void getAddressInfo( LocationDTO locationDTO, double x, double y ){
+
+        log.info("SgisLocationUtils - getAddressInfo with coordinate method start .....................");
+
+        checkAccessToken();
+
+        getAddressName(x,y,locationDTO);
+        getAddressCoor(locationDTO.getFullAddress(), locationDTO);
+
+    }
+
+    public void getAddressInfo( LocationDTO locationDTO ){
 
         log.info("SgisLocationUtils - getAddressInfo method start .....................");
 
         checkAccessToken();
 
-        LocationDTO locationDTO = new LocationDTO();
-        getAddressName(x,y,locationDTO);
         getAddressCoor(locationDTO.getFullAddress(), locationDTO);
-        return locationDTO;
 
     }
 
