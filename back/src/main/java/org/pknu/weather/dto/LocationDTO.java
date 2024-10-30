@@ -10,6 +10,8 @@ import org.locationtech.jts.geom.Point;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LocationDTO {
+    private Long id;
+
     private Double longitude;
 
     private Double latitude;
