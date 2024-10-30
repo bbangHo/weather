@@ -10,7 +10,7 @@ import {
   Dimensions,
   ScrollView,
 } from 'react-native';
-import {fetchUserLocation, fetchLocationInfo} from '../api/api';
+import {fetchUserLocation, fetchLocationInfo, submitAddress} from '../api/api';
 
 const InterestItem = ({
   accessToken,
@@ -80,7 +80,6 @@ const InterestItem = ({
     } else if (step === 3) {
       setStreet(selected);
       setUserLocation({province, city, street: selected});
-      setAddressModalVisible(false);
     }
     setSearchResults([]);
   };
@@ -91,6 +90,27 @@ const InterestItem = ({
     setProvince('');
     setCity('');
     setStreet('');
+  };
+
+  const handleSubmitAddress = async () => {
+    if (!province || !city || !street) {
+      setAddressModalVisible(false);
+      return;
+    }
+
+    try {
+      const response = await submitAddress(accessToken, province, city, street);
+      console.log('주소 생성:', response);
+      setUserLocation(response.result);
+      setAddressModalVisible(false);
+    } catch (error) {
+      console.error('주소 생성 중 에러 발생:', error);
+    }
+  };
+
+  const handleHobbyPress = hobby => {
+    setSelectedHobby(hobby);
+    setModalVisible(false);
   };
 
   const renderDropdown = (placeholder, value, onPress, visible) => (
@@ -188,7 +208,7 @@ const InterestItem = ({
         animationType="slide"
         onRequestClose={() => setModalVisible(false)}>
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
+          <View style={styles.modalHobbyContainer}>
             <Text style={styles.modalTitle}>취미 선택</Text>
             <FlatList
               data={hobbies}
@@ -261,8 +281,8 @@ const InterestItem = ({
 
             <TouchableOpacity
               style={styles.applyButton}
-              onPress={() => setAddressModalVisible(false)}>
-              <Text style={styles.applyText}>닫기</Text>
+              onPress={handleSubmitAddress}>
+              <Text style={styles.applyText}>확인</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -353,6 +373,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContainer: {
+    backgroundColor: '#fff',
+    width: width * 0.9,
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+  },
+  modalHobbyContainer: {
     backgroundColor: '#fff',
     width: width * 1,
     borderRadius: 10,
