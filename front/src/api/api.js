@@ -538,7 +538,7 @@ export const registerProfile = async (
 
     return responseData;
   } catch (error) {
-    console.error('API 요청 실패:', error);
+    console.error('Error registering profile:', error);
     throw error;
   }
 };
@@ -618,6 +618,31 @@ export const fetchLocationInfo = async (
     return data;
   } catch (error) {
     console.error('Error fetching location info:', error);
+    throw error;
+  }
+};
+
+export const submitAddress = async (accessToken, province, city, street) => {
+  const url = `${BASE_URL}/api/v1/location/locationInfo`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({province, city, street}),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      console.error('Failed to submit address:', data);
+      throw new Error('Failed to submit address');
+    }
+    return data;
+  } catch (error) {
+    console.error('Error submitting address:', error);
     throw error;
   }
 };
