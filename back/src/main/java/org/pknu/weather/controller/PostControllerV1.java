@@ -6,11 +6,14 @@ import org.pknu.weather.apiPayload.ApiResponse;
 import org.pknu.weather.common.converter.TokenConverter;
 import org.pknu.weather.dto.PostRequest;
 import org.pknu.weather.dto.converter.PostRequestConverter;
-import org.pknu.weather.service.PostQueryService;
 import org.pknu.weather.service.PostService;
 import org.pknu.weather.validation.annotation.IsPositive;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 public class PostControllerV1 {
     private final PostRequestConverter postRequestConverter;
     private final PostService postService;
-    private final PostQueryService postQueryService;
 
     @PostMapping("/post")
     public ApiResponse<Object> createWeatherPost(@RequestHeader("Authorization") String authorization,
@@ -39,8 +41,9 @@ public class PostControllerV1 {
     }
 
     @PostMapping("/post/recommendation")
-    public ApiResponse<Object> addLike(Long memberId, @IsPositive Long postId) {
-        boolean result = postService.addRecommendation(memberId, postId);
+    public ApiResponse<Object> addLike(@RequestHeader("Authorization") String authorization, @IsPositive Long postId) {
+        String email = TokenConverter.getEmailByToken(authorization);
+        boolean result = postService.addRecommendation(email, postId);
         return ApiResponse.of(result);
     }
 }

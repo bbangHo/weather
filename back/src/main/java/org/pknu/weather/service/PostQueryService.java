@@ -1,5 +1,6 @@
 package org.pknu.weather.service;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.domain.Member;
@@ -11,8 +12,6 @@ import org.pknu.weather.repository.PostRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -22,14 +21,15 @@ public class PostQueryService {
     private final MemberRepository memberRepository;
     private final PostService postService;
 
-    public PostResponse.PostList getWeatherPosts(Long memberId, Long lastPostId, Long size, String postType, Long locationId) {
-        Member member = memberRepository.safeFindById(memberId);
-        List<Post> postList = postService.getPosts(memberId, lastPostId, size, postType, locationId);
+    public PostResponse.PostList getWeatherPosts(String email, Long lastPostId, Long size, String postType,
+                                                 Long locationId) {
+        Member member = memberRepository.safeFindByEmail(email);
+        List<Post> postList = postService.getPosts(member.getId(), lastPostId, size, postType, locationId);
         return PostResponseConverter.toPostList(member, postList, postList.size() > size);
     }
 
-    public List<PostResponse.Post> getPopularPosts(Long memberId) {
-        Member member = memberRepository.safeFindById(memberId);
+    public List<PostResponse.Post> getPopularPosts(String email) {
+        Member member = memberRepository.safeFindByEmail(email);
         List<Post> popularPostList = postRepository.getPopularPostList(member.getLocation());
         return PostResponseConverter.toPopularPostList(member, popularPostList);
     }

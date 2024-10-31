@@ -15,10 +15,11 @@ public class MemberQueryService {
 
     /**
      * 사용자가 location을 등록했는지 확인하는 메서드
-     * @param memberId 사용자 pk
+     *
+     * @param email 사용자 email
      * @return true = 등록되어있음, false = 등록되지 않았음
      */
-    public Boolean hasRegisteredLocation(/*String email*/ Long memberId) {
-        return memberRepository.hasRegisteredLocation(memberId);
+    public Boolean hasRegisteredLocation(String email) {
+        return memberRepository.hasRegisteredLocation(email);
     }
 }

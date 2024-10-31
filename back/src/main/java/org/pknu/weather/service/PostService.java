@@ -1,20 +1,27 @@
 package org.pknu.weather.service;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
-import org.pknu.weather.domain.*;
+import org.pknu.weather.domain.Location;
+import org.pknu.weather.domain.Member;
+import org.pknu.weather.domain.Post;
+import org.pknu.weather.domain.Recommendation;
+import org.pknu.weather.domain.Tag;
 import org.pknu.weather.domain.common.PostType;
 import org.pknu.weather.dto.PostRequest;
 import org.pknu.weather.dto.converter.PostConverter;
 import org.pknu.weather.dto.converter.RecommendationConverter;
 import org.pknu.weather.dto.converter.TagConverter;
 import org.pknu.weather.exception.GeneralException;
-import org.pknu.weather.repository.*;
+import org.pknu.weather.repository.LocationRepository;
+import org.pknu.weather.repository.MemberRepository;
+import org.pknu.weather.repository.PostRepository;
+import org.pknu.weather.repository.RecommendationRepository;
+import org.pknu.weather.repository.TagRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -68,14 +75,14 @@ public class PostService {
     }
 
     @Transactional
-    public boolean addRecommendation(Long memberId, Long postId) {
-        Boolean isRecommended = recommendationRepository.isRecommended(memberId, postId);
+    public boolean addRecommendation(String email, Long postId) {
+        Member member = memberRepository.safeFindByEmail(email);
+        Boolean isRecommended = recommendationRepository.isRecommended(member.getId(), postId);
 
         if (!isRecommended) {
             throw new GeneralException(ErrorStatus._RECOMMENDATION_BAD_REQUEST);
         }
 
-        Member member = memberRepository.safeFindById(memberId);
         Post post = postRepository.safeFindById(postId);
         Recommendation recommendation = RecommendationConverter.toRecommendation(member, post);
 
