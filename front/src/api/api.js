@@ -75,18 +75,15 @@ export const refreshAccessToken = async () => {
   }
 };
 
-export const fetchWeatherData = async (memberId, accessToken) => {
+export const fetchWeatherData = async accessToken => {
   try {
-    const response = await fetch(
-      `${BASE_URL}/api/v1/main/weather?memberId=${memberId}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
+    const response = await fetch(`${BASE_URL}/api/v1/main/weather`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
       },
-    );
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -163,8 +160,8 @@ export const sendLocationToBackend = async (
   }
 };
 
-export const createPost = async (postData, accessToken, memberId) => {
-  const url = `${BASE_URL}/api/v1/post?memberId=${memberId}`;
+export const createPost = async (postData, accessToken) => {
+  const url = `${BASE_URL}/api/v1/post`;
 
   try {
     const response = await fetch(url, {
@@ -190,8 +187,8 @@ export const createPost = async (postData, accessToken, memberId) => {
   }
 };
 
-export const createInterestPost = async (postData, accessToken, memberId) => {
-  const url = `${BASE_URL}/api/v1/post/hobby?memberId=${memberId}`;
+export const createInterestPost = async (postData, accessToken) => {
+  const url = `${BASE_URL}/api/v1/post/hobby`;
 
   try {
     const response = await fetch(url, {
@@ -223,12 +220,11 @@ export const createInterestPost = async (postData, accessToken, memberId) => {
 
 export const fetchPosts = async (
   accessToken,
-  memberId,
   postType = 'WEATHER',
   lastPostId = null,
 ) => {
   try {
-    let url = `${BASE_URL}/api/v1/community/posts?memberId=${memberId}&size=6&postType=${postType}`;
+    let url = `${BASE_URL}/api/v1/community/posts?&size=6&postType=${postType}`;
 
     if (lastPostId !== null) {
       url += `&lastPostId=${lastPostId}`;
@@ -258,12 +254,11 @@ export const fetchPosts = async (
 
 export const fetchPopularPosts = async (
   accessToken,
-  memberId,
   lastPostId = null,
   size = 10,
 ) => {
   try {
-    let url = `${BASE_URL}/api/v1/main/posts/popular?memberId=${memberId}&size=${size}`;
+    let url = `${BASE_URL}/api/v1/main/posts/popular?&size=${size}`;
 
     if (lastPostId) {
       url += `&lastPostId=${lastPostId}`;
@@ -295,9 +290,9 @@ export const fetchPopularPosts = async (
   }
 };
 
-export const toggleLikePost = async (accessToken, memberId, postId) => {
+export const toggleLikePost = async (accessToken, postId) => {
   try {
-    const url = `${BASE_URL}/api/v1/post/recommendation?memberId=${memberId}&postId=${postId}`;
+    const url = `${BASE_URL}/api/v1/post/recommendation?&postId=${postId}`;
 
     const response = await fetch(url, {
       method: 'POST',
@@ -321,9 +316,9 @@ export const toggleLikePost = async (accessToken, memberId, postId) => {
   }
 };
 
-export const fetchWeatherTags = async (accessToken, memberId) => {
+export const fetchWeatherTags = async accessToken => {
   try {
-    const url = `${BASE_URL}/api/v1/main/weather/simple/tags?memberId=${memberId}`;
+    const url = `${BASE_URL}/api/v1/main/weather/simple/tags?`;
 
     const response = await fetch(url, {
       method: 'GET',
@@ -377,9 +372,9 @@ export const fetchPostTags = async accessToken => {
   }
 };
 
-export const fetchRainForecast = async (accessToken, memberId) => {
+export const fetchRainForecast = async accessToken => {
   try {
-    const url = `${BASE_URL}/api/v1/main/weather/simple/rain?memberId=${memberId}`;
+    const url = `${BASE_URL}/api/v1/main/weather/simple/rain?`;
 
     const response = await fetch(url, {
       method: 'GET',
@@ -494,7 +489,6 @@ export const registerProfile = async (
   sensitivity,
   profileImage,
   accessToken,
-  memberId,
 ) => {
   const formData = new FormData();
 
@@ -524,7 +518,6 @@ export const registerProfile = async (
       method: 'POST',
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        memberId: memberId,
       },
       body: formData,
     });
@@ -543,53 +536,8 @@ export const registerProfile = async (
   }
 };
 
-/*
-export const registerProfile = async (
-  nickname,
-  profileImage,
-  accessToken,
-  memberId,
-) => {
-  const formData = new FormData();
-  formData.append('nickname', nickname);
-
-  if (profileImage) {
-    formData.append('profileImage', {
-      uri: profileImage.uri,
-      name: profileImage.fileName,
-      type: profileImage.type,
-    });
-  }
-
-  try {
-    const response = await fetch(`${BASE_URL}/api/v1/member/info`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'multipart/form-data',
-        Authorization: `Bearer ${accessToken}`,
-        memberId: memberId,
-      },
-      body: formData,
-    });
-
-    const responseData = await response.json();
-
-    if (!response.ok) {
-      console.error('Backend error:', responseData);
-      throw new Error(responseData.message || '프로필 저장 실패');
-    }
-
-    return responseData;
-  } catch (error) {
-    console.error('API 요청 실패:', error);
-    throw error;
-  }
-};
-*/
-
 export const fetchLocationInfo = async (
   accessToken,
-  memberId,
   province = '',
   city = '',
 ) => {
@@ -636,6 +584,7 @@ export const submitAddress = async (accessToken, province, city, street) => {
     });
 
     const data = await response.json();
+
     if (!response.ok) {
       console.error('Failed to submit address:', data);
       throw new Error('Failed to submit address');

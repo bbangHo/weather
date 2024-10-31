@@ -17,7 +17,7 @@ import {useNavigation} from '@react-navigation/native';
 const arrowDownIcon = require('../../assets/images/icon_arrowDown.png');
 const shareIcon = require('../../assets/images/icon_share2.png');
 
-const InterestScreen = ({accessToken, memberId}) => {
+const InterestScreen = ({accessToken}) => {
   const [selectedHobby, setSelectedHobby] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [weatherData, setWeatherData] = useState(null);
@@ -39,7 +39,7 @@ const InterestScreen = ({accessToken, memberId}) => {
   useEffect(() => {
     const getWeatherData = async () => {
       try {
-        const data = await fetchWeatherData(memberId, accessToken);
+        const data = await fetchWeatherData(accessToken);
         if (data.isSuccess) setWeatherData(data.result);
         else console.error('Failed to fetch weather data:', data.message);
       } catch (error) {
@@ -47,7 +47,7 @@ const InterestScreen = ({accessToken, memberId}) => {
       }
     };
     getWeatherData();
-  }, [accessToken, memberId]);
+  }, [accessToken]);
 
   const handleScroll = event => {
     const {layoutMeasurement, contentOffset} = event.nativeEvent;
@@ -101,7 +101,6 @@ const InterestScreen = ({accessToken, memberId}) => {
       return (
         <InterestPostScroll
           accessToken={accessToken}
-          memberId={memberId}
           selectedHobby={selectedHobby}
         />
       );

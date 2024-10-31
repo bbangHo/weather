@@ -5,13 +5,13 @@ import globalStyles from '../globalStyles';
 import KakaoShareLink from 'react-native-kakao-share-link';
 import {fetchWeatherData} from '../api/api';
 
-const KakaoShareButton = ({accessToken, memberId}) => {
+const KakaoShareButton = ({accessToken}) => {
   const [weatherInfo, setWeatherInfo] = useState(null);
 
   useEffect(() => {
     const fetchWeather = async () => {
       try {
-        const data = await fetchWeatherData(memberId, accessToken);
+        const data = await fetchWeatherData(accessToken);
         if (data.result) {
           setWeatherInfo(data.result);
         }
@@ -21,7 +21,7 @@ const KakaoShareButton = ({accessToken, memberId}) => {
     };
 
     fetchWeather();
-  }, [accessToken, memberId]);
+  }, [accessToken]);
 
   const getWeatherEmoji = skyType => {
     switch (skyType) {

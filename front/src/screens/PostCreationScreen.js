@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import {fetchPostTags, createPost} from '../api/api';
 
-const PostCreationScreen = ({navigation, accessToken, memberId}) => {
+const PostCreationScreen = ({navigation, accessToken}) => {
   const [temperatureTags, setTemperatureTags] = useState([]);
   const [weatherTags, setWeatherTags] = useState([]);
   const [humidityTags, setHumidityTags] = useState([]);
@@ -73,7 +73,7 @@ const PostCreationScreen = ({navigation, accessToken, memberId}) => {
 
     try {
       console.log('Post data to send:', postData);
-      const response = await createPost(postData, accessToken, memberId);
+      const response = await createPost(postData, accessToken);
       console.log('Post created successfully:', response);
       navigation.navigate('Home');
     } catch (error) {

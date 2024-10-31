@@ -4,7 +4,7 @@ import Svg, {Path, Line, Text as SvgText} from 'react-native-svg';
 import globalStyles from '../globalStyles';
 import {fetchWeatherData} from '../api/api';
 
-const WeatherGraph = ({accessToken, memberId}) => {
+const WeatherGraph = ({accessToken}) => {
   const {width} = Dimensions.get('window');
   const graphWidth = width - 40;
   const graphHeight = 200;
@@ -18,7 +18,7 @@ const WeatherGraph = ({accessToken, memberId}) => {
   useEffect(() => {
     const getWeatherData = async () => {
       try {
-        const weatherData = await fetchWeatherData(memberId, accessToken);
+        const weatherData = await fetchWeatherData(accessToken);
         if (weatherData.isSuccess) {
           setMaxTmp(weatherData.result.temperature.maxTmp);
           setMinTmp(weatherData.result.temperature.minTmp);

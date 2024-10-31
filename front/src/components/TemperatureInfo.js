@@ -4,12 +4,11 @@ import {fetchWeatherData} from '../api/api';
 
 const TemperatureInfo = ({accessToken}) => {
   const [currentTmp, setCurrentTmp] = useState(null);
-  const memberId = 1;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const weatherData = await fetchWeatherData(memberId, accessToken);
+        const weatherData = await fetchWeatherData(accessToken);
         if (weatherData.isSuccess) {
           setCurrentTmp(weatherData.result.currentTmp);
 

@@ -15,42 +15,27 @@ import {StatusBar, Image, Button} from 'react-native';
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-const HomeStack = ({accessToken, memberId}) => (
+const HomeStack = ({accessToken}) => (
   <Stack.Navigator screenOptions={{headerShown: false}}>
     <Stack.Screen name="Home">
-      {props => (
-        <HomeScreen {...props} accessToken={accessToken} memberId={memberId} />
-      )}
+      {props => <HomeScreen {...props} accessToken={accessToken} />}
     </Stack.Screen>
     <Stack.Screen name="PostCreationScreen">
-      {props => (
-        <PostCreationScreen
-          {...props}
-          accessToken={accessToken}
-          memberId={memberId}
-        />
-      )}
+      {props => <PostCreationScreen {...props} accessToken={accessToken} />}
     </Stack.Screen>
   </Stack.Navigator>
 );
 
-const InterestStack = ({accessToken, memberId, locationId}) => (
+const InterestStack = ({accessToken, locationId}) => (
   <Stack.Navigator screenOptions={{headerShown: false}}>
     <Stack.Screen name="InterestScreen">
-      {props => (
-        <InterestScreen
-          {...props}
-          accessToken={accessToken}
-          memberId={memberId}
-        />
-      )}
+      {props => <InterestScreen {...props} accessToken={accessToken} />}
     </Stack.Screen>
     <Stack.Screen name="InterestPostCreationScreen">
       {props => (
         <InterestPostCreationScreen
           {...props}
           accessToken={accessToken}
-          memberId={memberId}
           locationId={locationId}
         />
       )}
@@ -58,14 +43,13 @@ const InterestStack = ({accessToken, memberId, locationId}) => (
   </Stack.Navigator>
 );
 
-const RegisterProfileStack = ({accessToken, memberId, setIsNewMember}) => (
+const RegisterProfileStack = ({accessToken, setIsNewMember}) => (
   <Stack.Navigator screenOptions={{headerShown: false}}>
     <Stack.Screen name="RegisterProfileScreen">
       {props => (
         <RegisterProfileScreen
           {...props}
           accessToken={accessToken}
-          memberId={memberId}
           setIsNewMember={setIsNewMember}
         />
       )}
@@ -78,7 +62,6 @@ const App = () => {
   const [accessToken, setAccessToken] = useState(null);
   const [isNewMember, setIsNewMember] = useState(false);
   const [locationId, setLocationId] = useState(null);
-  const [memberId] = useState(1); // 임의의 memberId 설정
 
   return (
     <>
@@ -88,7 +71,6 @@ const App = () => {
           isNewMember ? (
             <RegisterProfileStack
               accessToken={accessToken}
-              memberId={memberId}
               setIsNewMember={setIsNewMember}
             />
           ) : (
@@ -132,11 +114,7 @@ const App = () => {
                   tabBarLabel: 'Community',
                 }}>
                 {props => (
-                  <CommunityScreen
-                    {...props}
-                    accessToken={accessToken}
-                    memberId={memberId}
-                  />
+                  <CommunityScreen {...props} accessToken={accessToken} />
                 )}
               </Tab.Screen>
               <Tab.Screen
@@ -148,7 +126,6 @@ const App = () => {
                   <InterestStack
                     {...props}
                     accessToken={accessToken}
-                    memberId={memberId}
                     locationId={locationId}
                   />
                 )}
@@ -158,13 +135,7 @@ const App = () => {
                 options={{
                   tabBarLabel: 'Home',
                 }}>
-                {props => (
-                  <HomeStack
-                    {...props}
-                    accessToken={accessToken}
-                    memberId={memberId}
-                  />
-                )}
+                {props => <HomeStack {...props} accessToken={accessToken} />}
               </Tab.Screen>
               <Tab.Screen
                 name="My"
@@ -175,7 +146,6 @@ const App = () => {
                   <MyScreen
                     {...props}
                     accessToken={accessToken}
-                    memberId={memberId}
                     setIsNewMember={setIsNewMember}
                     setLocationId={setLocationId}
                   />

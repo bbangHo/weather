@@ -10,18 +10,13 @@ import {
 } from 'react-native';
 import {createInterestPost} from '../api/api';
 
-const InterestPostCreationScreen = ({
-  navigation,
-  accessToken,
-  memberId,
-  locationId,
-}) => {
+const InterestPostCreationScreen = ({navigation, accessToken, locationId}) => {
   const [content, setContent] = useState('');
   const [postType, setPostType] = useState(null);
 
   useEffect(() => {
     console.log('Location ID:', locationId);
-  }, [locationId, accessToken, memberId]);
+  }, [locationId, accessToken]);
 
   const handleSubmit = async () => {
     if (!postType) {
@@ -41,14 +36,10 @@ const InterestPostCreationScreen = ({
     };
 
     console.log('Requesting with postData:', postData);
-    console.log('accessToken:', accessToken, 'memberId:', memberId);
+    console.log('accessToken:', accessToken);
 
     try {
-      const response = await createInterestPost(
-        postData,
-        accessToken,
-        memberId,
-      );
+      const response = await createInterestPost(postData, accessToken);
       console.log('Post creation response:', response);
       Alert.alert('Success', '게시글이 성공적으로 등록되었습니다.');
       navigation.navigate('InterestScreen');

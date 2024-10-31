@@ -15,7 +15,7 @@ import {fetchPosts, toggleLikePost} from '../api/api';
 
 const {width: windowWidth} = Dimensions.get('window');
 
-const PostScroll = ({accessToken, memberId}) => {
+const PostScroll = ({accessToken}) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const postType = 'WEATHER';
@@ -26,7 +26,7 @@ const PostScroll = ({accessToken, memberId}) => {
 
   const loadPosts = async () => {
     try {
-      const fetchedPosts = await fetchPosts(accessToken, memberId, postType);
+      const fetchedPosts = await fetchPosts(accessToken, postType);
       console.log('Fetched posts:', fetchedPosts);
       setPosts(
         fetchedPosts.map(post => ({
@@ -50,7 +50,7 @@ const PostScroll = ({accessToken, memberId}) => {
 
   const handleLikePress = async postId => {
     try {
-      const response = await toggleLikePost(accessToken, memberId, postId);
+      const response = await toggleLikePost(accessToken, postId);
       if (response.isSuccess) {
         setPosts(prevPosts =>
           prevPosts.map(post =>

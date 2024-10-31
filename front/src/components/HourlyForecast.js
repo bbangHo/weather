@@ -11,13 +11,13 @@ import {Card} from 'react-native-elements';
 import globalStyles from '../globalStyles';
 import {fetchWeatherData} from '../api/api';
 
-const HourlyForecast = ({accessToken, memberId, showText}) => {
+const HourlyForecast = ({accessToken, showText}) => {
   const [hourlyData, setHourlyData] = useState([]);
 
   useEffect(() => {
     const getWeatherData = async () => {
       try {
-        const weatherData = await fetchWeatherData(memberId, accessToken);
+        const weatherData = await fetchWeatherData(accessToken);
 
         console.log('Backend response:', JSON.stringify(weatherData, null, 2));
 
