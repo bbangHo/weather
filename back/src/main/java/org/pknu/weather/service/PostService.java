@@ -3,7 +3,6 @@ package org.pknu.weather.service;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.pknu.weather.apiPayload.code.status.ErrorStatus;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.Post;
@@ -14,7 +13,6 @@ import org.pknu.weather.dto.PostRequest;
 import org.pknu.weather.dto.converter.PostConverter;
 import org.pknu.weather.dto.converter.RecommendationConverter;
 import org.pknu.weather.dto.converter.TagConverter;
-import org.pknu.weather.exception.GeneralException;
 import org.pknu.weather.repository.LocationRepository;
 import org.pknu.weather.repository.MemberRepository;
 import org.pknu.weather.repository.PostRepository;
@@ -57,9 +55,7 @@ public class PostService {
         Location location = member.getLocation();
         Tag tag = TagConverter.toTag(createPost);
         Post post = PostConverter.toPost(member, location, tag, createPost);
-//        Recommendation recommendation = RecommendationConverter.toRecommendation(member, post);
 
-//        recommendationRepository.save(recommendation);
         postRepository.save(post);
         tagRepository.save(tag);
 
@@ -80,14 +76,14 @@ public class PostService {
         Boolean isRecommended = recommendationRepository.isRecommended(member.getId(), postId);
 
         if (!isRecommended) {
-            throw new GeneralException(ErrorStatus._RECOMMENDATION_BAD_REQUEST);
+            recommendationRepository.deleteByMemberAndPostId(member, postId);
+            return true;
         }
 
         Post post = postRepository.safeFindById(postId);
         Recommendation recommendation = RecommendationConverter.toRecommendation(member, post);
 
         recommendationRepository.save(recommendation);
-
         return true;
     }
 }
