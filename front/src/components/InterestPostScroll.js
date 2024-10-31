@@ -260,8 +260,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderColor: 'rgba(255, 255, 255, 0)',
     padding: 15,
-    marginTop: 0,
-    marginBottom: 10,
+    marginTop: Platform.OS === 'ios' ? 2 : 8,
+    marginBottom: Platform.OS === 'ios' ? 8 : 2,
     width: width * 0.93,
     height: 130,
     justifyContent: 'space-between',
@@ -339,6 +339,7 @@ const styles = StyleSheet.create({
   hobbySelector: {
     marginTop: -60,
     paddingVertical: 10,
+    paddingBottom: 13,
     paddingHorizontal: 20,
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     borderRadius: 10,

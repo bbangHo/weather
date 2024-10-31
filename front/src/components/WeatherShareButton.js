@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     padding: 13,
     justifyContent: 'space-between',
     width: width / 2.1,
-    height: 110,
+    height: Platform.OS === 'ios' ? 107 : 115,
   },
   sectionText: {
     color: '#fff',

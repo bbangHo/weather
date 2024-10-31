@@ -261,6 +261,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 10,
+    paddingBottom: Platform.OS === 'ios' ? 13 : 16,
   },
   shareButtonText: {
     color: '#fff',

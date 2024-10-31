@@ -85,6 +85,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   shareButtonContainer: {
+    marginTop: -7,
     marginVertical: 10,
     alignItems: 'center',
   },

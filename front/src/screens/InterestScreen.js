@@ -166,6 +166,7 @@ const styles = StyleSheet.create({
     tintColor: '#c4c4c4',
   },
   scrollViewContent: {
+    marginTop: Platform.OS === 'ios' ? 10 : 40,
     minHeight: height * 1.5,
     paddingBottom: 20,
   },

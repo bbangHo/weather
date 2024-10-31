@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '95%',
-    paddingBottom: 15,
+    paddingBottom: Platform.OS === 'ios' ? 15 : 10,
   },
   rightContainer: {
     width: '50%',
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
   text: {
     color: '#fff',
     textAlign: 'center',
-    paddingBottom: 10,
+    paddingBottom: Platform.OS === 'ios' ? 10 : 15,
   },
 });
 

@@ -9,6 +9,7 @@ import {
   Image,
   Dimensions,
   ScrollView,
+  Platform,
 } from 'react-native';
 import {fetchUserLocation, fetchLocationInfo, submitAddress} from '../api/api';
 
@@ -357,6 +358,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 10,
+    paddingBottom: Platform.OS === 'ios' ? 10 : 15,
   },
   hobbyText: {
     fontSize: 20,

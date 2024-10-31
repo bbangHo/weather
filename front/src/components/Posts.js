@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0)',
     padding: 15,
     marginHorizontal: 5,
-    width: windowWidth * 0.94,
+    width: windowWidth * 0.93,
     height: 150,
     justifyContent: 'space-between',
     position: 'relative',

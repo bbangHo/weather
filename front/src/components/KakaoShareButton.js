@@ -45,15 +45,15 @@ const KakaoShareButton = ({accessToken}) => {
       return;
     }
 
-    const {city, street, currentSkyType, temperature} = weatherInfo;
+    const {city, street, currentTmp, currentSkyType, temperature} = weatherInfo;
     const {maxTmp, minTmp} = temperature;
     const weatherEmoji = getWeatherEmoji(currentSkyType);
 
     try {
       const response = await KakaoShareLink.sendFeed({
         content: {
-          title: `${city} ${street}은 ${weatherEmoji} ${currentSkyType} ${weatherEmoji}`,
-          description: `최고 ${maxTmp}°, 최저 ${minTmp}° 기온입니다.`,
+          title: `${city} ${street} 날씨입니다 ~`,
+          description: `현재 ${currentTmp}°C\n최고 ${maxTmp}°, 최저 ${minTmp}° 기온입니다.`,
           imageUrl: 'https:이미지 추가할 경우.png',
           link: {
             mobileWebUrl: 'https://링크 추가.com',

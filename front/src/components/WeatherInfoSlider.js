@@ -8,7 +8,6 @@ import {
   Image,
   Platform,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
 import globalStyles from '../globalStyles';
 import {fetchWeatherTags, fetchRainForecast} from '../api/api';
 
@@ -53,7 +52,7 @@ const WeatherInfoSlider = ({accessToken}) => {
   return (
     <View style={styles.sliderContainer}>
       <View style={styles.indicatorContainer}>
-        {[0, 1, 2].map((_, index) => (
+        {[0, 1].map((_, index) => (
           <View
             key={`indicator-${index}`}
             style={[
@@ -99,29 +98,6 @@ const WeatherInfoSlider = ({accessToken}) => {
             ) : (
               <Text style={styles.info}>비 정보를 불러오는 중...</Text>
             )}
-          </View>
-        </View>
-        <View style={[styles.slide, globalStyles.transparentBackground]}>
-          <Text style={styles.title}>이번 주 날씨</Text>
-          <View style={styles.infoContainer}>
-            <View style={styles.weeklyForecast}>
-              <View style={styles.dayForecast}>
-                <Text style={styles.day}>월</Text>
-                <Icon name="rainy" style={styles.weatherIcon} />
-              </View>
-              <View style={styles.dayForecast}>
-                <Text style={styles.day}>화</Text>
-                <Icon name="sunny" style={styles.weatherIcon} />
-              </View>
-              <View style={styles.dayForecast}>
-                <Text style={styles.day}>수</Text>
-                <Icon name="partly-sunny" style={styles.weatherIcon} />
-              </View>
-              <View style={styles.dayForecast}>
-                <Text style={styles.day}>목</Text>
-                <Icon name="rainy" style={styles.weatherIcon} />
-              </View>
-            </View>
           </View>
         </View>
       </ScrollView>
@@ -193,23 +169,6 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     alignSelf: 'center',
     tintColor: '#fff',
-  },
-  weeklyForecast: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
-  },
-  dayForecast: {
-    alignItems: 'center',
-  },
-  day: {
-    fontSize: 16,
-    marginBottom: 8,
-    color: '#fff',
-  },
-  weatherIcon: {
-    fontSize: 25,
-    color: '#fff',
   },
   indicatorContainer: {
     flexDirection: 'row',

@@ -105,6 +105,12 @@ const App = () => {
                 tabBarInactiveTintColor: 'gray',
                 tabBarStyle: {
                   paddingTop: 5,
+                  paddingBottom: 10,
+                  height: 80,
+                },
+                tabBarLabelStyle: {
+                  fontSize: Platform.OS === 'ios' ? 10 : 12,
+                  paddingBottom: Platform.OS === 'ios' ? 15 : 7,
                 },
               })}
               initialRouteName="HomeStack">
