@@ -43,20 +43,18 @@ const InterestItem = ({
   }, [accessToken]);
 
   const fetchLocationData = async currentStep => {
-    let query = '';
-    if (currentStep === 1) {
-      query = `province=&city=`;
-    } else if (currentStep === 2) {
-      query = `province=${province}&city=`;
-    } else if (currentStep === 3) {
-      query = `province=${province}&city=${city}`;
-    }
-
-    console.log('Fetching data for step:', currentStep, 'with query:', query);
-
     try {
-      const results = await fetchLocationInfo(accessToken, '', province, city);
-      setSearchResults(results.result);
+      let results;
+
+      if (currentStep === 1) {
+        results = await fetchLocationInfo(accessToken, '', '', '');
+      } else if (currentStep === 2) {
+        results = await fetchLocationInfo(accessToken, '', province, '');
+      } else if (currentStep === 3) {
+        results = await fetchLocationInfo(accessToken, '', province, city);
+      }
+
+      setSearchResults(results?.result || []);
     } catch (error) {
       console.error('주소 검색 중 에러:', error);
     }

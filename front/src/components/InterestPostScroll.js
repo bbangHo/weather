@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Modal,
   Dimensions,
+  Alert,
 } from 'react-native';
 import {Card} from 'react-native-elements';
 import globalStyles from '../globalStyles';
@@ -56,7 +57,15 @@ const InterestPostScroll = ({accessToken, memberId, selectedHobby}) => {
         memberId,
         currentHobby.postType,
       );
-      setPosts(fetchedPosts);
+      console.log(
+        'Fetched interest posts:',
+        JSON.stringify(fetchedPosts, null, 2),
+      );
+
+      const uniquePosts = Array.from(
+        new Set(fetchedPosts.map(post => post.postInfo.postId)),
+      ).map(id => fetchedPosts.find(post => post.postInfo.postId === id));
+      setPosts(uniquePosts);
     } catch (error) {
       console.error('Error fetching posts:', error);
     } finally {
@@ -75,8 +84,10 @@ const InterestPostScroll = ({accessToken, memberId, selectedHobby}) => {
                   ...post,
                   postInfo: {
                     ...post.postInfo,
-                    likeClickable: false,
-                    likeCount: post.postInfo.likeCount + 1,
+                    likeClickable: !post.postInfo.likeClickable,
+                    likeCount: post.postInfo.likeClickable
+                      ? post.postInfo.likeCount + 1
+                      : post.postInfo.likeCount - 1,
                   },
                 }
               : post,
@@ -86,7 +97,7 @@ const InterestPostScroll = ({accessToken, memberId, selectedHobby}) => {
         Alert.alert('Error', '좋아요를 할 수 없습니다. 다시 시도해주세요.');
       }
     } catch (error) {
-      console.error('Failed to like post:', error.message);
+      console.error('Failed to like/unlike post:', error.message);
       Alert.alert(
         'Error',
         '서버에 문제가 발생했습니다. 나중에 다시 시도해주세요.',

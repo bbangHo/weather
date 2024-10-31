@@ -17,9 +17,7 @@ const {width: windowWidth} = Dimensions.get('window');
 
 const PostScroll = ({accessToken, memberId}) => {
   const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [lastPostId, setLastPostId] = useState(null);
-  const [loadingMore, setLoadingMore] = useState(false);
+  const [loading, setLoading] = useState(true);
   const postType = 'WEATHER';
 
   useEffect(() => {
@@ -27,22 +25,18 @@ const PostScroll = ({accessToken, memberId}) => {
   }, []);
 
   const loadPosts = async () => {
-    if (loading || loadingMore) return;
-    setLoading(true);
     try {
-      const fetchedPosts = await fetchPosts(
-        accessToken,
-        memberId,
-        postType,
-        lastPostId,
-      );
+      const fetchedPosts = await fetchPosts(accessToken, memberId, postType);
       console.log('Fetched posts:', fetchedPosts);
-      if (fetchedPosts && fetchedPosts.length > 0) {
-        setPosts(prevPosts => [...prevPosts, ...fetchedPosts]);
-        setLastPostId(fetchedPosts[fetchedPosts.length - 1].postInfo.postId);
-      } else if (lastPostId === null) {
-        Alert.alert('Info', '불러올 게시글이 없습니다.');
-      }
+      setPosts(
+        fetchedPosts.map(post => ({
+          ...post,
+          postInfo: {
+            ...post.postInfo,
+            likeClickable: post.postInfo.likeCount > 0,
+          },
+        })),
+      );
     } catch (error) {
       console.error('Error loading posts:', error.message);
       Alert.alert(
@@ -51,15 +45,12 @@ const PostScroll = ({accessToken, memberId}) => {
       );
     } finally {
       setLoading(false);
-      setLoadingMore(false);
     }
   };
 
   const handleLikePress = async postId => {
-    console.log('Like button pressed for postId:', postId);
     try {
       const response = await toggleLikePost(accessToken, memberId, postId);
-      console.log('Like post response:', response);
       if (response.isSuccess) {
         setPosts(prevPosts =>
           prevPosts.map(post =>
@@ -68,8 +59,10 @@ const PostScroll = ({accessToken, memberId}) => {
                   ...post,
                   postInfo: {
                     ...post.postInfo,
-                    likeClickable: false,
-                    likeCount: post.postInfo.likeCount + 1,
+                    likeClickable: !post.postInfo.likeClickable,
+                    likeCount: post.postInfo.likeClickable
+                      ? Math.max(post.postInfo.likeCount - 1, 0)
+                      : post.postInfo.likeCount + 1,
                   },
                 }
               : post,
@@ -79,7 +72,7 @@ const PostScroll = ({accessToken, memberId}) => {
         Alert.alert('Error', '좋아요를 할 수 없습니다. 다시 시도해주세요.');
       }
     } catch (error) {
-      console.error('Failed to like post:', error.message);
+      console.error('Failed to like/unlike post:', error.message);
       Alert.alert(
         'Error',
         '서버에 문제가 발생했습니다. 나중에 다시 시도해주세요.',
@@ -133,8 +126,8 @@ const PostScroll = ({accessToken, memberId}) => {
             <Image
               source={
                 item.postInfo.likeClickable
-                  ? require('../../assets/images/icon_heart0.png')
-                  : require('../../assets/images/icon_heart2.png')
+                  ? require('../../assets/images/icon_heart2.png')
+                  : require('../../assets/images/icon_heart0.png')
               }
               style={styles.likeIcon}
             />
@@ -146,24 +139,19 @@ const PostScroll = ({accessToken, memberId}) => {
     </View>
   );
 
-  const loadMorePosts = () => {
-    if (!loading && !loadingMore) {
-      setLoadingMore(true);
-      loadPosts();
-    }
-  };
-
   return (
     <FlatList
       data={posts}
       renderItem={renderPost}
       keyExtractor={item => item.postInfo.postId.toString()}
-      ListFooterComponent={
-        loadingMore ? <Text style={styles.loadingText}>Loading...</Text> : null
-      }
       contentContainerStyle={styles.contentContainer}
-      onEndReached={loadMorePosts}
-      onEndReachedThreshold={0.5}
+      ListEmptyComponent={
+        loading ? (
+          <Text style={styles.loadingText}>Loading...</Text>
+        ) : (
+          <Text style={styles.noPostText}>불러올 게시글이 없습니다.</Text>
+        )
+      }
     />
   );
 };
@@ -246,6 +234,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     padding: 10,
     color: '#fff',
+  },
+  noPostText: {
+    color: '#fff',
+    textAlign: 'center',
+    marginTop: 20,
   },
 });
 

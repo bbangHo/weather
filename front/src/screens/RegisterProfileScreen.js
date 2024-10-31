@@ -10,7 +10,6 @@ import {
   PermissionsAndroid,
   Platform,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
 import {launchImageLibrary} from 'react-native-image-picker';
 import Geolocation from 'react-native-geolocation-service';
 import {check, PERMISSIONS, request, RESULTS} from 'react-native-permissions';
@@ -182,7 +181,10 @@ const RegisterProfileScreen = ({setIsNewMember, accessToken, memberId}) => {
         <TouchableOpacity
           style={styles.editIconContainer}
           onPress={handleImagePicker}>
-          <Icon name="add-circle-outline" size={30} color="#2f5af4" />
+          <Image
+            source={require('../../assets/images/icon_camera.png')}
+            style={styles.cameraIcon}
+          />
         </TouchableOpacity>
       </View>
 
@@ -291,6 +293,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     right: 0,
+  },
+  cameraIcon: {
+    width: 30,
+    height: 30,
   },
   label: {
     fontSize: 18,

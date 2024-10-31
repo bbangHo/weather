@@ -1,12 +1,12 @@
 import React, {useState, useEffect, useRef} from 'react';
 import {
   View,
-  ScrollView,
   StyleSheet,
   StatusBar,
   TouchableOpacity,
   Image,
   Animated,
+  VirtualizedList,
   Dimensions,
 } from 'react-native';
 import InterestItem from '../components/InterestItem';
@@ -31,27 +31,21 @@ const InterestScreen = ({accessToken, memberId}) => {
 
   useEffect(() => {
     const currentHour = new Date().getHours();
-    if (currentHour >= 6 && currentHour < 18) {
-      setBackgroundColor('#2f5af4');
-    } else {
-      setBackgroundColor('#1D2837');
-    }
+    setBackgroundColor(
+      currentHour >= 6 && currentHour < 18 ? '#2f5af4' : '#1D2837',
+    );
   }, []);
 
   useEffect(() => {
     const getWeatherData = async () => {
       try {
         const data = await fetchWeatherData(memberId, accessToken);
-        if (data.isSuccess) {
-          setWeatherData(data.result);
-        } else {
-          console.error('Failed to fetch weather data:', data.message);
-        }
+        if (data.isSuccess) setWeatherData(data.result);
+        else console.error('Failed to fetch weather data:', data.message);
       } catch (error) {
         console.error('Error fetching weather data:', error.message);
       }
     };
-
     getWeatherData();
   }, [accessToken, memberId]);
 
@@ -59,26 +53,22 @@ const InterestScreen = ({accessToken, memberId}) => {
     const {layoutMeasurement, contentOffset} = event.nativeEvent;
     const scrollThreshold = layoutMeasurement.height / 2;
 
-    if (contentOffset.y >= scrollThreshold) {
-      if (!showPostScroll) {
-        setShowPostScroll(true);
-        setCurrentIcon(shareIcon);
-        Animated.timing(translateY, {
-          toValue: -layoutMeasurement.height,
-          duration: 300,
-          useNativeDriver: true,
-        }).start();
-      }
-    } else {
-      if (showPostScroll) {
-        setShowPostScroll(false);
-        setCurrentIcon(arrowDownIcon);
-        Animated.timing(translateY, {
-          toValue: 0,
-          duration: 300,
-          useNativeDriver: true,
-        }).start();
-      }
+    if (contentOffset.y >= scrollThreshold && !showPostScroll) {
+      setShowPostScroll(true);
+      setCurrentIcon(shareIcon);
+      Animated.timing(translateY, {
+        toValue: -layoutMeasurement.height,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    } else if (contentOffset.y < scrollThreshold && showPostScroll) {
+      setShowPostScroll(false);
+      setCurrentIcon(arrowDownIcon);
+      Animated.timing(translateY, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
     }
   };
 
@@ -90,25 +80,12 @@ const InterestScreen = ({accessToken, memberId}) => {
     }
   };
 
-  const getIconStyle = () => {
-    return currentIcon === arrowDownIcon ? styles.arrowIcon : styles.shareIcon;
-  };
+  const getItemCount = () => (showPostScroll ? 2 : 1);
+  const getItem = (data, index) => data[index];
 
-  return (
-    <View style={[styles.container, {backgroundColor: backgroundColor}]}>
-      <StatusBar hidden={true} />
-
-      <View style={styles.fixedArrowContainer}>
-        <TouchableOpacity onPress={handleIconPress}>
-          <Image source={currentIcon} style={getIconStyle()} />
-        </TouchableOpacity>
-      </View>
-
-      <ScrollView
-        ref={scrollViewRef}
-        onScroll={handleScroll}
-        scrollEventThrottle={16}
-        contentContainerStyle={styles.scrollViewContent}>
+  const renderItem = ({item}) => {
+    if (item === 'InterestItem') {
+      return (
         <Animated.View
           style={[styles.animatedContainer, {transform: [{translateY}]}]}>
           <InterestItem
@@ -119,17 +96,46 @@ const InterestScreen = ({accessToken, memberId}) => {
             setModalVisible={setModalVisible}
           />
         </Animated.View>
+      );
+    } else if (item === 'InterestPostScroll' && selectedHobby) {
+      return (
+        <InterestPostScroll
+          accessToken={accessToken}
+          memberId={memberId}
+          selectedHobby={selectedHobby}
+        />
+      );
+    }
+  };
 
-        {showPostScroll && selectedHobby && (
-          <View style={styles.postScrollContainer}>
-            <InterestPostScroll
-              accessToken={accessToken}
-              memberId={memberId}
-              selectedHobby={selectedHobby}
-            />
-          </View>
-        )}
-      </ScrollView>
+  return (
+    <View style={[styles.container, {backgroundColor: backgroundColor}]}>
+      <StatusBar hidden={true} />
+
+      <View style={styles.fixedArrowContainer}>
+        <TouchableOpacity onPress={handleIconPress}>
+          <Image
+            source={currentIcon}
+            style={
+              currentIcon === arrowDownIcon
+                ? styles.arrowIcon
+                : styles.shareIcon
+            }
+          />
+        </TouchableOpacity>
+      </View>
+
+      <VirtualizedList
+        ref={scrollViewRef}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+        data={['InterestItem', 'InterestPostScroll']}
+        getItemCount={getItemCount}
+        getItem={getItem}
+        renderItem={renderItem}
+        keyExtractor={item => item}
+        contentContainerStyle={styles.scrollViewContent}
+      />
     </View>
   );
 };
@@ -162,13 +168,10 @@ const styles = StyleSheet.create({
   },
   scrollViewContent: {
     minHeight: height * 1.5,
+    paddingBottom: 20,
   },
   animatedContainer: {
     flex: 1,
-  },
-  postScrollContainer: {
-    flex: 1,
-    paddingTop: 0,
   },
 });
 
