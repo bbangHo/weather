@@ -98,12 +98,15 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     marginVertical: 5,
-    paddingHorizontal: 5,
+    paddingHorizontal: Platform.select({
+      ios: 8,
+      android: 9,
+    }),
   },
   card: {
     borderRadius: 10,
     borderColor: 'rgba(255, 255, 255, 0)',
-    padding: Platform.OS === 'ios' ? 10 : 8.5,
+    padding: Platform.OS === 'ios' ? 9.5 : 12,
     paddingVertical: 20,
     marginHorizontal: 5,
     alignItems: 'center',

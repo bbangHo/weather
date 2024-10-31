@@ -176,6 +176,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginVertical: 5,
     backgroundColor: '#fff',
+    paddingBottom: Platform.OS === 'ios' ? 13 : 16,
   },
   typeButtonText: {
     color: '#2f5af4',

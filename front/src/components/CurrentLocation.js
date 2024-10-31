@@ -2,10 +2,11 @@ import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
-  TouchableOpacity,
   StyleSheet,
   Alert,
   Image,
+  Dimensions,
+  Platform,
 } from 'react-native';
 import {fetchUserLocation, fetchWeatherData} from '../api/api';
 
@@ -48,6 +49,12 @@ const CurrentLocation = ({accessToken}) => {
     }
   };
 
+  const windowWidth = Dimensions.get('window').width;
+  const marginLeftValue = Platform.select({
+    ios: windowWidth * 0.05,
+    android: windowWidth * 0.02,
+  });
+
   if (loading) {
     return (
       <View style={styles.container}>
@@ -57,7 +64,7 @@ const CurrentLocation = ({accessToken}) => {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {marginLeft: marginLeftValue}]}>
       {userLocation && weatherData ? (
         <View>
           <View style={styles.locationContainer}>
@@ -82,7 +89,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 10,
     marginTop: -15,
-    marginLeft: 10,
     flexDirection: 'column',
   },
   locationContainer: {
