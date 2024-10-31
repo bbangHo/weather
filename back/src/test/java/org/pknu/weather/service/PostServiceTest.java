@@ -1,5 +1,9 @@
 package org.pknu.weather.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import jakarta.persistence.EntityManager;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -7,7 +11,11 @@ import org.pknu.weather.common.TestDataCreator;
 import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.Post;
 import org.pknu.weather.domain.common.PostType;
-import org.pknu.weather.domain.tag.*;
+import org.pknu.weather.domain.tag.DustTag;
+import org.pknu.weather.domain.tag.HumidityTag;
+import org.pknu.weather.domain.tag.SkyTag;
+import org.pknu.weather.domain.tag.TemperatureTag;
+import org.pknu.weather.domain.tag.WindTag;
 import org.pknu.weather.dto.PostRequest;
 import org.pknu.weather.dto.PostRequest.HobbyParams;
 import org.pknu.weather.dto.converter.PostRequestConverter;
@@ -18,10 +26,6 @@ import org.pknu.weather.repository.RecommendationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Slf4j
@@ -45,53 +49,8 @@ class PostServiceTest {
     @Autowired
     PostRequestConverter postRequestConverter;
 
-//    @BeforeEach
-//    void init() {
-//        String[][] list = {
-//                {"서울특별시", "종로구", "청운효자동"},
-//                {"서울특별시", "종로구", "사직동"},
-//                {"서울특별시", "종로구", "삼청동"},
-//                {"서울특별시", "종로구", "부암동"},
-//                {"부산광역시", "부산진구", "부전제2동"},
-//                {"부산광역시", "부산진구", "연지동"},
-//                {"부산광역시", "부산진구", "초읍동"},
-//                {"부산광역시", "부산진구", "양정제1동"}
-//        };
-//
-//        double[][] latlngList = {
-//                {126.9706519, 37.5841367},
-//                {126.970955555555, 37.5732694444444},
-//                {126.983977777777, 37.582425},
-//                {126.966444444444, 37.5898555555555},
-//                {129.059075, 35.1495222222222},
-//                {129.055008333333, 35.1697138888888},
-//                {129.049833333333, 35.175625},
-//                {129.066655555555, 35.1713972222222}
-//        };
-//
-//        for (int i = 0; i < list.length; i++) {
-//            double latitude = latlngList[i][1];
-//            double longitude = latlngList[i][0];
-//
-//            Location location = Location.builder()
-//                    .point(GeometryUtils.getPoint(latitude, longitude))
-//                    .province(list[i][0])
-//                    .city(list[i][1])
-//                    .street(list[i][2])
-//                    .latitude(latitude)
-//                    .longitude(longitude)
-//                    .build();
-//
-//            Member member = Member.builder()
-//                    .location(location)
-//                    .email(i + "email@naver.com")
-//                    .nickname(i + "user")
-//                    .sensitivity(Sensitivity.NONE)
-//                    .build();
-//
-//            memberRepository.save(member);
-//        }
-//    }
+    @Autowired
+    EntityManager em;
 
     @Test
     @Transactional
@@ -203,5 +162,27 @@ class PostServiceTest {
 
         // then
         assertThat(postList.get(0)).isEqualTo(hPost);
+    }
+
+    @Test
+    @Transactional
+    public void 좋아요_누르기_좋아요_취소_테스트() {
+        // given
+        Member member = memberRepository.save(TestDataCreator.getMember());
+        Post post = postRepository.save(TestDataCreator.getPost(member));
+        // when
+
+        // then
+        postService.addRecommendation(member.getEmail(), post.getId());
+        em.flush();
+        em.clear();
+        post = postRepository.safeFindById(post.getId());
+        assertThat(post.getRecommendationList().size()).isEqualTo(1);
+
+        postService.addRecommendation(member.getEmail(), post.getId());
+        em.flush();
+        em.clear();
+        post = postRepository.safeFindById(post.getId());
+        assertThat(post.getRecommendationList().size()).isEqualTo(0);
     }
 }
