@@ -15,7 +15,7 @@ import Geolocation from 'react-native-geolocation-service';
 import {check, PERMISSIONS, request, RESULTS} from 'react-native-permissions';
 import {registerProfile, sendLocationToBackend} from '../api/api';
 
-const RegisterProfileScreen = ({setIsNewMember, accessToken, memberId}) => {
+const RegisterProfileScreen = ({setIsNewMember, accessToken}) => {
   const [nickname, setNickname] = useState('');
   const [profileImage, setProfileImage] = useState(null);
   const [selectedType, setSelectedType] = useState(null);
@@ -87,7 +87,6 @@ const RegisterProfileScreen = ({setIsNewMember, accessToken, memberId}) => {
         sensitivityMap[selectedType],
         profileImage,
         accessToken,
-        memberId,
       );
 
       console.log('registered new member info:', result);

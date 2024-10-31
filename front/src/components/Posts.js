@@ -16,7 +16,7 @@ import {fetchPopularPosts, toggleLikePost} from '../api/api';
 
 const {width: windowWidth} = Dimensions.get('window');
 
-const Posts = ({accessToken, memberId}) => {
+const Posts = ({accessToken}) => {
   const screenWidth = Dimensions.get('window').width;
   const navigation = useNavigation();
   const [newPosts, setNewPosts] = useState([]);
@@ -25,7 +25,7 @@ const Posts = ({accessToken, memberId}) => {
   useEffect(() => {
     const loadPosts = async () => {
       try {
-        const posts = await fetchPopularPosts(accessToken, memberId);
+        const posts = await fetchPopularPosts(accessToken);
         setNewPosts(posts);
         console.log('Fetched popular posts:', posts);
       } catch (error) {
@@ -36,11 +36,11 @@ const Posts = ({accessToken, memberId}) => {
     };
 
     loadPosts();
-  }, [accessToken, memberId]);
+  }, [accessToken]);
 
   const handleLikePress = async postId => {
     try {
-      const response = await toggleLikePost(accessToken, memberId, postId);
+      const response = await toggleLikePost(accessToken, postId);
       console.log('Like/unlike response:', response);
 
       if (response && response.isSuccess) {

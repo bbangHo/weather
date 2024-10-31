@@ -15,7 +15,7 @@ import {fetchWeatherData, fetchMemberInfo} from '../api/api';
 
 const {height} = Dimensions.get('window');
 
-const CommunityScreen = ({accessToken, memberId}) => {
+const CommunityScreen = ({accessToken}) => {
   const [weatherData, setWeatherData] = useState(null);
   const [backgroundColor, setBackgroundColor] = useState('#2f5af4');
   const [sensitivityText, setSensitivityText] = useState('');
@@ -32,7 +32,7 @@ const CommunityScreen = ({accessToken, memberId}) => {
   useEffect(() => {
     const getWeatherData = async () => {
       try {
-        const data = await fetchWeatherData(memberId, accessToken);
+        const data = await fetchWeatherData(accessToken);
         if (data.isSuccess) {
           setWeatherData(data.result);
         } else {
@@ -44,7 +44,7 @@ const CommunityScreen = ({accessToken, memberId}) => {
     };
 
     getWeatherData();
-  }, [accessToken, memberId]);
+  }, [accessToken]);
 
   useEffect(() => {
     const getMemberInfo = async () => {
@@ -83,14 +83,14 @@ const CommunityScreen = ({accessToken, memberId}) => {
       <View style={styles.topContainer}>
         <WeatherShareButton />
         <View style={styles.rightContainer}>
-          <CurrentLocation accessToken={accessToken} memberId={memberId} />
+          <CurrentLocation accessToken={accessToken} />
           <TemperatureInfo accessToken={accessToken} />
         </View>
       </View>
       <Text style={styles.text}>
         ‘{sensitivityText}’ 유형이 가장 많이 공감했어요
       </Text>
-      <PostScroll accessToken={accessToken} memberId={memberId} />
+      <PostScroll accessToken={accessToken} />
     </View>
   );
 };

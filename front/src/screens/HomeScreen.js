@@ -20,7 +20,7 @@ import {useNavigation} from '@react-navigation/native';
 
 const {height} = Dimensions.get('window');
 
-const HomeScreen = ({accessToken, memberId}) => {
+const HomeScreen = ({accessToken}) => {
   const navigation = useNavigation();
   const [showText, setShowText] = useState(false);
   const [backgroundColor, setBackgroundColor] = useState('#2f5af4');
@@ -43,27 +43,23 @@ const HomeScreen = ({accessToken, memberId}) => {
       <StatusBar hidden={true} />
       <View style={styles.topSpacer} />
       <View style={styles.topContainer}>
-        <WeatherInfoSlider accessToken={accessToken} memberId={memberId} />
+        <WeatherInfoSlider accessToken={accessToken} />
         <View style={styles.rightContainer}>
-          <CurrentLocation accessToken={accessToken} memberId={memberId} />
-          <TemperatureInfo accessToken={accessToken} memberId={memberId} />
+          <CurrentLocation accessToken={accessToken} />
+          <TemperatureInfo accessToken={accessToken} />
           <ToggleViewButton showText={showText} setShowText={setShowText} />
         </View>
       </View>
 
-      <HourlyForecast
-        accessToken={accessToken}
-        memberId={memberId}
-        showText={showText}
-      />
-      <AirQuality accessToken={accessToken} memberId={memberId} />
-      <Posts accessToken={accessToken} memberId={memberId} />
+      <HourlyForecast accessToken={accessToken} showText={showText} />
+      <AirQuality accessToken={accessToken} />
+      <Posts accessToken={accessToken} />
 
       <View style={styles.shareButtonContainer}>
-        <KakaoShareButton accessToken={accessToken} memberId={memberId} />
+        <KakaoShareButton accessToken={accessToken} />
       </View>
 
-      <WeatherGraph accessToken={accessToken} memberId={memberId} />
+      <WeatherGraph accessToken={accessToken} />
     </ScrollView>
   );
 };

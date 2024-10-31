@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import {fetchUserLocation, fetchWeatherData} from '../api/api';
 
-const CurrentLocation = ({accessToken, memberId}) => {
+const CurrentLocation = ({accessToken}) => {
   const [userLocation, setUserLocation] = useState(null);
   const [weatherData, setWeatherData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -21,7 +21,7 @@ const CurrentLocation = ({accessToken, memberId}) => {
         console.log('Fetched user location:', location);
         setUserLocation(location);
 
-        const weather = await fetchWeatherData(memberId, accessToken);
+        const weather = await fetchWeatherData(accessToken);
         console.log('Fetched weather data:', weather);
         setWeatherData(weather.result);
         setLoading(false);
@@ -33,7 +33,7 @@ const CurrentLocation = ({accessToken, memberId}) => {
     };
 
     loadUserData();
-  }, [accessToken, memberId]);
+  }, [accessToken]);
 
   const getWeatherIcon = currentSkyType => {
     switch (currentSkyType) {

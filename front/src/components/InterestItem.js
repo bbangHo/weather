@@ -45,13 +45,12 @@ const InterestItem = ({
   const fetchLocationData = async currentStep => {
     try {
       let results;
-
       if (currentStep === 1) {
-        results = await fetchLocationInfo(accessToken, '', '', '');
+        results = await fetchLocationInfo(accessToken, '', '');
       } else if (currentStep === 2) {
-        results = await fetchLocationInfo(accessToken, '', province, '');
+        results = await fetchLocationInfo(accessToken, province, '');
       } else if (currentStep === 3) {
-        results = await fetchLocationInfo(accessToken, '', province, city);
+        results = await fetchLocationInfo(accessToken, province, city);
       }
 
       setSearchResults(results?.result || []);

@@ -12,7 +12,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import globalStyles from '../globalStyles';
 import {fetchWeatherTags, fetchRainForecast} from '../api/api';
 
-const WeatherInfoSlider = ({accessToken, memberId}) => {
+const WeatherInfoSlider = ({accessToken}) => {
   const [activeSlide, setActiveSlide] = useState(0);
   const [weatherTags, setWeatherTags] = useState([]);
   const [rainForecast, setRainForecast] = useState(null);
@@ -20,7 +20,7 @@ const WeatherInfoSlider = ({accessToken, memberId}) => {
   useEffect(() => {
     const loadWeatherTags = async () => {
       try {
-        const fetchedTags = await fetchWeatherTags(accessToken, memberId);
+        const fetchedTags = await fetchWeatherTags(accessToken);
         setWeatherTags(fetchedTags);
       } catch (error) {
         console.error('Error loading weather tags:', error);
@@ -29,10 +29,7 @@ const WeatherInfoSlider = ({accessToken, memberId}) => {
 
     const loadRainForecast = async () => {
       try {
-        const fetchedRainForecast = await fetchRainForecast(
-          accessToken,
-          memberId,
-        );
+        const fetchedRainForecast = await fetchRainForecast(accessToken);
         console.log('Fetched rain forecast:', fetchedRainForecast);
         setRainForecast(fetchedRainForecast);
       } catch (error) {
@@ -40,11 +37,11 @@ const WeatherInfoSlider = ({accessToken, memberId}) => {
       }
     };
 
-    if (accessToken && memberId) {
+    if (accessToken) {
       loadWeatherTags();
       loadRainForecast();
     }
-  }, [accessToken, memberId]);
+  }, [accessToken]);
 
   const handleScroll = event => {
     const contentOffsetX = event.nativeEvent.contentOffset.x;

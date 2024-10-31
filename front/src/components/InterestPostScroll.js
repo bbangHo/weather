@@ -37,7 +37,7 @@ const hobbies = [
   },
 ];
 
-const InterestPostScroll = ({accessToken, memberId, selectedHobby}) => {
+const InterestPostScroll = ({accessToken, selectedHobby}) => {
   const [posts, setPosts] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [currentHobby, setCurrentHobby] = useState(selectedHobby);
@@ -52,11 +52,7 @@ const InterestPostScroll = ({accessToken, memberId, selectedHobby}) => {
   const loadPosts = async () => {
     try {
       setLoading(true);
-      const fetchedPosts = await fetchPosts(
-        accessToken,
-        memberId,
-        currentHobby.postType,
-      );
+      const fetchedPosts = await fetchPosts(accessToken, currentHobby.postType);
       console.log(
         'Fetched interest posts:',
         JSON.stringify(fetchedPosts, null, 2),
@@ -75,7 +71,7 @@ const InterestPostScroll = ({accessToken, memberId, selectedHobby}) => {
 
   const handleLikePress = async postId => {
     try {
-      const response = await toggleLikePost(accessToken, memberId, postId);
+      const response = await toggleLikePost(accessToken, postId);
       if (response.isSuccess) {
         setPosts(prevPosts =>
           prevPosts.map(post =>
