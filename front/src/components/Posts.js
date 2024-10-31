@@ -5,9 +5,9 @@ import {
   View,
   StyleSheet,
   Image,
-  Dimensions,
-  TouchableOpacity,
   Alert,
+  TouchableOpacity,
+  Dimensions,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {Card} from 'react-native-elements';
@@ -21,36 +21,6 @@ const Posts = ({accessToken, memberId}) => {
   const navigation = useNavigation();
   const [newPosts, setNewPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  const handleLikePress = async postId => {
-    try {
-      const response = await toggleLikePost(accessToken, memberId, postId);
-      if (response.isSuccess) {
-        setNewPosts(prevPosts =>
-          prevPosts.map(post =>
-            post.postInfo.postId === postId
-              ? {
-                  ...post,
-                  postInfo: {
-                    ...post.postInfo,
-                    likeClickable: false,
-                    likeCount: post.postInfo.likeCount + 1,
-                  },
-                }
-              : post,
-          ),
-        );
-      } else {
-        Alert.alert('Error', '좋아요를 할 수 없습니다. 다시 시도해주세요.');
-      }
-    } catch (error) {
-      console.error('Failed to like post:', error.message);
-      Alert.alert(
-        'Error',
-        '서버에 문제가 발생했습니다. 나중에 다시 시도해주세요.',
-      );
-    }
-  };
 
   useEffect(() => {
     const loadPosts = async () => {
@@ -67,6 +37,42 @@ const Posts = ({accessToken, memberId}) => {
 
     loadPosts();
   }, [accessToken, memberId]);
+
+  const handleLikePress = async postId => {
+    try {
+      const response = await toggleLikePost(accessToken, memberId, postId);
+      console.log('Like/unlike response:', response);
+
+      if (response && response.isSuccess) {
+        setNewPosts(prevPosts =>
+          prevPosts.map(post => {
+            if (post.postInfo.postId === postId) {
+              const isCurrentlyLiked = post.postInfo.likeClickable;
+              return {
+                ...post,
+                postInfo: {
+                  ...post.postInfo,
+                  likeClickable: !isCurrentlyLiked,
+                  likeCount: isCurrentlyLiked
+                    ? Math.max(post.postInfo.likeCount - 1, 0)
+                    : post.postInfo.likeCount + 1,
+                },
+              };
+            }
+            return post;
+          }),
+        );
+      } else {
+        Alert.alert('Error', '좋아요를 처리할 수 없습니다. 다시 시도해주세요.');
+      }
+    } catch (error) {
+      console.error('Failed to like/unlike post:', error.message);
+      Alert.alert(
+        'Error',
+        '서버에 문제가 발생했습니다. 나중에 다시 시도해주세요.',
+      );
+    }
+  };
 
   const getUserIcon = sensitivity => {
     switch (sensitivity) {
@@ -87,34 +93,13 @@ const Posts = ({accessToken, memberId}) => {
         <View style={styles.header}>
           <View style={styles.profileInfo}>
             <Image
-              source={{uri: item.memberInfo.profileImageUrl}}
-              style={styles.profileImage}
-              onError={e => {
-                console.warn(
-                  `Image load failed for ${item.memberInfo.profileImageUrl}`,
-                );
-                setNewPosts(prevPosts =>
-                  prevPosts.map(post =>
-                    post.memberInfo.memberId === item.memberInfo.memberId
-                      ? {
-                          ...post,
-                          memberInfo: {
-                            ...post.memberInfo,
-                            profileImageUrl: null,
-                          },
-                        }
-                      : post,
-                  ),
-                );
-              }}
-            />
-            <Image
               source={
                 item.memberInfo.profileImageUrl
                   ? {uri: item.memberInfo.profileImageUrl}
                   : require('../../assets/images/profile.png')
               }
               style={styles.profileImage}
+              onError={() => {}}
             />
             <View style={styles.userInfo}>
               <View style={styles.userRow}>
@@ -129,16 +114,14 @@ const Posts = ({accessToken, memberId}) => {
               <Text style={styles.timeAgo}>{item.postInfo.createdAt}</Text>
             </View>
           </View>
-
           <TouchableOpacity
             style={styles.likeContainer}
-            onPress={() => handleLikePress(item.postInfo.postId)}
-            disabled={!item.postInfo.likeClickable}>
+            onPress={() => handleLikePress(item.postInfo.postId)}>
             <Image
               source={
                 item.postInfo.likeClickable
-                  ? require('../../assets/images/icon_heart0.png')
-                  : require('../../assets/images/icon_heart2.png')
+                  ? require('../../assets/images/icon_heart2.png')
+                  : require('../../assets/images/icon_heart0.png')
               }
               style={styles.likeIcon}
             />
@@ -189,6 +172,9 @@ const Posts = ({accessToken, memberId}) => {
 };
 
 const styles = StyleSheet.create({
+  contentContainer: {
+    alignItems: 'center',
+  },
   section: {
     justifyContent: 'center',
     alignItems: 'center',
@@ -219,7 +205,6 @@ const styles = StyleSheet.create({
     height: 35,
     borderRadius: 20,
     marginRight: 10,
-    marginLeft: -20,
   },
   userInfo: {
     flex: 1,

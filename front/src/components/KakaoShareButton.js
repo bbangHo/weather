@@ -52,8 +52,8 @@ const KakaoShareButton = ({accessToken, memberId}) => {
     try {
       const response = await KakaoShareLink.sendFeed({
         content: {
-          title: `${city} ${street}의 날씨를 공유해 드립니다!`,
-          description: `${weatherEmoji} ${currentSkyType} ${weatherEmoji}\n최고 ${maxTmp}°, 최저 ${minTmp}° 기온입니다.`,
+          title: `${city} ${street}은 ${weatherEmoji} ${currentSkyType} ${weatherEmoji}`,
+          description: `최고 ${maxTmp}°, 최저 ${minTmp}° 기온입니다.`,
           imageUrl: 'https:이미지 추가할 경우.png',
           link: {
             mobileWebUrl: 'https://링크 추가.com',
@@ -66,13 +66,6 @@ const KakaoShareButton = ({accessToken, memberId}) => {
             link: {
               mobileWebUrl: 'https://링크 추가.com',
               webUrl: 'https://링크 추가.com',
-            },
-          },
-          {
-            title: '동네 날씨 커뮤니티',
-            link: {
-              mobileWebUrl: 'https://링크 추가.com/community',
-              webUrl: 'https://링크 추가.com/community',
             },
           },
         ],
