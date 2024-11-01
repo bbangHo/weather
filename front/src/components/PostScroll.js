@@ -129,7 +129,14 @@ const PostScroll = ({accessToken}) => {
                   ? require('../../assets/images/icon_heart2.png')
                   : require('../../assets/images/icon_heart0.png')
               }
-              style={styles.likeIcon}
+              style={[
+                styles.likeIcon,
+                {
+                  tintColor: item.postInfo.likeClickable
+                    ? '#da4133'
+                    : '#3f51b5',
+                },
+              ]}
             />
             <Text style={styles.likeCount}>{item.postInfo.likeCount}</Text>
           </TouchableOpacity>

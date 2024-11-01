@@ -156,7 +156,14 @@ const InterestPostScroll = ({accessToken, selectedHobby}) => {
                   ? require('../../assets/images/icon_heart0.png')
                   : require('../../assets/images/icon_heart2.png')
               }
-              style={styles.likeIcon}
+              style={[
+                styles.likeIcon,
+                {
+                  tintColor: item.postInfo.likeClickable
+                    ? '#3f51b5'
+                    : '#da4133',
+                },
+              ]}
             />
             <Text style={styles.likeCount}>{item.postInfo.likeCount}</Text>
           </TouchableOpacity>
