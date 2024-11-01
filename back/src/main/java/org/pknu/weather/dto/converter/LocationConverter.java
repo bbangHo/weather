@@ -22,6 +22,7 @@ public class LocationConverter {
 
     public static LocationDTO toLocationDTO(Location location) {
         return LocationDTO.builder()
+                .id(location.getId())
                 .longitude(location.getLongitude())
                 .latitude(location.getLatitude())
                 .province(location.getProvince())
