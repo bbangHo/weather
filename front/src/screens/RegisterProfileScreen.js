@@ -296,6 +296,7 @@ const styles = StyleSheet.create({
   cameraIcon: {
     width: 30,
     height: 30,
+    tintColor: '#3f51b5',
   },
   label: {
     fontSize: 18,

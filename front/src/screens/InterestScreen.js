@@ -158,12 +158,14 @@ const styles = StyleSheet.create({
     height: 30,
     resizeMode: 'contain',
     tintColor: '#fff',
+    marginBottom: Platform.OS === 'ios' ? 4 : 10,
   },
   shareIcon: {
     width: 30,
     height: 30,
     resizeMode: 'contain',
     tintColor: '#c4c4c4',
+    marginBottom: Platform.OS === 'ios' ? 4 : 10,
   },
   scrollViewContent: {
     marginTop: Platform.OS === 'ios' ? 10 : 40,

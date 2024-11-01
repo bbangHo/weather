@@ -10,7 +10,7 @@ import PostCreationScreen from './src/screens/PostCreationScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import InterestScreen from './src/screens/InterestScreen';
 import InterestPostCreationScreen from './src/screens/InterestPostCreationScreen';
-import {StatusBar, Image, Button} from 'react-native';
+import {StatusBar, Image, Button, Platform} from 'react-native';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -77,17 +77,29 @@ const App = () => {
             <Tab.Navigator
               screenOptions={({route}) => ({
                 headerShown: false,
-                tabBarIcon: ({focused, color, size}) => {
+                tabBarIcon: ({focused, color}) => {
                   let iconSource;
+                  let size;
 
-                  if (route.name === 'HomeStack') {
-                    iconSource = require('./assets/images/icon_tab_home.png');
-                  } else if (route.name === 'Community') {
-                    iconSource = require('./assets/images/icon_tab_community.png');
-                  } else if (route.name === 'InterestStack') {
-                    iconSource = require('./assets/images/icon_interest_run.png');
-                  } else if (route.name === 'My') {
-                    iconSource = require('./assets/images/icon_tab_my.png');
+                  switch (route.name) {
+                    case 'HomeStack':
+                      iconSource = require('./assets/images/icon_tab_home.png');
+                      size = 28;
+                      break;
+                    case 'Community':
+                      iconSource = require('./assets/images/icon_tab_community.png');
+                      size = 22;
+                      break;
+                    case 'InterestStack':
+                      iconSource = require('./assets/images/icon_interest_run.png');
+                      size = 27;
+                      break;
+                    case 'My':
+                      iconSource = require('./assets/images/icon_tab_my.png');
+                      size = 28;
+                      break;
+                    default:
+                      size = 25;
                   }
 
                   return (
@@ -110,7 +122,7 @@ const App = () => {
                 },
                 tabBarLabelStyle: {
                   fontSize: Platform.OS === 'ios' ? 10 : 12,
-                  paddingBottom: Platform.OS === 'ios' ? 15 : 7,
+                  paddingBottom: Platform.OS === 'ios' ? 18 : 10,
                 },
               })}
               initialRouteName="HomeStack">

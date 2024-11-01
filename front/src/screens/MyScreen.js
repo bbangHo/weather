@@ -71,7 +71,7 @@ const MyScreen = ({accessToken, setIsNewMember, setLocationId}) => {
       </View>
       <Text style={styles.label}>닉네임</Text>
       <View style={styles.infoTextContainer}>
-        <Text style={styles.infoText}>{nickname}</Text>
+        <Text style={styles.infoTextNickname}>{nickname}</Text>
       </View>
 
       <Text style={styles.label}>대표 주소</Text>
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   profileContainer: {
-    marginTop: 50,
+    marginTop: Platform.OS === 'ios' ? 50 : 25,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#e0e0e0',
   },
   label: {
-    fontSize: 18,
+    fontSize: 17,
     marginTop: 30,
     marginBottom: 10,
     color: '#333',
@@ -162,8 +162,14 @@ const styles = StyleSheet.create({
     color: '#555',
     marginBottom: 10,
   },
+  infoTextNickname: {
+    fontSize: 15,
+    color: '#333',
+    marginBottom: 5,
+    marginLeft: 5,
+  },
   infoText: {
-    fontSize: 16,
+    fontSize: 15,
     color: '#333',
     marginBottom: 10,
   },

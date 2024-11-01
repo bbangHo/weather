@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
   },
   container: {
     alignItems: 'center',
-    paddingTop: 20,
+    paddingTop: Platform.OS === 'ios' ? 10 : 0,
     marginTop: 70,
   },
   locationText: {
