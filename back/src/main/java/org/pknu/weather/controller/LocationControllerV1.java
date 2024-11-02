@@ -31,9 +31,7 @@ public class LocationControllerV1 {
         double longitude = Double.parseDouble(String.valueOf(payload.get("longitude")));
         double latitude = Double.parseDouble(String.valueOf(payload.get("latitude")));
 
-        LocationDTO savedLocation= new LocationDTO();
-
-        locationService.saveLocation(savedLocation,email,longitude, latitude);
+        LocationDTO savedLocation = locationService.saveLocation(email,longitude, latitude);
 
         return ApiResponse.onSuccess(savedLocation);
     }
@@ -69,6 +67,13 @@ public class LocationControllerV1 {
         LocationDTO savedLocationDTO = locationService.saveLocation(locationDTO);
 
         return ApiResponse.onSuccess(savedLocationDTO);
+    }
+
+    @GetMapping("/defaultLocation")
+    public void setDefaultLocation() {
+
+        locationService.setDefaultLocation();
+
     }
 
     private void checkLocationInfo(LocationDTO locationDTO) {
