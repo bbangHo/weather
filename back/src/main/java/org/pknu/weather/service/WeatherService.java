@@ -17,6 +17,7 @@ import org.pknu.weather.repository.LocationRepository;
 import org.pknu.weather.repository.WeatherRepository;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -70,6 +71,25 @@ public class WeatherService {
         return weatherRepository.saveAll(weatherList);
     }
 
+    public List<Weather> getVillageShortTermForecast(Location location) {
+        float lon = location.getLongitude().floatValue();
+        float lat = location.getLatitude().floatValue();
+        return weatherFeignClient.preprocess(lon, lat);
+    }
+
+    @Async("threadPoolTaskExecutor")
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void saveWeatherSynchronization(Location loc, List<Weather> forecast) {
+        Location location = locationRepository.findById(loc.getId()).get();
+        float lon = location.getLongitude().floatValue();
+        float lat = location.getLatitude().floatValue();
+
+        List<Weather> weatherList = new ArrayList<>(forecast);
+
+        weatherList.forEach(w -> w.addLocation(location));
+        weatherRepository.saveAll(weatherList);
+    }
+
     /**
      * 단기 날씨 예보 API가 3시간 마다 갱신되기 때문에, 날씨 데이터 갱신을 위한 메서드
      *
@@ -77,7 +97,7 @@ public class WeatherService {
      * @return 해당 위치의 날씨 데이터 List
      */
     @Async("threadPoolTaskExecutor")
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void updateWeathers(Location loc) {
         Location location = locationRepository.safeFindById(loc.getId());
 
