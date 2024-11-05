@@ -75,18 +75,15 @@ export const refreshAccessToken = async () => {
   }
 };
 
-export const fetchWeatherData = async (memberId, accessToken) => {
+export const fetchWeatherData = async accessToken => {
   try {
-    const response = await fetch(
-      `${BASE_URL}/api/v1/main/weather?memberId=${memberId}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
+    const response = await fetch(`${BASE_URL}/api/v1/main/weather`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
       },
-    );
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -150,7 +147,6 @@ export const sendLocationToBackend = async (
     }
 
     const data = await response.json();
-    console.log('Backend response:', data);
 
     if (!data.isSuccess) {
       console.error('Backend error:', data.message);
@@ -164,8 +160,8 @@ export const sendLocationToBackend = async (
   }
 };
 
-export const createPost = async (postData, accessToken, memberId) => {
-  const url = `${BASE_URL}/api/v1/post?memberId=${memberId}`;
+export const createPost = async (postData, accessToken) => {
+  const url = `${BASE_URL}/api/v1/post`;
 
   try {
     const response = await fetch(url, {
@@ -191,9 +187,44 @@ export const createPost = async (postData, accessToken, memberId) => {
   }
 };
 
-export const fetchPosts = async (accessToken, memberId, lastPostId = null) => {
+export const createInterestPost = async (postData, accessToken) => {
+  const url = `${BASE_URL}/api/v1/post/hobby`;
+
   try {
-    let url = `${BASE_URL}/api/v1/community/posts?memberId=${memberId}&size=6`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(postData),
+    });
+
+    if (!response.ok) {
+      const errorResponse = await response.json();
+      console.error(
+        'Failed to create interest post:',
+        response.status,
+        errorResponse,
+      );
+      throw new Error('Failed to create interest post');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error creating interest post:', error);
+    throw error;
+  }
+};
+
+export const fetchPosts = async (
+  accessToken,
+  postType = 'WEATHER',
+  lastPostId = null,
+) => {
+  try {
+    let url = `${BASE_URL}/api/v1/community/posts?&size=6&postType=${postType}`;
 
     if (lastPostId !== null) {
       url += `&lastPostId=${lastPostId}`;
@@ -223,12 +254,11 @@ export const fetchPosts = async (accessToken, memberId, lastPostId = null) => {
 
 export const fetchPopularPosts = async (
   accessToken,
-  memberId,
   lastPostId = null,
   size = 10,
 ) => {
   try {
-    let url = `${BASE_URL}/api/v1/main/posts/popular?memberId=${memberId}&size=${size}`;
+    let url = `${BASE_URL}/api/v1/main/posts/popular?&size=${size}`;
 
     if (lastPostId) {
       url += `&lastPostId=${lastPostId}`;
@@ -260,9 +290,9 @@ export const fetchPopularPosts = async (
   }
 };
 
-export const toggleLikePost = async (accessToken, memberId, postId) => {
+export const toggleLikePost = async (accessToken, postId) => {
   try {
-    const url = `${BASE_URL}/api/v1/post/recommendation?memberId=${memberId}&postId=${postId}`;
+    const url = `${BASE_URL}/api/v1/post/recommendation?&postId=${postId}`;
 
     const response = await fetch(url, {
       method: 'POST',
@@ -286,9 +316,9 @@ export const toggleLikePost = async (accessToken, memberId, postId) => {
   }
 };
 
-export const fetchWeatherTags = async (accessToken, memberId) => {
+export const fetchWeatherTags = async accessToken => {
   try {
-    const url = `${BASE_URL}/api/v1/main/weather/simple/tags?memberId=${memberId}`;
+    const url = `${BASE_URL}/api/v1/main/weather/simple/tags?`;
 
     const response = await fetch(url, {
       method: 'GET',
@@ -312,6 +342,256 @@ export const fetchWeatherTags = async (accessToken, memberId) => {
     return data.result;
   } catch (error) {
     console.error('Error fetching weather tags:', error);
+    throw error;
+  }
+};
+
+export const fetchPostTags = async accessToken => {
+  const url = `${BASE_URL}/api/v1/tags`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorResponse = await response.text();
+      console.error('Failed to fetch tags:', response.status, errorResponse);
+      throw new Error('Failed to fetch tags');
+    }
+
+    const data = await response.json();
+    return data.result;
+  } catch (error) {
+    console.error('Error fetching tags:', error);
+    throw error;
+  }
+};
+
+export const fetchRainForecast = async accessToken => {
+  try {
+    const url = `${BASE_URL}/api/v1/main/weather/simple/rain?`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(
+        'Failed to fetch rain forecast:',
+        response.status,
+        errorText,
+      );
+      throw new Error('Failed to fetch rain forecast');
+    }
+
+    const data = await response.json();
+    if (!data.isSuccess) {
+      console.error('Backend error:', data.code, data.message);
+      throw new Error(data.message || 'Unknown error from backend');
+    }
+
+    return data.result;
+  } catch (error) {
+    console.error('Error fetching rain forecast:', error.message);
+    throw error;
+  }
+};
+
+export const fetchUserLocation = async accessToken => {
+  try {
+    const response = await fetch(`${BASE_URL}/api/v1/location/defaultLoc`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(
+        'Failed to fetch user location:',
+        response.status,
+        errorText,
+      );
+      throw new Error(`Failed to fetch user location: ${errorText}`);
+    }
+
+    const data = await response.json();
+    if (!data.isSuccess) {
+      console.error('Backend error:', data.message);
+      throw new Error(data.message || 'Unknown error from backend');
+    }
+
+    return data.result;
+  } catch (error) {
+    console.error('Error fetching user location:', error.message);
+    throw error;
+  }
+};
+
+export const fetchExtraWeatherInfo = async accessToken => {
+  try {
+    const response = await fetch(`${BASE_URL}/api/v1/main/extraWeatherInfo`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const result = await response.json();
+    if (result.isSuccess) {
+      return result.result;
+    } else {
+      throw new Error(result.message);
+    }
+  } catch (error) {
+    console.error('Error fetching extra weather info:', error);
+    throw error;
+  }
+};
+
+export const fetchMemberInfo = async accessToken => {
+  try {
+    const response = await fetch(`${BASE_URL}/api/v1/member/info`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const result = await response.json();
+    if (result.isSuccess) {
+      return result.result;
+    } else {
+      throw new Error(result.message);
+    }
+  } catch (error) {
+    console.error('Error fetching member info:', error);
+    throw error;
+  }
+};
+
+export const registerProfile = async (
+  nickname,
+  sensitivity,
+  profileImage,
+  accessToken,
+) => {
+  const formData = new FormData();
+
+  formData.append('nickname', nickname);
+  formData.append('sensitivity', sensitivity);
+
+  if (profileImage) {
+    formData.append('profileImg', {
+      uri: profileImage.uri,
+      type: profileImage.type || 'image/jpeg',
+      name: profileImage.name || 'profile.jpg',
+    });
+  }
+
+  formData._parts.forEach(part => {
+    console.log(`FormData key: ${part[0]}, value: ${JSON.stringify(part[1])}`);
+  });
+
+  console.log('Profile Image Details:', {
+    uri: profileImage.uri,
+    type: profileImage.type,
+    name: profileImage.name,
+  });
+
+  try {
+    const response = await fetch(`${BASE_URL}/api/v1/member/info`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: formData,
+    });
+
+    const responseData = await response.json();
+
+    if (!response.ok) {
+      console.error('Backend error:', responseData);
+      throw new Error(responseData.message || '프로필 저장 실패');
+    }
+
+    return responseData;
+  } catch (error) {
+    console.error('Error registering profile:', error);
+    throw error;
+  }
+};
+
+export const fetchLocationInfo = async (
+  accessToken,
+  province = '',
+  city = '',
+) => {
+  const url = `${BASE_URL}/api/v1/location/locationInfo?province=${province}&city=${city}`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorResponse = await response.json();
+      console.error(
+        'Failed to fetch location info:',
+        response.status,
+        errorResponse,
+      );
+      throw new Error('Failed to fetch location info');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching location info:', error);
+    throw error;
+  }
+};
+
+export const submitAddress = async (accessToken, province, city, street) => {
+  const url = `${BASE_URL}/api/v1/location/locationInfo`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({province, city, street}),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error('Failed to submit address:', data);
+      throw new Error('Failed to submit address');
+    }
+    return data;
+  } catch (error) {
+    console.error('Error submitting address:', error);
     throw error;
   }
 };

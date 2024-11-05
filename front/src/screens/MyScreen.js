@@ -1,64 +1,91 @@
-import React, {useState} from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Image,
-  Alert,
-} from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
+import React, {useState, useEffect} from 'react';
+import {View, Text, StyleSheet, Image} from 'react-native';
+import {fetchMemberInfo} from '../api/api';
+import profilePlaceholder from '../../assets/images/profile.png';
 
-const MyScreen = ({setIsNewMember}) => {
+const MyScreen = ({accessToken, setIsNewMember, setLocationId}) => {
   const [nickname, setNickname] = useState('');
+  const [email, setEmail] = useState('');
   const [selectedType, setSelectedType] = useState(null);
+  const [address, setAddress] = useState('');
+  const [profileImage, setProfileImage] = useState(profilePlaceholder);
+  const [loading, setLoading] = useState(true);
 
-  const handleTypeSelection = type => {
-    setSelectedType(type);
-  };
+  useEffect(() => {
+    const loadMemberInfo = async () => {
+      try {
+        const memberInfo = await fetchMemberInfo(accessToken);
+        console.log('Fetched member info:', memberInfo);
 
-  const handleSaveProfile = () => {
-    if (!nickname) {
-      Alert.alert('닉네임 필요', '닉네임을 입력해주세요.');
-      return;
+        if (
+          memberInfo.profileImage &&
+          memberInfo.profileImage.startsWith('http')
+        ) {
+          setProfileImage({uri: memberInfo.profileImage});
+        } else {
+          setProfileImage(profilePlaceholder);
+        }
+
+        setNickname(memberInfo.nickname || '');
+        setEmail(memberInfo.email || '');
+
+        switch (memberInfo.sensitivity) {
+          case 'HOT':
+            setSelectedType('hot');
+            break;
+          case 'NONE':
+            setSelectedType('normal');
+            break;
+          case 'COLD':
+            setSelectedType('cold');
+            break;
+          default:
+            setSelectedType(null);
+            break;
+        }
+
+        setAddress(
+          `${memberInfo.province} ${memberInfo.city} ${memberInfo.street}`,
+        );
+        setLocationId(memberInfo.locationId);
+        setLoading(false);
+      } catch (error) {
+        console.error('회원 정보 불러오는 중 오류 발생:', error);
+        setLoading(false);
+      }
+    };
+
+    if (accessToken) {
+      loadMemberInfo();
     }
+  }, [accessToken]);
 
-    if (!selectedType) {
-      Alert.alert('유형 선택 필요', '유형을 선택해주세요.');
-      return;
-    }
-
-    Alert.alert('저장 완료', '프로필이 저장되었습니다.');
-    setIsNewMember(false);
-  };
+  if (loading) {
+    return <Text>회원 정보를 불러오는 중...</Text>;
+  }
 
   return (
     <View style={styles.container}>
       <View style={styles.profileContainer}>
-        <Image
-          source={{uri: 'https://via.placeholder.com/100'}}
-          style={styles.profileImage}
-        />
-        <TouchableOpacity style={styles.editIconContainer}>
-          <Icon name="add-circle-outline" size={30} color="#2f5af4" />
-        </TouchableOpacity>
+        <Image source={profileImage} style={styles.profileImage} />
       </View>
       <Text style={styles.label}>닉네임</Text>
-      <TextInput
-        style={styles.input}
-        value={nickname}
-        placeholder="닉네임을 입력하세요"
-        onChangeText={setNickname}
-        editable={true}
-      />
+      <View style={styles.infoTextContainer}>
+        <Text style={styles.infoTextNickname}>{nickname}</Text>
+      </View>
+
+      <Text style={styles.label}>대표 주소</Text>
+      <Text style={styles.addressText}>{address}</Text>
+
+      <Text style={styles.label}>이메일</Text>
+      <Text style={styles.infoText}>{email}</Text>
+
       <Text style={styles.label}>유형</Text>
-      <TouchableOpacity
+      <View
         style={[
           styles.typeButton,
           selectedType === 'hot' && styles.selectedButton,
-        ]}
-        onPress={() => handleTypeSelection('hot')}>
+        ]}>
         <Text
           style={[
             styles.typeButtonText,
@@ -66,13 +93,12 @@ const MyScreen = ({setIsNewMember}) => {
           ]}>
           더위를 많이 타는 편
         </Text>
-      </TouchableOpacity>
-      <TouchableOpacity
+      </View>
+      <View
         style={[
           styles.typeButton,
           selectedType === 'normal' && styles.selectedButton,
-        ]}
-        onPress={() => handleTypeSelection('normal')}>
+        ]}>
         <Text
           style={[
             styles.typeButtonText,
@@ -80,13 +106,12 @@ const MyScreen = ({setIsNewMember}) => {
           ]}>
           평범한 편
         </Text>
-      </TouchableOpacity>
-      <TouchableOpacity
+      </View>
+      <View
         style={[
           styles.typeButton,
           selectedType === 'cold' && styles.selectedButton,
-        ]}
-        onPress={() => handleTypeSelection('cold')}>
+        ]}>
         <Text
           style={[
             styles.typeButtonText,
@@ -94,10 +119,7 @@ const MyScreen = ({setIsNewMember}) => {
           ]}>
           추위를 많이 타는 편
         </Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.submitButton} onPress={handleSaveProfile}>
-        <Text style={styles.submitButtonText}>저장하기</Text>
-      </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -110,7 +132,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   profileContainer: {
-    marginTop: 50,
+    marginTop: Platform.OS === 'ios' ? 50 : 25,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
@@ -121,36 +143,46 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     backgroundColor: '#e0e0e0',
   },
-  editIconContainer: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-  },
   label: {
-    fontSize: 18,
+    fontSize: 17,
     marginTop: 30,
-    marginBottom: 20,
+    marginBottom: 10,
     color: '#333',
     fontWeight: 'bold',
   },
-  input: {
+  infoTextContainer: {
     width: '100%',
-    height: 40,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
+    paddingBottom: 8,
+    marginBottom: 10,
+  },
+  addressText: {
     fontSize: 16,
+    color: '#555',
+    marginBottom: 10,
+  },
+  infoTextNickname: {
+    fontSize: 15,
     color: '#333',
-    marginBottom: 30,
+    marginBottom: 5,
+    marginLeft: 5,
+  },
+  infoText: {
+    fontSize: 15,
+    color: '#333',
+    marginBottom: 10,
   },
   typeButton: {
     width: '100%',
-    padding: 15,
+    padding: 14,
     borderWidth: 1,
     borderColor: '#2f5af4',
     borderRadius: 5,
     alignItems: 'center',
     marginVertical: 5,
     backgroundColor: '#fff',
+    paddingBottom: Platform.OS === 'ios' ? 13 : 16,
   },
   typeButtonText: {
     color: '#2f5af4',
@@ -161,18 +193,6 @@ const styles = StyleSheet.create({
   },
   selectedButtonText: {
     color: '#fff',
-  },
-  submitButton: {
-    width: '100%',
-    padding: 15,
-    backgroundColor: '#2f5af4',
-    borderRadius: 5,
-    alignItems: 'center',
-    marginTop: 50,
-  },
-  submitButtonText: {
-    color: '#fff',
-    fontSize: 16,
   },
 });
 

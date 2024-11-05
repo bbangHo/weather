@@ -1,15 +1,14 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, Dimensions} from 'react-native';
 import {fetchWeatherData} from '../api/api';
 
 const TemperatureInfo = ({accessToken}) => {
   const [currentTmp, setCurrentTmp] = useState(null);
-  const memberId = 1;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const weatherData = await fetchWeatherData(memberId, accessToken);
+        const weatherData = await fetchWeatherData(accessToken);
         if (weatherData.isSuccess) {
           setCurrentTmp(weatherData.result.currentTmp);
 
@@ -18,7 +17,6 @@ const TemperatureInfo = ({accessToken}) => {
             weatherData.result.weatherPerHourList.length > 0
           ) {
             console.log(
-              // 테스트입니다.
               'First item in weatherPerHourList:',
               weatherData.result.weatherPerHourList[0],
             );
@@ -38,12 +36,28 @@ const TemperatureInfo = ({accessToken}) => {
     }
   }, [accessToken]);
 
+  const windowWidth = Dimensions.get('window').width;
+  const marginLeftValue = windowWidth * 0.07;
+  const marginBottomValue = windowWidth * 0.03;
+
   return (
     <View style={styles.container}>
       {currentTmp !== null ? (
-        <Text style={styles.temperature}>{currentTmp}°C</Text>
+        <Text
+          style={[
+            styles.temperature,
+            {marginLeft: marginLeftValue, marginBottom: marginBottomValue},
+          ]}>
+          {currentTmp}°C
+        </Text>
       ) : (
-        <Text style={styles.temperature}>Loading...</Text>
+        <Text
+          style={[
+            styles.temperature,
+            {marginLeft: marginLeftValue, marginBottom: marginBottomValue},
+          ]}>
+          Loading...
+        </Text>
       )}
     </View>
   );
@@ -57,7 +71,7 @@ const styles = StyleSheet.create({
   temperature: {
     fontSize: 22,
     color: '#fff',
-    marginLeft: 27,
+    marginTop: 15,
   },
 });
 

@@ -61,6 +61,8 @@ jobs:
           spring.sigs.secret: ${{ secrets.CONSUMER_SECRET }}
           cloud.aws.credentials.access-key: ${{secrets.S3_ACCESS_KEY}}
           cloud.aws.credentials.secret-key: ${{secrets.S3_SECRET_KEY}}
+          spring.weather.key: ${{ secrets.METEOROLOGICAL_ADMIN_KEY }}
+
 
       # Gradle 실행 권한 부여
       - name: Grant execute permission for gradlew
@@ -105,6 +107,8 @@ jobs:
           spring.sigs.secret: ${{ secrets.CONSUMER_SECRET }}
           cloud.aws.credentials.access-key: ${{secrets.S3_ACCESS_KEY}}
           cloud.aws.credentials.secret-key: ${{secrets.S3_SECRET_KEY}}
+          spring.weather.key: ${{ secrets.METEOROLOGICAL_ADMIN_KEY }}
+
 
       # Gradle을 사용하여 빌드 실행 (테스트 코드 수행 생략)
       - name: Build with Gradle Wrapper

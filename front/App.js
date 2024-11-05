@@ -5,27 +5,52 @@ import {createStackNavigator} from '@react-navigation/stack';
 import HomeScreen from './src/screens/HomeScreen';
 import CommunityScreen from './src/screens/CommunityScreen';
 import MyScreen from './src/screens/MyScreen';
+import RegisterProfileScreen from './src/screens/RegisterProfileScreen';
 import PostCreationScreen from './src/screens/PostCreationScreen';
 import LoginScreen from './src/screens/LoginScreen';
-import Icon from 'react-native-vector-icons/Ionicons';
-import {StatusBar, Button} from 'react-native';
+import InterestScreen from './src/screens/InterestScreen';
+import InterestPostCreationScreen from './src/screens/InterestPostCreationScreen';
+import {StatusBar, Image, Button, Platform} from 'react-native';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-const HomeStack = ({accessToken, memberId}) => (
+const HomeStack = ({accessToken}) => (
   <Stack.Navigator screenOptions={{headerShown: false}}>
     <Stack.Screen name="Home">
-      {props => (
-        <HomeScreen {...props} accessToken={accessToken} memberId={memberId} />
-      )}
+      {props => <HomeScreen {...props} accessToken={accessToken} />}
     </Stack.Screen>
     <Stack.Screen name="PostCreationScreen">
+      {props => <PostCreationScreen {...props} accessToken={accessToken} />}
+    </Stack.Screen>
+  </Stack.Navigator>
+);
+
+const InterestStack = ({accessToken, locationId}) => (
+  <Stack.Navigator screenOptions={{headerShown: false}}>
+    <Stack.Screen name="InterestScreen">
+      {props => <InterestScreen {...props} accessToken={accessToken} />}
+    </Stack.Screen>
+    <Stack.Screen name="InterestPostCreationScreen">
       {props => (
-        <PostCreationScreen
+        <InterestPostCreationScreen
           {...props}
           accessToken={accessToken}
-          memberId={memberId}
+          locationId={locationId}
+        />
+      )}
+    </Stack.Screen>
+  </Stack.Navigator>
+);
+
+const RegisterProfileStack = ({accessToken, setIsNewMember}) => (
+  <Stack.Navigator screenOptions={{headerShown: false}}>
+    <Stack.Screen name="RegisterProfileScreen">
+      {props => (
+        <RegisterProfileScreen
+          {...props}
+          accessToken={accessToken}
+          setIsNewMember={setIsNewMember}
         />
       )}
     </Stack.Screen>
@@ -36,7 +61,7 @@ const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [accessToken, setAccessToken] = useState(null);
   const [isNewMember, setIsNewMember] = useState(false);
-  const [memberId] = useState(1); // 임의의 memberId 설정
+  const [locationId, setLocationId] = useState(null);
 
   return (
     <>
@@ -44,49 +69,106 @@ const App = () => {
       <NavigationContainer>
         {isLoggedIn ? (
           isNewMember ? (
-            <MyScreen setIsNewMember={setIsNewMember} />
+            <RegisterProfileStack
+              accessToken={accessToken}
+              setIsNewMember={setIsNewMember}
+            />
           ) : (
-            <Tab.Navigator screenOptions={{headerShown: false}}>
+            <Tab.Navigator
+              screenOptions={({route}) => ({
+                headerShown: false,
+                tabBarIcon: ({focused, color}) => {
+                  let iconSource;
+                  let size;
+
+                  switch (route.name) {
+                    case 'HomeStack':
+                      iconSource = require('./assets/images/icon_tab_home.png');
+                      size = 28;
+                      break;
+                    case 'Community':
+                      iconSource = require('./assets/images/icon_tab_community.png');
+                      size = 22;
+                      break;
+                    case 'InterestStack':
+                      iconSource = require('./assets/images/icon_interest_run.png');
+                      size = 27;
+                      break;
+                    case 'My':
+                      iconSource = require('./assets/images/icon_tab_my.png');
+                      size = 28;
+                      break;
+                    default:
+                      size = 25;
+                  }
+
+                  return (
+                    <Image
+                      source={iconSource}
+                      style={{
+                        width: size,
+                        height: size,
+                        tintColor: focused ? '#3f51b5' : color,
+                      }}
+                    />
+                  );
+                },
+                tabBarActiveTintColor: '#3f51b5',
+                tabBarInactiveTintColor: 'gray',
+                tabBarStyle: {
+                  paddingTop: 5,
+                  paddingBottom: 10,
+                  height: 80,
+                },
+                tabBarLabelStyle: {
+                  fontSize: Platform.OS === 'ios' ? 10 : 12,
+                  paddingBottom: Platform.OS === 'ios' ? 18 : 10,
+                },
+              })}
+              initialRouteName="HomeStack">
               <Tab.Screen
                 name="Community"
                 options={{
-                  tabBarIcon: ({color, size}) => (
-                    <Icon name="people" color={color} size={size} />
-                  ),
+                  tabBarLabel: 'Community',
                 }}>
                 {props => (
-                  <CommunityScreen
+                  <CommunityScreen {...props} accessToken={accessToken} />
+                )}
+              </Tab.Screen>
+              <Tab.Screen
+                name="InterestStack"
+                options={{
+                  tabBarLabel: 'Interest',
+                }}>
+                {props => (
+                  <InterestStack
                     {...props}
                     accessToken={accessToken}
-                    memberId={memberId}
+                    locationId={locationId}
                   />
                 )}
               </Tab.Screen>
               <Tab.Screen
                 name="HomeStack"
                 options={{
-                  tabBarIcon: ({color, size}) => (
-                    <Icon name="home" color={color} size={size} />
-                  ),
                   tabBarLabel: 'Home',
                 }}>
-                {props => (
-                  <HomeStack
-                    {...props}
-                    accessToken={accessToken}
-                    memberId={memberId}
-                  />
-                )}
+                {props => <HomeStack {...props} accessToken={accessToken} />}
               </Tab.Screen>
               <Tab.Screen
                 name="My"
-                component={MyScreen}
                 options={{
-                  tabBarIcon: ({color, size}) => (
-                    <Icon name="person" color={color} size={size} />
-                  ),
-                }}
-              />
+                  tabBarLabel: 'My',
+                }}>
+                {props => (
+                  <MyScreen
+                    {...props}
+                    accessToken={accessToken}
+                    setIsNewMember={setIsNewMember}
+                    setLocationId={setLocationId}
+                  />
+                )}
+              </Tab.Screen>
             </Tab.Navigator>
           )
         ) : (

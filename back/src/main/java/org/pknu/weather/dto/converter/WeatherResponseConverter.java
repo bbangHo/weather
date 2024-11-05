@@ -33,7 +33,8 @@ public class WeatherResponseConverter {
         Weather now = weatherList.get(0);
 
         return WeatherResponse.MainPageWeatherData.builder()
-                .location(location.getAddress())
+                .city(location.getCity())
+                .street(location.getStreet())
                 .currentSkyType(now.getSkyType())
                 .currentTmp(now.getTemperature())
                 .weatherPerHourList(weatherPerHourList)
@@ -76,7 +77,8 @@ public class WeatherResponseConverter {
     public static WeatherResponse.SimpleRainInformation toSimpleRainInformation(WeatherQueryResult.SimpleRainInfo simpleRainInfo) {
         if(simpleRainInfo == null) {
             return WeatherResponse.SimpleRainInformation.builder()
-                    .comment("오늘은 비소식이 없어요")
+                    .rainComment("오늘은 비소식이 없어요")
+                    .addComment("")
                     .willRain(false)
                     .rainfallAmount("0.0mm")
                     .build();
@@ -91,10 +93,11 @@ public class WeatherResponseConverter {
             comment += hours + "시간 뒤에 ";
         }
 
-        comment += "비 소식이 있어요. 외출할 때 우산 꼭 챙기세요!";
+        comment += "비 소식이 있어요.";
 
         return WeatherResponse.SimpleRainInformation.builder()
-                .comment(comment)
+                .rainComment(comment)
+                .addComment("외출할 때 우산 꼭 챙기세요!")
                 .willRain(true)
                 .rainfallAmount(simpleRainInfo.getRain() + "mm")
                 .build();

@@ -1,5 +1,10 @@
 package org.pknu.weather.repository;
 
+import static org.pknu.weather.domain.QLocation.location;
+import static org.pknu.weather.domain.QMember.member;
+import static org.pknu.weather.domain.QPost.post;
+import static org.pknu.weather.domain.QRecommendation.recommendation;
+
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -7,18 +12,13 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.StringPath;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.pknu.weather.common.utils.QueryUtils;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Post;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.pknu.weather.domain.QLocation.location;
-import static org.pknu.weather.domain.QMember.member;
-import static org.pknu.weather.domain.QPost.post;
-import static org.pknu.weather.domain.QRecommendation.recommendation;
+import org.pknu.weather.domain.common.PostType;
 
 
 @RequiredArgsConstructor
@@ -26,22 +26,22 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     /**
-     * post 무한 스크롤,  이내의 거리에 있는 사용자가 작성한 post만 보여줌
-     * 정렬은 최신순
+     * post 무한 스크롤,  이내의 거리에 있는 사용자가 작성한 post만 보여줌 정렬은 최신순
      *
-     * @param lastPostId 마지막 post id
-     * @param size       가져올 post의 개수
-     * @param locationEntity        Location entity
-     * @param distance   거리 (m단위)
+     * @param lastPostId     마지막 post id
+     * @param size           가져올 post의 개수
+     * @param locationEntity Location entity
+     * @param postType
      * @return size + 1 개의 Post
      */
-    public List<Post> findAllWithinDistance(Long lastPostId, Long size, Location locationEntity) {
+    public List<Post> findAllWithinDistance(Long lastPostId, Long size, Location locationEntity, PostType postType) {
         return jpaQueryFactory.selectFrom(post)
                 .join(post.location, location).fetchJoin()
                 .join(post.member, member).fetchJoin()
                 .where(
                         goeLastPostId(lastPostId),
-                        QueryUtils.isContains(locationEntity)
+                        QueryUtils.isContains(locationEntity),
+                        post.postType.eq(postType)
                 )
                 .orderBy(
                         post.id.desc()

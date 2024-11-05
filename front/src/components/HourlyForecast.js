@@ -1,16 +1,23 @@
 import React, {useEffect, useState} from 'react';
-import {ScrollView, Text, View, StyleSheet, Image} from 'react-native';
+import {
+  ScrollView,
+  Text,
+  View,
+  StyleSheet,
+  Image,
+  Platform,
+} from 'react-native';
 import {Card} from 'react-native-elements';
 import globalStyles from '../globalStyles';
 import {fetchWeatherData} from '../api/api';
 
-const HourlyForecast = ({accessToken, memberId, showText}) => {
+const HourlyForecast = ({accessToken, showText}) => {
   const [hourlyData, setHourlyData] = useState([]);
 
   useEffect(() => {
     const getWeatherData = async () => {
       try {
-        const weatherData = await fetchWeatherData(memberId, accessToken);
+        const weatherData = await fetchWeatherData(accessToken);
 
         console.log('Backend response:', JSON.stringify(weatherData, null, 2));
 
@@ -91,12 +98,16 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     marginVertical: 5,
-    paddingHorizontal: 5,
+    paddingHorizontal: Platform.select({
+      ios: 8,
+      android: 9,
+    }),
   },
   card: {
     borderRadius: 10,
     borderColor: 'rgba(255, 255, 255, 0)',
-    padding: 10,
+    padding: Platform.OS === 'ios' ? 9.5 : 12,
+    paddingVertical: 20,
     marginHorizontal: 5,
     alignItems: 'center',
   },
@@ -111,9 +122,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   icon: {
-    width: 30,
-    height: 30,
-    marginBottom: 5,
+    width: 40,
+    height: 40,
+    marginBottom: 0,
   },
   rainAdverb: {
     color: 'skyblue',

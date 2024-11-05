@@ -21,19 +21,23 @@ const ToggleViewButton = ({showText, setShowText}) => {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginVertical: 5,
+    justifyContent: 'center',
+    paddingHorizontal: 10,
   },
   card: {
     borderRadius: 10,
     borderColor: 'rgba(255, 255, 255, 0)',
     padding: 0,
+    paddingHorizontal: 10,
+    minWidth: 80,
   },
   button: {
     backgroundColor: 'transparent',
+    paddingHorizontal: 10,
+    minWidth: 120,
   },
   buttonTitle: {
-    fontSize: 13,
+    fontSize: 14,
   },
 });
 

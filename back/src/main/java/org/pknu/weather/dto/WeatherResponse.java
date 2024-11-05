@@ -16,7 +16,8 @@ public class WeatherResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class MainPageWeatherData {
-        String location;
+        String city;    // 시군구
+        String street;  // 읍면동
         SkyType currentSkyType;
         Integer currentTmp;
         List<WeatherPerHour> weatherPerHourList;
@@ -70,8 +71,21 @@ public class WeatherResponse {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class SimpleRainInformation{
-        String comment;
+    public static class ExtraWeatherInfo {
+        LocalDateTime baseTime;
+        Integer o3Grade;
+        Integer pm10Grade;
+        Integer pm25Grade;
+        Integer uvGrade;
+    }
+      
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SimpleRainInformation {
+        String rainComment;
+        String addComment;
         Boolean willRain;
         String rainfallAmount;
     }

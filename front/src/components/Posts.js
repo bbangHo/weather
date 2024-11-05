@@ -5,60 +5,29 @@ import {
   View,
   StyleSheet,
   Image,
-  Dimensions,
-  TouchableOpacity,
   Alert,
+  TouchableOpacity,
+  Dimensions,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {Card} from 'react-native-elements';
 import globalStyles from '../globalStyles';
 import {fetchPopularPosts, toggleLikePost} from '../api/api';
 
-const Posts = ({accessToken, memberId}) => {
+const {width: windowWidth} = Dimensions.get('window');
+
+const Posts = ({accessToken}) => {
   const screenWidth = Dimensions.get('window').width;
   const navigation = useNavigation();
   const [newPosts, setNewPosts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const handleLikePress = async postId => {
-    console.log('Like button pressed for postId:', postId);
-    try {
-      const response = await toggleLikePost(accessToken, memberId, postId);
-      console.log('Like post response:', response);
-
-      if (response.isSuccess) {
-        setNewPosts(prevPosts =>
-          prevPosts.map(post =>
-            post.postInfo.postId === postId
-              ? {
-                  ...post,
-                  postInfo: {
-                    ...post.postInfo,
-                    likeClickable: false,
-                    likeCount: post.postInfo.likeCount + 1,
-                  },
-                }
-              : post,
-          ),
-        );
-      } else {
-        Alert.alert('Error', '좋아요를 할 수 없습니다. 다시 시도해주세요.');
-      }
-    } catch (error) {
-      console.error('Failed to like post:', error.message);
-      Alert.alert(
-        'Error',
-        '서버에 문제가 발생했습니다. 나중에 다시 시도해주세요.',
-      );
-    }
-  };
-
   useEffect(() => {
     const loadPosts = async () => {
       try {
-        const posts = await fetchPopularPosts(accessToken, memberId);
-        console.log('Fetched posts:', posts);
+        const posts = await fetchPopularPosts(accessToken);
         setNewPosts(posts);
+        console.log('Fetched popular posts:', posts);
       } catch (error) {
         console.error('Error fetching popular posts:', error.message);
       } finally {
@@ -67,7 +36,56 @@ const Posts = ({accessToken, memberId}) => {
     };
 
     loadPosts();
-  }, [accessToken, memberId]);
+  }, [accessToken]);
+
+  const handleLikePress = async postId => {
+    try {
+      const response = await toggleLikePost(accessToken, postId);
+      console.log('Like/unlike response:', response);
+
+      if (response && response.isSuccess) {
+        setNewPosts(prevPosts =>
+          prevPosts.map(post => {
+            if (post.postInfo.postId === postId) {
+              const isCurrentlyLiked = post.postInfo.likeClickable;
+              return {
+                ...post,
+                postInfo: {
+                  ...post.postInfo,
+                  likeClickable: !isCurrentlyLiked,
+                  likeCount: isCurrentlyLiked
+                    ? Math.max(post.postInfo.likeCount - 1, 0)
+                    : post.postInfo.likeCount + 1,
+                },
+              };
+            }
+            return post;
+          }),
+        );
+      } else {
+        Alert.alert('Error', '좋아요를 처리할 수 없습니다. 다시 시도해주세요.');
+      }
+    } catch (error) {
+      console.error('Failed to like/unlike post:', error.message);
+      Alert.alert(
+        'Error',
+        '서버에 문제가 발생했습니다. 나중에 다시 시도해주세요.',
+      );
+    }
+  };
+
+  const getUserIcon = sensitivity => {
+    switch (sensitivity) {
+      case 'HOT':
+        return require('../../assets/images/icon_clear.png');
+      case 'NONE':
+        return require('../../assets/images/icon_partlycloudy.png');
+      case 'COLD':
+        return require('../../assets/images/icon_snow2.png');
+      default:
+        return null;
+    }
+  };
 
   const renderPost = ({item}) => (
     <View style={[styles.section, {width: screenWidth}]}>
@@ -81,6 +99,7 @@ const Posts = ({accessToken, memberId}) => {
                   : require('../../assets/images/profile.png')
               }
               style={styles.profileImage}
+              onError={() => {}}
             />
             <View style={styles.userInfo}>
               <View style={styles.userRow}>
@@ -88,31 +107,30 @@ const Posts = ({accessToken, memberId}) => {
                   {item.memberInfo.memberName}
                 </Text>
                 <Image
-                  source={require('../../assets/images/icon_clear.png')}
+                  source={getUserIcon(item.memberInfo.sensitivity)}
                   style={styles.userIcon}
                 />
               </View>
               <Text style={styles.timeAgo}>{item.postInfo.createdAt}</Text>
             </View>
           </View>
-
           <TouchableOpacity
             style={styles.likeContainer}
-            onPress={() => {
-              console.log(
-                'TouchableOpacity pressed, postId:',
-                item.postInfo.postId,
-              );
-              handleLikePress(item.postInfo.postId);
-            }}
-            disabled={!item.postInfo.likeClickable}>
+            onPress={() => handleLikePress(item.postInfo.postId)}>
             <Image
               source={
                 item.postInfo.likeClickable
-                  ? require('../../assets/images/icon_nonheart.png')
-                  : require('../../assets/images/icon_heart2.png')
+                  ? require('../../assets/images/icon_heart2.png')
+                  : require('../../assets/images/icon_heart0.png')
               }
-              style={styles.likeIcon}
+              style={[
+                styles.likeIcon,
+                {
+                  tintColor: item.postInfo.likeClickable
+                    ? '#da4133'
+                    : '#3f51b5',
+                },
+              ]}
             />
             <Text style={styles.likeCount}>{item.postInfo.likeCount}</Text>
           </TouchableOpacity>
@@ -161,6 +179,9 @@ const Posts = ({accessToken, memberId}) => {
 };
 
 const styles = StyleSheet.create({
+  contentContainer: {
+    alignItems: 'center',
+  },
   section: {
     justifyContent: 'center',
     alignItems: 'center',
@@ -170,10 +191,11 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0)',
     padding: 15,
     marginHorizontal: 5,
-    width: 350,
-    height: 130,
+    width: windowWidth * 0.93,
+    height: 150,
     justifyContent: 'space-between',
     position: 'relative',
+    marginBottom: 12,
   },
   header: {
     flexDirection: 'row',
@@ -183,6 +205,7 @@ const styles = StyleSheet.create({
   profileInfo: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'flex-start',
   },
   profileImage: {
     width: 35,
@@ -233,7 +256,8 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     textAlign: 'center',
-    marginBottom: 5,
+    marginBottom: 7,
+    marginTop: 5,
   },
   buttonContainer: {
     flexDirection: 'row',

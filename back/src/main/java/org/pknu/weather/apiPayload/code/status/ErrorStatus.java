@@ -13,9 +13,9 @@ public enum ErrorStatus implements BaseErrorCode {
     // 가장 일반적인 응답
     _INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON_500", "서버 에러, 관리자에게 문의 바랍니다."),
 
-    _BAD_REQUEST(HttpStatus.BAD_REQUEST,"COMMON_400_1","잘못된 요청입니다."),
+    _BAD_REQUEST(HttpStatus.BAD_REQUEST, "COMMON_400_1", "잘못된 요청입니다."),
     _MUST_BE_POSITIVE(HttpStatus.BAD_REQUEST, "COMMON_400_2", "Id는 1이상이어야 합니다."),
-    _UNAUTHORIZED(HttpStatus.UNAUTHORIZED,"COMMON_401","인증이 필요합니다."),
+    _UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "COMMON_401", "인증이 필요합니다."),
     _FORBIDDEN(HttpStatus.FORBIDDEN, "COMMON_403", "금지된 요청입니다."),
 
     // tag
@@ -38,6 +38,9 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // location
     _LOCATION_NOT_FOUND(HttpStatus.NOT_FOUND, "LOCATION_404_1", "존재하지 않는 지역입니다. 범위에 해당하는 위도와 경도 값을 입력하세요 "),
+    _PROVINCE_NOT_FOUND(HttpStatus.BAD_REQUEST, "LOCATION_400_2", "도(광역시)의 정보가 필요합니다."),
+    _MALFORMED_ADDRESS_INFORMATION(HttpStatus.BAD_REQUEST,"LOCATION_400_3", "주소의 일부 정보가 누락되었습니다."),
+
 
     // member
     _MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER_404_1", "사용자를 찾을 수 없습니다."),
@@ -46,13 +49,18 @@ public enum ErrorStatus implements BaseErrorCode {
 
 
     //sigs
-    _SGIS_BAD_AUTHENTICATION_PARAMETER(HttpStatus.UNAUTHORIZED,"SGIS_401_1", "sigs토큰을 얻기 위한 인증 정보가 잘못 설정되어 있습니다. 서버 관리자에게 문의 바랍니다."),
-    _SGIS_NOT_FOUND_RESULT(HttpStatus.BAD_REQUEST,"SGIS_400_2", "sigs토큰을 검색 결과가 없습니다. 서버 관리자에게 문의 바랍니다."),
+    _SGIS_BAD_AUTHENTICATION_PARAMETER(HttpStatus.UNAUTHORIZED, "SGIS_401_1",
+            "sigs토큰을 얻기 위한 인증 정보가 잘못 설정되어 있습니다. 서버 관리자에게 문의 바랍니다."),
+    _SGIS_NOT_FOUND_RESULT(HttpStatus.BAD_REQUEST, "SGIS_400_2", "sigs토큰을 검색 결과가 없습니다. 서버 관리자에게 문의 바랍니다."),
 
     // post
     _POST_NOT_FOUND(HttpStatus.NOT_FOUND, "POST_404_1", "게시글이 존재하지 않습니다."),
-    _RECOMMENDATION_BAD_REQUEST(HttpStatus.BAD_REQUEST, "RECOMMENDATION_400_1", "이미 좋아요를 눌렀습니다.")
-    ;
+    _RECOMMENDATION_BAD_REQUEST(HttpStatus.BAD_REQUEST, "RECOMMENDATION_400_1", "이미 좋아요를 눌렀습니다."),
+
+    _POST_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "POST_404_2", "올바르지 않은 게시글 Type 입니다."),
+
+    //feignClient
+    _API_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "API_500_1", "외부 API 서버에 문제가 발생했습니다.");
 
 
     private final HttpStatus httpStatus;

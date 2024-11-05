@@ -2,6 +2,8 @@ package org.pknu.weather.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
+import org.pknu.weather.domain.common.PostType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,4 +37,9 @@ public class Post extends BaseEntity {
     @Builder.Default
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
     private List<Recommendation> recommendationList = new ArrayList<>();
+
+    @Enumerated(EnumType.STRING)
+    @ColumnDefault("'WEATHER'")
+    @Builder.Default
+    private PostType postType = PostType.WEATHER;
 }

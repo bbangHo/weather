@@ -1,27 +1,46 @@
 import React, {useState, useEffect} from 'react';
-import {ScrollView, View, Text, StyleSheet, Dimensions} from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
+import {
+  ScrollView,
+  View,
+  Text,
+  StyleSheet,
+  Dimensions,
+  Image,
+  Platform,
+} from 'react-native';
 import globalStyles from '../globalStyles';
-import {fetchWeatherTags} from '../api/api';
+import {fetchWeatherTags, fetchRainForecast} from '../api/api';
 
-const WeatherInfoSlider = ({accessToken, memberId}) => {
+const WeatherInfoSlider = ({accessToken}) => {
   const [activeSlide, setActiveSlide] = useState(0);
   const [weatherTags, setWeatherTags] = useState([]);
+  const [rainForecast, setRainForecast] = useState(null);
 
   useEffect(() => {
     const loadWeatherTags = async () => {
       try {
-        const fetchedTags = await fetchWeatherTags(accessToken, memberId);
+        const fetchedTags = await fetchWeatherTags(accessToken);
         setWeatherTags(fetchedTags);
       } catch (error) {
         console.error('Error loading weather tags:', error);
       }
     };
 
-    if (accessToken && memberId) {
+    const loadRainForecast = async () => {
+      try {
+        const fetchedRainForecast = await fetchRainForecast(accessToken);
+        console.log('Fetched rain forecast:', fetchedRainForecast);
+        setRainForecast(fetchedRainForecast);
+      } catch (error) {
+        console.error('Error loading rain forecast:', error);
+      }
+    };
+
+    if (accessToken) {
       loadWeatherTags();
+      loadRainForecast();
     }
-  }, [accessToken, memberId]);
+  }, [accessToken]);
 
   const handleScroll = event => {
     const contentOffsetX = event.nativeEvent.contentOffset.x;
@@ -33,7 +52,7 @@ const WeatherInfoSlider = ({accessToken, memberId}) => {
   return (
     <View style={styles.sliderContainer}>
       <View style={styles.indicatorContainer}>
-        {[0, 1, 2].map((_, index) => (
+        {[0, 1].map((_, index) => (
           <View
             key={`indicator-${index}`}
             style={[
@@ -63,32 +82,22 @@ const WeatherInfoSlider = ({accessToken, memberId}) => {
         <View style={[styles.slide, globalStyles.transparentBackground]}>
           <Text style={styles.title}>비 올 확률</Text>
           <View style={styles.infoContainer}>
-            <Text style={styles.info}>6시간 뒤 비 예보</Text>
-            <Icon name="rainy" style={styles.icon} />
-            <Text style={styles.info}>우산 챙겨서 외출하세요!</Text>
-          </View>
-        </View>
-        <View style={[styles.slide, globalStyles.transparentBackground]}>
-          <Text style={styles.title}>이번 주 날씨</Text>
-          <View style={styles.infoContainer}>
-            <View style={styles.weeklyForecast}>
-              <View style={styles.dayForecast}>
-                <Text style={styles.day}>월</Text>
-                <Icon name="rainy" style={styles.weatherIcon} />
-              </View>
-              <View style={styles.dayForecast}>
-                <Text style={styles.day}>화</Text>
-                <Icon name="sunny" style={styles.weatherIcon} />
-              </View>
-              <View style={styles.dayForecast}>
-                <Text style={styles.day}>수</Text>
-                <Icon name="partly-sunny" style={styles.weatherIcon} />
-              </View>
-              <View style={styles.dayForecast}>
-                <Text style={styles.day}>목</Text>
-                <Icon name="rainy" style={styles.weatherIcon} />
-              </View>
-            </View>
+            {rainForecast ? (
+              <>
+                <Text style={styles.rainInfo}>{rainForecast.rainComment}</Text>
+                <Image
+                  source={
+                    rainForecast.willRain
+                      ? require('../../assets/images/icon_umbrella.png')
+                      : require('../../assets/images/icon_clear.png')
+                  }
+                  style={styles.icon}
+                />
+                <Text style={styles.rainInfo}>{rainForecast.addComment}</Text>
+              </>
+            ) : (
+              <Text style={styles.info}>비 정보를 불러오는 중...</Text>
+            )}
           </View>
         </View>
       </ScrollView>
@@ -104,10 +113,10 @@ const styles = StyleSheet.create({
   },
   container: {
     width: width / 2,
-    height: 180,
+    height: 190,
   },
   slide: {
-    width: width / 2.1,
+    width: width / 2.05,
     alignItems: 'center',
     paddingVertical: 5,
     paddingHorizontal: 20,
@@ -136,6 +145,13 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginVertical: 5,
   },
+  rainInfo: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#fff',
+    marginVertical: Platform.OS === 'ios' ? 0 : -2,
+  },
   innerBox: {
     backgroundColor: 'rgba(255, 255, 255, 0.3)',
     shadowColor: 'transparent',
@@ -148,27 +164,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   icon: {
-    fontSize: 40,
-    marginBottom: 10,
-    color: '#fff',
+    width: 40,
+    height: 40,
+    marginVertical: 10,
     alignSelf: 'center',
-  },
-  weeklyForecast: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
-  },
-  dayForecast: {
-    alignItems: 'center',
-  },
-  day: {
-    fontSize: 16,
-    marginBottom: 8,
-    color: '#fff',
-  },
-  weatherIcon: {
-    fontSize: 25,
-    color: '#fff',
+    tintColor: '#fff',
   },
   indicatorContainer: {
     flexDirection: 'row',

@@ -22,8 +22,8 @@ public class WeatherQueryService {
     private final MemberRepository memberRepository;
     private final WeatherRepository weatherRepository;
 
-    public WeatherResponse.SimpleRainInformation getSimpleRainInfo(Long memberId) {
-        Member member = memberRepository.safeFindById(memberId);
+    public WeatherResponse.SimpleRainInformation getSimpleRainInfo(String email) {
+        Member member = memberRepository.safeFindByEmail(email);
         Location location = member.getLocation();
         WeatherQueryResult.SimpleRainInfo simpleRainInfo = weatherRepository.getSimpleRainInfo(location);
         return WeatherResponseConverter.toSimpleRainInformation(simpleRainInfo);
@@ -31,6 +31,7 @@ public class WeatherQueryService {
 
     /**
      * 해당 지역의 날씨가 갱신되었는지 확인하는 메서드
+     *
      * @param location
      * @return true = 갱신되었음(3시간 안지남), false = 갱신되지 않았음(3시간 지남)
      */
@@ -40,6 +41,7 @@ public class WeatherQueryService {
 
     /**
      * 해당 지역의 날씨 데이터가 존재하는지 확인하는 메서드
+     *
      * @param location
      * @return true = 존재함, false = 존재 하지 않음
      */

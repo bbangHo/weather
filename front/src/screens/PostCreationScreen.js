@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -7,9 +7,15 @@ import {
   TextInput,
   ScrollView,
 } from 'react-native';
-import {createPost} from '../api/api';
+import {fetchPostTags, createPost} from '../api/api';
 
-const PostCreationScreen = ({navigation, accessToken, memberId}) => {
+const PostCreationScreen = ({navigation, accessToken}) => {
+  const [temperatureTags, setTemperatureTags] = useState([]);
+  const [weatherTags, setWeatherTags] = useState([]);
+  const [humidityTags, setHumidityTags] = useState([]);
+  const [windTags, setWindTags] = useState([]);
+  const [airQualityTags, setAirQualityTags] = useState([]);
+
   const [temperature, setTemperature] = useState(null);
   const [weather, setWeather] = useState(null);
   const [humidity, setHumidity] = useState(null);
@@ -17,23 +23,38 @@ const PostCreationScreen = ({navigation, accessToken, memberId}) => {
   const [airQuality, setAirQuality] = useState(null);
   const [description, setDescription] = useState('');
 
-  const handleTagPress = (type, index) => {
-    const tagCode = index + 1;
+  useEffect(() => {
+    const loadTags = async () => {
+      try {
+        const tags = await fetchPostTags(accessToken);
+        setTemperatureTags(tags.TemperatureTag);
+        setWeatherTags(tags.SkyTag);
+        setHumidityTags(tags.HumidityTag);
+        setWindTags(tags.WindTag);
+        setAirQualityTags(tags.DustTag);
+      } catch (error) {
+        console.error('Failed to fetch tags:', error);
+      }
+    };
+    loadTags();
+  }, [accessToken]);
+
+  const handleTagPress = (type, selectedTag) => {
     switch (type) {
       case 'temperature':
-        setTemperature(tagCode);
+        setTemperature(selectedTag.code);
         break;
       case 'weather':
-        setWeather(tagCode);
+        setWeather(selectedTag.code);
         break;
       case 'humidity':
-        setHumidity(tagCode);
+        setHumidity(selectedTag.code);
         break;
       case 'wind':
-        setWind(tagCode);
+        setWind(selectedTag.code);
         break;
       case 'airQuality':
-        setAirQuality(tagCode);
+        setAirQuality(selectedTag.code);
         break;
       default:
         break;
@@ -51,7 +72,8 @@ const PostCreationScreen = ({navigation, accessToken, memberId}) => {
     };
 
     try {
-      const response = await createPost(postData, accessToken, memberId);
+      console.log('Post data to send:', postData);
+      const response = await createPost(postData, accessToken);
       console.log('Post created successfully:', response);
       navigation.navigate('Home');
     } catch (error) {
@@ -75,31 +97,20 @@ const PostCreationScreen = ({navigation, accessToken, memberId}) => {
       <View style={styles.section}>
         <Text style={styles.label}>온도는 어떤가요?</Text>
         <View style={styles.tagContainer}>
-          {[
-            '매우 추움',
-            '추움',
-            '조금 추움',
-            '선선',
-            '보통',
-            '따뜻',
-            '조금 따뜻',
-            '조금 더움',
-            '더움',
-            '매우 더움',
-          ].map((item, index) => (
+          {temperatureTags.map(tag => (
             <TouchableOpacity
-              key={item}
+              key={tag.code}
               style={[
                 styles.tag,
-                temperature === index + 1 && styles.selectedTag,
+                temperature === tag.code && styles.selectedTag,
               ]}
-              onPress={() => handleTagPress('temperature', index)}>
+              onPress={() => handleTagPress('temperature', tag)}>
               <Text
                 style={[
                   styles.tagText,
-                  temperature === index + 1 && styles.selectedTagText,
+                  temperature === tag.code && styles.selectedTagText,
                 ]}>
-                {item}
+                {tag.text}
               </Text>
             </TouchableOpacity>
           ))}
@@ -108,65 +119,55 @@ const PostCreationScreen = ({navigation, accessToken, memberId}) => {
       <View style={styles.section}>
         <Text style={styles.label}>날씨는 어떤가요?</Text>
         <View style={styles.tagContainer}>
-          {['비와요', '흐려요', '맑고 구름이 많아요', '맑아요', '화창해요'].map(
-            (item, index) => (
-              <TouchableOpacity
-                key={item}
+          {weatherTags.map(tag => (
+            <TouchableOpacity
+              key={tag.code}
+              style={[styles.tag, weather === tag.code && styles.selectedTag]}
+              onPress={() => handleTagPress('weather', tag)}>
+              <Text
                 style={[
-                  styles.tag,
-                  weather === index + 1 && styles.selectedTag,
-                ]}
-                onPress={() => handleTagPress('weather', index)}>
-                <Text
-                  style={[
-                    styles.tagText,
-                    weather === index + 1 && styles.selectedTagText,
-                  ]}>
-                  {item}
-                </Text>
-              </TouchableOpacity>
-            ),
-          )}
+                  styles.tagText,
+                  weather === tag.code && styles.selectedTagText,
+                ]}>
+                {tag.text}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </View>
       </View>
       <View style={styles.section}>
         <Text style={styles.label}>습한가요?</Text>
         <View style={styles.tagContainer}>
-          {['건조함', '보통', '약간 습함', '습함', '매우 습함'].map(
-            (item, index) => (
-              <TouchableOpacity
-                key={item}
+          {humidityTags.map(tag => (
+            <TouchableOpacity
+              key={tag.code}
+              style={[styles.tag, humidity === tag.code && styles.selectedTag]}
+              onPress={() => handleTagPress('humidity', tag)}>
+              <Text
                 style={[
-                  styles.tag,
-                  humidity === index + 1 && styles.selectedTag,
-                ]}
-                onPress={() => handleTagPress('humidity', index)}>
-                <Text
-                  style={[
-                    styles.tagText,
-                    humidity === index + 1 && styles.selectedTagText,
-                  ]}>
-                  {item}
-                </Text>
-              </TouchableOpacity>
-            ),
-          )}
+                  styles.tagText,
+                  humidity === tag.code && styles.selectedTagText,
+                ]}>
+                {tag.text}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </View>
       </View>
       <View style={styles.section}>
         <Text style={styles.label}>바람은 어떤가요?</Text>
         <View style={styles.tagContainer}>
-          {['안 불어요', '조금 불어요', '많이 불어요'].map((item, index) => (
+          {windTags.map(tag => (
             <TouchableOpacity
-              key={item}
-              style={[styles.tag, wind === index + 1 && styles.selectedTag]}
-              onPress={() => handleTagPress('wind', index)}>
+              key={tag.code}
+              style={[styles.tag, wind === tag.code && styles.selectedTag]}
+              onPress={() => handleTagPress('wind', tag)}>
               <Text
                 style={[
                   styles.tagText,
-                  wind === index + 1 && styles.selectedTagText,
+                  wind === tag.code && styles.selectedTagText,
                 ]}>
-                {item}
+                {tag.text}
               </Text>
             </TouchableOpacity>
           ))}
@@ -175,25 +176,23 @@ const PostCreationScreen = ({navigation, accessToken, memberId}) => {
       <View style={styles.section}>
         <Text style={styles.label}>미세먼지는 어떤가요?</Text>
         <View style={styles.tagContainer}>
-          {['매우 좋음', '좋음', '보통', '약간 나쁨', '매우 나쁨'].map(
-            (item, index) => (
-              <TouchableOpacity
-                key={item}
+          {airQualityTags.map(tag => (
+            <TouchableOpacity
+              key={tag.code}
+              style={[
+                styles.tag,
+                airQuality === tag.code && styles.selectedTag,
+              ]}
+              onPress={() => handleTagPress('airQuality', tag)}>
+              <Text
                 style={[
-                  styles.tag,
-                  airQuality === index + 1 && styles.selectedTag,
-                ]}
-                onPress={() => handleTagPress('airQuality', index)}>
-                <Text
-                  style={[
-                    styles.tagText,
-                    airQuality === index + 1 && styles.selectedTagText,
-                  ]}>
-                  {item}
-                </Text>
-              </TouchableOpacity>
-            ),
-          )}
+                  styles.tagText,
+                  airQuality === tag.code && styles.selectedTagText,
+                ]}>
+                {tag.text}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </View>
       </View>
       <TouchableOpacity style={styles.shareButton} onPress={handleSubmit}>
@@ -214,6 +213,8 @@ const styles = StyleSheet.create({
     paddingTop: 50,
   },
   textInput: {
+    paddingTop: 12,
+    paddingLeft: 12,
     height: 100,
     borderColor: '#ccc',
     borderWidth: 1,
@@ -260,6 +261,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 10,
+    paddingBottom: Platform.OS === 'ios' ? 13 : 16,
   },
   shareButtonText: {
     color: '#fff',

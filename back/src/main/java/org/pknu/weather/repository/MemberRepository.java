@@ -1,13 +1,12 @@
 package org.pknu.weather.repository;
 
+import java.util.Optional;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
 import org.pknu.weather.domain.Member;
 import org.pknu.weather.exception.GeneralException;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
-
-import java.util.Optional;
 
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
@@ -18,9 +17,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     }
 
     // true = location이 있다.
-    default Boolean hasRegisteredLocation(/*String email*/ Long id) {
-        Member member = safeFindById(id);
-//        Member member = safeFindByEmail(email);
+    default Boolean hasRegisteredLocation(String email) {
+        Member member = safeFindByEmail(email);
         return member.getLocation() != null;
     }
 
@@ -34,7 +32,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     default Member safeFindByEmail(String email) {
         Member member = findByEmail(email);
 
-        if(member == null) {
+        if (member == null) {
             throw new GeneralException(ErrorStatus._MEMBER_NOT_FOUND);
         }
 

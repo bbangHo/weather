@@ -1,15 +1,20 @@
 package org.pknu.weather.controller;
 
+import static org.pknu.weather.common.converter.TokenConverter.getEmailByToken;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.apiPayload.ApiResponse;
 import org.pknu.weather.dto.MemberJoinDTO;
-import org.pknu.weather.dto.MemberResponseDTO;
+import org.pknu.weather.dto.MemberResponse;
 import org.pknu.weather.service.MemberService;
+import org.pknu.weather.service.WeatherService;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
-
-import static org.pknu.weather.common.converter.TokenConverter.getEmailByToken;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
@@ -18,16 +23,29 @@ import static org.pknu.weather.common.converter.TokenConverter.getEmailByToken;
 public class MemberControllerV1 {
 
     private final MemberService memberService;
+    private final WeatherService weatherService;
 
     @PostMapping(value = "/info", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ApiResponse<MemberResponseDTO> saveMemberInfo(@RequestHeader("Authorization") String authorization,
-                                                   MemberJoinDTO memberJoinDTO) {
+    public ApiResponse<MemberResponse.MemberResponseDTO> saveMemberInfo(
+            @RequestHeader("Authorization") String authorization,
+            MemberJoinDTO memberJoinDTO) {
         log.debug("/api/v1/member controller start ............");
 
         String email = getEmailByToken(authorization);
 
-        MemberResponseDTO memberResponseDTO = memberService.checkNicknameAndSave(email, memberJoinDTO);
+        MemberResponse.MemberResponseDTO memberResponseDTO = memberService.checkNicknameAndSave(email, memberJoinDTO);
 
         return ApiResponse.onSuccess(memberResponseDTO);
+    }
+
+    @GetMapping(value = "/info")
+    public ApiResponse<MemberResponse.MemberResponseWithAddressDTO> getMemberInfo(
+            @RequestHeader("Authorization") String authorization) {
+
+        String email = getEmailByToken(authorization);
+
+        MemberResponse.MemberResponseWithAddressDTO fullMemberInfo = memberService.findFullMemberInfoByEmail(email);
+
+        return ApiResponse.onSuccess(fullMemberInfo);
     }
 }
