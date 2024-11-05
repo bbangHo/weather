@@ -53,10 +53,10 @@ const TemperatureInfo = ({accessToken}) => {
       ) : (
         <Text
           style={[
-            styles.temperature,
+            styles.loadingOrErrorText,
             {marginLeft: marginLeftValue, marginBottom: marginBottomValue},
           ]}>
-          Loading...
+          Loading ...
         </Text>
       )}
     </View>
@@ -70,6 +70,11 @@ const styles = StyleSheet.create({
   },
   temperature: {
     fontSize: 22,
+    color: '#fff',
+    marginTop: 15,
+  },
+  loadingOrErrorText: {
+    fontSize: 16,
     color: '#fff',
     marginTop: 15,
   },

@@ -40,7 +40,10 @@ const HourlyForecast = ({accessToken, showText}) => {
     return `${hours}시`;
   };
 
-  const getWeatherIcon = skyType => {
+  const getWeatherIcon = (skyType, rain) => {
+    if (rain > 0) {
+      return require('../../assets/images/icon_rain.png');
+    }
     switch (skyType) {
       case 'CLEAR':
         return require('../../assets/images/icon_clear.png');
@@ -62,7 +65,10 @@ const HourlyForecast = ({accessToken, showText}) => {
           <View style={styles.content}>
             <Text style={styles.textTime}>{formatHour(item.hour)}</Text>
 
-            <Image source={getWeatherIcon(item.skyType)} style={styles.icon} />
+            <Image
+              source={getWeatherIcon(item.skyType, item.rain)}
+              style={styles.icon}
+            />
 
             {showText && item.rainAdverb ? (
               <Text style={styles.rainAdverb}>{item.rainAdverb}</Text>

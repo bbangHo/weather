@@ -3,10 +3,11 @@ import {View, StyleSheet, Alert} from 'react-native';
 import {Button, Card} from 'react-native-elements';
 import globalStyles from '../globalStyles';
 import KakaoShareLink from 'react-native-kakao-share-link';
-import {fetchWeatherData} from '../api/api';
+import {fetchWeatherData, fetchRainForecast} from '../api/api';
 
 const KakaoShareButton = ({accessToken}) => {
   const [weatherInfo, setWeatherInfo] = useState(null);
+  const [rainComment, setRainComment] = useState('');
 
   useEffect(() => {
     const fetchWeather = async () => {
@@ -20,7 +21,18 @@ const KakaoShareButton = ({accessToken}) => {
       }
     };
 
+    const fetchRain = async () => {
+      try {
+        const rainData = await fetchRainForecast(accessToken);
+        console.log('Fetched rain forecast:', rainData);
+        setRainComment(rainData.rainComment || '');
+      } catch (error) {
+        console.error('비 예보 정보 가져오기 오류:', error);
+      }
+    };
+
     fetchWeather();
+    fetchRain();
   }, [accessToken]);
 
   const getWeatherEmoji = skyType => {
@@ -53,7 +65,7 @@ const KakaoShareButton = ({accessToken}) => {
       const response = await KakaoShareLink.sendFeed({
         content: {
           title: `${city} ${street} 날씨입니다 ~`,
-          description: `현재 ${currentTmp}°C\n최고 ${maxTmp}°, 최저 ${minTmp}° 기온입니다.`,
+          description: `현재 ${currentTmp}°C\n${rainComment}\n최고 ${maxTmp}°, 최저 ${minTmp}°`,
           imageUrl: 'https:이미지 추가할 경우.png',
           link: {
             mobileWebUrl: 'https://링크 추가.com',

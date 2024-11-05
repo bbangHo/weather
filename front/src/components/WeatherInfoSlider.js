@@ -85,18 +85,16 @@ const WeatherInfoSlider = ({accessToken}) => {
             {rainForecast ? (
               <>
                 <Text style={styles.rainInfo}>{rainForecast.rainComment}</Text>
-                <Image
-                  source={
-                    rainForecast.willRain
-                      ? require('../../assets/images/icon_umbrella.png')
-                      : require('../../assets/images/icon_clear.png')
-                  }
-                  style={styles.icon}
-                />
+                {rainForecast.willRain && (
+                  <Image
+                    source={require('../../assets/images/icon_umbrella.png')}
+                    style={styles.icon}
+                  />
+                )}
                 <Text style={styles.rainInfo}>{rainForecast.addComment}</Text>
               </>
             ) : (
-              <Text style={styles.info}>비 정보를 불러오는 중...</Text>
+              <Text style={styles.info}>비 정보를 불러오는 중입니다</Text>
             )}
           </View>
         </View>
@@ -147,7 +145,6 @@ const styles = StyleSheet.create({
   },
   rainInfo: {
     fontSize: 14,
-    fontWeight: 'bold',
     textAlign: 'center',
     color: '#fff',
     marginVertical: Platform.OS === 'ios' ? 0 : -2,

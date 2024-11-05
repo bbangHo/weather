@@ -48,18 +48,6 @@
                 <data android:scheme="kakao53650279ac97bd9bde779eba3f9f2499"/>
             </intent-filter>
         </activity>
-
-        <activity
-            android:name="com.kakao.sdk.link.LinkClient"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="kakaolink" android:host="send" />
-            </intent-filter>
-        </activity>
-
     </application>
 
 </manifest>
