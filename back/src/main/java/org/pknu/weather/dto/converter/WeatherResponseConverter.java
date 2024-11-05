@@ -80,7 +80,7 @@ public class WeatherResponseConverter {
                     .rainComment("오늘은 비소식이 없어요")
                     .addComment("")
                     .willRain(false)
-                    .rainfallAmount(0 + "mm")
+                    .rainfallAmount("0.0mm")
                     .build();
         }
 
