@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react';
 import {View, Text, StyleSheet, Dimensions} from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
 import globalStyles from '../globalStyles';
 import {fetchExtraWeatherInfo} from '../api/api';
 
@@ -21,6 +20,21 @@ const AirQuality = ({accessToken}) => {
         return '매우 나쁨';
       default:
         return '정보 없음';
+    }
+  };
+
+  const getGradeColor = grade => {
+    switch (grade) {
+      case 1:
+        return '#81BEF7';
+      case 2:
+        return '#A9F5A9';
+      case 3:
+        return '#F78181';
+      case 4:
+        return '#F78181';
+      default:
+        return '#c4c4c4';
     }
   };
 
@@ -54,25 +68,41 @@ const AirQuality = ({accessToken}) => {
     <View style={styles.container}>
       <View style={[styles.box, globalStyles.transparentBackground]}>
         <Text style={styles.title}>초미세먼지</Text>
-        <Text style={styles.value}>
+        <Text
+          style={[
+            styles.value,
+            {color: getGradeColor(extraWeatherInfo.pm25Grade)},
+          ]}>
           {getGradeText(extraWeatherInfo.pm25Grade)}
         </Text>
       </View>
       <View style={[styles.box, globalStyles.transparentBackground]}>
         <Text style={styles.title}>미세먼지</Text>
-        <Text style={styles.value}>
+        <Text
+          style={[
+            styles.value,
+            {color: getGradeColor(extraWeatherInfo.pm10Grade)},
+          ]}>
           {getGradeText(extraWeatherInfo.pm10Grade)}
         </Text>
       </View>
       <View style={[styles.box, globalStyles.transparentBackground]}>
         <Text style={styles.title}>자외선</Text>
-        <Text style={styles.value}>
+        <Text
+          style={[
+            styles.value,
+            {color: getGradeColor(extraWeatherInfo.uvGrade)},
+          ]}>
           {getGradeText(extraWeatherInfo.uvGrade)}
         </Text>
       </View>
       <View style={[styles.box, globalStyles.transparentBackground]}>
         <Text style={styles.title}>오존</Text>
-        <Text style={styles.value}>
+        <Text
+          style={[
+            styles.value,
+            {color: getGradeColor(extraWeatherInfo.o3Grade)},
+          ]}>
           {getGradeText(extraWeatherInfo.o3Grade)}
         </Text>
       </View>
@@ -109,14 +139,8 @@ const styles = StyleSheet.create({
   },
   value: {
     fontSize: 14,
-    color: '#fff',
     marginBottom: 5,
     marginTop: 5,
-  },
-  data: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#fff',
   },
 });
 

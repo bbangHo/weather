@@ -1,7 +1,8 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, StyleSheet, Image} from 'react-native';
+import {View, Text, StyleSheet, Image, Platform} from 'react-native';
 import {fetchMemberInfo} from '../api/api';
 import profilePlaceholder from '../../assets/images/profile.png';
+import loadingIcon from '../../assets/images/icon_loading.png';
 
 const MyScreen = ({accessToken, setIsNewMember, setLocationId}) => {
   const [nickname, setNickname] = useState('');
@@ -61,7 +62,11 @@ const MyScreen = ({accessToken, setIsNewMember, setLocationId}) => {
   }, [accessToken]);
 
   if (loading) {
-    return <Text>회원 정보를 불러오는 중...</Text>;
+    return (
+      <View style={styles.loadingContainer}>
+        <Image source={loadingIcon} style={styles.loadingIcon} />
+      </View>
+    );
   }
 
   return (
@@ -130,6 +135,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     backgroundColor: '#fff',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  loadingIcon: {
+    width: 40,
+    height: 40,
+    tintColor: '#fff',
   },
   profileContainer: {
     marginTop: Platform.OS === 'ios' ? 50 : 25,

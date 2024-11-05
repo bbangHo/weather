@@ -58,7 +58,10 @@ const CurrentLocation = ({accessToken}) => {
   if (loading) {
     return (
       <View style={styles.container}>
-        <Text style={styles.loadingText}>데이터를 불러오는 중...</Text>
+        <Image
+          source={require('../../assets/images/icon_loading.png')}
+          style={styles.loadingIcon}
+        />
       </View>
     );
   }
@@ -77,7 +80,12 @@ const CurrentLocation = ({accessToken}) => {
           <Text style={styles.location}>{userLocation.street}</Text>
         </View>
       ) : (
-        <Text style={styles.errorText}>데이터를 불러오지 못했습니다.</Text>
+        <View style={styles.container}>
+          <Image
+            source={require('../../assets/images/icon_loading.png')}
+            style={styles.loadingIcon}
+          />
+        </View>
       )}
     </View>
   );
@@ -108,6 +116,13 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginTop: 20,
   },
+  loadingIcon: {
+    width: 40,
+    height: 40,
+    marginTop: 50,
+    marginLeft: -10,
+    tintColor: '#fff',
+  },
   button: {
     backgroundColor: 'rgba(255, 255, 255, 0.3)',
     paddingVertical: 10,
@@ -131,8 +146,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     textAlign: 'center',
-    marginTop: 35,
-    marginRight: 15,
+    marginTop: 10,
   },
 });
 
