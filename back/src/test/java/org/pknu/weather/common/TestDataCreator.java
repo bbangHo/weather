@@ -4,6 +4,9 @@ import java.time.LocalDateTime;
 import org.pknu.weather.common.utils.GeometryUtils;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Member;
+import org.pknu.weather.domain.Post;
+import org.pknu.weather.domain.common.PostType;
+import org.pknu.weather.domain.common.Sensitivity;
 
 public class TestDataCreator {
     private static int locationIdx = 1;
@@ -12,7 +15,19 @@ public class TestDataCreator {
     public static Member getMember() {
         return Member.builder()
                 .location(getBusanLocation())
+                .email("test@naver.com")
+                .profileImage("http://test.png")
+                .sensitivity(Sensitivity.HOT)
                 .nickname("busan member")
+                .build();
+    }
+
+    public static Post getPost(Member member) {
+        return Post.builder()
+                .location(member.getLocation())
+                .member(member)
+                .content("content")
+                .postType(PostType.WEATHER)
                 .build();
     }
 
