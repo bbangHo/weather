@@ -3,18 +3,24 @@ package org.pknu.weather.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
+import org.pknu.weather.common.WeatherParamsFactory;
+import org.pknu.weather.common.formatter.DateTimeFormatter;
+import org.pknu.weather.common.utils.GeometryUtils;
 import org.pknu.weather.domain.ExtraWeather;
+import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Member;
+import org.pknu.weather.domain.Weather;
+import org.pknu.weather.dto.WeatherApiResponse;
 import org.pknu.weather.dto.WeatherResponse;
 import org.pknu.weather.exception.GeneralException;
 import org.pknu.weather.feignClient.WeatherFeignClient;
-import org.pknu.weather.domain.Location;
-import org.pknu.weather.domain.Weather;
+import org.pknu.weather.feignClient.dto.PointDTO;
+import org.pknu.weather.feignClient.dto.WeatherParams;
 import org.pknu.weather.feignClient.utils.ExtraWeatherApiUtils;
+import org.pknu.weather.feignClient.utils.WeatherApiUtils;
 import org.pknu.weather.repository.ExtraWeatherRepository;
-import org.pknu.weather.repository.MemberRepository;
-
 import org.pknu.weather.repository.LocationRepository;
+import org.pknu.weather.repository.MemberRepository;
 import org.pknu.weather.repository.WeatherRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -50,7 +56,7 @@ public class WeatherService {
      * @Location 사용자 위치 엔티티
      * @return now ~ 24 시간의 Wether 엔티티를 담고있는 List
      */
-    private List<Weather> getPreprocessWeatherList(Location location) {
+    public List<Weather> getVillageShortTermForecast(Location location) {
         float lon = location.getLongitude().floatValue();
         float lat = location.getLatitude().floatValue();
 
@@ -61,12 +67,13 @@ public class WeatherService {
         WeatherParams weatherParams = WeatherParamsFactory.create(weatherServiceKey, date, time, pointDTO);
 
         WeatherApiResponse weatherApiResponse = weatherFeignClient.getVillageShortTermForecast(weatherParams);
-        List<WeatherApiResponse.Response.Body.Items.Item> itemList = weatherApiResponse.getResponse().getBody().getItems().getItemList();
+        List<WeatherApiResponse.Response.Body.Items.Item> itemList = weatherApiResponse.getResponse()
+                .getBody()
+                .getItems()
+                .getItemList();
 
         return WeatherApiUtils.responseProcess(itemList, date, time);
     }
-
-
     /**
      * TODO: 성능 개선 필요
      * 현재 ~ +24시간 까지의 날씨 정보를 불러옵니다.
@@ -88,17 +95,11 @@ public class WeatherService {
     // TODO: 비동기 처리
     @Transactional
     public List<Weather> saveWeathers(Location location) {
-        List<Weather> values = getPreprocessWeatherList(location);
+        List<Weather> values = getVillageShortTermForecast(location);
         List<Weather> weatherList = new ArrayList<>(values);
 
         weatherList.forEach(w -> w.addLocation(location));
         return weatherRepository.saveAll(weatherList);
-    }
-
-    public List<Weather> getVillageShortTermForecast(Location location) {
-        float lon = location.getLongitude().floatValue();
-        float lat = location.getLatitude().floatValue();
-        return weatherFeignClient.preprocess(lon, lat);
     }
 
     @Async("threadPoolTaskExecutor")
@@ -125,7 +126,7 @@ public class WeatherService {
     public void updateWeathers(Location loc) {
         Location location = locationRepository.safeFindById(loc.getId());
 
-        List<Weather> newWeatherList = getPreprocessWeatherList(location);
+        List<Weather> newWeatherList = getVillageShortTermForecast(location);
 
         List<Weather> orderWeatherList = new ArrayList<>(weatherRepository.findAllWithLocation(location, LocalDateTime.now().plusHours(24)).stream()
                 .sorted(Comparator.comparing(Weather::getPresentationTime))
