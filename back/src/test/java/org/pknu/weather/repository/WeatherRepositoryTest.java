@@ -1,23 +1,20 @@
 package org.pknu.weather.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.pknu.weather.common.TestDataCreator;
-import org.pknu.weather.common.TestGlobalParams;
 import org.pknu.weather.common.formatter.DateTimeFormatter;
-import org.pknu.weather.common.utils.GeometryUtils;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Weather;
 import org.pknu.weather.dto.WeatherQueryResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 @SpringBootTest
@@ -47,6 +44,9 @@ class WeatherRepositoryTest {
                 .basetime(now.minusHours(3))
                 .presentationTime(now.plusHours(1))
                 .location(createLocation())
+                .temperature(14)
+                .humidity(50)
+                .windSpeed(1.5)
                 .build();
 
         Weather weatherEntity = weatherRepository.save(weather);
@@ -69,6 +69,9 @@ class WeatherRepositoryTest {
                 .basetime(baseTime)
                 .presentationTime(TestDataCreator.getLocalDateTimePlusHours(1))
                 .location(createLocation())
+                .temperature(14)
+                .humidity(50)
+                .windSpeed(1.5)
                 .build();
 
         Weather weatherEntity = weatherRepository.save(weather);
@@ -104,6 +107,9 @@ class WeatherRepositoryTest {
                 .basetime(baseTime)
                 .presentationTime(TestDataCreator.getLocalDateTimePlusHours(1))
                 .location(createLocation())
+                .temperature(14)
+                .humidity(50)
+                .windSpeed(1.5)
                 .build();
 
         Weather weatherEntity = weatherRepository.save(weather);
@@ -127,6 +133,9 @@ class WeatherRepositoryTest {
                 .location(location)
                 .rain(1.0F)
                 .rainProb(10)
+                .temperature(14)
+                .humidity(50)
+                .windSpeed(1.5)
                 .build();
 
         weatherRepository.save(weather);
@@ -151,6 +160,9 @@ class WeatherRepositoryTest {
                 .location(location)
                 .rain(0.0F)
                 .rainProb(0)
+                .temperature(14)
+                .humidity(50)
+                .windSpeed(1.5)
                 .build();
 
         weatherRepository.save(weather);

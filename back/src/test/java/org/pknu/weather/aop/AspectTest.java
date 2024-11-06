@@ -29,6 +29,8 @@
 //    @Autowired
 //    MemberRepository memberRepository;
 //
+//    @Autowired
+//    TestLocationCheckAspect testLocationCheckAspect;
 //
 //    public void aopTest() {
 //        // given
