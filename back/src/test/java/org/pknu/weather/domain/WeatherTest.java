@@ -37,29 +37,4 @@ class WeatherTest {
                 SensibleTemperatureUtils.getSensibleTemperature(weather.getTemperature(), weather.getHumidity(),
                         weather.getWindSpeed()));
     }
-
-    @Test
-    @Transactional
-    void test() {
-        for (int i = -30; i <= 0; i++) {
-            for (double w = 0.0f; w <= 30.0f; w += 0.1f) {
-                Weather weather = weatherRepository.save(Weather.builder()
-                        .temperature(i)
-                        .humidity(0)
-                        .windSpeed(w)
-                        .build());
-
-                em.flush();
-                em.clear();
-
-                weather = weatherRepository.findById(weather.getId()).get();
-
-                log.info("온도{}, 체감 {}, 습도 {}, 바람 {}",
-                        weather.getTemperature().toString(),
-                        weather.getSensibleTemperature().toString(),
-                        weather.getHumidity(),
-                        weather.getWindSpeed());
-            }
-        }
-    }
 }
