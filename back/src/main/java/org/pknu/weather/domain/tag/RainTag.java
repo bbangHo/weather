@@ -1,11 +1,10 @@
 package org.pknu.weather.domain.tag;
 
+import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
 import org.pknu.weather.exception.GeneralException;
-
-import java.util.Arrays;
 
 @Getter
 @RequiredArgsConstructor
@@ -20,7 +19,7 @@ public enum RainTag implements EnumTag {
     LITTLE_STRONG("조금", "강함", 7),
     VERY_STRONG("매우", "강함", 8);
 
-    private final String Adverb;
+    private final String adverb;
     private final String text;
     private final Integer code;
 
