@@ -75,7 +75,7 @@ public class WeatherResponseConverter {
 
     public static WeatherResponse.SimpleRainInformation toSimpleRainInformation(
             WeatherQueryResult.SimpleRainInfo simpleRainInfo) {
-        if (simpleRainInfo.getRain() == 0 && simpleRainInfo.getSnowCover() == 0) {
+        if (simpleRainInfo == null) {
             return WeatherResponse.SimpleRainInformation.builder()
                     .rainComment("오늘은 비소식이 없어요")
                     .addComment("")

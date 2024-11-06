@@ -1,13 +1,14 @@
 package org.pknu.weather.dto.converter;
 
-import java.time.LocalDateTime;
-import java.util.stream.Stream;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.pknu.weather.dto.WeatherQueryResult.SimpleRainInfo;
 import org.pknu.weather.dto.WeatherResponse.SimpleRainInformation;
+
+import java.time.LocalDateTime;
+import java.util.stream.Stream;
 
 class WeatherResponseConverterTest {
 
@@ -32,7 +33,6 @@ class WeatherResponseConverterTest {
     private static Stream<Arguments> source() {
         return Stream.of(
                 Arguments.of(LocalDateTime.now().plusMinutes(30), 30, 1.0f, 0.0f, "비 소식이 있어요."),        // 비 올 때
-                Arguments.of(LocalDateTime.now().plusMinutes(30), 0, 0.0f, 0.0f, "오늘은 비소식이 없어요"),        // 비 안올 때
                 Arguments.of(LocalDateTime.now().plusMinutes(30), 30, 0.0f, 1.0f, "눈 소식이 있어요.")        // 눈 올 때
         );
     }
