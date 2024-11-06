@@ -1,4 +1,3 @@
-/*
 package org.pknu.weather.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -187,4 +186,3 @@ class PostServiceTest {
         assertThat(post.getRecommendationList().size()).isEqualTo(0);
     }
 }
-*/
