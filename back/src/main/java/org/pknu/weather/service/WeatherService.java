@@ -1,5 +1,12 @@
 package org.pknu.weather.service;
 
+import static org.pknu.weather.dto.converter.LocationConverter.toLocationDTO;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
@@ -28,14 +35,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-
-import static org.pknu.weather.dto.converter.LocationConverter.toLocationDTO;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -53,8 +52,9 @@ public class WeatherService {
 
     /**
      * 사용자의 위도 경도 및 기타 정보를 받아와 Point(x, y)로 치환하고 weather로 반환한다.
-     * @Location 사용자 위치 엔티티
+     *
      * @return now ~ 24 시간의 Wether 엔티티를 담고있는 List
+     * @Location 사용자 위치 엔티티
      */
     public List<Weather> getVillageShortTermForecast(Location location) {
         float lon = location.getLongitude().floatValue();
@@ -74,6 +74,7 @@ public class WeatherService {
 
         return WeatherApiUtils.responseProcess(itemList, date, time);
     }
+
     /**
      * TODO: 성능 개선 필요
      * 현재 ~ +24시간 까지의 날씨 정보를 불러옵니다.
@@ -128,9 +129,10 @@ public class WeatherService {
 
         List<Weather> newWeatherList = getVillageShortTermForecast(location);
 
-        List<Weather> orderWeatherList = new ArrayList<>(weatherRepository.findAllWithLocation(location, LocalDateTime.now().plusHours(24)).stream()
-                .sorted(Comparator.comparing(Weather::getPresentationTime))
-                .toList());
+        List<Weather> orderWeatherList = new ArrayList<>(
+                weatherRepository.findAllWithLocation(location, LocalDateTime.now().plusHours(24)).stream()
+                        .sorted(Comparator.comparing(Weather::getPresentationTime))
+                        .toList());
 
         int minLen = Math.min(newWeatherList.size(), orderWeatherList.size());
         int maxLen = Math.max(newWeatherList.size(), orderWeatherList.size());
@@ -151,21 +153,23 @@ public class WeatherService {
     /**
      * 예보 시간이 현재 보다 과거이면 모두 삭제합니다.
      */
-    // TODO: 비동기 처리
+    @Async("threadPoolDeleteTaskExecutor")
     public void bulkDeletePastWeather() {
         weatherRepository.bulkDeletePastWeathers();
     }
 
     @Transactional
-    public WeatherResponse.ExtraWeatherInfo extraWeatherInfo(String email){
+    public WeatherResponse.ExtraWeatherInfo extraWeatherInfo(String email) {
 
-        Member member = memberRepository.findMemberByEmail(email).orElseThrow(() -> new GeneralException(ErrorStatus._MEMBER_NOT_FOUND));
+        Member member = memberRepository.findMemberByEmail(email)
+                .orElseThrow(() -> new GeneralException(ErrorStatus._MEMBER_NOT_FOUND));
         Location location = member.getLocation();
 
         Optional<ExtraWeather> searchedExtraWeather = extraWeatherRepository.findByLocationId(location.getId());
 
-        if (searchedExtraWeather.isEmpty()){
-            WeatherResponse.ExtraWeatherInfo extraWeatherInfo = extraWeatherApiUtils.getExtraWeatherInfo(toLocationDTO(location));
+        if (searchedExtraWeather.isEmpty()) {
+            WeatherResponse.ExtraWeatherInfo extraWeatherInfo = extraWeatherApiUtils.getExtraWeatherInfo(
+                    toLocationDTO(location));
 
             saveExtraWeatherInfo(location, extraWeatherInfo);
 
@@ -174,9 +178,10 @@ public class WeatherService {
 
         ExtraWeather extraWeather = searchedExtraWeather.get();
 
-        if (extraWeather.getBasetime().isBefore(LocalDateTime.now().minusHours(3))){
+        if (extraWeather.getBasetime().isBefore(LocalDateTime.now().minusHours(3))) {
 
-            WeatherResponse.ExtraWeatherInfo extraWeatherInfo = extraWeatherApiUtils.getExtraWeatherInfo(toLocationDTO(location),extraWeather.getBasetime());
+            WeatherResponse.ExtraWeatherInfo extraWeatherInfo = extraWeatherApiUtils.getExtraWeatherInfo(
+                    toLocationDTO(location), extraWeather.getBasetime());
             extraWeather.updateExtraWeather(extraWeatherInfo);
 
             return extraWeatherInfo;

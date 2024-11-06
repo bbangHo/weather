@@ -1,12 +1,26 @@
 package org.pknu.weather.domain;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import java.time.LocalDateTime;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.pknu.weather.common.utils.SensibleTemperatureUtils;
 import org.pknu.weather.domain.common.RainType;
 import org.pknu.weather.domain.common.SkyType;
 import org.pknu.weather.dto.WeatherApiResponse;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -26,7 +40,7 @@ public class Weather extends BaseEntity {
     @JoinColumn(name = "location_id")
     private Location location;
 
-    private Float windSpeed;
+    private Double windSpeed;
 
     private Integer humidity;
 
@@ -38,15 +52,22 @@ public class Weather extends BaseEntity {
 
     private Integer temperature;
 
-    private Integer maxTemperature;
-
-    private Integer minTemperature;
+    private Double sensibleTemperature;
 
     private Float snowCover;
 
     private SkyType skyType;
 
     private LocalDateTime presentationTime;
+
+    @PrePersist
+    @PreUpdate
+    private void updateSensibleTemperature() {
+        double sensibleTemperature = SensibleTemperatureUtils.getSensibleTemperature(getTemperature(), getHumidity(),
+                getWindSpeed());
+
+        setSensibleTemperature(sensibleTemperature);
+    }
 
     // location 과의 연관 관계 편의 메소드
     public void addLocation(Location location) {
@@ -55,41 +76,57 @@ public class Weather extends BaseEntity {
     }
 
     public void updateWeather(Weather newWeather) {
-        if(!this.rainProb.equals(newWeather.getRainProb())) setRainProb(newWeather.getRainProb());
-        if(!this.rainType.equals(newWeather.getRainType())) setRainType(newWeather.getRainType());
-        if(!this.rain.equals(newWeather.getRain())) setRain(newWeather.getRain());
-        if(!this.humidity.equals(newWeather.getHumidity())) setHumidity(newWeather.getHumidity());
-        if(!this.snowCover.equals(newWeather.getSnowCover())) setSnowCover(newWeather.getSnowCover());
-        if(!this.skyType.equals(newWeather.getSkyType())) setSkyType(newWeather.getSkyType());
-        if(!this.temperature.equals(newWeather.getTemperature())) setTemperature(newWeather.getTemperature());
-        if(!this.windSpeed.equals(newWeather.getWindSpeed())) setWindSpeed(newWeather.getWindSpeed());
-        if(!this.basetime.equals(newWeather.getBasetime())) setBasetime(newWeather.getBasetime());
-        if(!this.presentationTime.equals(newWeather.getPresentationTime())) setPresentationTime(newWeather.getPresentationTime());
+        if (!this.rainProb.equals(newWeather.getRainProb())) {
+            setRainProb(newWeather.getRainProb());
+        }
+        if (!this.rainType.equals(newWeather.getRainType())) {
+            setRainType(newWeather.getRainType());
+        }
+        if (!this.rain.equals(newWeather.getRain())) {
+            setRain(newWeather.getRain());
+        }
+        if (!this.humidity.equals(newWeather.getHumidity())) {
+            setHumidity(newWeather.getHumidity());
+        }
+        if (!this.snowCover.equals(newWeather.getSnowCover())) {
+            setSnowCover(newWeather.getSnowCover());
+        }
+        if (!this.skyType.equals(newWeather.getSkyType())) {
+            setSkyType(newWeather.getSkyType());
+        }
+        if (!this.temperature.equals(newWeather.getTemperature())) {
+            setTemperature(newWeather.getTemperature());
+        }
+        if (!this.windSpeed.equals(newWeather.getWindSpeed())) {
+            setWindSpeed(newWeather.getWindSpeed());
+        }
+        if (!this.basetime.equals(newWeather.getBasetime())) {
+            setBasetime(newWeather.getBasetime());
+        }
+        if (!this.presentationTime.equals(newWeather.getPresentationTime())) {
+            setPresentationTime(newWeather.getPresentationTime());
+        }
     }
 
     public void categoryClassify(WeatherApiResponse.Response.Body.Items.Item item) {
         String val = item.getFcstValue();
         switch (item.getCategory()) {
             // 강수 확률
-            case "POP" -> this.setRainProb(Integer.parseInt(val));
+            case "POP" -> setRainProb(Integer.parseInt(val));
             // 강수 형태
-            case "PTY" -> this.setRainType(convertRainType(val));
+            case "PTY" -> setRainType(convertRainType(val));
             // 1시간 강수량
-            case "PCP" -> this.setRain(val.equals("강수없음") ? 0.0f : Float.parseFloat(val.split("[~mm]+")[0]));
+            case "PCP" -> setRain(val.equals("강수없음") ? 0.0f : Float.parseFloat(val.split("[~mm]+")[0]));
             // 습도
-            case "REH" -> this.setHumidity(Integer.parseInt(val));
+            case "REH" -> setHumidity(Integer.parseInt(val));
             // 1시간 신척설
-            case "SNO" -> this.setSnowCover(val.equals("적설없음") ? 0.0f : Float.parseFloat(val.split("[~cm]+")[0]));
+            case "SNO" -> setSnowCover(val.equals("적설없음") ? 0.0f : Float.parseFloat(val.split("[~cm]+")[0]));
             // 하늘 상태
-            case "SKY" -> this.setSkyType(convertSkyType(val));
+            case "SKY" -> setSkyType(convertSkyType(val));
             // 1시간 기온
-            case "TMP" -> this.setTemperature(Integer.parseInt(val));
-            // 일 최저 기온
-//            case "TMN" -> this.setMinTemperature(Integer.parseInt(val));
-            // 일 최고 기온
-//            case "TMX" -> this.setMaxTemperature(Integer.parseInt(val));
+            case "TMP" -> setTemperature(Integer.parseInt(val));
             // 풍속
-            case "WSD" -> this.setWindSpeed(Float.parseFloat(val));
+            case "WSD" -> setWindSpeed(Double.parseDouble(val));
         }
     }
 
@@ -119,7 +156,7 @@ public class Weather extends BaseEntity {
         }
     }
 
-    private void setWindSpeed(Float windSpeed) {
+    private void setWindSpeed(Double windSpeed) {
         this.windSpeed = windSpeed;
     }
 
@@ -143,12 +180,8 @@ public class Weather extends BaseEntity {
         this.temperature = temperature;
     }
 
-    private void setMaxTemperature(Integer maxTemperature) {
-        this.maxTemperature = maxTemperature;
-    }
-
-    private void setMinTemperature(Integer minTemperature) {
-        this.minTemperature = minTemperature;
+    private void setSensibleTemperature(Double sensibleTemperature) {
+        this.sensibleTemperature = sensibleTemperature;
     }
 
     private void setSnowCover(Float snowCover) {
@@ -158,6 +191,7 @@ public class Weather extends BaseEntity {
     private void setSkyType(SkyType skyType) {
         this.skyType = skyType;
     }
+
     private void setBasetime(LocalDateTime basetime) {
         this.basetime = basetime;
     }
