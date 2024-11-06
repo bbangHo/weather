@@ -31,4 +31,21 @@ public class TokenConverter {
 
         return String.valueOf(claim.get("email"));
     }
+
+    public static Map<String, Object> getMemberInfoFromAuth(String auth){
+
+        String accessToken = auth.substring(7);
+
+        SecretKey secretKey = Keys.hmacShaKeyFor(key.getBytes(StandardCharsets.UTF_8));
+
+        Map<String, Object> claim = null;
+
+        claim = Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(accessToken)
+                .getBody();
+
+        return claim;
+    }
 }
