@@ -39,13 +39,11 @@ public class SensibleTemperatureUtils {
      * @return 체감온도
      */
     public static double getSensibleTemperature(double ta, double rh, double v) {
-        int season = getCurrentSeason();
-
         if (ta <= 10 && v >= 1.3) {
             return getWinterSensibleTemperature(ta, v);
         }
 
-        if (season >= 5 && season <= 10) {
+        if (ta >= 25) {
             return getSummerSensibleTemperature(ta, rh);
         }
 
