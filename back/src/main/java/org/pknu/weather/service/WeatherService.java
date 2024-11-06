@@ -1,32 +1,31 @@
 package org.pknu.weather.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.pknu.weather.apiPayload.code.status.ErrorStatus;
-import org.pknu.weather.domain.ExtraWeather;
-import org.pknu.weather.domain.Member;
-import org.pknu.weather.dto.WeatherResponse;
-import org.pknu.weather.exception.GeneralException;
-import org.pknu.weather.feignClient.WeatherFeignClient;
-import org.pknu.weather.domain.Location;
-import org.pknu.weather.domain.Weather;
-import org.pknu.weather.feignClient.utils.ExtraWeatherApiUtils;
-import org.pknu.weather.repository.ExtraWeatherRepository;
-import org.pknu.weather.repository.MemberRepository;
-import org.pknu.weather.repository.LocationRepository;
-import org.pknu.weather.repository.WeatherRepository;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
+import static org.pknu.weather.dto.converter.LocationConverter.toLocationDTO;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-
-import static org.pknu.weather.dto.converter.LocationConverter.toLocationDTO;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.pknu.weather.apiPayload.code.status.ErrorStatus;
+import org.pknu.weather.domain.ExtraWeather;
+import org.pknu.weather.domain.Location;
+import org.pknu.weather.domain.Member;
+import org.pknu.weather.domain.Weather;
+import org.pknu.weather.dto.WeatherResponse;
+import org.pknu.weather.exception.GeneralException;
+import org.pknu.weather.feignClient.WeatherFeignClient;
+import org.pknu.weather.feignClient.utils.ExtraWeatherApiUtils;
+import org.pknu.weather.repository.ExtraWeatherRepository;
+import org.pknu.weather.repository.LocationRepository;
+import org.pknu.weather.repository.MemberRepository;
+import org.pknu.weather.repository.WeatherRepository;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +38,16 @@ public class WeatherService {
     private final MemberRepository memberRepository;
     private final ExtraWeatherApiUtils extraWeatherApiUtils;
     private final LocationRepository locationRepository;
+
+    public List<Weather> getVillageShortTermForecast(Location location) {
+        float lon = location.getLongitude().floatValue();
+        float lat = location.getLatitude().floatValue();
+
+        List<Weather> weatherList = weatherFeignClient.preprocess(lon, lat);
+
+        weatherList.forEach(w -> w.addLocation(location));
+        return weatherList;
+    }
 
     /**
      * TODO: 성능 개선 필요
@@ -71,12 +80,6 @@ public class WeatherService {
         return weatherRepository.saveAll(weatherList);
     }
 
-    public List<Weather> getVillageShortTermForecast(Location location) {
-        float lon = location.getLongitude().floatValue();
-        float lat = location.getLatitude().floatValue();
-        return weatherFeignClient.preprocess(lon, lat);
-    }
-
     @Async("threadPoolTaskExecutor")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void saveWeatherSynchronization(Location loc, List<Weather> forecast) {
@@ -87,6 +90,12 @@ public class WeatherService {
         List<Weather> weatherList = new ArrayList<>(forecast);
 
         weatherList.forEach(w -> w.addLocation(location));
+        weatherRepository.saveAll(weatherList);
+    }
+
+    @Async("threadPoolTaskExecutor")
+    @Transactional
+    public void saveWeathersAsynchronous(List<Weather> weatherList) {
         weatherRepository.saveAll(weatherList);
     }
 
@@ -106,9 +115,10 @@ public class WeatherService {
 
         List<Weather> newWeatherList = weatherFeignClient.preprocess(lon, lat);
 
-        List<Weather> orderWeatherList = new ArrayList<>(weatherRepository.findAllWithLocation(location, LocalDateTime.now().plusHours(24)).stream()
-                .sorted(Comparator.comparing(Weather::getPresentationTime))
-                .toList());
+        List<Weather> orderWeatherList = new ArrayList<>(
+                weatherRepository.findAllWithLocation(location, LocalDateTime.now().plusHours(24)).stream()
+                        .sorted(Comparator.comparing(Weather::getPresentationTime))
+                        .toList());
 
         int minLen = Math.min(newWeatherList.size(), orderWeatherList.size());
         int maxLen = Math.max(newWeatherList.size(), orderWeatherList.size());
@@ -135,15 +145,17 @@ public class WeatherService {
     }
 
     @Transactional
-    public WeatherResponse.ExtraWeatherInfo extraWeatherInfo(String email){
+    public WeatherResponse.ExtraWeatherInfo extraWeatherInfo(String email) {
 
-        Member member = memberRepository.findMemberByEmail(email).orElseThrow(() -> new GeneralException(ErrorStatus._MEMBER_NOT_FOUND));
+        Member member = memberRepository.findMemberByEmail(email)
+                .orElseThrow(() -> new GeneralException(ErrorStatus._MEMBER_NOT_FOUND));
         Location location = member.getLocation();
 
         Optional<ExtraWeather> searchedExtraWeather = extraWeatherRepository.findByLocationId(location.getId());
 
-        if (searchedExtraWeather.isEmpty()){
-            WeatherResponse.ExtraWeatherInfo extraWeatherInfo = extraWeatherApiUtils.getExtraWeatherInfo(toLocationDTO(location));
+        if (searchedExtraWeather.isEmpty()) {
+            WeatherResponse.ExtraWeatherInfo extraWeatherInfo = extraWeatherApiUtils.getExtraWeatherInfo(
+                    toLocationDTO(location));
 
             saveExtraWeatherInfo(location, extraWeatherInfo);
 
@@ -152,9 +164,10 @@ public class WeatherService {
 
         ExtraWeather extraWeather = searchedExtraWeather.get();
 
-        if (extraWeather.getBasetime().isBefore(LocalDateTime.now().minusHours(3))){
+        if (extraWeather.getBasetime().isBefore(LocalDateTime.now().minusHours(3))) {
 
-            WeatherResponse.ExtraWeatherInfo extraWeatherInfo = extraWeatherApiUtils.getExtraWeatherInfo(toLocationDTO(location),extraWeather.getBasetime());
+            WeatherResponse.ExtraWeatherInfo extraWeatherInfo = extraWeatherApiUtils.getExtraWeatherInfo(
+                    toLocationDTO(location), extraWeather.getBasetime());
             extraWeather.updateExtraWeather(extraWeatherInfo);
 
             return extraWeatherInfo;

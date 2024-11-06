@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -14,8 +13,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class ExecuteTimeAspect {
 
-    @Around("org.pknu.weather.aop.Pointcuts.transactionalPointcut() && args(memberId)")
-    public Object recordExecuteTIme(ProceedingJoinPoint pjp, Long memberId) throws Throwable {
+    @Around("org.pknu.weather.aop.Pointcuts.transactionalPointcut()")
+    public Object recordExecuteTIme(ProceedingJoinPoint pjp) throws Throwable {
         long current = System.currentTimeMillis();
 
         Object result = pjp.proceed();

@@ -24,7 +24,7 @@ public class LocationCheckAspect {
      * 사용자가 지역을 등록했는지 확인하는 공통 로직
      *
      * @param pjp
-     * @param email
+     * @param authorization
      * @return
      * @throws Throwable
      */

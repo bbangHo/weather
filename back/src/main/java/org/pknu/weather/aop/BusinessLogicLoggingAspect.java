@@ -15,8 +15,8 @@ import org.springframework.stereotype.Component;
 public class BusinessLogicLoggingAspect {
 
     // @Transactional 이 붙어있으면서 매개변수 memberId 를 포함하는 모든 메서드들에 대해서 로깅
-    @Around("org.pknu.weather.aop.Pointcuts.transactionalPointcut() && args(memberId,..)")
-    public Object doLog(ProceedingJoinPoint pjp, Long memberId) throws Throwable {
+    @Around("org.pknu.weather.aop.Pointcuts.transactionalPointcut() && args(email,..)")
+    public Object doLog(ProceedingJoinPoint pjp, String email) throws Throwable {
         Signature signature = pjp.getSignature();
 
         String className = signature.getDeclaringTypeName();
@@ -24,12 +24,12 @@ public class BusinessLogicLoggingAspect {
 //        Object[] args = pjp.getArgs();
 
         try {
-            log.info("[memberId = {}] [****\t트랜잭션 시작\t\t****] {}, {}", memberId, className, methodName);
+            log.info("[memberId = {}] [****\t트랜잭션 시작\t\t****] {}, {}", email, className, methodName);
             Object result = pjp.proceed();
-            log.info("[memberId = {}] [****\t트랜잭션 커밋\t\t****] {}, {}", memberId, className, methodName);
+            log.info("[memberId = {}] [****\t트랜잭션 커밋\t\t****] {}, {}", email, className, methodName);
             return result;
         } catch (Exception e) {
-            log.info("[memberId = {}] [****\t트랜잭션 롤백\t\t****] {}, {},", memberId, className, methodName);
+            log.info("[memberId = {}] [****\t트랜잭션 롤백\t\t****] {}, {},", email, className, methodName);
             throw e;
         }
     }
