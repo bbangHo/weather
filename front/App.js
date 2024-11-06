@@ -10,10 +10,29 @@ import PostCreationScreen from './src/screens/PostCreationScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import InterestScreen from './src/screens/InterestScreen';
 import InterestPostCreationScreen from './src/screens/InterestPostCreationScreen';
-import {StatusBar, Image, Button, Platform} from 'react-native';
+import {StatusBar, Image, Platform} from 'react-native';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
+
+const AuthStack = ({setIsLoggedIn, setAccessToken, setIsNewMember}) => (
+  <Stack.Navigator screenOptions={{headerShown: false}}>
+    <Stack.Screen name="LoginScreen">
+      {props => (
+        <LoginScreen
+          {...props}
+          setIsLoggedIn={setIsLoggedIn}
+          setAccessToken={setAccessToken}
+          setIsNewMember={setIsNewMember}
+        />
+      )}
+    </Stack.Screen>
+    <Stack.Screen
+      name="RegisterProfileScreen"
+      component={RegisterProfileScreen}
+    />
+  </Stack.Navigator>
+);
 
 const HomeStack = ({accessToken}) => (
   <Stack.Navigator screenOptions={{headerShown: false}}>
@@ -43,20 +62,6 @@ const InterestStack = ({accessToken, locationId}) => (
   </Stack.Navigator>
 );
 
-const RegisterProfileStack = ({accessToken, setIsNewMember}) => (
-  <Stack.Navigator screenOptions={{headerShown: false}}>
-    <Stack.Screen name="RegisterProfileScreen">
-      {props => (
-        <RegisterProfileScreen
-          {...props}
-          accessToken={accessToken}
-          setIsNewMember={setIsNewMember}
-        />
-      )}
-    </Stack.Screen>
-  </Stack.Navigator>
-);
-
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [accessToken, setAccessToken] = useState(null);
@@ -69,10 +74,17 @@ const App = () => {
       <NavigationContainer>
         {isLoggedIn ? (
           isNewMember ? (
-            <RegisterProfileStack
-              accessToken={accessToken}
-              setIsNewMember={setIsNewMember}
-            />
+            <Stack.Navigator screenOptions={{headerShown: false}}>
+              <Stack.Screen name="RegisterProfileScreen">
+                {props => (
+                  <RegisterProfileScreen
+                    {...props}
+                    accessToken={accessToken}
+                    setIsNewMember={setIsNewMember}
+                  />
+                )}
+              </Stack.Screen>
+            </Stack.Navigator>
           ) : (
             <Tab.Navigator
               screenOptions={({route}) => ({
@@ -172,14 +184,11 @@ const App = () => {
             </Tab.Navigator>
           )
         ) : (
-          <>
-            <LoginScreen
-              setIsLoggedIn={setIsLoggedIn}
-              setAccessToken={setAccessToken}
-              setIsNewMember={setIsNewMember}
-            />
-            <Button title="Skip Login" onPress={() => setIsLoggedIn(true)} />
-          </>
+          <AuthStack
+            setIsLoggedIn={setIsLoggedIn}
+            setAccessToken={setAccessToken}
+            setIsNewMember={setIsNewMember}
+          />
         )}
       </NavigationContainer>
     </>
