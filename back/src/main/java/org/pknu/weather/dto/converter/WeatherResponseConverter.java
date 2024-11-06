@@ -1,5 +1,8 @@
 package org.pknu.weather.dto.converter;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.List;
 import org.pknu.weather.common.utils.TagUtils;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Member;
@@ -10,17 +13,13 @@ import org.pknu.weather.dto.TagDto;
 import org.pknu.weather.dto.WeatherQueryResult;
 import org.pknu.weather.dto.WeatherResponse;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.List;
-
 public class WeatherResponseConverter {
 
     public static WeatherResponse.MainPageWeatherData toMainPageWeatherData(List<Weather> weatherList, Member member) {
         int max = Integer.MIN_VALUE;
         int min = Integer.MAX_VALUE;
 
-        for(Weather w : weatherList) {
+        for (Weather w : weatherList) {
             max = Math.max(max, w.getTemperature());
             min = Math.min(min, w.getTemperature());
         }
@@ -74,8 +73,9 @@ public class WeatherResponseConverter {
                 .build();
     }
 
-    public static WeatherResponse.SimpleRainInformation toSimpleRainInformation(WeatherQueryResult.SimpleRainInfo simpleRainInfo) {
-        if(simpleRainInfo == null) {
+    public static WeatherResponse.SimpleRainInformation toSimpleRainInformation(
+            WeatherQueryResult.SimpleRainInfo simpleRainInfo) {
+        if (simpleRainInfo.getRain() == 0 && simpleRainInfo.getSnowCover() == 0) {
             return WeatherResponse.SimpleRainInformation.builder()
                     .rainComment("오늘은 비소식이 없어요")
                     .addComment("")
@@ -85,21 +85,51 @@ public class WeatherResponseConverter {
         }
 
         long hours = Duration.between(simpleRainInfo.getTime(), LocalDateTime.now()).toHours();
-        String comment = "";
+        StringBuilder sb = new StringBuilder();
 
-        if(hours == 0) {
-            comment += "잠시후에 ";
+        if (hours == 0) {
+            sb.append("잠시 후에 ");
         } else {
-            comment += hours + "시간 뒤에 ";
+            sb.append(hours + "시간 뒤에 ");
         }
 
-        comment += "비 소식이 있어요.";
+        if (simpleRainInfo.getSnowCover() > 0) {
+            sb.append("눈 ");
+        } else {
+            sb.append("비 ");
+        }
+        sb.append("소식이 있어요.");
 
         return WeatherResponse.SimpleRainInformation.builder()
-                .rainComment(comment)
+                .rainComment(sb.toString())
                 .addComment("외출할 때 우산 꼭 챙기세요!")
                 .willRain(true)
                 .rainfallAmount(simpleRainInfo.getRain() + "mm")
                 .build();
     }
+
+//    private static String commentBuilder(SimpleRainInfo simpleRainInfo) {
+//        StringBuilder sb = new StringBuilder();
+//        if (simpleRainInfo == null) {
+//            sb.append()
+//        }
+//    }
+
+//    private static String checkRain(SimpleRainInfo simpleRainInfo) {
+//        LocalDateTime forecastTime = simpleRainInfo.getTime();
+//
+//        if (simpleRainInfo.getRain() > 0) {
+//            return forecastTimeCheck(forecastTime);
+//        }
+//
+//        return "오늘은 비소식이 없어요";
+//    }
+//
+//    private static String forecastTimeCheck(LocalDateTime forecastTime) {
+//        long hours = Duration.between(forecastTime, LocalDateTime.now()).toHours();
+//        if (hours == 0) {
+//            return "잠시 후에";
+//        }
+//        return hours + "시간 후에";
+//    }
 }

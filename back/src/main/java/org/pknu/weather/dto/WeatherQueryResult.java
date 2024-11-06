@@ -1,11 +1,10 @@
 package org.pknu.weather.dto;
 
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 public class WeatherQueryResult {
     @Getter
@@ -16,5 +15,6 @@ public class WeatherQueryResult {
         LocalDateTime time;
         Integer rainProbability;
         Float rain;
+        Float snowCover;
     }
 }
