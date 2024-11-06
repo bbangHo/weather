@@ -1,35 +1,23 @@
 package org.pknu.weather.repository;
 
 
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.pknu.weather.common.TestDataCreator;
-import org.pknu.weather.common.formatter.DateTimeFormatter;
-import org.pknu.weather.common.utils.GeometryUtils;
-import org.pknu.weather.config.QueryDslConfig;
-import org.pknu.weather.domain.Location;
-import org.pknu.weather.domain.Weather;
-import org.pknu.weather.validation.annotation.IsPositive;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.junit4.SpringRunner;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.pknu.weather.common.TestDataCreator;
+import org.pknu.weather.common.formatter.DateTimeFormatter;
+import org.pknu.weather.domain.Location;
+import org.pknu.weather.domain.Weather;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 class LocationRepositoryTest {
@@ -47,12 +35,15 @@ class LocationRepositoryTest {
         List<Weather> weatherList = new ArrayList<>();
 
         // 어제, 오늘 날씨 추가
-        for(int i = 0; i <= 23; i++) {
+        for (int i = 0; i <= 23; i++) {
             Weather weather = Weather.builder()
                     .basetime(LocalDateTime.now())
                     .presentationTime(
                             DateTimeFormatter.formattedDateTime2LocalDateTime(DateTimeFormatter.getFormattedDate(),
-                            DateTimeFormatter.getFormattedTimeByOneHour(LocalTime.of(i, 0))))
+                                    DateTimeFormatter.getFormattedTimeByOneHour(LocalTime.of(i, 0))))
+                    .temperature(14)
+                    .humidity(50)
+                    .windSpeed(1.5)
                     .build();
 
             LocalDateTime now = LocalDateTime.now();
@@ -60,8 +51,12 @@ class LocationRepositoryTest {
                     .basetime(now)
                     .presentationTime(
                             DateTimeFormatter.formattedDateTime2LocalDateTime(
-                                    DateTimeFormatter.getFormattedDate(LocalDate.of(now.getYear(), now.getMonth(), now.getDayOfMonth() - 1)),
+                                    DateTimeFormatter.getFormattedDate(
+                                            LocalDate.of(now.getYear(), now.getMonth(), now.getDayOfMonth() - 1)),
                                     DateTimeFormatter.getFormattedTimeByOneHour(LocalTime.of(i, 0))))
+                    .temperature(14)
+                    .humidity(50)
+                    .windSpeed(1.5)
                     .build();
 
             weather.addLocation(location);

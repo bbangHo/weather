@@ -21,7 +21,7 @@ class WeatherTest {
 
     @Test
     @Transactional
-    void weather_엔티티는_영속화_되기전_체감_온도를_갱신한다() {
+    void weather_엔티티는_영속화_되기전_체감_온도를_업데이트_한다() {
         // given
         Weather weather = Weather.builder()
                 .temperature(14)
