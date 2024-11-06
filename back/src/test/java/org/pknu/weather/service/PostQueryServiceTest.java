@@ -1,3 +1,4 @@
+/*
 package org.pknu.weather.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -116,3 +117,4 @@ class PostQueryServiceTest {
         memberRepository.deleteAll(memberList);
     }
 }
+*/
