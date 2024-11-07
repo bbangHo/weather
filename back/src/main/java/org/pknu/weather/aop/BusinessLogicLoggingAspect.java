@@ -24,12 +24,12 @@ public class BusinessLogicLoggingAspect {
 //        Object[] args = pjp.getArgs();
 
         try {
-            log.info("[memberId = {}] [****\t트랜잭션 시작\t\t****] {}, {}", email, className, methodName);
+            log.info("[email = {}] [****\t트랜잭션 시작\t\t****] {}, {}", email, className, methodName);
             Object result = pjp.proceed();
-            log.info("[memberId = {}] [****\t트랜잭션 커밋\t\t****] {}, {}", email, className, methodName);
+            log.info("[email = {}] [****\t트랜잭션 커밋\t\t****] {}, {}", email, className, methodName);
             return result;
         } catch (Exception e) {
-            log.info("[memberId = {}] [****\t트랜잭션 롤백\t\t****] {}, {},", email, className, methodName);
+            log.info("[email = {}] [****\t트랜잭션 롤백\t\t****] {}, {},", email, className, methodName);
             throw e;
         }
     }

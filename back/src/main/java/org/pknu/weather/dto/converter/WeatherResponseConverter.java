@@ -1,8 +1,5 @@
 package org.pknu.weather.dto.converter;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.List;
 import org.pknu.weather.common.utils.TagUtils;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Member;
@@ -12,6 +9,10 @@ import org.pknu.weather.domain.tag.TemperatureTag;
 import org.pknu.weather.dto.TagDto;
 import org.pknu.weather.dto.WeatherQueryResult;
 import org.pknu.weather.dto.WeatherResponse;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.List;
 
 public class WeatherResponseConverter {
 
@@ -28,7 +29,7 @@ public class WeatherResponseConverter {
                 .map(weather -> toWeatherPerHour(weather, member))
                 .toList();
 
-        Location location = weatherList.get(0).getLocation();
+        Location location = member.getLocation();
         Weather now = weatherList.get(0);
 
         return WeatherResponse.MainPageWeatherData.builder()
