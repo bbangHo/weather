@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import {login} from '@react-native-seoul/kakao-login';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {sendAccessTokenToBackend} from '../api/api';
+import {sendAccessTokenToBackend, refreshAccessToken} from '../api/api';
 
 const LoginScreen = ({
   setIsLoggedIn,
@@ -29,7 +29,10 @@ const LoginScreen = ({
       Alert.alert('로그인 성공', `토큰: ${token.accessToken}`);
       const response = await sendAccessTokenToBackend(token.accessToken);
       if (response.isSuccess) {
+        console.log('Login successful, server response:', response);
         setAccessToken(response.result.accessToken);
+        // 테스트를 위해 false 값으로 설정합니다.
+        // 구현 완료 후 true 값으로 변경해야 합니다.
         setIsNewMember(response.result.isNewMember === 'true');
         setIsLoggedIn(true);
 
@@ -39,12 +42,14 @@ const LoginScreen = ({
           response.result.refreshToken,
         );
       } else {
+        console.error('Login failed, server response:', response);
         Alert.alert(
           '로그인 실패',
           response.message || '서버 오류가 발생했습니다.',
         );
       }
     } catch (err) {
+      console.error('Login failed:', err.message);
       Alert.alert('로그인 실패', err.message);
     }
   };
@@ -53,28 +58,49 @@ const LoginScreen = ({
     try {
       const token =
         'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRlc3RlckB0ZXN0LmNvbSIsImlkIjoxMDAyLCJpYXQiOjE3MzA5MTMxNDQsImV4cCI6NDg4NDUxMzE0NH0.F__4oJACAY85nKT-oyjAargtjVKpmsHn6MeIEYDxzjI';
-      const response = await sendAccessTokenToBackend(token);
-      if (response.isSuccess) {
-        setAccessToken(response.result.accessToken);
-        setIsNewMember(response.result.isNewMember === 'true');
-        setIsLoggedIn(true);
-        Alert.alert('로그인 성공', '일반 로그인에 성공했습니다.');
 
-        await AsyncStorage.setItem('accessToken', response.result.accessToken);
-        await AsyncStorage.setItem(
-          'refreshToken',
-          response.result.refreshToken,
-        );
-      } else {
-        Alert.alert(
-          '로그인 실패',
-          response.message || '서버 오류가 발생했습니다.',
-        );
-      }
+      setAccessToken(token);
+      setIsLoggedIn(true);
+      setIsNewMember(false);
+
+      await AsyncStorage.setItem('accessToken', token);
+
+      Alert.alert('로그인 성공', '메인 화면으로 이동합니다.');
     } catch (err) {
       Alert.alert('로그인 실패', err.message);
     }
   };
+
+  useEffect(() => {
+    const refreshTokenImmediately = async () => {
+      try {
+        console.log('Attempting to refresh token immediately...');
+        const newAccessToken = await refreshAccessToken();
+        console.log('Refreshed access token immediately:', newAccessToken);
+
+        setAccessToken(newAccessToken);
+        setIsLoggedIn(true);
+      } catch (err) {
+        console.error('Failed to refresh token immediately:', err);
+        handleLogout();
+      }
+    };
+
+    refreshTokenImmediately();
+
+    const interval = setInterval(async () => {
+      try {
+        console.log('Attempting to refresh token...');
+        const newAccessToken = await refreshAccessToken();
+        console.log('Refreshed access token:', newAccessToken);
+        setAccessToken(newAccessToken);
+      } catch (err) {
+        console.error('Failed to refresh token:', err);
+        handleLogout();
+      }
+    }, 15 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <View style={styles.container}>

@@ -57,11 +57,11 @@ const AirQuality = ({accessToken}) => {
   }, [accessToken]);
 
   if (loading) {
-    return <Text>데이터를 불러오는 중...</Text>;
+    return <Text style={styles.loadingText}>데이터를 불러오는 중...</Text>;
   }
 
   if (error) {
-    return <Text>error: {error}</Text>;
+    return <Text style={styles.errorText}>error: {error}</Text>;
   }
 
   return (
@@ -122,6 +122,18 @@ const styles = StyleSheet.create({
     marginBottom: -5,
     padding: 9,
     borderRadius: 10,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#fff',
+    textAlign: 'center',
+    marginTop: 20,
+  },
+  errorText: {
+    fontSize: 16,
+    color: '#fff',
+    textAlign: 'center',
+    marginTop: 20,
   },
   box: {
     borderRadius: 10,

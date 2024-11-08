@@ -595,3 +595,28 @@ export const submitAddress = async (accessToken, province, city, street) => {
     throw error;
   }
 };
+
+export const deleteMember = async accessToken => {
+  const url = `${BASE_URL}/api/v1/member`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorResponse = await response.json();
+      console.error('Failed to delete member:', errorResponse);
+      throw new Error('Failed to delete member');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Erroe Deleting member:', error);
+    throw error;
+  }
+};
