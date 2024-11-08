@@ -1,10 +1,27 @@
-import React, {useState, useEffect} from 'react';
-import {View, Text, StyleSheet, Image, Platform} from 'react-native';
-import {fetchMemberInfo} from '../api/api';
+import React, {useEffect, useState} from 'react';
+import {
+  ScrollView,
+  Text,
+  View,
+  StyleSheet,
+  Image,
+  Alert,
+  TouchableOpacity,
+  Platform,
+} from 'react-native';
+import {fetchMemberInfo, deleteMember} from '../api/api';
 import profilePlaceholder from '../../assets/images/profile.png';
 import loadingIcon from '../../assets/images/icon_loading.png';
+import {logout} from '@react-native-seoul/kakao-login';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const MyScreen = ({accessToken, setIsNewMember, setLocationId}) => {
+const MyScreen = ({
+  accessToken,
+  setIsNewMember,
+  setLocationId,
+  setIsLoggedIn,
+  setAccessToken,
+}) => {
   const [nickname, setNickname] = useState('');
   const [email, setEmail] = useState('');
   const [selectedType, setSelectedType] = useState(null);
@@ -61,6 +78,53 @@ const MyScreen = ({accessToken, setIsNewMember, setLocationId}) => {
     }
   }, [accessToken]);
 
+  const handleLogout = async () => {
+    try {
+      console.log('Starting Kakao logout...');
+      await logout();
+      setIsLoggedIn(false);
+      setAccessToken(null);
+      await AsyncStorage.removeItem('accessToken');
+      await AsyncStorage.removeItem('refreshToken');
+      Alert.alert('로그아웃 성공', '성공적으로 로그아웃되었습니다.');
+    } catch (err) {
+      console.error('Logout failed:', err.message);
+      Alert.alert('로그아웃 실패', '이미 로그아웃된 상태입니다.');
+      setIsLoggedIn(false);
+      setAccessToken(null);
+      await AsyncStorage.removeItem('accessToken');
+      await AsyncStorage.removeItem('refreshToken');
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    Alert.alert(
+      '회원 탈퇴',
+      '정말 탈퇴하시겠습니까?',
+      [
+        {text: '아니오', style: 'cancel'},
+        {
+          text: '네',
+          onPress: async () => {
+            try {
+              await deleteMember(accessToken);
+              Alert.alert('탈퇴 완료', '회원 탈퇴가 완료되었습니다.');
+              setIsNewMember(true);
+              setIsLoggedIn(false);
+            } catch (error) {
+              console.error('Failed to delete member:', error);
+              Alert.alert(
+                '오류',
+                '회원 탈퇴에 실패했습니다. 다시 시도해주세요.',
+              );
+            }
+          },
+        },
+      ],
+      {cancelable: true},
+    );
+  };
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -70,71 +134,84 @@ const MyScreen = ({accessToken, setIsNewMember, setLocationId}) => {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.profileContainer}>
-        <Image source={profileImage} style={styles.profileImage} />
-      </View>
-      <Text style={styles.label}>닉네임</Text>
-      <View style={styles.infoTextContainer}>
-        <Text style={styles.infoTextNickname}>{nickname}</Text>
-      </View>
+    <ScrollView style={styles.scrollContainer}>
+      <View style={styles.container}>
+        <View style={styles.profileContainer}>
+          <Image source={profileImage} style={styles.profileImage} />
+        </View>
+        <Text style={styles.label}>닉네임</Text>
+        <View style={styles.infoTextContainer}>
+          <Text style={styles.infoTextNickname}>{nickname}</Text>
+        </View>
 
-      <Text style={styles.label}>대표 주소</Text>
-      <Text style={styles.addressText}>{address}</Text>
+        <Text style={styles.label}>대표 주소</Text>
+        <Text style={styles.addressText}>{address}</Text>
 
-      <Text style={styles.label}>이메일</Text>
-      <Text style={styles.infoText}>{email}</Text>
+        <Text style={styles.label}>이메일</Text>
+        <Text style={styles.infoText}>{email}</Text>
 
-      <Text style={styles.label}>유형</Text>
-      <View
-        style={[
-          styles.typeButton,
-          selectedType === 'hot' && styles.selectedButton,
-        ]}>
-        <Text
+        <Text style={styles.label}>유형</Text>
+        <View
           style={[
-            styles.typeButtonText,
-            selectedType === 'hot' && styles.selectedButtonText,
+            styles.typeButton,
+            selectedType === 'hot' && styles.selectedButton,
           ]}>
-          더위를 많이 타는 편
-        </Text>
-      </View>
-      <View
-        style={[
-          styles.typeButton,
-          selectedType === 'normal' && styles.selectedButton,
-        ]}>
-        <Text
+          <Text
+            style={[
+              styles.typeButtonText,
+              selectedType === 'hot' && styles.selectedButtonText,
+            ]}>
+            더위를 많이 타는 편
+          </Text>
+        </View>
+        <View
           style={[
-            styles.typeButtonText,
-            selectedType === 'normal' && styles.selectedButtonText,
+            styles.typeButton,
+            selectedType === 'normal' && styles.selectedButton,
           ]}>
-          평범한 편
-        </Text>
-      </View>
-      <View
-        style={[
-          styles.typeButton,
-          selectedType === 'cold' && styles.selectedButton,
-        ]}>
-        <Text
+          <Text
+            style={[
+              styles.typeButtonText,
+              selectedType === 'normal' && styles.selectedButtonText,
+            ]}>
+            평범한 편
+          </Text>
+        </View>
+        <View
           style={[
-            styles.typeButtonText,
-            selectedType === 'cold' && styles.selectedButtonText,
+            styles.typeButton,
+            selectedType === 'cold' && styles.selectedButton,
           ]}>
-          추위를 많이 타는 편
-        </Text>
+          <Text
+            style={[
+              styles.typeButtonText,
+              selectedType === 'cold' && styles.selectedButtonText,
+            ]}>
+            추위를 많이 타는 편
+          </Text>
+        </View>
+
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity onPress={handleLogout}>
+            <Text style={styles.logoutButtonText}>로그아웃</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleDeleteAccount}>
+            <Text style={styles.deleteButtonText}>회원 탈퇴하기</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  scrollContainer: {
     flex: 1,
+    backgroundColor: '#fff',
+  },
+  container: {
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#fff',
   },
   loadingContainer: {
     flex: 1,
@@ -145,7 +222,6 @@ const styles = StyleSheet.create({
   loadingIcon: {
     width: 40,
     height: 40,
-    tintColor: '#fff',
   },
   profileContainer: {
     marginTop: Platform.OS === 'ios' ? 50 : 25,
@@ -209,6 +285,22 @@ const styles = StyleSheet.create({
   },
   selectedButtonText: {
     color: '#fff',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    marginTop: 30,
+    justifyContent: 'space-between',
+    width: '60%',
+  },
+  logoutButtonText: {
+    fontSize: 13,
+    color: 'gray',
+    textDecorationLine: 'underline',
+  },
+  deleteButtonText: {
+    fontSize: 13,
+    color: 'gray',
+    textDecorationLine: 'underline',
   },
 });
 

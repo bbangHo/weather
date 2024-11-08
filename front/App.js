@@ -178,6 +178,8 @@ const App = () => {
                     accessToken={accessToken}
                     setIsNewMember={setIsNewMember}
                     setLocationId={setLocationId}
+                    setIsLoggedIn={setIsLoggedIn}
+                    setAccessToken={setAccessToken}
                   />
                 )}
               </Tab.Screen>
