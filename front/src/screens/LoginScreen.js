@@ -18,6 +18,7 @@ const LoginScreen = ({
   setIsNewMember,
   navigation,
 }) => {
+  const [token, setToken] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -26,7 +27,6 @@ const LoginScreen = ({
       console.log('Starting Kakao login...');
       const token = await login();
       console.log('Kakao login successful, token:', token.accessToken);
-      Alert.alert('로그인 성공', `토큰: ${token.accessToken}`);
       const response = await sendAccessTokenToBackend(token.accessToken);
       if (response.isSuccess) {
         console.log('Login successful, server response:', response);
@@ -56,14 +56,21 @@ const LoginScreen = ({
 
   const handleRegularLogin = async () => {
     try {
-      const token =
-        'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRlc3RlckB0ZXN0LmNvbSIsImlkIjoxMDAyLCJpYXQiOjE3MzA5MTMxNDQsImV4cCI6NDg4NDUxMzE0NH0.F__4oJACAY85nKT-oyjAargtjVKpmsHn6MeIEYDxzjI';
+      if (!token) {
+        Alert.alert('토큰 입력 오류', '테스트 토큰을 입력해주세요.');
+        return;
+      }
 
       setAccessToken(token);
       setIsLoggedIn(true);
       setIsNewMember(false);
 
       await AsyncStorage.setItem('accessToken', token);
+
+      Alert.alert(
+        '로그인 성공',
+        '테스트 토큰으로 성공적으로 로그인되었습니다.',
+      );
     } catch (err) {
       Alert.alert('로그인 실패', err.message);
     }
@@ -102,22 +109,15 @@ const LoginScreen = ({
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>로그인</Text>
+      <Text style={styles.title}>임시 로그인</Text>
 
       <TextInput
         style={styles.input}
-        placeholder="이메일"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
+        placeholder="테스트 계정 토큰을 입력해 주세요."
+        value={token}
+        onChangeText={setToken}
         autoCapitalize="none"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="비밀번호"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
+        multiline={true}
       />
 
       <TouchableHighlight
@@ -126,12 +126,6 @@ const LoginScreen = ({
         <Text style={styles.loginButtonText}>로그인</Text>
       </TouchableHighlight>
 
-      <TouchableOpacity
-        onPress={() => navigation.navigate('RegisterProfileScreen')}>
-        <Text style={styles.signupText}>회원이 아니신가요? 회원가입하기</Text>
-      </TouchableOpacity>
-
-      <Text style={styles.kakaoTitle}>간편 로그인</Text>
       <TouchableHighlight style={styles.kakaoButton} onPress={handleKakaoLogin}>
         <Text style={styles.kakaoButtonText}>카카오톡으로 로그인</Text>
       </TouchableHighlight>
@@ -147,7 +141,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: 24,
+    fontSize: 16,
     marginBottom: 20,
   },
   input: {
@@ -157,6 +151,8 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     marginBottom: 10,
     borderRadius: 5,
+    height: 80,
+    textAlignVertical: 'top',
   },
   signupText: {
     marginTop: 10,
@@ -174,6 +170,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: 'center',
     width: '100%',
+    marginTop: 70,
   },
   kakaoButtonText: {
     color: '#3C1E1E',
