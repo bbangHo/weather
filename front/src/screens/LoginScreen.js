@@ -64,8 +64,6 @@ const LoginScreen = ({
       setIsNewMember(false);
 
       await AsyncStorage.setItem('accessToken', token);
-
-      Alert.alert('로그인 성공', '메인 화면으로 이동합니다.');
     } catch (err) {
       Alert.alert('로그인 실패', err.message);
     }
