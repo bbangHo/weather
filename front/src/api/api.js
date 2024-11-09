@@ -599,6 +599,9 @@ export const submitAddress = async (accessToken, province, city, street) => {
 export const deleteMember = async accessToken => {
   const url = `${BASE_URL}/api/v1/member`;
 
+  console.log('Attempting to delete member with API:', url);
+  console.log('Authorization header:', `Bearer ${accessToken}`);
+
   try {
     const response = await fetch(url, {
       method: 'DELETE',
