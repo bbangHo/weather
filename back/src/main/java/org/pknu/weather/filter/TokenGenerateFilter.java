@@ -31,6 +31,7 @@ public class TokenGenerateFilter extends OncePerRequestFilter {
 
         log.info("TokenGenerateFilter start----------------------------------------");
         String email = (String)request.getAttribute("email");
+        Long kakaoId = (Long) request.getAttribute("kakaoId");
 
         Optional<Member> appMember = memberService.findMemberByEmail(email);
 
@@ -42,7 +43,7 @@ public class TokenGenerateFilter extends OncePerRequestFilter {
 
         log.info("Generate AppToken ...................");
 
-        Map<String, Object> claims = Map.of("id", loginMember.getId(),"email", loginMember.getEmail());
+        Map<String, Object> claims = Map.of("id", loginMember.getId(),"email", loginMember.getEmail(),"kakaoId", kakaoId);
 
 
         String accessToken = jwtUtil.generateToken(claims,3);

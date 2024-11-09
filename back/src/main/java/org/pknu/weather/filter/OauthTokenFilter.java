@@ -47,6 +47,7 @@ public class OauthTokenFilter extends OncePerRequestFilter {
             KakaoUserResponseDTO oauthMember = kaKaoLoginClient.getMemberData(authHeader, "application/x-www-form-urlencoded;charset=utf-8");
 
             request.setAttribute("email", oauthMember.getKakao_account().getEmail());
+            request.setAttribute("kakaoId", oauthMember.getId());
 
         } catch (FeignException e){
             log.error(e.getMessage());

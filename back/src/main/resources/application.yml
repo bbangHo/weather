@@ -25,6 +25,8 @@ spring:
     secret: ${CONSUMER_SECRET}
   weather:
     key: ${METEOROLOGICAL_ADMIN_KEY}
+  kakao:
+    admin_key: ${KAKAO_SERVICE_ADMIN_KEY}
   profiles:
     active: default
   servlet:

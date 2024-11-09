@@ -1,9 +1,11 @@
 package org.pknu.weather.service;
 
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
+import org.pknu.weather.common.utils.KakaoLoginUtils;
 import org.pknu.weather.common.utils.LocalUploaderUtils;
 import org.pknu.weather.common.utils.S3UploaderUtils;
 import org.pknu.weather.domain.Member;
@@ -32,6 +34,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final LocalUploaderUtils localUploaderUtils;
     private final S3UploaderUtils s3UploaderUtils;
+    private final KakaoLoginUtils kakaoLoginUtils;
 
 
     public Member saveMember(Member member){
@@ -64,6 +67,21 @@ public class MemberService {
         Member savedMember = checkNicknameAndSave(member);
 
         return toMemberResponseDTO(savedMember);
+    }
+
+    @Transactional
+    public void deleteMember(Map<String, Object> memberInfo){
+
+        String email = String.valueOf(memberInfo.get("email"));
+        Long id = Long.parseLong(String.valueOf(memberInfo.get("kakaoId")));
+
+        kakaoLoginUtils.unlinkMember(id);
+
+        Member member = memberRepository.findMemberByEmail(email)
+                .orElseThrow(() -> new GeneralException(ErrorStatus._MEMBER_NOT_FOUND));
+
+        memberRepository.delete(member);
+
     }
 
     private Member checkNicknameAndSave(Member member) {
