@@ -6,10 +6,16 @@ import org.aspectj.lang.annotation.Pointcut;
 @Aspect  // only Aspect annotation
 public class Pointcuts {
 
-    @Pointcut("execution(* org.pknu.weather.controller.MainPageControllerV1.*(..))")
+    @Pointcut("mainPageControllerV1Pointcut() || getMemberDefaultLocationPointcut()")
     public void doCheckLocationPointcut() {}
 
-    @Pointcut("execution(* org.pknu.weather.controller.*.*(..))")
+    @Pointcut("execution(* org.pknu.weather.controller.MainPageControllerV1.*(..))")
+    public void mainPageControllerV1Pointcut() {}
+
+    @Pointcut("execution(* org.pknu.weather.controller.LocationControllerV1.getMemberDefaultLocation(..))")
+    public void getMemberDefaultLocationPointcut() {}
+
+    @Pointcut("execution(* org.pknu.weather.controller..*(..))")
     public void controllerPointcut() {}
 
     @Pointcut("execution(* org.pknu.weather.service.*.*(..))")
