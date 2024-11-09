@@ -35,7 +35,7 @@ public class Post extends BaseEntity {
     private Member member;
 
     @Builder.Default
-    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<Recommendation> recommendationList = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
