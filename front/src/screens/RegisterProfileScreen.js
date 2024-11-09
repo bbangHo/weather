@@ -9,6 +9,7 @@ import {
   Alert,
   PermissionsAndroid,
   Platform,
+  Linking,
 } from 'react-native';
 import {launchImageLibrary} from 'react-native-image-picker';
 import Geolocation from 'react-native-geolocation-service';
@@ -97,10 +98,22 @@ const RegisterProfileScreen = ({setIsNewMember, accessToken}) => {
       } else {
         Alert.alert(
           '위치 권한 필요',
-          '위치 정보를 등록하려면 권한을 허용해주세요.',
+          '위치 정보를 등록하려면 권한을 허용해주세요. 앱 설정에서 권한을 활성화하세요.',
+          [
+            {text: '취소', style: 'cancel', onPress: () => setLoading(false)},
+            {
+              text: '설정 열기',
+              onPress: async () => {
+                try {
+                  await Linking.openSettings();
+                } catch (error) {
+                  console.error('Error opening settings:', error);
+                  Alert.alert('오류', '설정을 열 수 없습니다.');
+                }
+              },
+            },
+          ],
         );
-        setLoading(false);
-        return;
       }
     } catch (error) {
       console.error('프로필 저장 오류:', error);
