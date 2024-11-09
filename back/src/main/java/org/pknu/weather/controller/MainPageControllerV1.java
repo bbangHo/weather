@@ -34,7 +34,7 @@ public class MainPageControllerV1 {
             @RequestParam(required = false) Long locationId) {
 
         String email = TokenConverter.getEmailByToken(authorization);
-        WeatherResponse.MainPageWeatherData weatherInfo = mainPageService.getWeatherInfo(email,locationId);
+        WeatherResponse.MainPageWeatherData weatherInfo = mainPageService.getWeatherInfo(email, locationId);
 
         return ApiResponse.onSuccess(weatherInfo);
     }
@@ -54,7 +54,7 @@ public class MainPageControllerV1 {
             @RequestParam(required = false) Long locationId) {
 
         String email = getEmailByToken(authorization);
-        WeatherResponse.ExtraWeatherInfo extraWeatherInfo = weatherService.extraWeatherInfo(email,locationId);
+        WeatherResponse.ExtraWeatherInfo extraWeatherInfo = weatherService.extraWeatherInfo(email, locationId);
 
         return ApiResponse.onSuccess(extraWeatherInfo);
     }
