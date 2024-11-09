@@ -45,6 +45,10 @@ end
 target 'Weather2' do
   config = use_native_modules!
 
+  pod 'KakaoSDKCommon', '2.22.0'
+  pod 'KakaoSDKAuth', '2.22.0'
+  pod 'KakaoSDKUser', '2.22.0'
+
   use_react_native!(
     :path => config[:reactNativePath],
     # An absolute path to your application root.
