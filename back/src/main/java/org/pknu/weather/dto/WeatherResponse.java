@@ -77,6 +77,13 @@ public class WeatherResponse {
         Integer pm10Grade;
         Integer pm25Grade;
         Integer uvGrade;
+        Integer uvGradePlus3;
+        Integer uvGradePlus6;
+        Integer uvGradePlus9;
+        Integer uvGradePlus12;
+        Integer uvGradePlus15;
+        Integer uvGradePlus18;
+        Integer uvGradePlus21;
     }
       
     @Getter

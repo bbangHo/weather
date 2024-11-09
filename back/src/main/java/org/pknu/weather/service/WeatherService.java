@@ -159,11 +159,18 @@ public class WeatherService {
     }
 
     @Transactional
-    public WeatherResponse.ExtraWeatherInfo extraWeatherInfo(String email) {
+    public WeatherResponse.ExtraWeatherInfo extraWeatherInfo(String email, Long locationId) {
 
         Member member = memberRepository.findMemberByEmail(email)
                 .orElseThrow(() -> new GeneralException(ErrorStatus._MEMBER_NOT_FOUND));
-        Location location = member.getLocation();
+
+        Location location;
+
+        if (locationId != null) {
+            location = locationRepository.safeFindById(locationId);
+        } else {
+            location = member.getLocation();
+        }
 
         Optional<ExtraWeather> searchedExtraWeather = extraWeatherRepository.findByLocationId(location.getId());
 
@@ -195,6 +202,13 @@ public class WeatherService {
         return WeatherResponse.ExtraWeatherInfo.builder()
                 .baseTime(extraWeather.getBasetime())
                 .uvGrade(extraWeather.getUv())
+                .uvGradePlus3(extraWeather.getUvPlus3())
+                .uvGradePlus6(extraWeather.getUvPlus6())
+                .uvGradePlus9(extraWeather.getUvPlus9())
+                .uvGradePlus12(extraWeather.getUvPlus12())
+                .uvGradePlus15(extraWeather.getUvPlus15())
+                .uvGradePlus18(extraWeather.getUvPlus18())
+                .uvGradePlus21(extraWeather.getUvPlus21())
                 .o3Grade(extraWeather.getO3())
                 .pm10Grade(extraWeather.getPm10())
                 .pm25Grade(extraWeather.getPm25())
@@ -206,6 +220,13 @@ public class WeatherService {
                 .location(location)
                 .basetime(extraWeatherInfo.getBaseTime())
                 .uv(extraWeatherInfo.getUvGrade())
+                .uvPlus3(extraWeatherInfo.getUvGradePlus3())
+                .uvPlus6(extraWeatherInfo.getUvGradePlus6())
+                .uvPlus9(extraWeatherInfo.getUvGradePlus9())
+                .uvPlus12(extraWeatherInfo.getUvGradePlus12())
+                .uvPlus15(extraWeatherInfo.getUvGradePlus15())
+                .uvPlus18(extraWeatherInfo.getUvGradePlus18())
+                .uvPlus21(extraWeatherInfo.getUvGradePlus21())
                 .o3(extraWeatherInfo.getO3Grade())
                 .pm10(extraWeatherInfo.getPm10Grade())
                 .pm25(extraWeatherInfo.getPm25Grade())
