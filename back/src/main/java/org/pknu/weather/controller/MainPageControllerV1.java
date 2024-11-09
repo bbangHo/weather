@@ -11,6 +11,7 @@ import org.pknu.weather.service.WeatherService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -29,10 +30,12 @@ public class MainPageControllerV1 {
 
     @GetMapping("/weather")
     public ApiResponse<WeatherResponse.MainPageWeatherData> getMainPageResource(
-            @RequestHeader("Authorization") String authorization) {
+            @RequestHeader("Authorization") String authorization,
+            @RequestParam(required = false) Long locationId) {
 
         String email = TokenConverter.getEmailByToken(authorization);
-        WeatherResponse.MainPageWeatherData weatherInfo = mainPageService.getWeatherInfo(email);
+        WeatherResponse.MainPageWeatherData weatherInfo = mainPageService.getWeatherInfo(email,locationId);
+
         return ApiResponse.onSuccess(weatherInfo);
     }
 
@@ -47,10 +50,11 @@ public class MainPageControllerV1 {
 
     @GetMapping(value = "/extraWeatherInfo")
     public ApiResponse<WeatherResponse.ExtraWeatherInfo> getExtraWeatherInfo(
-            @RequestHeader("Authorization") String authorization) {
+            @RequestHeader("Authorization") String authorization,
+            @RequestParam(required = false) Long locationId) {
 
         String email = getEmailByToken(authorization);
-        WeatherResponse.ExtraWeatherInfo extraWeatherInfo = weatherService.extraWeatherInfo(email);
+        WeatherResponse.ExtraWeatherInfo extraWeatherInfo = weatherService.extraWeatherInfo(email,locationId);
 
         return ApiResponse.onSuccess(extraWeatherInfo);
     }

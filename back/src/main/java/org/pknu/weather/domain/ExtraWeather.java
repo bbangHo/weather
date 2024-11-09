@@ -26,6 +26,13 @@ public class ExtraWeather extends BaseEntity {
     private Location location;
 
     private Integer uv;
+    private Integer uvPlus3;
+    private Integer uvPlus6;
+    private Integer uvPlus9;
+    private Integer uvPlus12;
+    private Integer uvPlus15;
+    private Integer uvPlus18;
+    private Integer uvPlus21;
     private Integer o3;
     private Integer pm10;
     private Integer pm25;
@@ -34,6 +41,27 @@ public class ExtraWeather extends BaseEntity {
         this.basetime = extraWeatherInfo.getBaseTime();
         if (extraWeatherInfo.getUvGrade() != null)
             this.uv = extraWeatherInfo.getUvGrade();
+
+        if (extraWeatherInfo.getUvGrade() != null)
+            this.uvPlus3 = extraWeatherInfo.getUvGradePlus3();
+
+        if (extraWeatherInfo.getUvGrade() != null)
+            this.uvPlus6 = extraWeatherInfo.getUvGradePlus6();
+
+        if (extraWeatherInfo.getUvGrade() != null)
+            this.uvPlus9 = extraWeatherInfo.getUvGradePlus9();
+
+        if (extraWeatherInfo.getUvGrade() != null)
+            this.uvPlus12 = extraWeatherInfo.getUvGradePlus12();
+
+        if (extraWeatherInfo.getUvGrade() != null)
+            this.uvPlus15 = extraWeatherInfo.getUvGradePlus15();
+
+        if (extraWeatherInfo.getUvGrade() != null)
+            this.uvPlus18 = extraWeatherInfo.getUvGradePlus18();
+
+        if (extraWeatherInfo.getUvGrade() != null)
+            this.uvPlus21 = extraWeatherInfo.getUvGradePlus21();
 
         if (extraWeatherInfo.getO3Grade() != null)
             this.o3 = extraWeatherInfo.getO3Grade();

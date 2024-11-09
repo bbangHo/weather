@@ -1,5 +1,6 @@
 package org.pknu.weather.feignClient.utils;
 
+import java.lang.reflect.Method;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
@@ -56,18 +57,46 @@ public class ExtraWeatherApiUtils {
                 .pm10Grade(airConditionInfo.getPm10Grade1h())
                 .pm25Grade(airConditionInfo.getPm25Grade1h())
                 .uvGrade(uvResult.getH0())
+                .uvGradePlus3(uvResult.getH3())
+                .uvGradePlus6(uvResult.getH6())
+                .uvGradePlus9(uvResult.getH9())
+                .uvGradePlus12(uvResult.getH12())
+                .uvGradePlus15(uvResult.getH15())
+                .uvGradePlus18(uvResult.getH18())
+                .uvGradePlus21(uvResult.getH21())
                 .build();
     }
 
-    private static void transferUvGrade(UVResponseDTO.Item uvResult) {
-        if(uvResult.getH0() <3)
-            uvResult.setH0(1);
-        else if (uvResult.getH0() <6)
-            uvResult.setH0(2);
-        else if (uvResult.getH0() <9)
-            uvResult.setH0(3);
-        else
-            uvResult.setH0(4);
+    public void transferUvGrade(UVResponseDTO.Item uvResult) {
+
+        int[] fieldNumbers = {0, 3, 6, 9, 12, 15, 18, 21};
+
+        try {
+            for (int fieldNumber : fieldNumbers) {
+                String getterMethodName = "getH" + fieldNumber;
+                Method getterMethod = uvResult.getClass().getMethod(getterMethodName);
+
+                Integer currentValue = (Integer) getterMethod.invoke(uvResult);
+
+                int newValue;
+                if (currentValue != null && currentValue < 3) {
+                    newValue = 1;
+                } else if (currentValue != null && currentValue < 6) {
+                    newValue = 2;
+                } else if (currentValue != null && currentValue < 9) {
+                    newValue = 3;
+                } else {
+                    newValue = 4;
+                }
+
+                String setterMethodName = "setH" + fieldNumber;
+                Method setterMethod = uvResult.getClass().getMethod(setterMethodName, Integer.class);
+
+                setterMethod.invoke(uvResult, newValue);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
     }
 
     public WeatherResponse.ExtraWeatherInfo getExtraWeatherInfo(LocationDTO locationDTO, LocalDateTime baseTime){
@@ -84,12 +113,26 @@ public class ExtraWeatherApiUtils {
                     .pm10Grade(airConditionInfo.getPm10Grade())
                     .pm25Grade(airConditionInfo.getPm25Grade())
                     .uvGrade(uvResult.getH0())
+                    .uvGradePlus3(uvResult.getH3())
+                    .uvGradePlus6(uvResult.getH6())
+                    .uvGradePlus9(uvResult.getH9())
+                    .uvGradePlus12(uvResult.getH12())
+                    .uvGradePlus15(uvResult.getH15())
+                    .uvGradePlus18(uvResult.getH18())
+                    .uvGradePlus21(uvResult.getH21())
                     .build();
         }
 
         return WeatherResponse.ExtraWeatherInfo.builder()
                 .baseTime(convertToLocalDateTime(uvResult.getDate()))
                 .uvGrade(uvResult.getH0())
+                .uvGradePlus3(uvResult.getH3())
+                .uvGradePlus6(uvResult.getH6())
+                .uvGradePlus9(uvResult.getH9())
+                .uvGradePlus12(uvResult.getH12())
+                .uvGradePlus15(uvResult.getH15())
+                .uvGradePlus18(uvResult.getH18())
+                .uvGradePlus21(uvResult.getH21())
                 .build();
     }
 

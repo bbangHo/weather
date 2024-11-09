@@ -11,6 +11,7 @@ import org.pknu.weather.dto.PostResponse;
 import org.pknu.weather.dto.TagDto;
 import org.pknu.weather.dto.WeatherResponse;
 import org.pknu.weather.dto.converter.WeatherResponseConverter;
+import org.pknu.weather.repository.LocationRepository;
 import org.pknu.weather.repository.MemberRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +28,7 @@ public class MainPageService {
     private final MemberRepository memberRepository;
     private final WeatherService weatherService;
     private final WeatherQueryService weatherQueryService;
-    private final PostService postService;
+    private final LocationRepository locationRepository;
     private final PostQueryService postQueryService;
     private final TagQueryService tagQueryService;
 
@@ -38,9 +39,17 @@ public class MainPageService {
      * @return
      */
     @Transactional
-    public WeatherResponse.MainPageWeatherData getWeatherInfo(String email) {
+    public WeatherResponse.MainPageWeatherData getWeatherInfo(String email, Long locationId) {
         Member member = memberRepository.safeFindByEmail(email);
-        Location location = member.getLocation();
+
+        Location location;
+        if (locationId != null) {
+            location = locationRepository.safeFindById(locationId);
+
+        } else {
+            location = member.getLocation();
+        }
+
         List<Weather> weatherList = new ArrayList<>();
 
         // 해당 지역에 날씨 예보가 있는지 없는지 체크
@@ -56,6 +65,7 @@ public class MainPageService {
         }
 
         weatherList = weatherService.getWeathers(location);
+
         return WeatherResponseConverter.toMainPageWeatherData(weatherList, member);
     }
 
