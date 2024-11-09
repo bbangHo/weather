@@ -46,6 +46,7 @@
 		5DCACB8F33CDC322A6C60F78 /* libPods-Weather2.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Weather2.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		689953E32C74A274001E4F25 /* Weather2-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Weather2-Bridging-Header.h"; sourceTree = "<group>"; };
 		689953E42C74A274001E4F25 /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
+		68E9250B2CDF940000D15438 /* Weather2.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Weather2.entitlements; path = Weather2/Weather2.entitlements; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = Weather2/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-Weather2-Weather2Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Weather2-Weather2Tests.release.xcconfig"; path = "Target Support Files/Pods-Weather2-Weather2Tests/Pods-Weather2-Weather2Tests.release.xcconfig"; sourceTree = "<group>"; };
 		DC2DEA4F98C34B47A797AA43 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = Weather2/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
@@ -92,6 +93,7 @@
 		13B07FAE1A68108700A75B9A /* Weather2 */ = {
 			isa = PBXGroup;
 			children = (
+				68E9250B2CDF940000D15438 /* Weather2.entitlements */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -443,6 +445,8 @@
 					"$(inherited)",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.capstone.weatherTests;
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=macosx*]" = com.capstone.weatherTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Weather2.app/Weather2";
 			};
@@ -468,6 +472,8 @@
 					"$(inherited)",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.capstone.weatherTests;
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=macosx*]" = com.capstone.weatherTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Weather2.app/Weather2";
 			};
@@ -479,7 +485,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Weather2/Weather2.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = TJ362775K4;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Weather2/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -492,7 +500,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.capstone.weather;
 				PRODUCT_NAME = Weather2;
 				SWIFT_OBJC_BRIDGING_HEADER = "Weather2-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -507,7 +515,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Weather2/Weather2.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = TJ362775K4;
 				INFOPLIST_FILE = Weather2/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -519,7 +529,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.capstone.weather;
 				PRODUCT_NAME = Weather2;
 				SWIFT_OBJC_BRIDGING_HEADER = "Weather2-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;

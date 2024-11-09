@@ -5,11 +5,14 @@ import {
   Alert,
   StyleSheet,
   TextInput,
-  TouchableOpacity,
   TouchableHighlight,
+  Platform,
 } from 'react-native';
 import {login} from '@react-native-seoul/kakao-login';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import appleAuth, {
+  AppleButton,
+} from '@invertase/react-native-apple-authentication';
 import {sendAccessTokenToBackend, refreshAccessToken} from '../api/api';
 
 const LoginScreen = ({
@@ -19,8 +22,38 @@ const LoginScreen = ({
   navigation,
 }) => {
   const [token, setToken] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+
+  const handleSignInApple = async () => {
+    try {
+      const appleAuthRequestResponse = await appleAuth.performRequest({
+        requestedOperation: appleAuth.Operation.LOGIN,
+        requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL],
+      });
+
+      const credentialState = await appleAuth.getCredentialStateForUser(
+        appleAuthRequestResponse.user,
+      );
+
+      if (credentialState === appleAuth.State.AUTHORIZED) {
+        console.log('Apple Login Successful:', appleAuthRequestResponse);
+
+        console.log('Identity Token:', appleAuthRequestResponse.identityToken);
+        console.log('User ID:', appleAuthRequestResponse.user);
+        console.log('Full Name:', appleAuthRequestResponse.fullName);
+        console.log('Email:', appleAuthRequestResponse.email);
+
+        Alert.alert('애플 로그인 성공', '로그를 확인해주세요.');
+      } else {
+        Alert.alert('애플 로그인 실패', '사용자가 인증되지 않았습니다.');
+      }
+    } catch (err) {
+      console.error('Apple Login Error:', err.message);
+      Alert.alert(
+        '애플 로그인 실패',
+        err.message || '알 수 없는 오류가 발생했습니다.',
+      );
+    }
+  };
 
   const handleKakaoLogin = async () => {
     try {
@@ -118,6 +151,7 @@ const LoginScreen = ({
         onChangeText={setToken}
         autoCapitalize="none"
         multiline={true}
+        placeholderTextColor="#000"
       />
 
       <TouchableHighlight
@@ -129,6 +163,19 @@ const LoginScreen = ({
       <TouchableHighlight style={styles.kakaoButton} onPress={handleKakaoLogin}>
         <Text style={styles.kakaoButtonText}>카카오톡으로 로그인</Text>
       </TouchableHighlight>
+
+      {Platform.OS === 'ios' && (
+        <AppleButton
+          buttonStyle={AppleButton.Style.WHITE}
+          buttonType={AppleButton.Type.SIGN_IN}
+          style={{
+            width: '100%',
+            height: 45,
+            marginTop: 20,
+          }}
+          onPress={handleSignInApple}
+        />
+      )}
     </View>
   );
 };
@@ -143,6 +190,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     marginBottom: 20,
+    color: '#000',
   },
   input: {
     width: '100%',
@@ -153,15 +201,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     height: 80,
     textAlignVertical: 'top',
-  },
-  signupText: {
-    marginTop: 10,
-    textDecorationLine: 'underline',
-  },
-  kakaoTitle: {
-    fontSize: 16,
-    marginVertical: 15,
-    marginTop: 50,
   },
   kakaoButton: {
     backgroundColor: '#FEE500',
