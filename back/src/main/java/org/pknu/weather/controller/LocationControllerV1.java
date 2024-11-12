@@ -49,7 +49,7 @@ public class LocationControllerV1 {
     }
 
     @GetMapping("/locationInfo")
-    public ApiResponse<List<String>> getMemberDefaultLocation(@RequestParam String province, String city) {
+    public ApiResponse<List<String>> getLocationName(@RequestParam(required = false) String province, String city) {
 
         if((city != null && !city.isEmpty()) && (province == null || province.isEmpty()))
             throw new GeneralException(ErrorStatus._PROVINCE_NOT_FOUND);
