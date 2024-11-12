@@ -134,7 +134,7 @@ const PostScroll = ({accessToken}) => {
                 {
                   tintColor: item.postInfo.likeClickable
                     ? '#da4133'
-                    : '#3f51b5',
+                    : '#d3d3d3',
                 },
               ]}
             />

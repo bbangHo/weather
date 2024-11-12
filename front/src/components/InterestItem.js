@@ -11,7 +11,12 @@ import {
   ScrollView,
   Platform,
 } from 'react-native';
-import {fetchUserLocation, fetchLocationInfo, submitAddress} from '../api/api';
+import {
+  fetchUserLocation,
+  fetchLocationInfo,
+  submitAddress,
+  fetchWeatherData,
+} from '../api/api';
 
 const InterestItem = ({
   accessToken,
@@ -28,6 +33,8 @@ const InterestItem = ({
   const [street, setStreet] = useState('');
   const [step, setStep] = useState(0);
 
+  const [hobbiesWeatherData, setHobbiesWeatherData] = useState([]);
+
   useEffect(() => {
     const loadUserLocation = async () => {
       try {
@@ -42,6 +49,40 @@ const InterestItem = ({
       loadUserLocation();
     }
   }, [accessToken]);
+
+  useEffect(() => {
+    const loadWeatherData = async () => {
+      if (!userLocation) return;
+
+      try {
+        const weatherData = await fetchWeatherData(
+          accessToken,
+          userLocation.city,
+          userLocation.street,
+        );
+        console.log('Fetched weather data:', weatherData);
+
+        if (weatherData.isSuccess && weatherData.result.weatherPerHourList) {
+          const formattedData = weatherData.result.weatherPerHourList
+            .slice(0, 10)
+            .map(item => ({
+              hour: new Date(item.hour).getHours() + '시',
+              skyType: item.skyType,
+              tmp: item.tmp,
+              rain: item.rain,
+            }));
+
+          setHobbiesWeatherData(formattedData);
+        } else {
+          console.error('Weather data fetch failed:', weatherData.message);
+        }
+      } catch (error) {
+        console.error('Error fetching weather data:', error);
+      }
+    };
+
+    loadWeatherData();
+  }, [userLocation, accessToken]);
 
   const fetchLocationData = async currentStep => {
     try {
@@ -134,19 +175,6 @@ const InterestItem = ({
     </View>
   );
 
-  const getWeatherIcon = skyType => {
-    switch (skyType) {
-      case 'CLEAR':
-        return require('../../assets/images/icon_clear.png');
-      case 'PARTLYCLOUDY':
-        return require('../../assets/images/icon_partlycloudy.png');
-      case 'CLOUDY':
-        return require('../../assets/images/icon_cloudy.png');
-      default:
-        return require('../../assets/images/icon_default.png');
-    }
-  };
-
   const hobbies = [
     {
       id: 1,
@@ -168,12 +196,41 @@ const InterestItem = ({
     },
   ];
 
-  const hobbiesWeatherData = [
-    {hour: '12시', skyType: 'CLEAR', tmp: '25', rain: '0'},
-    {hour: '13시', skyType: 'PARTLYCLOUDY', tmp: '26', rain: '0'},
-    {hour: '14시', skyType: 'CLOUDY', tmp: '24', rain: '1'},
-    {hour: '15시', skyType: 'CLEAR', tmp: '25', rain: '0'},
-  ];
+  const getHobbyIcon = () => {
+    switch (selectedHobby?.postType) {
+      case 'HIKING':
+        return require('../../assets/images/icon_interest_hiking.png');
+      case 'PET':
+        return require('../../assets/images/icon_interest_pet.png');
+      case 'RUN':
+      default:
+        return require('../../assets/images/icon_interest_run.png');
+    }
+  };
+
+  const getGrade = (rain, tmp) => {
+    if (rain > 0) return '나쁨';
+    if (tmp >= 33 || tmp <= -12) return '매우 나쁨';
+    if (tmp >= 28 || tmp <= 4) return '나쁨';
+    if ((tmp >= 24 && tmp <= 27) || (tmp >= 5 && tmp <= 14)) return '보통';
+    if (tmp >= 15 && tmp <= 23) return '좋음';
+    return '정보 없음';
+  };
+
+  const getGradeColor = grade => {
+    switch (grade) {
+      case '좋음':
+        return '#81BEF7';
+      case '보통':
+        return '#A9F5A9';
+      case '나쁨':
+        return '#F78181';
+      case '매우 나쁨':
+        return '#DB4455';
+      default:
+        return '#c4c4c4';
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -184,10 +241,39 @@ const InterestItem = ({
             : '위치 정보를 불러오는 중...'}
         </Text>
       </TouchableOpacity>
-
       <View style={styles.weatherIconContainer}>
-        <Image source={getWeatherIcon('CLEAR')} style={styles.weatherIcon} />
-        <Text style={styles.weatherText}>보통</Text>
+        {hobbiesWeatherData.length > 0 && (
+          <>
+            <Image
+              source={getHobbyIcon()}
+              style={[
+                styles.weatherIcon,
+                {
+                  tintColor: getGradeColor(
+                    getGrade(
+                      hobbiesWeatherData[0].rain,
+                      hobbiesWeatherData[0].tmp,
+                    ),
+                  ),
+                },
+              ]}
+            />
+            <Text
+              style={[
+                styles.weatherText,
+                {
+                  color: getGradeColor(
+                    getGrade(
+                      hobbiesWeatherData[0].rain,
+                      hobbiesWeatherData[0].tmp,
+                    ),
+                  ),
+                },
+              ]}>
+              {getGrade(hobbiesWeatherData[0].rain, hobbiesWeatherData[0].tmp)}
+            </Text>
+          </>
+        )}
       </View>
 
       <View style={styles.hobbyContainer}>
@@ -199,7 +285,6 @@ const InterestItem = ({
           </View>
         </TouchableOpacity>
       </View>
-
       <Modal
         visible={modalVisible}
         transparent={true}
@@ -248,7 +333,6 @@ const InterestItem = ({
           </View>
         </View>
       </Modal>
-
       <Modal
         visible={addressModalVisible}
         transparent={true}
@@ -285,16 +369,26 @@ const InterestItem = ({
           </View>
         </View>
       </Modal>
-
       <ScrollView style={styles.hourlyContainer} horizontal>
-        {hobbiesWeatherData.map((item, index) => (
-          <View key={index} style={styles.timeSlot}>
-            <Text style={styles.textTime}>{item.hour}</Text>
-            <Image source={getWeatherIcon(item.skyType)} style={styles.icon} />
-            <Text style={styles.tmpText}>{`${item.tmp}°C`}</Text>
-            <Text style={styles.rainText}>{`${item.rain}mm`}</Text>
-          </View>
-        ))}
+        {hobbiesWeatherData.map((item, index) => {
+          const grade = getGrade(item.rain, item.tmp);
+          const gradeColor = getGradeColor(grade);
+
+          return (
+            <View key={index} style={styles.timeSlot}>
+              <Text style={styles.textTime}>{item.hour}</Text>
+              <Image
+                source={getHobbyIcon()}
+                style={[styles.icon, {tintColor: gradeColor}]}
+              />
+              <Text style={[styles.gradeText, {color: gradeColor}]}>
+                {grade}
+              </Text>
+              <Text style={styles.tmpText}>{`${item.tmp}°C`}</Text>
+              <Text style={styles.rainText}>{`${item.rain}mm`}</Text>
+            </View>
+          );
+        })}
       </ScrollView>
     </View>
   );
@@ -338,14 +432,13 @@ const styles = StyleSheet.create({
     marginVertical: 30,
   },
   weatherIcon: {
-    width: 50,
-    height: 50,
-    tintColor: '#fff',
+    width: 60,
+    height: 60,
   },
   weatherText: {
     color: '#fff',
     fontSize: 18,
-    marginTop: 5,
+    marginTop: 10,
   },
   hobbyContainer: {
     alignItems: 'center',
@@ -472,30 +565,36 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
     width: 80,
     padding: 10,
-    paddingVertical: 30,
+    paddingVertical: 25,
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     borderRadius: 10,
   },
   textTime: {
     color: '#fff',
     fontSize: 13,
-    marginBottom: 5,
+    marginBottom: 15,
     textAlign: 'center',
   },
   icon: {
-    width: 40,
-    height: 40,
-    marginBottom: 5,
+    width: 45,
+    height: 45,
+    marginBottom: 2,
   },
   tmpText: {
     color: '#fff',
     fontSize: 14,
-    marginBottom: 3,
+    marginTop: 20,
     textAlign: 'center',
   },
   rainText: {
     color: 'skyblue',
     fontSize: 12,
+    marginTop: 3,
+    textAlign: 'center',
+  },
+  gradeText: {
+    fontSize: 12,
+    marginTop: 5,
     textAlign: 'center',
   },
 });

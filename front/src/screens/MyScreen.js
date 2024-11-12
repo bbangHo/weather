@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   Platform,
 } from 'react-native';
-import {fetchMemberInfo, deleteMember} from '../api/api';
+import {fetchMemberInfo, deleteMember, refreshAccessToken} from '../api/api';
 import profilePlaceholder from '../../assets/images/profile.png';
 import loadingIcon from '../../assets/images/icon_loading.png';
 import {logout} from '@react-native-seoul/kakao-login';
@@ -98,6 +98,32 @@ const MyScreen = ({
   };
 
   const handleDeleteAccount = async () => {
+    if (!accessToken) {
+      Alert.alert('오류', '유효한 인증 토큰이 없습니다.');
+      return;
+    }
+
+    const ensureAccessToken = async () => {
+      try {
+        const newAccessToken = await refreshAccessToken(accessToken);
+        if (newAccessToken) {
+          console.log('New access token:', newAccessToken);
+          await AsyncStorage.setItem('accessToken', newAccessToken);
+          setAccessToken(newAccessToken);
+          return newAccessToken;
+        } else {
+          console.log('Access token remains the same:', accessToken);
+          return accessToken;
+        }
+      } catch (error) {
+        console.error('Failed to refresh access token:', error);
+        Alert.alert('오류', '인증이 만료되었습니다. 다시 로그인해주세요.', [
+          {text: '확인', onPress: handleLogout},
+        ]);
+        throw error;
+      }
+    };
+
     Alert.alert(
       '회원 탈퇴',
       '정말 탈퇴하시겠습니까?',
@@ -107,7 +133,8 @@ const MyScreen = ({
           text: '네',
           onPress: async () => {
             try {
-              await deleteMember(accessToken);
+              const validAccessToken = await ensureAccessToken();
+              await deleteMember(validAccessToken);
               Alert.alert('탈퇴 완료', '회원 탈퇴가 완료되었습니다.');
               setIsNewMember(true);
               setIsLoggedIn(false);

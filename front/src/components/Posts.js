@@ -128,7 +128,7 @@ const Posts = ({accessToken}) => {
                 {
                   tintColor: item.postInfo.likeClickable
                     ? '#da4133'
-                    : '#3f51b5',
+                    : '#d3d3d3',
                 },
               ]}
             />
@@ -168,9 +168,11 @@ const Posts = ({accessToken}) => {
         <View style={[styles.section, {width: screenWidth}]}>
           <Card
             containerStyle={[styles.card, globalStyles.transparentBackground]}>
-            <View style={styles.moreContainer}>
+            <TouchableOpacity
+              style={styles.moreContainer}
+              onPress={() => navigation.navigate('Community')}>
               <Text style={styles.moreText}>더 보기</Text>
-            </View>
+            </TouchableOpacity>
           </Card>
         </View>
       }
