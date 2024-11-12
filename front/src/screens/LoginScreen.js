@@ -7,13 +7,20 @@ import {
   TextInput,
   TouchableHighlight,
   Platform,
+  PermissionsAndroid,
+  Linking,
 } from 'react-native';
 import {login} from '@react-native-seoul/kakao-login';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import appleAuth, {
   AppleButton,
 } from '@invertase/react-native-apple-authentication';
-import {sendAccessTokenToBackend, refreshAccessToken} from '../api/api';
+import Geolocation from 'react-native-geolocation-service';
+import {
+  sendAccessTokenToBackend,
+  sendLocationToBackend,
+  refreshAccessToken,
+} from '../api/api';
 
 const LoginScreen = ({
   setIsLoggedIn,
@@ -82,7 +89,7 @@ const LoginScreen = ({
         );
       }
     } catch (err) {
-      console.error('Login failed:', err.message);
+      console.error('Kakao Login Failed:', err.message);
       Alert.alert('로그인 실패', err.message);
     }
   };
@@ -104,12 +111,96 @@ const LoginScreen = ({
         '로그인 성공',
         '테스트 토큰으로 성공적으로 로그인되었습니다.',
       );
+
+      const permissionGranted = await requestLocationPermission();
+      if (permissionGranted) {
+        await getCurrentLocation(token);
+      } else {
+        Alert.alert(
+          '위치 권한 필요',
+          '위치 정보를 등록하려면 권한을 허용해주세요. 앱 설정에서 권한을 활성화하세요.',
+          [
+            {text: '취소', style: 'cancel'},
+            {
+              text: '설정 열기',
+              onPress: async () => {
+                try {
+                  await Linking.openSettings();
+                } catch (error) {
+                  console.error('Error opening settings:', error);
+                  Alert.alert('오류', '설정을 열 수 없습니다.');
+                }
+              },
+            },
+          ],
+        );
+      }
     } catch (err) {
+      console.error('로그인 실패:', err.message);
       Alert.alert('로그인 실패', err.message);
     }
   };
 
+  const requestLocationPermission = async () => {
+    try {
+      if (Platform.OS === 'ios') {
+        const status = await Geolocation.requestAuthorization('whenInUse');
+        return status === 'granted';
+      } else {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+          {
+            title: '위치 접근 권한',
+            message: '앱에서 위치 정보를 사용하려면 권한이 필요합니다.',
+            buttonNeutral: '나중에',
+            buttonNegative: '취소',
+            buttonPositive: '허용',
+          },
+        );
+        return granted === PermissionsAndroid.RESULTS.GRANTED;
+      }
+    } catch (error) {
+      console.error('Error requesting location permission:', error);
+      return false;
+    }
+  };
+
+  const getCurrentLocation = async token => {
+    Geolocation.getCurrentPosition(
+      async position => {
+        const {longitude, latitude} = position.coords;
+        try {
+          const response = await sendLocationToBackend(
+            longitude,
+            latitude,
+            token,
+          );
+          console.log('Location registered successfully:', response);
+          Alert.alert(
+            '위치 등록 완료',
+            '위치 정보가 성공적으로 등록되었습니다.',
+          );
+        } catch (error) {
+          console.error('Error registering location:', error);
+          Alert.alert(
+            '위치 등록 실패',
+            '위치 정보를 등록하는 중 오류가 발생했습니다.',
+          );
+        }
+      },
+      error => {
+        console.error('Error getting current position:', error);
+        Alert.alert(
+          '위치 정보를 가져올 수 없습니다.',
+          '위치 권한을 확인해주세요.',
+        );
+      },
+      {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+    );
+  };
+
   useEffect(() => {
+    /*
     const refreshTokenImmediately = async () => {
       try {
         console.log('Attempting to refresh token immediately...');
@@ -138,6 +229,7 @@ const LoginScreen = ({
       }
     }, 15 * 60 * 1000);
     return () => clearInterval(interval);
+    */
   }, []);
 
   return (

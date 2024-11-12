@@ -207,6 +207,7 @@ const RegisterProfileScreen = ({setIsNewMember, accessToken}) => {
         placeholder="닉네임을 입력하세요"
         onChangeText={setNickname}
         editable={true}
+        placeholderTextColor="#000"
       />
 
       <Text style={styles.label}>날씨 체감 유형</Text>
