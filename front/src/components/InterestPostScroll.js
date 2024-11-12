@@ -160,7 +160,7 @@ const InterestPostScroll = ({accessToken, selectedHobby}) => {
                 styles.likeIcon,
                 {
                   tintColor: item.postInfo.likeClickable
-                    ? '#3f51b5'
+                    ? '#d3d3d3'
                     : '#da4133',
                 },
               ]}

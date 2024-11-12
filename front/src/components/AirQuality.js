@@ -4,9 +4,13 @@ import globalStyles from '../globalStyles';
 import {fetchExtraWeatherInfo} from '../api/api';
 
 const AirQuality = ({accessToken}) => {
-  const [extraWeatherInfo, setExtraWeatherInfo] = useState(null);
+  const [extraWeatherInfo, setExtraWeatherInfo] = useState({
+    pm25Grade: 0,
+    pm10Grade: 0,
+    uvGrade: 0,
+    o3Grade: 0,
+  });
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   const getGradeText = grade => {
     switch (grade) {
@@ -44,9 +48,9 @@ const AirQuality = ({accessToken}) => {
         const data = await fetchExtraWeatherInfo(accessToken);
         console.log('fetched extra weather info:', data);
         setExtraWeatherInfo(data);
-        setLoading(false);
       } catch (error) {
-        setError(error.message);
+        console.error('Error fetching extra weather info:', error);
+      } finally {
         setLoading(false);
       }
     };
@@ -55,14 +59,6 @@ const AirQuality = ({accessToken}) => {
       loadExtraWeatherInfo();
     }
   }, [accessToken]);
-
-  if (loading) {
-    return <Text style={styles.loadingText}>데이터를 불러오는 중...</Text>;
-  }
-
-  if (error) {
-    return <Text style={styles.errorText}>error: {error}</Text>;
-  }
 
   return (
     <View style={styles.container}>
