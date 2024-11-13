@@ -1,5 +1,7 @@
 package org.pknu.weather.dto.converter;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.pknu.weather.common.formatter.DateTimeFormatter;
 import org.pknu.weather.common.utils.RecommendationUtils;
 import org.pknu.weather.domain.Location;
@@ -8,17 +10,14 @@ import org.pknu.weather.domain.Post;
 import org.pknu.weather.domain.Recommendation;
 import org.pknu.weather.dto.PostResponse;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class PostResponseConverter {
 
-    public static PostResponse.PostList toPostList(Member member, List<Post> postList, boolean hasNext) {
+    public static PostResponse.PostList toPostList(List<Post> postList, boolean hasNext) {
         List<PostResponse.Post> list = new ArrayList<>(postList.stream()
-                .map(p -> toPost(member, p))
+                .map(PostResponseConverter::toPost)
                 .toList());
 
-        if(hasNext) {
+        if (hasNext) {
             list.remove(list.size() - 1);
         }
 
@@ -31,11 +30,13 @@ public class PostResponseConverter {
 
     public static List<PostResponse.Post> toPopularPostList(Member member, List<Post> popularPostList) {
         return popularPostList.stream()
-                .map(post -> toPost(member, post))
+                .map(PostResponseConverter::toPost)
                 .toList();
     }
 
-    private static PostResponse.Post toPost(Member member, Post post) {
+    private static PostResponse.Post toPost(Post post) {
+        Member member = post.getMember();
+
         return PostResponse.Post.builder()
                 .postInfo(toPostInfo(post, member))
                 .memberInfo(toMemberInfo(member))
