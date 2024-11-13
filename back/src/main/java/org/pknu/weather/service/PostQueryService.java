@@ -25,7 +25,7 @@ public class PostQueryService {
                                                  Long locationId) {
         Member member = memberRepository.safeFindByEmail(email);
         List<Post> postList = postService.getPosts(member.getId(), lastPostId, size, postType, locationId);
-        return PostResponseConverter.toPostList(member, postList, postList.size() > size);
+        return PostResponseConverter.toPostList(postList, postList.size() > size);
     }
 
     public List<PostResponse.Post> getPopularPosts(String email) {

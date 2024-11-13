@@ -34,10 +34,12 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
      * @param postType
      * @return size + 1 개의 Post
      */
+    // TODO: tag 도 함께 페치 조인하여 n + 1 문제를 해결해야함(적용하니까 쿼리 결과가 0개 날라와서 일단 주석처리)
     public List<Post> findAllWithinDistance(Long lastPostId, Long size, Location locationEntity, PostType postType) {
         return jpaQueryFactory.selectFrom(post)
                 .join(post.location, location).fetchJoin()
                 .join(post.member, member).fetchJoin()
+//                .join(post.tag, tag)
                 .where(
                         goeLastPostId(lastPostId),
                         QueryUtils.isContains(locationEntity),
