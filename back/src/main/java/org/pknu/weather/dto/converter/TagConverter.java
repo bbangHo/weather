@@ -1,6 +1,7 @@
 package org.pknu.weather.dto.converter;
 
 import lombok.RequiredArgsConstructor;
+import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Tag;
 import org.pknu.weather.domain.tag.EnumTag;
 import org.pknu.weather.dto.PostRequest;
@@ -16,8 +17,9 @@ public class TagConverter {
         return tag.findByCode(code);
     }
 
-    public static Tag toTag(PostRequest.CreatePost createPost) {
+    public static Tag toTag(PostRequest.CreatePost createPost, Location location) {
         return Tag.builder()
+                .location(location)
                 .temperTag(createPost.getTemperatureTag())
                 .skyTag(createPost.getSkyTag())
                 .humidityTag(createPost.getHumidityTag())

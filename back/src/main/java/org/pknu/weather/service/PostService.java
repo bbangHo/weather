@@ -1,25 +1,18 @@
 package org.pknu.weather.service;
 
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.pknu.weather.domain.Location;
-import org.pknu.weather.domain.Member;
-import org.pknu.weather.domain.Post;
-import org.pknu.weather.domain.Recommendation;
-import org.pknu.weather.domain.Tag;
+import org.pknu.weather.domain.*;
 import org.pknu.weather.domain.common.PostType;
 import org.pknu.weather.dto.PostRequest;
 import org.pknu.weather.dto.converter.PostConverter;
 import org.pknu.weather.dto.converter.RecommendationConverter;
 import org.pknu.weather.dto.converter.TagConverter;
-import org.pknu.weather.repository.LocationRepository;
-import org.pknu.weather.repository.MemberRepository;
-import org.pknu.weather.repository.PostRepository;
-import org.pknu.weather.repository.RecommendationRepository;
-import org.pknu.weather.repository.TagRepository;
+import org.pknu.weather.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -53,10 +46,11 @@ public class PostService {
     public boolean createWeatherPost(String email, PostRequest.CreatePost createPost) {
         Member member = memberRepository.safeFindByEmail(email);
         Location location = member.getLocation();
-        Tag tag = TagConverter.toTag(createPost);
+        Tag tag = TagConverter.toTag(createPost, location);
         Post post = PostConverter.toPost(member, location, tag, createPost);
 
-        postRepository.save(post);
+        post = postRepository.save(post);
+        post.addTag(tag);
         tagRepository.save(tag);
 
         return true;
