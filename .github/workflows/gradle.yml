@@ -138,6 +138,10 @@ jobs:
     if: ${{ success() }}
 
     steps:
+      # 타임존 설정
+      - name: Set timezone
+      - run: sudo timedatectl set-timezone Asia/Seoul
+
       # 최신 Docker 이미지를 풀
       - name: Pull the latest Docker image
         run: sudo docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/github-actions-demo
