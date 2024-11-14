@@ -1,5 +1,12 @@
 package org.pknu.weather.service;
 
+import static org.pknu.weather.dto.converter.LocationConverter.toLocationDTO;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
@@ -27,14 +34,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-
-import static org.pknu.weather.dto.converter.LocationConverter.toLocationDTO;
 
 @Service
 @RequiredArgsConstructor
@@ -127,32 +126,20 @@ public class WeatherService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void updateWeathers(Location loc) {
         Location location = locationRepository.safeFindById(loc.getId());
+        weatherRepository.deleteAllByLocation(location);
 
-        List<Weather> newWeatherList = getVillageShortTermForecast(location);
+        List<Weather> newWeathers = getVillageShortTermForecast(location).stream()
+                .toList();
 
-        List<Weather> orderWeatherList = new ArrayList<>(
-                weatherRepository.findAllWithLocation(location, LocalDateTime.now().plusHours(24)).stream()
-                        .sorted(Comparator.comparing(Weather::getPresentationTime))
-                        .toList());
+        newWeathers.forEach(weather -> {
+            weather.addLocation(location);
+        });
 
-        int minLen = Math.min(newWeatherList.size(), orderWeatherList.size());
-        int maxLen = Math.max(newWeatherList.size(), orderWeatherList.size());
-
-        for (int i = 0; i < minLen; i++) {
-            Weather orderWeather = orderWeatherList.get(i);
-            Weather newWeather = newWeatherList.get(i);
-            orderWeather.updateWeather(newWeather);
-        }
-
-        List<Weather> subList = new ArrayList<>(newWeatherList.subList(minLen, maxLen));
-        subList.forEach(weather -> weather.addLocation(location));
-        orderWeatherList.addAll(subList);
-
-        weatherRepository.saveAll(orderWeatherList);
+        weatherRepository.saveAll(newWeathers);
     }
 
     /**
-     * 예보 시간이 현재 보다 과거이면 모두 삭제합니다.
+     * 예보 시간이 현재 보다 과거이면 모두 삭제합니다.v
      */
     @Async("threadPoolDeleteTaskExecutor")
     public void bulkDeletePastWeather() {

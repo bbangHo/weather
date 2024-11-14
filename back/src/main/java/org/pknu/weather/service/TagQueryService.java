@@ -27,7 +27,7 @@ public class TagQueryService {
     /**
      * 간단 날씨 보기 기능에서 태그 정보를 불러온다.
      *
-     * @param memberId
+     * @param email
      * @return
      */
     public List<TagDto.SimpleTag> getMostSelectedTags(String email) {
