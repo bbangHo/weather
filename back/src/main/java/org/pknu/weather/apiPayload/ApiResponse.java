@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.pknu.weather.apiPayload.code.BaseCode;
+import org.pknu.weather.apiPayload.code.status.ErrorStatus;
 import org.pknu.weather.apiPayload.code.status.SuccessStatus;
 
 @Getter
@@ -20,12 +21,28 @@ public class ApiResponse<T> {
     @JsonInclude(JsonInclude.Include.NON_NULL)  // null인 데이터는 제외한다.
     private T result;
 
+    public static <T> ApiResponse<T> onSuccess() {
+        return new ApiResponse<>(true, SuccessStatus._OK.getCode(), SuccessStatus._OK.getMessage(), null);
+    }
+
     public static <T> ApiResponse<T> onSuccess(T result) {
         return new ApiResponse<>(true, SuccessStatus._OK.getCode(), SuccessStatus._OK.getMessage(), result);
     }
 
     public static <T> ApiResponse<T> of(BaseCode code, T result) {
         return new ApiResponse<>(true, code.getReasonHttpStatus().getCode(), code.getReasonHttpStatus().getMessage(), result);
+    }
+
+    public static <T> ApiResponse<T> of(BaseCode code, String message, T result) {
+        return new ApiResponse<>(true, code.getReasonHttpStatus().getCode(), message, result);
+    }
+
+    public static <T> ApiResponse<T> of(boolean isSuccess) {
+        if(isSuccess) {
+            return new ApiResponse<>(true, SuccessStatus._OK.getCode(), SuccessStatus._OK.getMessage(), null);
+        }
+
+        return new ApiResponse<>(false, ErrorStatus._BAD_REQUEST.getCode(), ErrorStatus._BAD_REQUEST.getMessage(), null);
     }
 
     public static <T> ApiResponse<T> onFailure(String code, String message, T data) {

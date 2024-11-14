@@ -1,7 +1,8 @@
 package org.pknu.weather.domain;
+
 import jakarta.persistence.*;
 import lombok.*;
-import org.pknu.weather.common.BaseEntity;
+import org.pknu.weather.domain.tag.*;
 
 @Entity
 @Getter
@@ -15,12 +16,26 @@ public class Tag extends BaseEntity {
     @Column(name = "tag_id")
     private Long id;
 
-    private String temperTag;
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "post_id")
+    private Post post;
 
-    private String windTag;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "location_id")
+    private Location location;
 
-    private String skyTag;
+    @Enumerated(EnumType.STRING)
+    private TemperatureTag temperTag;
 
-    private String dustTag;
+    @Enumerated(EnumType.STRING)
+    private WindTag windTag;
 
+    @Enumerated(EnumType.STRING)
+    private HumidityTag humidityTag;
+
+    @Enumerated(EnumType.STRING)
+    private SkyTag skyTag;
+
+    @Enumerated(EnumType.STRING)
+    private DustTag dustTag;
 }

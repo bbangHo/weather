@@ -2,7 +2,6 @@ package org.pknu.weather.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.pknu.weather.common.BaseEntity;
 
 @Entity
 @Getter
@@ -20,7 +19,7 @@ public class Recommendation extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @JoinColumn(name = "post_id")
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id")
     private Post post;
 }
