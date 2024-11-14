@@ -162,7 +162,13 @@ jobs:
 
       # 새로운 Docker 컨테이너를 실행
       - name: Run the new Docker container
-        run: sudo docker run --name neighborhood_weather_community_app --rm -d -p 8080:8080 ${{ secrets.DOCKER_HUB_USERNAME }}/github-actions-demo
+        run: |
+          sudo docker run --name neighborhood_weather_community_app \
+          -e TZ=Asia/Seoul \
+          -v /etc/localtime:/etc/localtime:ro \
+          -v /etc/timezone:/etc/timezone:ro \
+          --rm -d -p 8080:8080 \
+          ${{ secrets.DOCKER_HUB_USERNAME }}/github-actions-demo
 
       # 사용하지 않는 Docker 이미지를 정리
       - name: Clean up unused Docker images
