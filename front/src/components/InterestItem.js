@@ -16,6 +16,7 @@ import {
   fetchLocationInfo,
   submitAddress,
   fetchWeatherData,
+  fetchExtraWeatherInfo,
 } from '../api/api';
 
 const InterestItem = ({
@@ -34,12 +35,18 @@ const InterestItem = ({
   const [step, setStep] = useState(0);
 
   const [hobbiesWeatherData, setHobbiesWeatherData] = useState([]);
+  const [pm10Grade, setPm10Grade] = useState(null);
+  const [locationId, setLocationId] = useState(null);
 
   useEffect(() => {
     const loadUserLocation = async () => {
       try {
         const locationData = await fetchUserLocation(accessToken);
         setUserLocation(locationData);
+        if (locationData && locationData.id) {
+          setLocationId(locationData.id);
+          console.log('Fetched locationId:', locationData.id);
+        }
       } catch (error) {
         console.error('위치 정보를 불러오는 중 에러가 발생했습니다:', error);
       }
@@ -52,14 +59,8 @@ const InterestItem = ({
 
   useEffect(() => {
     const loadWeatherData = async () => {
-      if (!userLocation) return;
-
       try {
-        const weatherData = await fetchWeatherData(
-          accessToken,
-          userLocation.city,
-          userLocation.street,
-        );
+        const weatherData = await fetchWeatherData(accessToken, locationId);
         console.log('Fetched weather data:', weatherData);
 
         if (weatherData.isSuccess && weatherData.result.weatherPerHourList) {
@@ -81,8 +82,35 @@ const InterestItem = ({
       }
     };
 
+    const loadExtraWeatherInfo = async () => {
+      try {
+        const extraWeatherData = await fetchExtraWeatherInfo(
+          accessToken,
+          locationId,
+        );
+        console.log('Fetched extra weather info:', extraWeatherData);
+
+        if (extraWeatherData?.pm10Grade !== undefined) {
+          setPm10Grade(extraWeatherData.pm10Grade);
+        } else {
+          console.error(
+            'pm10Grade is missing in extra weather data:',
+            extraWeatherData,
+          );
+          setPm10Grade(0);
+        }
+      } catch (error) {
+        console.error(
+          'Error fetching extra weather info:',
+          error.message || error,
+        );
+        setPm10Grade(0);
+      }
+    };
+
     loadWeatherData();
-  }, [userLocation, accessToken]);
+    loadExtraWeatherInfo();
+  }, [userLocation, accessToken, locationId]);
 
   const fetchLocationData = async currentStep => {
     try {
@@ -140,7 +168,16 @@ const InterestItem = ({
     try {
       const response = await submitAddress(accessToken, province, city, street);
       console.log('주소 생성:', response);
-      setUserLocation(response.result);
+
+      if (response.result && response.result.id) {
+        setUserLocation(response.result);
+        setLocationId(response.result.id);
+        console.log(
+          'Fetched locationId (id) from address:',
+          response.result.id,
+        );
+      }
+
       setAddressModalVisible(false);
     } catch (error) {
       console.error('주소 생성 중 에러 발생:', error);
@@ -210,6 +247,8 @@ const InterestItem = ({
 
   const getGrade = (rain, tmp) => {
     if (rain > 0) return '나쁨';
+    if (pm10Grade === 4) return '매우 나쁨';
+    if (pm10Grade === 3) return '나쁨';
     if (tmp >= 33 || tmp <= -12) return '매우 나쁨';
     if (tmp >= 28 || tmp <= 4) return '나쁨';
     if ((tmp >= 24 && tmp <= 27) || (tmp >= 5 && tmp <= 14)) return '보통';

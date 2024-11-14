@@ -146,12 +146,16 @@ const Posts = ({accessToken}) => {
       keyExtractor={item => item.postInfo.postId.toString()}
       renderItem={renderPost}
       horizontal
-      pagingEnabled
       showsHorizontalScrollIndicator={false}
+      ItemSeparatorComponent={() => <View style={{width: 5}} />}
       ListHeaderComponent={
-        <View style={[styles.section, {width: screenWidth}]}>
+        <View style={[styles.section, {width: screenWidth * 0.96}]}>
           <Card
-            containerStyle={[styles.card, globalStyles.transparentBackground]}>
+            containerStyle={[
+              styles.card,
+              globalStyles.transparentBackground,
+              {width: '92%'},
+            ]}>
             <Text style={styles.sectionText}>외출하셨나요?</Text>
             <Text style={styles.sectionText}>우리 동네의 날씨는 어떤가요?</Text>
             <View style={styles.buttonContainer}>
@@ -192,8 +196,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderColor: 'rgba(255, 255, 255, 0)',
     padding: 15,
-    marginHorizontal: 5,
-    width: windowWidth * 0.93,
+    marginHorizontal: 10,
+    width: windowWidth * 0.97,
     height: 150,
     justifyContent: 'space-between',
     position: 'relative',
