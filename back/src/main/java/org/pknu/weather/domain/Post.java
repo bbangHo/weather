@@ -26,7 +26,7 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "location_id")
     private Location location;
 
-    @OneToOne(mappedBy = "post", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Tag tag;
 
     @ManyToOne(fetch = FetchType.LAZY)

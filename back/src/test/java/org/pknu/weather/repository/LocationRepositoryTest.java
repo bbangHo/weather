@@ -1,14 +1,7 @@
 package org.pknu.weather.repository;
 
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import jakarta.transaction.Transactional;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,6 +11,14 @@ import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Weather;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 class LocationRepositoryTest {
@@ -31,6 +32,7 @@ class LocationRepositoryTest {
     @BeforeEach
     void init() {
         Location location = TestDataCreator.getBusanLocation();
+        location = locationRepository.save(location);
 
         List<Weather> weatherList = new ArrayList<>();
 
