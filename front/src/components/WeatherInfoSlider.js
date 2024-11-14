@@ -74,7 +74,7 @@ const WeatherInfoSlider = ({accessToken}) => {
           <View style={styles.infoContainer}>
             {weatherTags.map((tag, index) => (
               <View key={`tag-${index}`} style={styles.innerBox}>
-                <Text style={styles.info}>{tag.text}</Text>
+                <Text style={styles.info}># {tag.text}</Text>
               </View>
             ))}
           </View>
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
     color: '#fff',
-    marginVertical: 5,
+    marginVertical: 6,
   },
   rainInfo: {
     fontSize: 14,

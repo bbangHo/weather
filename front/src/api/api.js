@@ -75,9 +75,15 @@ export const refreshAccessToken = async () => {
   }
 };
 
-export const fetchWeatherData = async accessToken => {
+export const fetchWeatherData = async (accessToken, locationId) => {
   try {
-    const response = await fetch(`${BASE_URL}/api/v1/main/weather`, {
+    const url = locationId
+      ? `${BASE_URL}/api/v1/main/weather?locationId=${locationId}`
+      : `${BASE_URL}/api/v1/main/weather`;
+
+    console.log('Attempting weather data API:', url);
+
+    const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -101,13 +107,6 @@ export const fetchWeatherData = async accessToken => {
     if (!data.isSuccess) {
       console.error('Backend error:', data.code, data.message);
       throw new Error(data.message || 'Unknown error from backend');
-    }
-
-    if (data.result && data.result.weatherPerHourList) {
-      console.log(
-        'First item in weatherPerHourList:',
-        data.result.weatherPerHourList[0],
-      );
     }
 
     return data;
@@ -440,9 +439,15 @@ export const fetchUserLocation = async accessToken => {
   }
 };
 
-export const fetchExtraWeatherInfo = async accessToken => {
+export const fetchExtraWeatherInfo = async (accessToken, locationId) => {
   try {
-    const response = await fetch(`${BASE_URL}/api/v1/main/extraWeatherInfo`, {
+    const url = locationId
+      ? `${BASE_URL}/api/v1/main/extraWeatherInfo?locationId=${locationId}`
+      : `${BASE_URL}/api/v1/main/extraWeatherInfo`;
+
+    console.log('Attempting extre weather info API:', url);
+
+    const response = await fetch(url, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -452,8 +457,10 @@ export const fetchExtraWeatherInfo = async accessToken => {
 
     const result = await response.json();
     if (result.isSuccess) {
+      console.log('Fetched extra weather info:', result.result);
       return result.result;
     } else {
+      console.error('Backend error:', result.message);
       throw new Error(result.message);
     }
   } catch (error) {
