@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderColor: 'rgba(255, 255, 255, 0)',
     padding: Platform.OS === 'ios' ? 9.5 : 12,
-    paddingVertical: 20,
+    paddingVertical: Platform.OS === 'ios' ? 18 : 23,
     marginHorizontal: 5,
     alignItems: 'center',
   },
@@ -123,13 +123,13 @@ const styles = StyleSheet.create({
   },
   textTime: {
     color: '#fff',
-    fontSize: 13,
+    fontSize: Platform.OS === 'ios' ? 12 : 14,
     marginBottom: 5,
     textAlign: 'center',
   },
   icon: {
-    width: 40,
-    height: 40,
+    width: Platform.OS === 'ios' ? 40 : 50,
+    height: Platform.OS === 'ios' ? 40 : 50,
     marginBottom: 0,
   },
   rainAdverb: {
@@ -148,15 +148,15 @@ const styles = StyleSheet.create({
   },
   rainText: {
     color: 'skyblue',
-    fontSize: 14,
-    marginVertical: 4,
+    fontSize: Platform.OS === 'ios' ? 13 : 14,
+    marginVertical: Platform.OS === 'ios' ? 4 : 1,
     textAlign: 'center',
     marginBottom: 5,
   },
   tmpText: {
     color: '#fff',
-    fontSize: 15,
-    marginVertical: 4,
+    fontSize: Platform.OS === 'ios' ? 14 : 15,
+    marginVertical: Platform.OS === 'ios' ? 4 : 1,
     textAlign: 'center',
   },
   adverbPlaceholder: {

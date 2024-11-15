@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
   },
   container: {
     width: width / 2,
-    height: 190,
+    height: Platform.OS === 'ios' ? 185 : 210,
   },
   slide: {
     width: width / 2.05,

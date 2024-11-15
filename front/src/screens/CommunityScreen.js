@@ -7,8 +7,7 @@ import {
   Dimensions,
   Platform,
 } from 'react-native';
-import CurrentLocation from '../components/CurrentLocation';
-import TemperatureInfo from '../components/TemperatureInfo';
+import CurrentLocationCommunity from '../components/CurrentLocationCommunity';
 import PostScroll from '../components/PostScroll';
 import WeatherShareButton from '../components/WeatherShareButton';
 import {fetchWeatherData, fetchMemberInfo} from '../api/api';
@@ -97,8 +96,7 @@ const CommunityScreen = ({accessToken}) => {
           accessToken={accessToken}
         />
         <View style={styles.rightContainer}>
-          <CurrentLocation accessToken={accessToken} />
-          <TemperatureInfo accessToken={accessToken} />
+          <CurrentLocationCommunity accessToken={accessToken} />
         </View>
       </View>
       <Text style={styles.text}>
@@ -130,6 +128,7 @@ const styles = StyleSheet.create({
     width: '50%',
     justifyContent: 'space-between',
     paddingBottom: 10,
+    marginLeft: Platform.OS === 'ios' ? 0 : -5,
   },
   text: {
     color: '#fff',

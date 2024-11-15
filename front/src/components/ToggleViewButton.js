@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0)',
     padding: 0,
     paddingHorizontal: 10,
-    minWidth: 80,
+    minWidth: Platform.OS === 'ios' ? 80 : 150,
   },
   button: {
     backgroundColor: 'transparent',

@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   contentContainer: {
-    padding: 16,
+    padding: Platform.OS === 'ios' ? 16 : 20,
     paddingBottom: 30,
     paddingTop: 50,
   },
@@ -234,12 +234,13 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   section: {
-    marginBottom: 22,
+    marginBottom: Platform.OS === 'ios' ? 22 : 25,
   },
   label: {
-    fontSize: 16,
-    marginBottom: 8,
+    fontSize: Platform.OS === 'ios' ? 15 : 16,
+    marginBottom: Platform.OS === 'ios' ? 9 : 11,
     color: '#333',
+    marginLeft: 5,
   },
   tagContainer: {
     flexDirection: 'row',
@@ -254,7 +255,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   tagText: {
-    fontSize: 14,
+    fontSize: Platform.OS === 'ios' ? 14 : 15,
     color: '#333',
   },
   selectedTag: {

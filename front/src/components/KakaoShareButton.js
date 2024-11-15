@@ -116,6 +116,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0)',
     padding: 0,
     paddingHorizontal: 10,
+    paddingVertical: Platform.OS === 'ios' ? 1 : 3,
   },
   button: {
     backgroundColor: 'transparent',

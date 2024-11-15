@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     justifyContent: 'center',
     borderRadius: 10,
-    marginTop: -15,
+    marginTop: -20,
     flexDirection: 'column',
   },
   loadingContainer: {
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
   temperature: {
     fontSize: 22,
     color: '#fff',
-    marginTop: 25,
+    marginTop: 17,
   },
 });
 

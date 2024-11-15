@@ -10,7 +10,6 @@ import {
 import ToggleViewButton from '../components/ToggleViewButton';
 import WeatherInfoSlider from '../components/WeatherInfoSlider';
 import CurrentLocation from '../components/CurrentLocation';
-import TemperatureInfo from '../components/TemperatureInfo';
 import Posts from '../components/Posts';
 import HourlyForecast from '../components/HourlyForecast';
 import AirQuality from '../components/AirQuality';
@@ -46,7 +45,6 @@ const HomeScreen = ({accessToken}) => {
         <WeatherInfoSlider accessToken={accessToken} />
         <View style={styles.rightContainer}>
           <CurrentLocation accessToken={accessToken} />
-          <TemperatureInfo accessToken={accessToken} />
           <ToggleViewButton showText={showText} setShowText={setShowText} />
         </View>
       </View>
