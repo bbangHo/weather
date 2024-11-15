@@ -221,12 +221,17 @@ export const fetchPosts = async (
   accessToken,
   postType = 'WEATHER',
   lastPostId = null,
+  locationId = null,
 ) => {
   try {
-    let url = `${BASE_URL}/api/v1/community/posts?&size=6&postType=${postType}`;
+    let url = `${BASE_URL}/api/v1/community/posts?size=6&postType=${postType}`;
 
     if (lastPostId !== null) {
       url += `&lastPostId=${lastPostId}`;
+    }
+
+    if (locationId) {
+      url += `&locationId=${locationId}`;
     }
 
     const response = await fetch(url, {

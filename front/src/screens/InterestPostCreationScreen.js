@@ -10,7 +10,8 @@ import {
 } from 'react-native';
 import {createInterestPost} from '../api/api';
 
-const InterestPostCreationScreen = ({navigation, accessToken, locationId}) => {
+const InterestPostCreationScreen = ({navigation, accessToken, route}) => {
+  const {locationId, onPostCreated} = route.params;
   const [content, setContent] = useState('');
   const [postType, setPostType] = useState(null);
 
@@ -20,12 +21,12 @@ const InterestPostCreationScreen = ({navigation, accessToken, locationId}) => {
 
   const handleSubmit = async () => {
     if (!postType) {
-      Alert.alert('Error', '먼저 취미를 선택해 주세요.');
+      Alert.alert('취미 선택', '먼저 취미를 선택해 주세요!');
       return;
     }
 
     if (!locationId) {
-      Alert.alert('Error', '위치 정보가 없습니다. 다시 시도해 주세요.');
+      Alert.alert('위치 정보', '위치 정보가 없습니다. 다시 시도해 주세요.');
       return;
     }
 
@@ -40,12 +41,13 @@ const InterestPostCreationScreen = ({navigation, accessToken, locationId}) => {
 
     try {
       const response = await createInterestPost(postData, accessToken);
+      onPostCreated();
+      navigation.goBack();
       console.log('Post creation response:', response);
-      Alert.alert('Success', '게시글이 성공적으로 등록되었습니다.');
       navigation.navigate('InterestScreen');
     } catch (error) {
       console.error('Error creating interest post:', error);
-      Alert.alert('Error', '게시글 등록에 실패했습니다. 다시 시도해 주세요.');
+      Alert.alert('Error', '게시글 작성에 실패했습니다. 다시 시도해 주세요.');
     }
   };
 

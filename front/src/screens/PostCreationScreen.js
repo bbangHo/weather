@@ -9,7 +9,8 @@ import {
 } from 'react-native';
 import {fetchPostTags, createPost} from '../api/api';
 
-const PostCreationScreen = ({navigation, accessToken}) => {
+const PostCreationScreen = ({navigation, accessToken, route}) => {
+  const {onPostCreated} = route.params || {};
   const [temperatureTags, setTemperatureTags] = useState([]);
   const [weatherTags, setWeatherTags] = useState([]);
   const [humidityTags, setHumidityTags] = useState([]);
@@ -75,7 +76,15 @@ const PostCreationScreen = ({navigation, accessToken}) => {
       console.log('Post data to send:', postData);
       const response = await createPost(postData, accessToken);
       console.log('Post created successfully:', response);
-      navigation.navigate('Home');
+
+      if (onPostCreated) {
+        onPostCreated();
+      }
+
+      navigation.reset({
+        index: 0,
+        routes: [{name: 'Community'}],
+      });
     } catch (error) {
       console.error('Failed to create post:', error.message);
       console.error('Error details:', error);

@@ -37,7 +37,13 @@ const hobbies = [
   },
 ];
 
-const InterestPostScroll = ({accessToken, selectedHobby}) => {
+const InterestPostScroll = ({
+  accessToken,
+  selectedHobby,
+  locationId,
+  refreshPosts,
+  setRefreshPosts,
+}) => {
   const [posts, setPosts] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [currentHobby, setCurrentHobby] = useState(selectedHobby);
@@ -47,12 +53,24 @@ const InterestPostScroll = ({accessToken, selectedHobby}) => {
     if (currentHobby) {
       loadPosts();
     }
-  }, [currentHobby]);
+  }, [currentHobby, locationId]);
+
+  useEffect(() => {
+    if (refreshPosts) {
+      loadPosts();
+      setRefreshPosts(false);
+    }
+  }, [refreshPosts]);
 
   const loadPosts = async () => {
     try {
       setLoading(true);
-      const fetchedPosts = await fetchPosts(accessToken, currentHobby.postType);
+      const fetchedPosts = await fetchPosts(
+        accessToken,
+        currentHobby.postType,
+        null,
+        locationId,
+      );
       console.log(
         'Fetched interest posts:',
         JSON.stringify(fetchedPosts, null, 2),

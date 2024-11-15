@@ -10,7 +10,7 @@ import {useNavigation} from '@react-navigation/native';
 import {Card} from 'react-native-elements';
 import globalStyles from '../globalStyles';
 
-const WeatherShareButton = () => {
+const WeatherShareButton = ({onPostCreated, accessToken}) => {
   const navigation = useNavigation();
   const screenWidth = Dimensions.get('window').width;
 
@@ -22,7 +22,12 @@ const WeatherShareButton = () => {
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={styles.button}
-            onPress={() => navigation.navigate('PostCreationScreen')}>
+            onPress={() =>
+              navigation.navigate('PostCreationScreen', {
+                accessToken,
+                onPostCreated,
+              })
+            }>
             <Text style={styles.buttonText}>날씨 공유하기</Text>
           </TouchableOpacity>
         </View>

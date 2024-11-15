@@ -15,7 +15,7 @@ import {fetchPosts, toggleLikePost} from '../api/api';
 
 const {width: windowWidth} = Dimensions.get('window');
 
-const PostScroll = ({accessToken}) => {
+const PostScroll = ({accessToken, refreshPosts, onRefreshComplete}) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const postType = 'WEATHER';
@@ -23,6 +23,15 @@ const PostScroll = ({accessToken}) => {
   useEffect(() => {
     loadPosts();
   }, []);
+
+  useEffect(() => {
+    if (refreshPosts) {
+      loadPosts();
+      if (onRefreshComplete) {
+        onRefreshComplete();
+      }
+    }
+  }, [refreshPosts]);
 
   const loadPosts = async () => {
     try {
