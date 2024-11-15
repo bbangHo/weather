@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title></title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        form {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .question {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .button-group {
+            display: flex;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* Internet Explorer 10+ */
+        }
+
+        .button-group::-webkit-scrollbar {
+            display: none; /* WebKit */
+        }
+
+        .button-group.vertical {
+            flex-direction: column;
+            max-height: 200px;
+            overflow-y: auto;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* Internet Explorer 10+ */
+        }
+
+        .button-group.vertical::-webkit-scrollbar {
+            display: none; /* WebKit */
+        }
+
+        .button {
+            margin: 5px;
+            padding: 10px 15px;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 15px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .button.selected {
+            background-color: #2F5AF4;
+            color: white;
+        }
+
+        input[type="submit"] {
+            background-color: #2F5AF4;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        /* 새로운 스타일 추가 */
+        @media screen and (min-width: 360px) and (max-width: 767px) {
+            body {
+                font-size: 16px;
+            }
+
+            /* 추가 모바일 스타일 */
+        }
+
+        @media screen and (min-width: 768px) {
+            body {
+                font-size: 18px;
+            }
+
+            /* 추가 태블릿 스타일 */
+        }
+
+        /* 스크롤바 숨기기 스타일 추가 */
+        .button-group {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .button-group::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<form th:action="@{/submit-survey}" method="post">
+    <div class="question">
+        <label>성별</label>
+        <div class="button-group">
+            <button type="button" class="button" onclick="selectButton(this, 'gender')" data-value="male">남자</button>
+            <button type="button" class="button" onclick="selectButton(this, 'gender')" data-value="female">여자</button>
+        </div>
+        <input type="hidden" name="gender" id="gender">
+    </div>
+
+    <div class="question">
+        <label>당신의 날씨 체감 유형은?</label>
+        <div class="button-group vertical">
+            <button type="button" class="button" onclick="selectButton(this, 'weatherSensitivity')" data-value="COLD">
+                추위를 많이 타는 편
+            </button>
+            <button type="button" class="button" onclick="selectButton(this, 'weatherSensitivity')" data-value="NONE">
+                평범한 펀
+            </button>
+            <button type="button" class="button" onclick="selectButton(this, 'weatherSensitivity')" data-value="HOT">더위를
+                많이 타는 편
+            </button>
+        </div>
+        <input type="hidden" name="weatherSensitivity" id="weatherSensitivity">
+    </div>
+
+
+    <div class="question">
+        <label>오늘의 날씨는 어떤가요?</label>
+        <div class="button-group vertical">
+            <button type="button" class="button" onclick="selectButton(this, 'todayFeeling')" data-value="VERY_COLD">매우
+                추움
+            </button>
+            <button type="button" class="button" onclick="selectButton(this, 'todayFeeling')" data-value="COLD">추움
+            </button>
+            <button type="button" class="button" onclick="selectButton(this, 'todayFeeling')" data-value="LITTLE_COLD">
+                조금 추움
+            </button>
+            <button type="button" class="button" onclick="selectButton(this, 'todayFeeling')" data-value="COOL">선선함
+            </button>
+            <button type="button" class="button" onclick="selectButton(this, 'todayFeeling')" data-value="COMMON">보통
+            </button>
+            <button type="button" class="button" onclick="selectButton(this, 'todayFeeling')" data-value="WARM">따뜻함
+            </button>
+            <button type="button" class="button" onclick="selectButton(this, 'todayFeeling')" data-value="LITTLE_WARM">
+                조금 따뜻
+            </button>
+            <button type="button" class="button" onclick="selectButton(this, 'todayFeeling')" data-value="LITTLE_HOT">
+                조금 더움
+            </button>
+            <button type="button" class="button" onclick="selectButton(this, 'todayFeeling')" data-value="HOT">더움
+            </button>
+            <button type="button" class="button" onclick="selectButton(this, 'todayFeeling')" data-value="VERY_HOT">매우
+                더움
+            </button>
+        </div>
+        <input type="hidden" name="todayFeeling" id="todayFeeling">
+    </div>
+
+    <div class="question">
+        <label>지금 날씨는 어떤가요?</label>
+        <div class="button-group">
+            <button type="button" class="button" onclick="selectButton(this, 'weatherCondition')" data-value="RAINY">
+                비와요
+            </button>
+            <button type="button" class="button" onclick="selectButton(this, 'weatherCondition')" data-value="CLOUDY">
+                흐려요
+            </button>
+            <button type="button" class="button" onclick="selectButton(this, 'weatherCondition')"
+                    data-value="CLEAR_AND_CLOUDY">구름이 많아요
+            </button>
+            <button type="button" class="button" onclick="selectButton(this, 'weatherCondition')" data-value="CLEAR">
+                맑아요
+            </button>
+        </div>
+        <input type="hidden" name="weatherCondition" id="weatherCondition">
+    </div>
+
+    <div class="question">
+        <label>습한가요?</label>
+        <div class="button-group">
+            <button type="button" class="button" onclick="selectButton(this, 'humidity')" data-value="HUMID">예</button>
+            <button type="button" class="button" onclick="selectButton(this, 'humidity')" data-value="COMMON_HUMID">
+                아니요
+            </button>
+        </div>
+        <input type="hidden" name="humidity" id="humidity">
+    </div>
+
+    <div class="question">
+        <label>바람이 많이 부나요?</label>
+        <div class="button-group">
+            <button type="button" class="button" onclick="selectButton(this, 'windy')" data-value="WINDY">예</button>
+            <button type="button" class="button" onclick="selectButton(this, 'windy')" data-value="NONE">아니요</button>
+        </div>
+        <input type="hidden" name="windy" id="windy">
+    </div>
+
+    <input type="submit" value="제출하기">
+</form>
+
+<script>
+    function selectButton(button, inputId) {
+        // 같은 그룹의 모든 버튼에서 'selected' 클래스 제거
+        var buttons = button.parentElement.getElementsByClassName('button');
+        for (var i = 0; i < buttons.length; i++) {
+            buttons[i].classList.remove('selected');
+        }
+        // 클릭된 버튼에 'selected' 클래스 추가
+        button.classList.add('selected');
+
+        // hidden input의 값을 설정
+        document.getElementById(inputId).value = button.getAttribute('data-value');
+    }
+</script>
+</body>
+</html>

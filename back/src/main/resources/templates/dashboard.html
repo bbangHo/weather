@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="dashboard">
+    <header>
+        <h1>Analytics Dashboard</h1>
+    </header>
+    <div class="content">
+        <aside class="sidebar">
+            <h2>🏂 US Population Dashboard</h2>
+            <div class="filter">
+                <label for="year">Select a year:</label>
+                <select id="year" th:field="*{selectedYear}">
+                    <option th:each="year : ${years}" th:value="${year}" th:text="${year}"></option>
+                </select>
+            </div>
+            <div class="filter">
+                <label for="colorTheme">Select a color theme:</label>
+                <select id="colorTheme" th:field="*{selectedColorTheme}">
+                    <option th:each="theme : ${colorThemes}" th:value="${theme}" th:text="${theme}"></option>
+                </select>
+            </div>
+        </aside>
+        <main>
+            <section class="chart-container">
+                <h3>Population Heatmap</h3>
+                <canvas id="heatmapChart"></canvas>
+            </section>
+            <section class="chart-container">
+                <h3>Population by State</h3>
+                <canvas id="barChart"></canvas>
+            </section>
+            <section class="data-table">
+                <h3>Population Data</h3>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>State</th>
+                        <th>Population</th>
+                        <th>Year</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="data : ${populationData}">
+                        <td th:text="${data.state}"></td>
+                        <td th:text="${data.population}"></td>
+                        <td th:text="${data.year}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+</div>
+<script th:inline="javascript">
+    // 차트 생성 로직을 여기에 추가
+</script>
+</body>
+</html>

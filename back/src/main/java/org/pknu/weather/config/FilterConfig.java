@@ -1,11 +1,12 @@
 package org.pknu.weather.config;
 
 import lombok.RequiredArgsConstructor;
+import org.pknu.weather.feignClient.KaKaoLoginClient;
 import org.pknu.weather.filter.OauthTokenFilter;
+import org.pknu.weather.filter.OpenApiFilter;
 import org.pknu.weather.filter.RefreshTokenFilter;
 import org.pknu.weather.filter.TokenCheckFilter;
 import org.pknu.weather.filter.TokenGenerateFilter;
-import org.pknu.weather.feignClient.KaKaoLoginClient;
 import org.pknu.weather.security.util.JWTUtil;
 import org.pknu.weather.service.MemberService;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -19,6 +20,18 @@ public class FilterConfig {
     private final KaKaoLoginClient kaKaoLoginClient;
     private final MemberService memberservice;
     private final JWTUtil jwtUtil;
+
+    /**
+     * 인증,인가 과정이 필요없는 요청들을 처리
+     */
+    @Bean
+    public FilterRegistrationBean<OpenApiFilter> openApiFilterRegister() {
+        FilterRegistrationBean<OpenApiFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(new OpenApiFilter());
+        registrationBean.addUrlPatterns("/*");
+        registrationBean.setOrder(0);
+        return registrationBean;
+    }
 
     @Bean
     public FilterRegistrationBean<RefreshTokenFilter> refreshTokenFilterRegister() {
@@ -42,7 +55,7 @@ public class FilterConfig {
     @Bean
     public FilterRegistrationBean<TokenGenerateFilter> tokenGenerateFilterRegister() {
         FilterRegistrationBean<TokenGenerateFilter> registrationBean = new FilterRegistrationBean<>();
-        registrationBean.setFilter(new TokenGenerateFilter(memberservice,jwtUtil));
+        registrationBean.setFilter(new TokenGenerateFilter(memberservice, jwtUtil));
         registrationBean.addUrlPatterns("/token");
         registrationBean.setOrder(3);
         return registrationBean;
