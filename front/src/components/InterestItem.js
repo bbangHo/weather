@@ -25,6 +25,7 @@ const InterestItem = ({
   setSelectedHobby,
   modalVisible,
   setModalVisible,
+  setLocationId,
 }) => {
   const [userLocation, setUserLocation] = useState(null);
   const [addressModalVisible, setAddressModalVisible] = useState(false);
@@ -36,7 +37,7 @@ const InterestItem = ({
 
   const [hobbiesWeatherData, setHobbiesWeatherData] = useState([]);
   const [pm10Grade, setPm10Grade] = useState(null);
-  const [locationId, setLocationId] = useState(null);
+  const [locationId, setLocalLocationId] = useState(null);
 
   useEffect(() => {
     const loadUserLocation = async () => {
@@ -45,6 +46,7 @@ const InterestItem = ({
         setUserLocation(locationData);
         if (locationData && locationData.id) {
           setLocationId(locationData.id);
+          setLocalLocationId(locationData.id);
           console.log('Fetched locationId:', locationData.id);
         }
       } catch (error) {
@@ -172,6 +174,7 @@ const InterestItem = ({
       if (response.result && response.result.id) {
         setUserLocation(response.result);
         setLocationId(response.result.id);
+        setLocalLocationId(response.result.id);
         console.log(
           'Fetched locationId (id) from address:',
           response.result.id,

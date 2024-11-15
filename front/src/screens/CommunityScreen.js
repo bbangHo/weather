@@ -16,9 +16,20 @@ import {fetchWeatherData, fetchMemberInfo} from '../api/api';
 const {height} = Dimensions.get('window');
 
 const CommunityScreen = ({accessToken}) => {
+  const [refreshPosts, setRefreshPosts] = useState(false);
   const [weatherData, setWeatherData] = useState(null);
   const [backgroundColor, setBackgroundColor] = useState('#2f5af4');
   const [sensitivityText, setSensitivityText] = useState('');
+
+  useEffect(() => {
+    if (refreshPosts) {
+      setRefreshPosts(false);
+    }
+  }, [refreshPosts]);
+
+  const handlePostCreated = () => {
+    setRefreshPosts(true);
+  };
 
   useEffect(() => {
     const currentHour = new Date().getHours();
@@ -81,7 +92,10 @@ const CommunityScreen = ({accessToken}) => {
       <StatusBar hidden={true} />
       <View style={styles.topSpacer} />
       <View style={styles.topContainer}>
-        <WeatherShareButton />
+        <WeatherShareButton
+          onPostCreated={handlePostCreated}
+          accessToken={accessToken}
+        />
         <View style={styles.rightContainer}>
           <CurrentLocation accessToken={accessToken} />
           <TemperatureInfo accessToken={accessToken} />
@@ -90,7 +104,11 @@ const CommunityScreen = ({accessToken}) => {
       <Text style={styles.text}>
         ‘{sensitivityText}’ 유형이 가장 많이 공감했어요
       </Text>
-      <PostScroll accessToken={accessToken} />
+      <PostScroll
+        accessToken={accessToken}
+        refreshPosts={refreshPosts}
+        onRefreshComplete={() => setRefreshPosts(false)}
+      />
     </View>
   );
 };

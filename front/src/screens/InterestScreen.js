@@ -20,12 +20,14 @@ const shareIcon = require('../../assets/images/icon_share2.png');
 const InterestScreen = ({accessToken}) => {
   const [selectedHobby, setSelectedHobby] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [locationId, setLocationId] = useState(null);
   const [weatherData, setWeatherData] = useState(null);
   const [showPostScroll, setShowPostScroll] = useState(false);
   const [currentIcon, setCurrentIcon] = useState(arrowDownIcon);
   const [backgroundColor, setBackgroundColor] = useState('#2f5af4');
   const scrollViewRef = useRef(null);
   const translateY = useRef(new Animated.Value(0)).current;
+  const [refreshPosts, setRefreshPosts] = useState(false);
 
   const navigation = useNavigation();
 
@@ -74,7 +76,11 @@ const InterestScreen = ({accessToken}) => {
 
   const handleIconPress = () => {
     if (showPostScroll) {
-      navigation.navigate('InterestPostCreationScreen');
+      navigation.navigate('InterestPostCreationScreen', {
+        accessToken,
+        locationId,
+        onPostCreated: () => setRefreshPosts(true),
+      });
     } else {
       scrollViewRef.current.scrollToEnd({animated: true});
     }
@@ -94,6 +100,7 @@ const InterestScreen = ({accessToken}) => {
             setSelectedHobby={setSelectedHobby}
             modalVisible={modalVisible}
             setModalVisible={setModalVisible}
+            setLocationId={setLocationId}
           />
         </Animated.View>
       );
@@ -102,6 +109,9 @@ const InterestScreen = ({accessToken}) => {
         <InterestPostScroll
           accessToken={accessToken}
           selectedHobby={selectedHobby}
+          locationId={locationId}
+          refreshPosts={refreshPosts}
+          setRefreshPosts={setRefreshPosts}
         />
       );
     }
