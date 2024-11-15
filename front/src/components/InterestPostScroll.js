@@ -70,6 +70,7 @@ const InterestPostScroll = ({
         currentHobby.postType,
         null,
         locationId,
+        100000000,
       );
       console.log(
         'Fetched interest posts:',
@@ -288,7 +289,7 @@ const styles = StyleSheet.create({
     marginTop: Platform.OS === 'ios' ? 2 : 8,
     marginBottom: Platform.OS === 'ios' ? 8 : 2,
     width: width * 0.93,
-    height: 130,
+    height: Platform.OS === 'ios' ? 130 : 155,
     justifyContent: 'space-between',
     position: 'relative',
   },

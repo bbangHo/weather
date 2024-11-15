@@ -35,8 +35,15 @@ const PostScroll = ({accessToken, refreshPosts, onRefreshComplete}) => {
 
   const loadPosts = async () => {
     try {
-      const fetchedPosts = await fetchPosts(accessToken, postType);
+      const fetchedPosts = await fetchPosts(
+        accessToken,
+        postType,
+        null,
+        null,
+        100000000,
+      );
       console.log('Fetched posts:', fetchedPosts);
+
       setPosts(
         fetchedPosts.map(post => ({
           ...post,
@@ -50,7 +57,7 @@ const PostScroll = ({accessToken, refreshPosts, onRefreshComplete}) => {
       console.error('Error loading posts:', error.message);
       Alert.alert(
         'Error',
-        '서버에 문제가 발생했습니다. 나중에 다시 시도해주세요.',
+        '게시글을 불러오는 중 문제가 발생했습니다. 다시 시도해주세요.',
       );
     } finally {
       setLoading(false);
@@ -175,6 +182,7 @@ const PostScroll = ({accessToken, refreshPosts, onRefreshComplete}) => {
 const styles = StyleSheet.create({
   contentContainer: {
     alignItems: 'center',
+    marginBottom: '100',
   },
   section: {
     justifyContent: 'center',
@@ -187,7 +195,7 @@ const styles = StyleSheet.create({
     marginTop: 0,
     marginBottom: 10,
     width: windowWidth * 0.93,
-    height: 130,
+    height: Platform.OS === 'ios' ? 130 : 155,
     justifyContent: 'space-between',
     position: 'relative',
   },

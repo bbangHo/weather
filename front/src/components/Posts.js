@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
     padding: 15,
     marginHorizontal: 10,
     width: windowWidth * 0.97,
-    height: 150,
+    height: Platform.OS === 'ios' ? 150 : 160,
     justifyContent: 'space-between',
     position: 'relative',
     marginBottom: 12,
