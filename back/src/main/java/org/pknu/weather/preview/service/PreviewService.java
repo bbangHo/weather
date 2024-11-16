@@ -1,25 +1,22 @@
 package org.pknu.weather.preview.service;
 
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.pknu.weather.domain.Location;
-import org.pknu.weather.domain.Member;
-import org.pknu.weather.domain.Post;
-import org.pknu.weather.domain.Tag;
+import org.pknu.weather.domain.*;
 import org.pknu.weather.domain.common.Sensitivity;
-import org.pknu.weather.domain.tag.DustTag;
-import org.pknu.weather.domain.tag.HumidityTag;
-import org.pknu.weather.domain.tag.SkyTag;
-import org.pknu.weather.domain.tag.TemperatureTag;
-import org.pknu.weather.domain.tag.WindTag;
+import org.pknu.weather.domain.tag.*;
 import org.pknu.weather.preview.dto.Request.WeatherSurvey;
+import org.pknu.weather.preview.dto.Response;
 import org.pknu.weather.repository.LocationRepository;
 import org.pknu.weather.repository.MemberRepository;
 import org.pknu.weather.repository.PostRepository;
 import org.pknu.weather.repository.TagRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -69,4 +66,31 @@ public class PreviewService {
 
         return "Thank you";
     }
+
+    @Transactional(readOnly = true)
+    public void getTags() {
+        Location location = locationRepository.findLocationByFullAddress("부산광역시", "남구", "대연3동").get();
+        List<Weather> weatherList = location.getWeatherList();
+
+        // 08시 ~ 15시 시간대 온도 가져오기
+        for (Weather weather : weatherList) {
+            LocalDateTime time8 = LocalDateTime.now()
+                    .withHour(9)
+                    .withMinute(0)
+                    .withSecond(0)
+                    .withNano(0);
+
+            LocalDateTime time15 = time8.plusHours(6);
+
+            LocalDateTime presentationTime = weather.getPresentationTime();
+
+            if(presentationTime.isAfter(time8) &&  presentationTime.isBefore(time15)) {
+                Response.TimeAndTemp timeAndTemp = Response.TimeAndTemp.builder()
+                        .time(weather.getPresentationTime())
+                        .temp(weather.getTemperature())
+                        .build();
+            }
+        }
+    }
+
 }

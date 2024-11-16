@@ -1,16 +1,18 @@
 package org.pknu.weather.repository;
 
-import static org.pknu.weather.domain.QWeather.weather;
-
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.pknu.weather.common.formatter.DateTimeFormatter;
 import org.pknu.weather.common.utils.QueryUtils;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Weather;
 import org.pknu.weather.dto.WeatherQueryResult;
+import org.pknu.weather.preview.dto.Response;
+
+import java.time.LocalDateTime;
+
+import static org.pknu.weather.domain.QWeather.weather;
 
 @RequiredArgsConstructor
 public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
@@ -89,5 +91,20 @@ public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
                 .fetchFirst();
 
         return w != null;
+    }
+
+    public Response.TimeAndTemp getTemperatureForHour(LocalDateTime startTime) {
+        startTime = startTime.withMinute(0).withSecond(0).withNano(0);
+
+        Integer temp = jpaQueryFactory
+                .select(weather.temperature)
+                .from(weather)
+                .where(weather.presentationTime.eq(startTime))
+                .fetchFirst();
+
+        return Response.TimeAndTemp.builder()
+                .time(startTime)
+                .temp(temp)
+                .build();
     }
 }
