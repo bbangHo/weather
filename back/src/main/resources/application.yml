@@ -1,4 +1,13 @@
 spring:
+  thymeleaf:
+    prefix:
+      classpath:/templates/
+    suffix:
+      .html
+  web:
+    resources:
+      static-locations:
+        classpath:/static/assets
   sql:
     init:
       mode: never
@@ -28,7 +37,7 @@ spring:
   kakao:
     admin_key: ${KAKAO_SERVICE_ADMIN_KEY}
   profiles:
-    active: default
+    active: local
   servlet:
     multipart:
       enabled: true

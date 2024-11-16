@@ -3,7 +3,6 @@ package org.pknu.weather.config;
 import lombok.RequiredArgsConstructor;
 import org.pknu.weather.feignClient.KaKaoLoginClient;
 import org.pknu.weather.filter.OauthTokenFilter;
-import org.pknu.weather.filter.OpenApiFilter;
 import org.pknu.weather.filter.RefreshTokenFilter;
 import org.pknu.weather.filter.TokenCheckFilter;
 import org.pknu.weather.filter.TokenGenerateFilter;
@@ -24,15 +23,14 @@ public class FilterConfig {
     /**
      * 인증,인가 과정이 필요없는 요청들을 처리
      */
-    @Bean
-    public FilterRegistrationBean<OpenApiFilter> openApiFilterRegister() {
-        FilterRegistrationBean<OpenApiFilter> registrationBean = new FilterRegistrationBean<>();
-        registrationBean.setFilter(new OpenApiFilter());
-        registrationBean.addUrlPatterns("/*");
-        registrationBean.setOrder(0);
-        return registrationBean;
-    }
-
+//    @Bean
+//    public FilterRegistrationBean<DashboardApiFilter> openApiFilterRegister() {
+//        FilterRegistrationBean<DashboardApiFilter> registrationBean = new FilterRegistrationBean<>();
+//        registrationBean.setFilter(new DashboardApiFilter());
+//        registrationBean.addUrlPatterns("/api/dashboard/*");
+//        registrationBean.setOrder(0);
+//        return registrationBean;
+//    }
     @Bean
     public FilterRegistrationBean<RefreshTokenFilter> refreshTokenFilterRegister() {
         FilterRegistrationBean<RefreshTokenFilter> registrationBean = new FilterRegistrationBean<>();

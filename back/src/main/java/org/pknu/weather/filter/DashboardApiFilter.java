@@ -13,8 +13,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 @Slf4j
 @RequiredArgsConstructor
-public class OpenApiFilter extends OncePerRequestFilter {
-    private static final List<String> OPEN_API_PATHS = Arrays.asList("/api/public/**");
+public class DashboardApiFilter extends OncePerRequestFilter {
+    private static final List<String> OPEN_API_PATHS = Arrays.asList("/api/dashboard/**");
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -24,7 +24,8 @@ public class OpenApiFilter extends OncePerRequestFilter {
 
         if (isOpenApiPath(path)) {
             // Open API 경로인 경우 다음 필터들을 모두 건너뛰고 직접 DispatcherServlet으로 요청을 전달
-            request.getRequestDispatcher(path).forward(request, response);
+            request.getRequestDispatcher("dashboard").forward(request, response);
+
         } else {
             // Open API 경로가 아닌 경우 정상적으로 다음 필터로 진행
             filterChain.doFilter(request, response);

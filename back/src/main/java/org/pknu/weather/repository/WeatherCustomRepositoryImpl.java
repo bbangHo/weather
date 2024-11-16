@@ -1,18 +1,17 @@
 package org.pknu.weather.repository;
 
+import static org.pknu.weather.domain.QWeather.weather;
+
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.pknu.weather.common.formatter.DateTimeFormatter;
 import org.pknu.weather.common.utils.QueryUtils;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Weather;
 import org.pknu.weather.dto.WeatherQueryResult;
-import org.pknu.weather.preview.dto.Response;
-
-import java.time.LocalDateTime;
-
-import static org.pknu.weather.domain.QWeather.weather;
 
 @RequiredArgsConstructor
 public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
@@ -93,18 +92,16 @@ public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
         return w != null;
     }
 
-    public Response.TimeAndTemp getTemperatureForHour(LocalDateTime startTime) {
-        startTime = startTime.withMinute(0).withSecond(0).withNano(0);
+    // 시각화 페이지용 메서드
+    @Override
+    public List<Weather> getTemperatureForHour(LocalDateTime startTime) {
+        LocalDateTime endTime = startTime;
+        startTime = startTime.withMinute(0).withSecond(0).withNano(0).minusHours(6);
 
-        Integer temp = jpaQueryFactory
-                .select(weather.temperature)
+        return jpaQueryFactory
+                .select(weather)
                 .from(weather)
-                .where(weather.presentationTime.eq(startTime))
-                .fetchFirst();
-
-        return Response.TimeAndTemp.builder()
-                .time(startTime)
-                .temp(temp)
-                .build();
+                .where(weather.presentationTime.between(startTime, endTime))
+                .fetch();
     }
 }
