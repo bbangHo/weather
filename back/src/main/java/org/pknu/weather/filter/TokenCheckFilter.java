@@ -7,10 +7,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
@@ -18,13 +14,18 @@ import org.pknu.weather.security.exception.TokenException;
 import org.pknu.weather.security.util.JWTUtil;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 @Slf4j
 @RequiredArgsConstructor
 public class TokenCheckFilter extends OncePerRequestFilter {
 
     private final JWTUtil jwtUtil;
 
-    private static final List<String> PATHS = Arrays.asList("/api/dashboard", "/static/**");
+    private static final List<String> PATHS = Arrays.asList("/dashboard", "/assets/", "dashboard/static/*");
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)

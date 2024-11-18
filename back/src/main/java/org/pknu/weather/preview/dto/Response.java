@@ -1,13 +1,14 @@
 package org.pknu.weather.preview.dto;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.pknu.weather.domain.tag.TemperatureTag;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Response {
     @Getter
@@ -38,7 +39,6 @@ public class Response {
     @AllArgsConstructor
     public static class TagHour {
         private TemperatureTag temperatureTag;
-        private Integer count;
         private String time;
     }
 }

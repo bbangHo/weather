@@ -7,7 +7,7 @@ spring:
   web:
     resources:
       static-locations:
-        classpath:/static/assets
+        classpath:/static/
   sql:
     init:
       mode: never
