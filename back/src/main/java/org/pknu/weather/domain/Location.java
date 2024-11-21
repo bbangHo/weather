@@ -34,8 +34,7 @@ public class Location extends BaseEntity {
 
     @Builder.Default
     @OneToMany(mappedBy = "location",
-            fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL)
+            fetch = FetchType.LAZY)
     private List<Weather> weatherList = new ArrayList<>();
 
     @Builder.Default

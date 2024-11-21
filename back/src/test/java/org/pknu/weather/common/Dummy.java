@@ -1,6 +1,7 @@
 package org.pknu.weather.common;
 
 import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.pknu.weather.common.utils.GeometryUtils;
@@ -16,7 +17,6 @@ import org.pknu.weather.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -94,34 +94,6 @@ public class Dummy {
         em.flush();
         em.clear();
 
-        for(int i = 1; i <=123; i++) {
-            Random random = new Random();
-
-            Request.WeatherSurvey survey = Request.WeatherSurvey.builder()
-                    .comment("코맨트")
-                    .humidity(random.nextInt(2) == 0 ? "HUMID" : "COMMON_HUMID")
-                    .skyCondition(
-                            random.nextInt(4) == 0 ? "RAIN" :
-                                    random.nextInt(4) == 1 ? "CLOUDY" :
-                                            random.nextInt(4) == 2 ? "CLEAR_AND_CLOUDY" : "CLEAR"
-                    )
-                    .weatherSensitivity(
-                            random.nextInt(3) == 0 ? "COLD" :
-                                    random.nextInt(3) == 1 ? "HOT" : "NONE")
-                    .todayFeelingTemperature(
-                            random.nextInt(7) == 0 ? "VERY_COLD" :
-                                    random.nextInt(7) == 1 ? "COLD" :
-                                            random.nextInt(7) == 2 ? "LITTLE_COLD" :
-                                                    random.nextInt(7) == 3 ? "COOL" :
-                                                            random.nextInt(7) == 4 ? "COMMON" :
-                                                                    random.nextInt(7) == 5 ? "WARM" : "LITTLE_WARM"
-                    )
-                    .windy(random.nextInt(2) == 0 ? "WINDY" : "NONE")
-                    .build();
-
-            previewService.createWeatherSurvey(survey);
-        }
-
         Location loc = locationRepository.findLocationByFullAddress("부산광역시", "남구", "대연3동").get();
 
         for (int i = 0; i <= 23; i++) {
@@ -149,6 +121,32 @@ public class Dummy {
                     .build());
         }
 
+        for(int i = 1; i <=123; i++) {
+            Random random = new Random();
 
+            Request.WeatherSurvey survey = Request.WeatherSurvey.builder()
+                    .comment("코맨트")
+                    .humidity(random.nextInt(2) == 0 ? "HUMID" : "COMMON_HUMID")
+                    .skyCondition(
+                            random.nextInt(4) == 0 ? "RAIN" :
+                                    random.nextInt(4) == 1 ? "CLOUDY" :
+                                            random.nextInt(4) == 2 ? "CLEAR_AND_CLOUDY" : "CLEAR"
+                    )
+                    .weatherSensitivity(
+                            random.nextInt(3) == 0 ? "COLD" :
+                                    random.nextInt(3) == 1 ? "HOT" : "NONE")
+                    .todayFeelingTemperature(
+                            random.nextInt(7) == 0 ? "VERY_COLD" :
+                                    random.nextInt(7) == 1 ? "COLD" :
+                                            random.nextInt(7) == 2 ? "LITTLE_COLD" :
+                                                    random.nextInt(7) == 3 ? "COOL" :
+                                                            random.nextInt(7) == 4 ? "COMMON" :
+                                                                    random.nextInt(7) == 5 ? "WARM" : "LITTLE_WARM"
+                    )
+                    .windy(random.nextInt(2) == 0 ? "WINDY" : "NONE")
+                    .build();
+
+            previewService.createWeatherSurvey(survey);
+        }
     }
 }

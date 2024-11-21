@@ -1,24 +1,18 @@
 package org.pknu.weather.preview;
 
 import jakarta.persistence.EntityManager;
-import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.pknu.weather.common.utils.GeometryUtils;
-import org.pknu.weather.domain.Location;
-import org.pknu.weather.domain.Member;
-import org.pknu.weather.domain.Post;
-import org.pknu.weather.domain.Tag;
+import org.pknu.weather.domain.*;
 import org.pknu.weather.preview.dto.Request.WeatherSurvey;
 import org.pknu.weather.preview.service.PreviewService;
-import org.pknu.weather.repository.LocationRepository;
-import org.pknu.weather.repository.MemberRepository;
-import org.pknu.weather.repository.PostRepository;
-import org.pknu.weather.repository.TagRepository;
+import org.pknu.weather.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @SpringBootTest
 class PreviewServiceTest {
@@ -38,11 +32,14 @@ class PreviewServiceTest {
     LocationRepository locationRepository;
 
     @Autowired
+    TagWeatherRepository tagWeatherRepository;
+
+    @Autowired
     EntityManager em;
 
     @Test
     @Transactional
-    @Rollback(value = false)
+//    @Rollback(value = false)
     void test() {
         Location location = Location.builder()
                 .point(GeometryUtils.getPoint(35.1316361111111, 129.102577777777))
@@ -71,11 +68,12 @@ class PreviewServiceTest {
         List<Post> postList = postRepository.findAll();
         List<Tag> tagList = tagRepository.findAll();
         List<Location> locationList = locationRepository.findAll();
+        List<TagWeather> tagWeathers = tagWeatherRepository.findAll();
 
         Assertions.assertThat(memberList.size()).isEqualTo(1);
         Assertions.assertThat(postList.size()).isEqualTo(1);
         Assertions.assertThat(tagList.size()).isEqualTo(1);
         Assertions.assertThat(locationList.size()).isEqualTo(1);
-
+        Assertions.assertThat(tagWeathers.size()).isEqualTo(1);
     }
 }

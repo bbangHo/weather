@@ -6,6 +6,7 @@ import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.common.Sensitivity;
 import org.pknu.weather.domain.tag.TemperatureTag;
 import org.pknu.weather.preview.dto.Request.WeatherSurvey;
+import org.pknu.weather.preview.dto.Response;
 import org.pknu.weather.preview.dto.Response.TagHour;
 import org.pknu.weather.preview.dto.Response.TimeAndTemp;
 import org.pknu.weather.preview.service.PreviewService;
@@ -139,4 +140,9 @@ public class DashboardController {
         return response;
     }
 
+    @GetMapping("/chart-data2")
+    @ResponseBody
+    public List<Response.Data> showChartData2() {
+        return previewService.getChart2();
+    }
 }

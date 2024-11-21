@@ -41,4 +41,13 @@ public class Response {
         private TemperatureTag temperatureTag;
         private String time;
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Data {
+        private Double windChillTemp;   // 체감온도
+        private String tag;
+    }
 }

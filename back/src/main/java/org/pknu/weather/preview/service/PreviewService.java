@@ -6,6 +6,7 @@ import org.pknu.weather.domain.*;
 import org.pknu.weather.domain.common.Sensitivity;
 import org.pknu.weather.domain.tag.*;
 import org.pknu.weather.preview.dto.Request.WeatherSurvey;
+import org.pknu.weather.preview.dto.Response;
 import org.pknu.weather.preview.dto.Response.TagHour;
 import org.pknu.weather.preview.dto.Response.TimeAndTemp;
 import org.pknu.weather.repository.*;
@@ -29,6 +30,7 @@ public class PreviewService {
     private final LocationRepository locationRepository;
     private final TagRepository tagRepository;
     private final WeatherRepository weatherRepository;
+    private final TagWeatherRepository tagWeatherRepository;
 
     public List<Member> getMostMembers() {
         Location location = locationRepository.findLocationByFullAddress("부산광역시", "남구", "대연3동").get();
@@ -97,6 +99,15 @@ public class PreviewService {
 
         tagRepository.save(tag);
 
+        Weather weather = weatherRepository.findByLocationAndCloseTime(location);
+
+        TagWeather tagWeather = TagWeather.builder()
+                .tag(tag)
+                .weather(weather)
+                .build();
+
+        tagWeatherRepository.save(tagWeather);
+
         return "Thank you";
     }
 
@@ -124,6 +135,25 @@ public class PreviewService {
                         .build())
                 .toList();
 
+    }
+
+    /**
+     * TODO: 메서드 네이밍 수정
+     * 체감온도, 태그가 작성된 시점의 날씨 정보, 사용자의 체감 정도(태그) 등을 리턴
+     *
+     * @return
+     */
+    @Transactional(readOnly = true)
+    public List<Response.Data> getChart2() {
+        List<TagWeather> tagWeathers = tagWeatherRepository.findAll();
+        return tagWeathers.stream()
+                .map(tw -> {
+                    return Response.Data.builder()
+                            .windChillTemp(tw.getWeather().getSensibleTemperature())
+                            .tag(tw.getTag().getTemperTag().toText())
+                            .build();
+                })
+                .toList();
     }
 
 }

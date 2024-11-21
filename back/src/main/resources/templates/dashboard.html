@@ -45,7 +45,8 @@
                                     <p class="text-sm mb-0 text-uppercase font-weight-bold">공유된 날씨 수</p>
                                     <h6 class="font-weight-bolder" th:text="${sharedWeatherCount}"></h6>
                                     <p class="mb-0">
-                                        <span class="text-success text-sm font-weight-bolder" th:text="${sharedWeatherIncrease}"></span>
+                                        <span class="text-success text-sm font-weight-bolder"
+                                              th:text="${sharedWeatherIncrease}"></span>
                                     </p>
                                 </div>
                             </div>
@@ -92,9 +93,11 @@
                                 <div class="numbers">
                                     <p class="text-sm mb-0 text-uppercase font-weight-bold">최다 유형</p>
                                     <p class="mb-0">
-                                        <span class="text-success text-sm font-weight-bolder" th:text="${mostSelectTypeCount}"></span>
+                                        <span class="text-success text-sm font-weight-bolder"
+                                              th:text="${mostSelectTypeCount}"></span>
                                         명이
-                                        <span class="text-success text-sm font-weight-bolder" th:text="${mostSelectType}"></span>
+                                        <span class="text-success text-sm font-weight-bolder"
+                                              th:text="${mostSelectType}"></span>
                                         유형을 선택했습니다.
                                     </p>
                                 </div>
@@ -123,37 +126,25 @@
                         </div>
                         <div class="card-body p-3">
                             <div class="chart">
-                                <canvas id="chart-line" class="chart-canvas" height="300"></canvas>
+                                <canvas id="chart-line" class="chart-canvas"></canvas>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-5">
                     <div class="card card-carousel overflow-hidden h-100 p-0">
-                        <div id="carouselExampleCaptions" class="carousel slide h-100" data-bs-ride="carousel">
-                            <div class="carousel-inner border-radius-lg h-100">
-                                <div class="carousel-item h-100" style="background-image: url('/assets/img/carousel-1.jpg');
-      background-size: cover;">
-                                    <div class="carousel-caption d-none d-md-block bottom-0 text-start start-0 ms-5">
-                                        <div class="icon icon-shape icon-sm bg-white text-center border-radius-md mb-3">
-                                            <i class="ni ni-camera-compact text-dark opacity-10"></i>
-                                        </div>
-                                        <h5 class="text-white mb-1">Get started with Argon</h5>
-                                        <p>There’s nothing I really wanted to do in life that I wasn’t able to get good
-                                            at.</p>
-                                    </div>
+                        <div class="carousel-item h-100">
+                            <div class="card-header pb-0 pt-3 bg-transparent">
+                                <h6 class="text-capitalize">체감 온도 vs 체감 범주</h6>
+                                <p class="text-sm mb-0">
+                                    <span class="font-weight-bold">사용자의 체감 범주와 계산된 체감 온도</span>
+                                </p>
+                            </div>
+                            <div class="card-body p-3">
+                                <div class="chart">
+                                    <canvas id="chart-perceived" class="chart-canvas"></canvas>
                                 </div>
                             </div>
-                            <button class="carousel-control-prev w-5 me-3" type="button"
-                                    data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
-                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Previous</span>
-                            </button>
-                            <button class="carousel-control-next w-5 me-3" type="button"
-                                    data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
-                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Next</span>
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -222,6 +213,14 @@
         tagData3: [[${tagData3}]]
     };
 
+    var perceivedChart; // 전역 변수 선언
+
+    // 서버에서 전달된 체감 데이터로 초기화
+    var initialPerceivedData = {
+        tag: [[${tags}]], // 체감 범주 (추움, 더움 등)
+        windChillTemp: [[${windChillTemps}]] // 계산된 체감 온도
+    };
+
     $(document).ready(function () {
         // 차트 초기화
         var ctx = document.getElementById('chart-line').getContext('2d');
@@ -264,7 +263,7 @@
             options: {
                 responsive: true,
                 scales: {
-                    x: { stacked: false },
+                    x: {stacked: false},
                     'y-axis-temp': {
                         type: 'linear',
                         position: 'left',
@@ -286,16 +285,95 @@
             }
         });
 
+        // 체감 범주 차트 초기화
+        var ctx = document.getElementById('chart-perceived').getContext('2d');
+        perceivedChart = new Chart(ctx, {
+            type: 'scatter',
+            data: {
+                datasets: [
+                    {
+                        label: '체감 온도 vs 체감 범주',
+                        data: [], // 초기 데이터 없음
+                        backgroundColor: Charts.colors.theme['primary'], // 데이터 포인트 색상
+                        borderColor: Charts.colors.theme['default'], // 경계선 색상
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        type: 'category', // 범주형 데이터
+                        title: {
+                            display: true,
+                            text: '체감 범주'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: '체감 온도 (°C)'
+                        },
+                        ticks: {
+                            callback: function (value) {
+                                return value + '°C'; // 온도 단위 추가
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                }
+            }
+        });
+
         // 초기 데이터 로드
+        updatePerceivedChart();
         updateChart(0);
     });
+
+    // 새로운 차트 업데이트 함수
+    function updatePerceivedChart() {
+        console.log("updatePerceivedChart 호출됨");
+
+        $.ajax({
+            url: '/dashboard/chart-data2',
+            method: 'GET',
+            success: function (response) {
+                console.log("서버 응답 데이터:", response);
+
+                // 데이터 매핑
+                const scatterData = response.map(item => ({
+                    x: item.tag, // 체감 범주
+                    y: item.windChillTemp // 체감 온도
+                }));
+
+                console.log("산점도 데이터:", scatterData);
+
+                // 차트 데이터 업데이트
+                perceivedChart.data.datasets[0].data = scatterData;
+
+                // 차트 업데이트
+                perceivedChart.update();
+
+                console.log("차트 업데이트 완료");
+            },
+            error: function (xhr) {
+                console.error("AJAX 요청 실패:", xhr.responseText);
+            }
+        });
+    }
 
     // 버튼 클릭 이벤트 핸들러
     function updateChart(sensitivity) {
         $.ajax({
             url: '/dashboard/chart-data',
             method: 'GET',
-            data: { sensitivity: sensitivity },
+            data: {sensitivity: sensitivity},
             success: function (response) {
                 chartLine.data.labels = response.times;
                 chartLine.data.datasets[0].data = response.temps;
