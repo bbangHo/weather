@@ -2,6 +2,10 @@ package org.pknu.weather.common;
 
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Random;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.pknu.weather.common.utils.GeometryUtils;
@@ -17,11 +21,6 @@ import org.pknu.weather.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.Random;
 
 @SpringBootTest
 @Slf4j
@@ -97,7 +96,8 @@ public class Dummy {
         Location loc = locationRepository.findLocationByFullAddress("부산광역시", "남구", "대연3동").get();
 
         for (int i = 0; i <= 23; i++) {
-            LocalDateTime itime = LocalDateTime.of(LocalDate.now(), LocalTime.of(i, 0)).withMinute(0).withSecond(0).withNano(0);
+            LocalDateTime itime = LocalDateTime.of(LocalDate.now(), LocalTime.of(i, 0)).withMinute(0).withSecond(0)
+                    .withNano(0);
             LocalDateTime ttime = itime.plusDays(1);
             Random random = new Random();
             weatherRepository.save(Weather.builder()
@@ -106,8 +106,8 @@ public class Dummy {
                     .rain(0.0F)
                     .rainProb(0)
                     .temperature(random.nextInt(7, 16) + 1)
-                    .humidity(50)
-                    .windSpeed(1.5)
+                    .humidity(random.nextInt(50, 100))
+                    .windSpeed(random.nextDouble(0.0, 10.0))
                     .build());
 
             weatherRepository.save(Weather.builder()
@@ -116,12 +116,12 @@ public class Dummy {
                     .rain(0.0F)
                     .rainProb(0)
                     .temperature(random.nextInt(7, 16) + 1)
-                    .humidity(50)
-                    .windSpeed(1.5)
+                    .humidity(random.nextInt(50, 100))
+                    .windSpeed(random.nextDouble(0.0, 10.0))
                     .build());
         }
 
-        for(int i = 1; i <=123; i++) {
+        for (int i = 1; i <= 123; i++) {
             Random random = new Random();
 
             Request.WeatherSurvey survey = Request.WeatherSurvey.builder()

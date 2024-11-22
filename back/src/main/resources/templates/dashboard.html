@@ -23,10 +23,6 @@
 <body class="g-sidenav-show bg-gray-100" th:classappend="${bodyClass}">
 <div class="min-height-300 bg-primary position-absolute w-100"></div>
 <!-- Sidebar -->
-<aside class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4"
-       id="sidenav-main">
-    <!-- Sidebar content -->
-</aside>
 <main class="main-content position-relative border-radius-lg">
     <!-- Navbar -->
     <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur"
@@ -38,15 +34,16 @@
         <div class="row">
             <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
                 <div class="card">
-                    <div class="card-body p-3">
+                    <div class="card-body p-3" style="width: 392px; height: 105px;">
                         <div class="row">
                             <div class="col-8">
                                 <div class="numbers">
                                     <p class="text-sm mb-0 text-uppercase font-weight-bold">공유된 날씨 수</p>
-                                    <h6 class="font-weight-bolder" th:text="${sharedWeatherCount}"></h6>
+                                    <p class="font-weight-bolder" style="margin-bottom: 0px;"
+                                       th:text="${sharedWeatherCount}"></p>
                                     <p class="mb-0">
-                                        <span class="text-success text-sm font-weight-bolder"
-                                              th:text="${sharedWeatherIncrease}"></span>
+                                            <span class="text-success text-sm font-weight-bolder"
+                                                  th:text="${sharedWeatherIncrease}"></span>
                                     </p>
                                 </div>
                             </div>
@@ -61,14 +58,14 @@
             </div>
             <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
                 <div class="card">
-                    <div class="card-body p-3">
+                    <div class="card-body p-3" style="width: 392px; height: 105px;">
                         <div class="row">
                             <div class="col-8">
                                 <div class="numbers">
                                     <p class="text-sm mb-0 text-uppercase font-weight-bold">최다 응답</p>
                                     <p class="mb-0">
-                                        <span class="text-success text-sm font-weight-bolder"
-                                              th:text="${countUser}"></span>
+                                            <span class="text-success text-sm font-weight-bolder"
+                                                  th:text="${countUser}"></span>
                                         명의 사용자들이
                                         <span class="text-success text-sm font-weight-bolder"
                                               th:text="${mostSelectTempTag}"></span>
@@ -87,14 +84,14 @@
             </div>
             <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
                 <div class="card">
-                    <div class="card-body p-3">
+                    <div class="card-body p-3" style="width: 392px; height: 105px;">
                         <div class="row">
                             <div class="col-8">
                                 <div class="numbers">
                                     <p class="text-sm mb-0 text-uppercase font-weight-bold">최다 유형</p>
                                     <p class="mb-0">
-                                        <span class="text-success text-sm font-weight-bolder"
-                                              th:text="${mostSelectTypeCount}"></span>
+                                            <span class="text-success text-sm font-weight-bolder"
+                                                  th:text="${mostSelectTypeCount}"></span>
                                         명이
                                         <span class="text-success text-sm font-weight-bolder"
                                               th:text="${mostSelectType}"></span>
@@ -132,8 +129,8 @@
                     </div>
                 </div>
                 <div class="col-lg-5">
-                    <div class="card card-carousel overflow-hidden h-100 p-0">
-                        <div class="carousel-item h-100">
+                    <div class="col-lg-7 mb-lg-0 mb-4" style="height: 100%; width: 100%; position: relative;">
+                        <div class="card z-index-2 h-100">
                             <div class="card-header pb-0 pt-3 bg-transparent">
                                 <h6 class="text-capitalize">체감 온도 vs 체감 범주</h6>
                                 <p class="text-sm mb-0">
@@ -142,7 +139,9 @@
                             </div>
                             <div class="card-body p-3">
                                 <div class="chart">
-                                    <canvas id="chart-perceived" class="chart-canvas"></canvas>
+                                    <canvas id="chart-perceived" class="chart-canvas"
+                                            style="display: block; width: 100%; height: 100%;"
+                                    ></canvas>
                                 </div>
                             </div>
                         </div>
@@ -200,6 +199,7 @@
     };
 
     var chartLine; // 전역 변수 선언
+    let scatterData = [];
 
     // 서버에서 전달된 데이터로 초기화
     var initialData = {
@@ -233,7 +233,7 @@
                         type: 'line',
                         label: '온도',
                         data: [],
-                        borderColor: Charts.colors.theme['default'],
+                        borderColor: Charts.colors.theme['primary'],
                         backgroundColor: 'rgba(94, 114, 228, 0.1)',
                         yAxisID: 'y-axis-temp'
                     },
@@ -286,25 +286,30 @@
         });
 
         // 체감 범주 차트 초기화
-        var ctx = document.getElementById('chart-perceived').getContext('2d');
-        perceivedChart = new Chart(ctx, {
+        var ctxx = document.getElementById('chart-perceived').getContext('2d');
+        var canvasElement = document.getElementById('chart-perceived');
+        console.log("Canvas element size:", canvasElement.offsetWidth, canvasElement.offsetHeight);
+
+        perceivedChart = new Chart(ctxx, {
             type: 'scatter',
             data: {
                 datasets: [
                     {
                         label: '체감 온도 vs 체감 범주',
                         data: [], // 초기 데이터 없음
-                        backgroundColor: Charts.colors.theme['primary'], // 데이터 포인트 색상
-                        borderColor: Charts.colors.theme['default'], // 경계선 색상
+                        backgroundColor: Charts.colors.theme['primary'],
+                        borderColor: Charts.colors.theme['default'],
                         borderWidth: 1
                     }
                 ]
             },
             options: {
-                responsive: true,
+                responsive: true, // 반응형 활성화
+                maintainAspectRatio: false, // 비율 유지 비활성화
                 scales: {
                     x: {
-                        type: 'category', // 범주형 데이터
+                        type: 'category',
+                        labels: [], // 초기에는 빈 배열
                         title: {
                             display: true,
                             text: '체감 범주'
@@ -317,7 +322,7 @@
                         },
                         ticks: {
                             callback: function (value) {
-                                return value + '°C'; // 온도 단위 추가
+                                return value + '°C'; // °C 단위 추가
                             }
                         }
                     }
@@ -346,21 +351,68 @@
             success: function (response) {
                 console.log("서버 응답 데이터:", response);
 
-                // 데이터 매핑
-                const scatterData = response.map(item => ({
-                    x: item.tag, // 체감 범주
-                    y: item.windChillTemp // 체감 온도
+                const categories = [...new Set(response.map(item => item.tag))];
+                const dataPoints = response.map(item => ({
+                    x: item.tag,
+                    y: item.windChillTemp
                 }));
 
-                console.log("산점도 데이터:", scatterData);
+                console.log("X축 범주:", categories);
+                console.log("데이터 포인트:", dataPoints);
 
-                // 차트 데이터 업데이트
-                perceivedChart.data.datasets[0].data = scatterData;
+                // 기존 차트가 있으면 삭제
+                if (perceivedChart) {
+                    perceivedChart.destroy();
+                }
 
-                // 차트 업데이트
-                perceivedChart.update();
+                // 차트 다시 생성
+                const ctxx = document.getElementById('chart-perceived').getContext('2d');
+                perceivedChart = new Chart(ctxx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [
+                            {
+                                label: '체감 온도 vs 체감 범주',
+                                data: dataPoints,
+                                backgroundColor: Charts.colors.theme['primary'],
+                                borderColor: Charts.colors.theme['default'],
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                type: 'category',
+                                labels: categories,
+                                title: {
+                                    display: true,
+                                    text: '체감 범주'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: '체감 온도 (°C)'
+                                },
+                                ticks: {
+                                    callback: function (value) {
+                                        return value + '°C';
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            }
+                        }
+                    }
+                });
 
-                console.log("차트 업데이트 완료");
+                console.log("Chart updated.");
             },
             error: function (xhr) {
                 console.error("AJAX 요청 실패:", xhr.responseText);
@@ -392,8 +444,8 @@
             }
         });
     }
-
 </script>
+
 
 </body>
 
