@@ -139,11 +139,13 @@ class PostServiceTest {
         Post busanPost = postRepository.save(Post.builder()
                 .member(busanMember)
                 .location(busanMember.getLocation())
+                .content("test")
                 .build());
 
         Post seoulPost = postRepository.save(Post.builder()
                 .member(seoulMember)
                 .location(seoulMember.getLocation())
+                .content("test")
                 .build());
 
         // when
@@ -163,6 +165,7 @@ class PostServiceTest {
         Post hPost = postRepository.save(Post.builder()
                 .postType(PostType.HIKING)
                 .location(member.getLocation())
+                .content("test")
                 .member(member)
                 .build());
 
@@ -170,6 +173,7 @@ class PostServiceTest {
                 .postType(PostType.WEATHER)
                 .location(member.getLocation())
                 .member(member)
+                .content("test")
                 .build());
 
         // when
