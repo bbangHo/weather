@@ -85,7 +85,7 @@ public class WeatherResponseConverter {
                     .build();
         }
 
-        long hours = Duration.between(simpleRainInfo.getTime(), LocalDateTime.now()).toHours();
+        long hours = Duration.between(LocalDateTime.now(), simpleRainInfo.getTime()).toHours();
         StringBuilder sb = new StringBuilder();
 
         if (hours == 0) {
