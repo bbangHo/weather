@@ -200,7 +200,6 @@ const LoginScreen = ({
   };
 
   useEffect(() => {
-    /*
     const refreshTokenImmediately = async () => {
       try {
         console.log('Attempting to refresh token immediately...');
@@ -229,7 +228,6 @@ const LoginScreen = ({
       }
     }, 15 * 60 * 1000);
     return () => clearInterval(interval);
-    */
   }, []);
 
   return (
