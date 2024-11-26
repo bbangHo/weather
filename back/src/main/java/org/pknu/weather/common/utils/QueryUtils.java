@@ -5,7 +5,6 @@ import com.querydsl.core.types.dsl.BooleanTemplate;
 import com.querydsl.core.types.dsl.Expressions;
 import org.pknu.weather.common.GlobalParams;
 import org.pknu.weather.domain.Location;
-import org.pknu.weather.domain.QLocation;
 import org.pknu.weather.domain.QWeather;
 
 import java.time.LocalDateTime;
@@ -22,11 +21,17 @@ public class QueryUtils {
         Double latitude = locationEntity.getLatitude();
         Double longitude = locationEntity.getLongitude();
 
-        String target = "Point(%f %f)".formatted(latitude, longitude);
-        String geoFunction = "ST_CONTAINS(ST_BUFFER(ST_GeomFromText('%s', 4326), {0}), point)";
-        String expression = String.format(geoFunction, target);
+//        String target = "Point(%f %f)".formatted(latitude, longitude);
+//        String geoFunction = "ST_CONTAINS(ST_BUFFER(ST_GeomFromText('%s', 4326), {0}), point)";
+//        String expression = String.format(geoFunction, target);
+//
+//        return Expressions.booleanTemplate(expression, GlobalParams.RADIUS_DISTANCE);
 
-        return Expressions.booleanTemplate(expression, GlobalParams.RADIUS_DISTANCE);
+        String target = String.format("Point(%f %f)", latitude, longitude); // 경도 먼저, 위도 나중 (WKT 형식)
+        String geoFunction = "ST_CONTAINS(ST_BUFFER(ST_GeomFromText('%s', 4326), %f), point)";
+        String expression = String.format(geoFunction, target, (double)GlobalParams.RADIUS_DISTANCE);
+
+        return Expressions.booleanTemplate(expression);
     }
 
     /**

@@ -21,7 +21,7 @@
             background-color: white;
             padding: 40px;
             border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
             max-width: 400px;
             width: 90%;
         }
@@ -77,14 +77,16 @@
 <body>
 <div class="container">
     <div class="app-icon">
-        <img src="weather-icon.png" alt="날씨 비서 앱 아이콘">
+        <img src="/static/assets/img/app_icon.png" alt="날씨 비서 앱 아이콘">
     </div>
     <div class="app-title">날씨 요정</div>
     <div class="app-description">
-        당신만을 위한 개인화된 날씨 정보 서비스<br>
+        함께 만드는 우리 동네 날씨 커뮤니티<br>
         오늘의 날씨, 당신의 감각으로 느껴보세요
     </div>
-    <button class="start-button">시작하기</button>
+    <form action="weather_survey.html" method="get">
+        <button class="start-button">날씨 공유하기</button>
+    </form>
 </div>
 </body>
 </html>

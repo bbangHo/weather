@@ -122,16 +122,7 @@
 <body>
 <form th:action="@{/submit-survey}" method="post">
     <div class="question">
-        <label>성별</label>
-        <div class="button-group">
-            <button type="button" class="button" onclick="selectButton(this, 'gender')" data-value="male">남자</button>
-            <button type="button" class="button" onclick="selectButton(this, 'gender')" data-value="female">여자</button>
-        </div>
-        <input type="hidden" name="gender" id="gender">
-    </div>
-
-    <div class="question">
-        <label>당신의 날씨 체감 유형은?</label>
+        <label>당신은 어떤 유형인가요?</label>
         <div class="button-group vertical">
             <button type="button" class="button" onclick="selectButton(this, 'weatherSensitivity')" data-value="COLD">
                 추위를 많이 타는 편
@@ -148,7 +139,7 @@
 
 
     <div class="question">
-        <label>오늘의 날씨는 어떤가요?</label>
+        <label>오늘의 온도는 어떤가요?</label>
         <div class="button-group vertical">
             <button type="button" class="button" onclick="selectButton(this, 'todayFeeling')" data-value="VERY_COLD">매우
                 추움
@@ -218,7 +209,7 @@
         <input type="hidden" name="windy" id="windy">
     </div>
 
-    <input type="submit" value="제출하기">
+    <input type="submit" value="제출하기" style="width: inherit;">
 </form>
 
 <script>
