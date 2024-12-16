@@ -3,7 +3,6 @@ package org.pknu.weather.repository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.pknu.weather.common.utils.GeometryUtils;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.Post;
@@ -45,7 +44,6 @@ class PostRepositoryTest {
 
         for (int i = 1; i <= 5; i++) {
             Location location = Location.builder()
-                    .point(GeometryUtils.getPoint(LATITUDE, LONGITUDE))
                     .city("city" + i)
                     .province("province" + i)
                     .street("street" + i)

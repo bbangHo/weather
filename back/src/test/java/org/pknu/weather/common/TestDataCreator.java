@@ -1,12 +1,12 @@
 package org.pknu.weather.common;
 
-import java.time.LocalDateTime;
-import org.pknu.weather.common.utils.GeometryUtils;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.Post;
 import org.pknu.weather.domain.common.PostType;
 import org.pknu.weather.domain.common.Sensitivity;
+
+import java.time.LocalDateTime;
 
 public class TestDataCreator {
     private static int locationIdx = 1;
@@ -44,8 +44,6 @@ public class TestDataCreator {
 
     public static Location getBusanLocation() {
         return Location.builder()
-                .point(GeometryUtils.getPoint(TestGlobalParams.BusanGeometry.LATITUDE,
-                        TestGlobalParams.BusanGeometry.LONGITUDE))
                 .city("시군구")
                 .province("부산광역시" + locationIdx++)
                 .street("읍면동")
@@ -56,8 +54,6 @@ public class TestDataCreator {
 
     public static Location getSeoulLocation() {
         return Location.builder()
-                .point(GeometryUtils.getPoint(TestGlobalParams.SeoulGeometry.LATITUDE,
-                        TestGlobalParams.SeoulGeometry.LONGITUDE))
                 .city("시군구")
                 .province("서울광역시" + locationIdx++)
                 .street("읍면동")
