@@ -8,6 +8,7 @@ import org.pknu.weather.dto.PostRequest;
 import org.pknu.weather.dto.converter.PostConverter;
 import org.pknu.weather.dto.converter.RecommendationConverter;
 import org.pknu.weather.dto.converter.TagConverter;
+import org.pknu.weather.dto.converter.TagWeatherConverter;
 import org.pknu.weather.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,8 @@ public class PostService {
     private final RecommendationRepository recommendationRepository;
     private final TagRepository tagRepository;
     private final LocationRepository locationRepository;
+    private final TagWeatherRepository tagWeatherRepository;
+    private final WeatherRepository weatherRepository;
     private static final int DISTANCE = 3000;
 
     @Transactional(readOnly = true)
@@ -51,11 +54,16 @@ public class PostService {
 
         post = postRepository.save(post);
         post.addTag(tag);
-        tagRepository.save(tag);
+        tag = tagRepository.save(tag);
+
+        Weather weather = weatherRepository.findByLocationClosePresentationTime(location);
+        TagWeather tagWeather = TagWeatherConverter.toTagWeather(tag, weather);
+        tagWeatherRepository.save(tagWeather);
 
         return true;
     }
 
+    @Transactional
     public boolean createHobbyPost(String email, PostRequest.HobbyParams params) {
         Member member = memberRepository.safeFindByEmail(email);
         Location location = locationRepository.safeFindById(params.getLocationId());
