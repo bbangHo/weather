@@ -2,7 +2,6 @@ package org.pknu.weather.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.locationtech.jts.geom.Point;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,9 +17,6 @@ public class Location extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "location_id")
     private Long id;
-
-    @Column(name = "POINT", columnDefinition = "POINT SRID 4326", nullable = false)
-    private Point point;
 
     private Double longitude;
 
