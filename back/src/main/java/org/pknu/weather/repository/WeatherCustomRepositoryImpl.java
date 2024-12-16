@@ -43,7 +43,8 @@ public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
     }
 
     /**
-     * 해당 지역의 날씨가 갱신되었는지 확인하는 메서드 ex. baseTime: 14:00, now: 14:00~16:59 true baseTime: 14:00, now: 17:00~      false
+     * 해당 지역의 날씨가 갱신되었는지 확인하는 메서드
+     * ex. baseTime: 14:00, now: 14:00~16:59 true baseTime: 14:00, now: 17:00~      false
      *
      * @param location
      * @return true = 갱신되었음(3시간 안지남), false = 갱신되지 않았음(3시간 지남)
