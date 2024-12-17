@@ -56,6 +56,7 @@ public enum ErrorStatus implements BaseErrorCode {
     // post
     _POST_NOT_FOUND(HttpStatus.NOT_FOUND, "POST_404_1", "게시글이 존재하지 않습니다."),
     _RECOMMENDATION_BAD_REQUEST(HttpStatus.BAD_REQUEST, "RECOMMENDATION_400_1", "이미 좋아요를 눌렀습니다."),
+    _POST_CONTENT_OR_TAGS_REQUIRED(HttpStatus.BAD_REQUEST, "POST_400_2", "게시글의 내용이나 태그 중 하나는 필수입니다."),
 
     _POST_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "POST_404_2", "올바르지 않은 게시글 Type 입니다."),
 

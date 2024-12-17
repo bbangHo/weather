@@ -7,11 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.pknu.weather.domain.tag.DustTag;
-import org.pknu.weather.domain.tag.HumidityTag;
-import org.pknu.weather.domain.tag.SkyTag;
-import org.pknu.weather.domain.tag.TemperatureTag;
-import org.pknu.weather.domain.tag.WindTag;
+import org.pknu.weather.domain.tag.*;
 
 public class PostRequest {
 
@@ -65,5 +61,40 @@ public class PostRequest {
         private HumidityTag humidityTag;
         private WindTag windTag;
         private DustTag dustTag;
+    }
+
+    @Builder
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class CreatePostAndTagParameters {
+        @Size(max = 300)
+        private String content;
+
+        private String temperatureTagKey;
+
+        private String skyTagKey;
+
+        private String humidityTagKey;
+
+        private String windTagKey;
+
+        private String dustTagKey;
+
+        public boolean contentIsEmpty() {
+            return this.content == null || this.content.isBlank();
+        }
+
+        public boolean tagKeyStringIsEmpty() {
+            return (this.dustTagKey == null || this.dustTagKey.isBlank()) &&
+                    (this.humidityTagKey == null || this.humidityTagKey.isBlank()) &&
+                    (this.skyTagKey == null || this.skyTagKey.isBlank()) &&
+                    (this.windTagKey == null || this.windTagKey.isBlank()) &&
+                    (this.temperatureTagKey == null || this.temperatureTagKey.isBlank());
+        }
+
+        public boolean parametersIsEmpty() {
+            return contentIsEmpty() && tagKeyStringIsEmpty();
+        }
     }
 }
