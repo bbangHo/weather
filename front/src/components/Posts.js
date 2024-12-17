@@ -91,28 +91,24 @@ const Posts = ({accessToken}) => {
     <View style={[styles.section, {width: screenWidth}]}>
       <Card containerStyle={[styles.card, globalStyles.transparentBackground]}>
         <View style={styles.header}>
-          <View style={styles.profileInfo}>
-            <Image
-              source={
-                item.memberInfo.profileImageUrl
-                  ? {uri: item.memberInfo.profileImageUrl}
-                  : require('../../assets/images/profile.png')
-              }
-              style={styles.profileImage}
-              onError={() => {}}
-            />
-            <View style={styles.userInfo}>
-              <View style={styles.userRow}>
-                <Text style={styles.username}>
-                  {item.memberInfo.memberName}
-                </Text>
-                <Image
-                  source={getUserIcon(item.memberInfo.sensitivity)}
-                  style={styles.userIcon}
-                />
-              </View>
-              <Text style={styles.timeAgo}>{item.postInfo.createdAt}</Text>
+          <Image
+            source={
+              item.memberInfo.profileImageUrl
+                ? {uri: item.memberInfo.profileImageUrl}
+                : require('../../assets/images/profile.png')
+            }
+            style={styles.profileImage}
+            onError={() => {}}
+          />
+          <View style={styles.userInfo}>
+            <View style={styles.userRow}>
+              <Text style={styles.username}>{item.memberInfo.memberName}</Text>
+              <Image
+                source={getUserIcon(item.memberInfo.sensitivity)}
+                style={styles.userIcon}
+              />
             </View>
+            <Text style={styles.timeAgo}>{item.postInfo.createdAt}</Text>
           </View>
           <TouchableOpacity
             style={styles.likeContainer}
@@ -148,26 +144,6 @@ const Posts = ({accessToken}) => {
       horizontal
       showsHorizontalScrollIndicator={false}
       ItemSeparatorComponent={() => <View style={{width: 5}} />}
-      ListHeaderComponent={
-        <View style={[styles.section, {width: screenWidth * 0.96}]}>
-          <Card
-            containerStyle={[
-              styles.card,
-              globalStyles.transparentBackground,
-              {width: '92%'},
-            ]}>
-            <Text style={styles.sectionText}>외출하셨나요?</Text>
-            <Text style={styles.sectionText}>우리 동네의 날씨는 어떤가요?</Text>
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => navigation.navigate('PostCreationScreen')}>
-                <Text style={styles.buttonText}>날씨 공유하기</Text>
-              </TouchableOpacity>
-            </View>
-          </Card>
-        </View>
-      }
       ListFooterComponent={
         <View style={[styles.section, {width: screenWidth}]}>
           <Card
@@ -194,19 +170,21 @@ const styles = StyleSheet.create({
   },
   card: {
     borderRadius: 10,
-    borderColor: 'rgba(255, 255, 255, 0)',
+    backgroundColor: '#fff',
     padding: 15,
+    marginVertical: 10,
     marginHorizontal: 10,
-    width: windowWidth * 0.97,
-    height: Platform.OS === 'ios' ? 150 : 160,
-    justifyContent: 'space-between',
-    position: 'relative',
-    marginBottom: 12,
+    width: '95%',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    elevation: 3,
+    minHeight: 130, // Home 탭 게시글 높이 제한 고려
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 5,
   },
   profileInfo: {
     flexDirection: 'row',
@@ -214,21 +192,24 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   profileImage: {
-    width: 35,
-    height: 35,
+    width: 40,
+    height: 40,
     borderRadius: 20,
     marginRight: 10,
   },
   userInfo: {
     flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
   },
   userRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   username: {
-    color: '#fff',
+    color: '#333',
     fontWeight: 'bold',
+    fontSize: 14,
   },
   userIcon: {
     width: 18,
@@ -236,30 +217,32 @@ const styles = StyleSheet.create({
     marginLeft: 7,
   },
   timeAgo: {
-    color: '#ddd',
+    color: '#777',
     fontSize: 12,
     marginTop: 2,
   },
   likeContainer: {
-    position: 'absolute',
-    top: -3,
-    right: 0,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   likeIcon: {
     width: 20,
     height: 20,
   },
   likeCount: {
-    color: '#fff',
-    fontSize: 13,
+    color: '#777',
+    fontSize: 12,
+    textAlign: 'center',
+    marginTop: 2,
   },
   content: {
-    color: '#fff',
-    marginTop: 13,
+    color: '#444',
+    marginTop: 10,
+    fontSize: 14,
+    lineHeight: 20,
   },
   sectionText: {
-    color: '#fff',
+    color: '#333',
     fontSize: 16,
     textAlign: 'center',
     marginBottom: 7,
@@ -272,16 +255,14 @@ const styles = StyleSheet.create({
   },
   button: {
     flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    shadowColor: 'transparent',
-    elevation: 0,
+    backgroundColor: '#f0f0f0',
     padding: 10,
     borderRadius: 5,
     marginHorizontal: 5,
     alignItems: 'center',
   },
   buttonText: {
-    color: '#fff',
+    color: '#333',
     fontSize: 14,
   },
   moreContainer: {
@@ -291,8 +272,8 @@ const styles = StyleSheet.create({
     height: 110,
   },
   moreText: {
-    color: '#fff',
-    fontSize: 18,
+    color: '#3f51b5',
+    fontSize: 16,
     textAlign: 'center',
   },
 });

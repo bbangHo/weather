@@ -6,8 +6,10 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
+  Image,
+  Alert,
 } from 'react-native';
-import {fetchPostTags, createPost} from '../api/api';
+import {fetchPostTags, createPost, fetchMemberInfo} from '../api/api';
 
 const PostCreationScreen = ({navigation, accessToken, route}) => {
   const {onPostCreated} = route.params || {};
@@ -24,6 +26,9 @@ const PostCreationScreen = ({navigation, accessToken, route}) => {
   const [airQuality, setAirQuality] = useState(null);
   const [description, setDescription] = useState('');
 
+  const [nickname, setNickname] = useState('');
+  const [profileImage, setProfileImage] = useState(null);
+
   useEffect(() => {
     const loadTags = async () => {
       try {
@@ -37,7 +42,24 @@ const PostCreationScreen = ({navigation, accessToken, route}) => {
         console.error('Failed to fetch tags:', error);
       }
     };
+
+    const loadMemberInfo = async () => {
+      try {
+        const memberInfo = await fetchMemberInfo(accessToken);
+        setNickname(memberInfo.nickname || '사용자');
+        setProfileImage(
+          memberInfo.profileImage?.startsWith('http')
+            ? {uri: memberInfo.profileImage}
+            : require('../../assets/images/profile.png'),
+        );
+      } catch (error) {
+        console.error('Failed to fetch member info:', error);
+        setProfileImage(require('../../assets/images/profile.png'));
+      }
+    };
+
     loadTags();
+    loadMemberInfo();
   }, [accessToken]);
 
   const handleTagPress = (type, selectedTag) => {
@@ -73,7 +95,6 @@ const PostCreationScreen = ({navigation, accessToken, route}) => {
     };
 
     try {
-      console.log('Post data to send:', postData);
       const response = await createPost(postData, accessToken);
       console.log('Post created successfully:', response);
 
@@ -81,13 +102,10 @@ const PostCreationScreen = ({navigation, accessToken, route}) => {
         onPostCreated();
       }
 
-      navigation.reset({
-        index: 0,
-        routes: [{name: 'Community'}],
-      });
+      navigation.popToTop();
+      navigation.jumpTo('Community');
     } catch (error) {
       console.error('Failed to create post:', error.message);
-      console.error('Error details:', error);
     }
   };
 
@@ -95,6 +113,13 @@ const PostCreationScreen = ({navigation, accessToken, route}) => {
     <ScrollView
       style={styles.container}
       contentContainerStyle={styles.contentContainer}>
+      <View style={styles.header}>
+        <Image source={profileImage} style={styles.profileImage} />
+        <Text style={styles.nickname}>{nickname}</Text>
+      </View>
+
+      <View style={styles.separator} />
+
       <TextInput
         style={styles.textInput}
         placeholder="현재 날씨가 어떤지, 오늘 입은 옷 등을 공유해 주세요"
@@ -103,107 +128,126 @@ const PostCreationScreen = ({navigation, accessToken, route}) => {
         value={description}
         onChangeText={setDescription}
       />
+
       <View style={styles.section}>
         <Text style={styles.label}>온도는 어떤가요?</Text>
-        <View style={styles.tagContainer}>
-          {temperatureTags.map(tag => (
-            <TouchableOpacity
-              key={tag.code}
-              style={[
-                styles.tag,
-                temperature === tag.code && styles.selectedTag,
-              ]}
-              onPress={() => handleTagPress('temperature', tag)}>
-              <Text
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <View style={styles.tagContainer}>
+            {temperatureTags.map(tag => (
+              <TouchableOpacity
+                key={tag.code}
                 style={[
-                  styles.tagText,
-                  temperature === tag.code && styles.selectedTagText,
-                ]}>
-                {tag.text}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+                  styles.tag,
+                  temperature === tag.code && styles.selectedTag,
+                ]}
+                onPress={() => handleTagPress('temperature', tag)}>
+                <Text
+                  style={[
+                    styles.tagText,
+                    temperature === tag.code && styles.selectedTagText,
+                  ]}>
+                  {tag.text}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </ScrollView>
       </View>
+
       <View style={styles.section}>
         <Text style={styles.label}>날씨는 어떤가요?</Text>
-        <View style={styles.tagContainer}>
-          {weatherTags.map(tag => (
-            <TouchableOpacity
-              key={tag.code}
-              style={[styles.tag, weather === tag.code && styles.selectedTag]}
-              onPress={() => handleTagPress('weather', tag)}>
-              <Text
-                style={[
-                  styles.tagText,
-                  weather === tag.code && styles.selectedTagText,
-                ]}>
-                {tag.text}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <View style={styles.tagContainer}>
+            {weatherTags.map(tag => (
+              <TouchableOpacity
+                key={tag.code}
+                style={[styles.tag, weather === tag.code && styles.selectedTag]}
+                onPress={() => handleTagPress('weather', tag)}>
+                <Text
+                  style={[
+                    styles.tagText,
+                    weather === tag.code && styles.selectedTagText,
+                  ]}>
+                  {tag.text}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </ScrollView>
       </View>
+
       <View style={styles.section}>
         <Text style={styles.label}>습한가요?</Text>
-        <View style={styles.tagContainer}>
-          {humidityTags.map(tag => (
-            <TouchableOpacity
-              key={tag.code}
-              style={[styles.tag, humidity === tag.code && styles.selectedTag]}
-              onPress={() => handleTagPress('humidity', tag)}>
-              <Text
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <View style={styles.tagContainer}>
+            {humidityTags.map(tag => (
+              <TouchableOpacity
+                key={tag.code}
                 style={[
-                  styles.tagText,
-                  humidity === tag.code && styles.selectedTagText,
-                ]}>
-                {tag.text}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+                  styles.tag,
+                  humidity === tag.code && styles.selectedTag,
+                ]}
+                onPress={() => handleTagPress('humidity', tag)}>
+                <Text
+                  style={[
+                    styles.tagText,
+                    humidity === tag.code && styles.selectedTagText,
+                  ]}>
+                  {tag.text}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </ScrollView>
       </View>
+
       <View style={styles.section}>
         <Text style={styles.label}>바람은 어떤가요?</Text>
-        <View style={styles.tagContainer}>
-          {windTags.map(tag => (
-            <TouchableOpacity
-              key={tag.code}
-              style={[styles.tag, wind === tag.code && styles.selectedTag]}
-              onPress={() => handleTagPress('wind', tag)}>
-              <Text
-                style={[
-                  styles.tagText,
-                  wind === tag.code && styles.selectedTagText,
-                ]}>
-                {tag.text}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <View style={styles.tagContainer}>
+            {windTags.map(tag => (
+              <TouchableOpacity
+                key={tag.code}
+                style={[styles.tag, wind === tag.code && styles.selectedTag]}
+                onPress={() => handleTagPress('wind', tag)}>
+                <Text
+                  style={[
+                    styles.tagText,
+                    wind === tag.code && styles.selectedTagText,
+                  ]}>
+                  {tag.text}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </ScrollView>
       </View>
+
       <View style={styles.section}>
         <Text style={styles.label}>미세먼지는 어떤가요?</Text>
-        <View style={styles.tagContainer}>
-          {airQualityTags.map(tag => (
-            <TouchableOpacity
-              key={tag.code}
-              style={[
-                styles.tag,
-                airQuality === tag.code && styles.selectedTag,
-              ]}
-              onPress={() => handleTagPress('airQuality', tag)}>
-              <Text
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <View style={styles.tagContainer}>
+            {airQualityTags.map(tag => (
+              <TouchableOpacity
+                key={tag.code}
                 style={[
-                  styles.tagText,
-                  airQuality === tag.code && styles.selectedTagText,
-                ]}>
-                {tag.text}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+                  styles.tag,
+                  airQuality === tag.code && styles.selectedTag,
+                ]}
+                onPress={() => handleTagPress('airQuality', tag)}>
+                <Text
+                  style={[
+                    styles.tagText,
+                    airQuality === tag.code && styles.selectedTagText,
+                  ]}>
+                  {tag.text}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </ScrollView>
       </View>
+
       <TouchableOpacity style={styles.shareButton} onPress={handleSubmit}>
         <Text style={styles.shareButtonText}>공유하기</Text>
       </TouchableOpacity>
@@ -217,45 +261,58 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   contentContainer: {
-    padding: Platform.OS === 'ios' ? 16 : 20,
-    paddingBottom: 30,
-    paddingTop: 50,
+    padding: 20,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+    marginTop: 15,
+  },
+  profileImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 10,
+  },
+  nickname: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  separator: {
+    height: 1,
+    backgroundColor: '#E5E7EB',
+    marginBottom: 20,
   },
   textInput: {
-    paddingTop: 12,
-    paddingLeft: 12,
     height: 100,
-    borderColor: '#ccc',
+    borderColor: '#E5E7EB',
     borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 10,
+    borderRadius: 16,
+    padding: 10,
     marginBottom: 20,
     textAlignVertical: 'top',
-    color: '#000',
   },
   section: {
-    marginBottom: Platform.OS === 'ios' ? 22 : 25,
+    marginBottom: 20,
   },
   label: {
-    fontSize: Platform.OS === 'ios' ? 15 : 16,
-    marginBottom: Platform.OS === 'ios' ? 9 : 11,
-    color: '#333',
-    marginLeft: 5,
+    fontSize: 16,
+    marginBottom: 10,
   },
   tagContainer: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
   },
   tag: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
     borderRadius: 20,
     backgroundColor: '#f0f0f0',
     marginRight: 8,
-    marginBottom: 8,
   },
   tagText: {
-    fontSize: Platform.OS === 'ios' ? 14 : 15,
+    fontSize: 14,
     color: '#333',
   },
   selectedTag: {
@@ -265,13 +322,11 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   shareButton: {
-    paddingVertical: 12,
     backgroundColor: '#2f5af4',
     borderRadius: 8,
+    padding: 12,
     alignItems: 'center',
-    justifyContent: 'center',
     marginTop: 10,
-    paddingBottom: Platform.OS === 'ios' ? 13 : 16,
   },
   shareButtonText: {
     color: '#fff',

@@ -1,111 +1,57 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   View,
-  Text,
-  StyleSheet,
   StatusBar,
-  Dimensions,
-  Platform,
+  StyleSheet,
+  ScrollView,
+  RefreshControl,
 } from 'react-native';
-import CurrentLocationCommunity from '../components/CurrentLocationCommunity';
+import WeatherHeaderCommunity from '../components/WeatherHeaderCommunity';
 import PostScroll from '../components/PostScroll';
-import WeatherShareButton from '../components/WeatherShareButton';
-import {fetchWeatherData, fetchMemberInfo} from '../api/api';
+import FloatingActionButton from '../components/FloatingActionButton';
+import {useFocusEffect} from '@react-navigation/native';
 
-const {height} = Dimensions.get('window');
-
-const CommunityScreen = ({accessToken}) => {
+const CommunityScreen = ({accessToken, navigation}) => {
   const [refreshPosts, setRefreshPosts] = useState(false);
-  const [weatherData, setWeatherData] = useState(null);
-  const [backgroundColor, setBackgroundColor] = useState('#2f5af4');
-  const [sensitivityText, setSensitivityText] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    if (refreshPosts) {
-      setRefreshPosts(false);
+  const loadPosts = async (showRefreshIndicator = false) => {
+    if (showRefreshIndicator) {
+      setRefreshing(true);
     }
-  }, [refreshPosts]);
-
-  const handlePostCreated = () => {
     setRefreshPosts(true);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setRefreshPosts(false);
+    setRefreshing(false);
   };
 
-  useEffect(() => {
-    const currentHour = new Date().getHours();
-    if (currentHour >= 6 && currentHour < 18) {
-      setBackgroundColor('#2f5af4');
-    } else {
-      setBackgroundColor('#1D2837');
-    }
-  }, []);
-
-  useEffect(() => {
-    const getWeatherData = async () => {
-      try {
-        const data = await fetchWeatherData(accessToken);
-        if (data.isSuccess) {
-          setWeatherData(data.result);
-        } else {
-          console.error('Failed to fetch weather data:', data.message);
-        }
-      } catch (error) {
-        console.error('Error fetching weather data:', error.message);
-      }
-    };
-
-    getWeatherData();
-  }, [accessToken]);
-
-  useEffect(() => {
-    const getMemberInfo = async () => {
-      try {
-        const memberInfo = await fetchMemberInfo(accessToken);
-        console.log('Fetched member info:', memberInfo);
-
-        if (memberInfo && memberInfo.sensitivity) {
-          switch (memberInfo.sensitivity) {
-            case 'HOT':
-              setSensitivityText('더위를 많이 타는');
-              break;
-            case 'NONE':
-              setSensitivityText('평범한');
-              break;
-            case 'COLD':
-              setSensitivityText('추위를 많이 타는');
-              break;
-            default:
-              setSensitivityText('알 수 없는');
-              break;
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching member info:', error.message);
-      }
-    };
-
-    getMemberInfo();
-  }, [accessToken]);
+  useFocusEffect(
+    useCallback(() => {
+      loadPosts(false);
+    }, []),
+  );
 
   return (
-    <View style={[styles.container, {backgroundColor: backgroundColor}]}>
+    <View style={styles.container}>
       <StatusBar hidden={true} />
-      <View style={styles.topSpacer} />
-      <View style={styles.topContainer}>
-        <WeatherShareButton
-          onPostCreated={handlePostCreated}
+      <WeatherHeaderCommunity accessToken={accessToken} />
+
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={() => loadPosts(true)}
+          />
+        }>
+        <PostScroll
           accessToken={accessToken}
+          refreshPosts={refreshPosts}
+          onRefreshComplete={() => setRefreshPosts(false)}
         />
-        <View style={styles.rightContainer}>
-          <CurrentLocationCommunity accessToken={accessToken} />
-        </View>
-      </View>
-      <Text style={styles.text}>
-        ‘{sensitivityText}’ 유형이 가장 많이 공감했어요
-      </Text>
-      <PostScroll
-        accessToken={accessToken}
-        refreshPosts={refreshPosts}
-        onRefreshComplete={() => setRefreshPosts(false)}
+      </ScrollView>
+
+      <FloatingActionButton
+        onPress={() => navigation.navigate('PostCreationScreen')}
       />
     </View>
   );
@@ -114,26 +60,7 @@ const CommunityScreen = ({accessToken}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  topSpacer: {
-    height: Platform.OS === 'ios' ? height * 0.05 : height * 0.03,
-  },
-  topContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '95%',
-    paddingBottom: Platform.OS === 'ios' ? 15 : 10,
-  },
-  rightContainer: {
-    width: '50%',
-    justifyContent: 'space-between',
-    paddingBottom: 10,
-    marginLeft: Platform.OS === 'ios' ? 0 : -5,
-  },
-  text: {
-    color: '#fff',
-    textAlign: 'center',
-    paddingBottom: Platform.OS === 'ios' ? 10 : 15,
+    backgroundColor: '#F5F6FA',
   },
 });
 
