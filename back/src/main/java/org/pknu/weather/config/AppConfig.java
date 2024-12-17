@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 public class AppConfig {
 
     @Bean
-    public EnumTagMapper enumTagConverter() {
+    public EnumTagMapper enumTagMapper() {
         EnumTagMapper enumTagMapper = new EnumTagMapper();
 
         enumTagMapper.put(TemperatureTag.class);
