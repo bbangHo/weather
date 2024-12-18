@@ -9,6 +9,7 @@ import {
   Alert,
   Dimensions,
 } from 'react-native';
+import {useFocusEffect} from '@react-navigation/native';
 import {fetchMemberInfo, deleteMember} from '../api/api';
 import profilePlaceholder from '../../assets/images/profile.png';
 import loadingIcon from '../../assets/images/icon_loading.png';
@@ -30,30 +31,32 @@ const MyScreen = ({
   const [profileImage, setProfileImage] = useState(profilePlaceholder);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const loadMemberInfo = async () => {
-      try {
-        const memberInfo = await fetchMemberInfo(accessToken);
-        console.log('Fetched member info:', memberInfo);
-        if (
-          memberInfo.profileImage &&
-          memberInfo.profileImage.startsWith('http')
-        ) {
-          setProfileImage({uri: memberInfo.profileImage});
-        } else {
-          setProfileImage(profilePlaceholder);
-        }
-        setNickname(memberInfo.nickname || '닉네임');
-        setEmail(memberInfo.email || 'example@email.com');
-        setLoading(false);
-      } catch (error) {
-        console.error('회원 정보 불러오는 중 오류 발생:', error);
-        setLoading(false);
+  const loadMemberInfo = async () => {
+    try {
+      const memberInfo = await fetchMemberInfo(accessToken);
+      console.log('Fetched member info:', memberInfo);
+      if (
+        memberInfo.profileImage &&
+        memberInfo.profileImage.startsWith('http')
+      ) {
+        setProfileImage({uri: memberInfo.profileImage});
+      } else {
+        setProfileImage(profilePlaceholder);
       }
-    };
+      setNickname(memberInfo.nickname || '닉네임');
+      setEmail(memberInfo.email || 'example@email.com');
+      setLoading(false);
+    } catch (error) {
+      console.error('회원 정보 불러오는 중 오류 발생:', error);
+      setLoading(false);
+    }
+  };
 
-    loadMemberInfo();
-  }, [accessToken]);
+  useFocusEffect(
+    React.useCallback(() => {
+      loadMemberInfo();
+    }, []),
+  );
 
   const handleLogout = async () => {
     try {
@@ -80,27 +83,6 @@ const MyScreen = ({
       return;
     }
 
-    const ensureAccessToken = async () => {
-      try {
-        const newAccessToken = await refreshAccessToken(accessToken);
-        if (newAccessToken) {
-          console.log('New access token:', newAccessToken);
-          await AsyncStorage.setItem('accessToken', newAccessToken);
-          setAccessToken(newAccessToken);
-          return newAccessToken;
-        } else {
-          console.log('Access token remains the same:', accessToken);
-          return accessToken;
-        }
-      } catch (error) {
-        console.error('Failed to refresh access token:', error);
-        Alert.alert('오류', '인증이 만료되었습니다. 다시 로그인해주세요.', [
-          {text: '확인', onPress: handleLogout},
-        ]);
-        throw error;
-      }
-    };
-
     Alert.alert(
       '회원 탈퇴',
       '정말 탈퇴하시겠습니까?',
@@ -110,8 +92,7 @@ const MyScreen = ({
           text: '네',
           onPress: async () => {
             try {
-              const validAccessToken = await ensureAccessToken();
-              await deleteMember(validAccessToken);
+              await deleteMember(accessToken);
               Alert.alert('탈퇴 완료', '회원 탈퇴가 완료되었습니다.');
               setIsNewMember(true);
               setIsLoggedIn(false);
@@ -202,15 +183,15 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginVertical: 20,
     color: '#333',
-    marginTop: height * 0.07,
+    marginTop: height * 0.06,
   },
   profileSection: {
     alignItems: 'center',
     marginBottom: 10,
   },
   profileImage: {
-    width: width * 0.3,
-    height: width * 0.3,
+    width: width * 0.27,
+    height: width * 0.27,
     borderRadius: 9999,
     backgroundColor: '#e0e0e0',
     marginTop: height * 0.01,
@@ -291,7 +272,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   logoutButton: {
-    marginTop: 40,
+    marginTop: height * 0.07,
     marginHorizontal: 20,
     backgroundColor: '#F2F3F5',
     paddingVertical: 15,

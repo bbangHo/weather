@@ -13,7 +13,7 @@ import {Card} from 'react-native-elements';
 import globalStyles from '../globalStyles';
 import {fetchPosts, toggleLikePost} from '../api/api';
 
-const {width: windowWidth} = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 
 const PostScroll = ({accessToken, refreshPosts, onRefreshComplete}) => {
   const [posts, setPosts] = useState([]);
@@ -110,7 +110,7 @@ const PostScroll = ({accessToken, refreshPosts, onRefreshComplete}) => {
   };
 
   const renderPost = ({item}) => (
-    <View style={styles.section}>
+    <View style={styles.shadowContainer}>
       <Card containerStyle={[styles.card, globalStyles.transparentBackground]}>
         <View style={styles.header}>
           <Image
@@ -176,20 +176,28 @@ const PostScroll = ({accessToken, refreshPosts, onRefreshComplete}) => {
 };
 
 const styles = StyleSheet.create({
-  section: {
+  shadowContainer: {
     justifyContent: 'center',
     alignItems: 'center',
+    width: width * 0.94,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    marginVertical: 10,
+    marginHorizontal: 10,
+    marginBottom: 1,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 6,
   },
   card: {
     borderRadius: 10,
+    borderColor: '#fff',
     backgroundColor: '#fff',
+    paddingTop: -15,
     padding: 15,
-    marginVertical: 10,
-    marginHorizontal: 10,
-    width: '95%',
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    elevation: 3,
+    width: '100%',
     minHeight: 130,
   },
   header: {
@@ -247,6 +255,9 @@ const styles = StyleSheet.create({
     color: '#444',
     fontSize: 14,
     lineHeight: 20,
+  },
+  contentContainer: {
+    paddingBottom: 10,
   },
 });
 

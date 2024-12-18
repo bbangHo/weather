@@ -36,11 +36,24 @@ const AirQuality = ({accessToken}) => {
       case 2:
         return ['#F0FDF4', '#DCFCE7'];
       case 3:
-        return ['#FFF7ED', '#FFEDD5'];
       case 4:
         return ['#FEF2F2', '#FEE2E2'];
       default:
         return ['#F4F4F5', '#E4E4E7'];
+    }
+  };
+
+  const getTextColor = grade => {
+    switch (grade) {
+      case 1:
+        return '#2F5AF4';
+      case 2:
+        return '#22C55E';
+      case 3:
+      case 4:
+        return '#EF4444';
+      default:
+        return '#666';
     }
   };
 
@@ -66,32 +79,42 @@ const AirQuality = ({accessToken}) => {
     <View style={styles.container}>
       <View style={styles.row}>
         {['pm10Grade', 'pm25Grade'].map((key, index) => (
-          <LinearGradient
-            key={index}
-            colors={getGradientColors(extraWeatherInfo[key])}
-            style={styles.box}>
-            <Text style={styles.title}>
-              {key === 'pm25Grade' ? '초미세먼지' : '미세먼지'}
-            </Text>
-            <Text style={styles.value}>
-              {getGradeText(extraWeatherInfo[key])}
-            </Text>
-          </LinearGradient>
+          <View style={styles.shadowContainer} key={index}>
+            <LinearGradient
+              colors={getGradientColors(extraWeatherInfo[key])}
+              style={styles.box}>
+              <Text style={styles.title}>
+                {key === 'pm25Grade' ? '초미세먼지' : '미세먼지'}
+              </Text>
+              <Text
+                style={[
+                  styles.value,
+                  {color: getTextColor(extraWeatherInfo[key])},
+                ]}>
+                {getGradeText(extraWeatherInfo[key])}
+              </Text>
+            </LinearGradient>
+          </View>
         ))}
       </View>
       <View style={styles.row}>
         {['uvGrade', 'o3Grade'].map((key, index) => (
-          <LinearGradient
-            key={index}
-            colors={getGradientColors(extraWeatherInfo[key])}
-            style={styles.box}>
-            <Text style={styles.title}>
-              {key === 'uvGrade' ? '자외선' : '오존'}
-            </Text>
-            <Text style={styles.value}>
-              {getGradeText(extraWeatherInfo[key])}
-            </Text>
-          </LinearGradient>
+          <View style={styles.shadowContainer} key={index}>
+            <LinearGradient
+              colors={getGradientColors(extraWeatherInfo[key])}
+              style={styles.box}>
+              <Text style={styles.title}>
+                {key === 'uvGrade' ? '자외선' : '오존'}
+              </Text>
+              <Text
+                style={[
+                  styles.value,
+                  {color: getTextColor(extraWeatherInfo[key])},
+                ]}>
+                {getGradeText(extraWeatherInfo[key])}
+              </Text>
+            </LinearGradient>
+          </View>
         ))}
       </View>
     </View>
@@ -110,29 +133,31 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     paddingHorizontal: 10,
   },
+  shadowContainer: {
+    width: width * 0.46,
+    borderRadius: 10,
+    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    elevation: 3,
+  },
   box: {
-    width: width * 0.45,
     height: 77,
     borderRadius: 10,
-    paddingVertical: 12,
+    paddingBottom: 5,
     alignItems: 'center',
     justifyContent: 'center',
-    elevation: 2,
   },
   title: {
     fontSize: 13,
     color: '#333',
-    marginBottom: 5,
+    marginBottom: 8,
   },
   value: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
-  },
-  unitText: {
-    fontSize: 12,
-    color: '#666',
-    marginTop: 2,
   },
 });
 

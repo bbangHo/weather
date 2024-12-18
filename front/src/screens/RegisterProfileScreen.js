@@ -10,11 +10,14 @@ import {
   PermissionsAndroid,
   Platform,
   Linking,
+  Dimensions,
 } from 'react-native';
 import {launchImageLibrary} from 'react-native-image-picker';
 import Geolocation from 'react-native-geolocation-service';
 import {check, PERMISSIONS, request, RESULTS} from 'react-native-permissions';
 import {registerProfile, sendLocationToBackend} from '../api/api';
+
+const {width, height} = Dimensions.get('window');
 
 const RegisterProfileScreen = ({setIsNewMember, accessToken}) => {
   const [nickname, setNickname] = useState('');
@@ -47,8 +50,6 @@ const RegisterProfileScreen = ({setIsNewMember, accessToken}) => {
           ? selectedImage.uri
           : `file://${selectedImage.uri}`;
 
-        console.log('Selected image URI:', imageUri);
-
         setProfileImage({
           uri: imageUri,
           name: selectedImage.fileName || 'profile.jpg',
@@ -60,17 +61,17 @@ const RegisterProfileScreen = ({setIsNewMember, accessToken}) => {
 
   const handleSaveProfile = async () => {
     if (!nickname) {
-      Alert.alert('닉네임 필요', '닉네임을 입력해주세요.');
+      Alert.alert('닉네임 입력', '닉네임을 입력해주세요.');
       return;
     }
 
     if (!profileImage) {
-      Alert.alert('프로필 이미지 필요', '프로필 이미지를 선택해주세요.');
+      Alert.alert('프로필 이미지 설정', '프로필 이미지를 선택해주세요.');
       return;
     }
 
     if (!selectedType) {
-      Alert.alert('유형 선택 필요', '날씨 체감 유형을 선택해주세요.');
+      Alert.alert('유형 선택', '날씨 체감 유형을 선택해주세요.');
       return;
     }
 
@@ -181,82 +182,86 @@ const RegisterProfileScreen = ({setIsNewMember, accessToken}) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.profileContainer}>
+      <Text style={styles.headerTitle}>프로필 설정</Text>
+      <View style={styles.separator} />
+
+      <View style={styles.profileSection}>
         <Image
           source={
             profileImage
               ? {uri: profileImage.uri}
-              : {uri: 'https://via.placeholder.com/100'}
+              : require('../../assets/images/profile.png')
           }
           style={styles.profileImage}
         />
-        <TouchableOpacity
-          style={styles.editIconContainer}
-          onPress={handleImagePicker}>
-          <Image
-            source={require('../../assets/images/icon_camera.png')}
-            style={styles.cameraIcon}
-          />
+        <TouchableOpacity style={styles.imageEdit} onPress={handleImagePicker}>
+          <Text style={styles.plusIcon}>+</Text>
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.label}>닉네임</Text>
-      <TextInput
-        style={styles.input}
-        value={nickname}
-        placeholder="닉네임을 입력하세요"
-        onChangeText={setNickname}
-        editable={true}
-        placeholderTextColor="#000"
-      />
+      <View style={styles.profileInfoContainer}>
+        <Text style={styles.nickname}>닉네임</Text>
+        <TextInput
+          style={styles.input}
+          value={nickname}
+          placeholder="닉네임을 입력해주세요"
+          onChangeText={setNickname}
+          placeholderTextColor="#999"
+        />
+      </View>
 
-      <Text style={styles.label}>날씨 체감 유형</Text>
-      <TouchableOpacity
-        style={[
-          styles.typeButton,
-          selectedType === 'hot' && styles.selectedButton,
-        ]}
-        onPress={() => setSelectedType('hot')}>
-        <Text
-          style={[
-            styles.typeButtonText,
-            selectedType === 'hot' && styles.selectedButtonText,
-          ]}>
-          더위를 많이 타는 편
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[
-          styles.typeButton,
-          selectedType === 'none' && styles.selectedButton,
-        ]}
-        onPress={() => setSelectedType('none')}>
-        <Text
-          style={[
-            styles.typeButtonText,
-            selectedType === 'none' && styles.selectedButtonText,
-          ]}>
-          평범한 편
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[
-          styles.typeButton,
-          selectedType === 'cold' && styles.selectedButton,
-        ]}
-        onPress={() => setSelectedType('cold')}>
-        <Text
-          style={[
-            styles.typeButtonText,
-            selectedType === 'cold' && styles.selectedButtonText,
-          ]}>
-          추위를 많이 타는 편
-        </Text>
-      </TouchableOpacity>
+      <View style={styles.typeSelection}>
+        <Text style={styles.subHeader}>당신은 어떤 유형인가요?</Text>
 
-      <TouchableOpacity style={styles.submitButton} onPress={handleSaveProfile}>
-        <Text style={styles.submitButtonText}>
-          {loading ? '저장 중...' : '저장하기'}
+        <TouchableOpacity
+          style={[
+            styles.typeButton,
+            selectedType === 'hot' && styles.selectedButton,
+          ]}
+          onPress={() => setSelectedType('hot')}>
+          <Text
+            style={[
+              styles.typeButtonText,
+              selectedType === 'hot' && styles.selectedButtonText,
+            ]}>
+            남들보다 더위를 많이 타는 편
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.typeButton,
+            selectedType === 'none' && styles.selectedButton,
+          ]}
+          onPress={() => setSelectedType('none')}>
+          <Text
+            style={[
+              styles.typeButtonText,
+              selectedType === 'none' && styles.selectedButtonText,
+            ]}>
+            평범한 편
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.typeButton,
+            selectedType === 'cold' && styles.selectedButton,
+          ]}
+          onPress={() => setSelectedType('cold')}>
+          <Text
+            style={[
+              styles.typeButtonText,
+              selectedType === 'cold' && styles.selectedButtonText,
+            ]}>
+            남들보다 추위를 많이 타는 편
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      <TouchableOpacity style={styles.saveButton} onPress={handleSaveProfile}>
+        <Text style={styles.saveButtonText}>
+          {loading ? '저장 중...' : '완료'}
         </Text>
       </TouchableOpacity>
     </View>
@@ -286,79 +291,105 @@ const requestStoragePermission = async () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    padding: 20,
     backgroundColor: '#fff',
   },
-  profileContainer: {
-    marginTop: 50,
+  headerTitle: {
+    fontSize: 18,
+    textAlign: 'center',
+    marginVertical: 20,
+    color: '#333',
+    marginTop: height * 0.06,
+  },
+  nickname: {
+    color: '#000',
+    marginBottom: 10,
+    marginTop: height * 0.05,
+  },
+  separator: {
+    borderBottomWidth: 0.9,
+    borderColor: '#E5E5E5',
+    marginHorizontal: 15,
+    marginTop: -8,
+    marginBottom: 20,
+  },
+  profileSection: {
     alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
+    marginBottom: 10,
   },
   profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: width * 0.27,
+    height: width * 0.27,
+    borderRadius: 9999,
     backgroundColor: '#e0e0e0',
+    marginTop: height * 0.01,
   },
-  editIconContainer: {
+  imageEdit: {
     position: 'absolute',
     bottom: 0,
-    right: 0,
+    right: width * 0.4,
+    backgroundColor: '#3f7dfd',
+    borderRadius: 20,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
   },
-  cameraIcon: {
-    width: 30,
-    height: 30,
-    tintColor: '#3f51b5',
-  },
-  label: {
-    fontSize: 18,
-    marginTop: 30,
-    marginBottom: 20,
-    color: '#333',
+  plusIcon: {
+    color: '#fff',
+    fontSize: 14,
     fontWeight: 'bold',
   },
+  profileInfoContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 14,
+    color: '#777',
+    marginBottom: 5,
+  },
   input: {
-    width: '100%',
-    height: 40,
+    fontSize: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
-    fontSize: 16,
-    color: '#333',
-    marginBottom: 30,
+    paddingVertical: 5,
+    color: '#000',
+  },
+  typeSelection: {
+    marginVertical: 10,
+    paddingHorizontal: 20,
   },
   typeButton: {
-    width: '100%',
-    padding: 15,
     borderWidth: 1,
-    borderColor: '#2f5af4',
-    borderRadius: 5,
+    borderColor: '#E5E7EB',
+    borderRadius: 10,
+    paddingVertical: 15,
     alignItems: 'center',
     marginVertical: 5,
-    backgroundColor: '#fff',
   },
   typeButtonText: {
-    color: '#2f5af4',
-    fontSize: 16,
+    color: '#374151',
+    fontSize: 14,
   },
   selectedButton: {
-    backgroundColor: '#2f5af4',
+    backgroundColor: '#3f7dfd',
   },
   selectedButtonText: {
     color: '#fff',
   },
-  submitButton: {
-    width: '100%',
-    padding: 15,
-    backgroundColor: '#2f5af4',
-    borderRadius: 5,
+  saveButton: {
+    marginTop: height * 0.07,
+    marginHorizontal: 20,
+    backgroundColor: '#F2F3F5',
+    paddingVertical: 15,
+    borderRadius: 8,
     alignItems: 'center',
-    marginTop: 50,
   },
-  submitButtonText: {
-    color: '#fff',
+  saveButtonText: {
     fontSize: 16,
+    color: '#000',
+  },
+  subHeader: {
+    color: '#000',
+    marginBottom: 10,
   },
 });
 
