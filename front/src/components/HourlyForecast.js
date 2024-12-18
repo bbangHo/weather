@@ -5,11 +5,13 @@ import {
   View,
   StyleSheet,
   Image,
-  Platform,
+  Dimensions,
 } from 'react-native';
 import {Card} from 'react-native-elements';
 import globalStyles from '../globalStyles';
 import {fetchWeatherData} from '../api/api';
+
+const {width} = Dimensions.get('window');
 
 const HourlyForecast = ({accessToken, showText}) => {
   const [hourlyData, setHourlyData] = useState([]);
@@ -57,7 +59,10 @@ const HourlyForecast = ({accessToken, showText}) => {
   };
 
   return (
-    <ScrollView horizontal style={styles.container}>
+    <ScrollView
+      horizontal
+      contentContainerStyle={styles.scrollContent}
+      style={styles.container}>
       {hourlyData.map((item, i) => (
         <Card
           key={i}
@@ -70,18 +75,6 @@ const HourlyForecast = ({accessToken, showText}) => {
               style={styles.icon}
             />
 
-            {showText && item.rainAdverb ? (
-              <Text style={styles.rainAdverb}>{item.rainAdverb}</Text>
-            ) : (
-              <View
-                style={showText ? styles.adverbPlaceholder : styles.noAdverb}
-              />
-            )}
-
-            <Text style={styles.rainText}>
-              {showText ? item.rainText : `${item.rain}mm`}
-            </Text>
-
             {showText && item.tmpAdverb ? (
               <Text style={styles.adverbText}>{item.tmpAdverb}</Text>
             ) : (
@@ -93,6 +86,18 @@ const HourlyForecast = ({accessToken, showText}) => {
             <Text style={styles.tmpText}>
               {showText ? item.tmpText : `${item.tmp}°C`}
             </Text>
+
+            {showText && item.rainAdverb ? (
+              <Text style={styles.rainAdverb}>{item.rainAdverb}</Text>
+            ) : (
+              <View
+                style={showText ? styles.adverbPlaceholder : styles.noAdverb}
+              />
+            )}
+
+            <Text style={styles.rainText}>
+              {showText ? item.rainText : `${item.rain}mm`}
+            </Text>
           </View>
         </Card>
       ))}
@@ -102,68 +107,61 @@ const HourlyForecast = ({accessToken, showText}) => {
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    marginVertical: 5,
-    paddingHorizontal: Platform.select({
-      ios: 8,
-      android: 9,
-    }),
+    marginTop: -width * 0.16,
   },
+
   card: {
-    borderRadius: 10,
-    borderColor: 'rgba(255, 255, 255, 0)',
-    padding: Platform.OS === 'ios' ? 9.5 : 12,
-    paddingVertical: Platform.OS === 'ios' ? 18 : 23,
-    marginHorizontal: 5,
+    borderRadius: 12,
+    paddingVertical: 15,
+    width: width * 0.22,
+    height: 150,
+    marginRight: -width * 0.01,
+    marginLeft: width * 0.025,
     alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    elevation: 2,
   },
   content: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
   textTime: {
-    color: '#fff',
-    fontSize: Platform.OS === 'ios' ? 12 : 14,
+    fontSize: 14,
+    color: '#333',
     marginBottom: 5,
+    fontWeight: '600',
     textAlign: 'center',
   },
   icon: {
-    width: Platform.OS === 'ios' ? 40 : 50,
-    height: Platform.OS === 'ios' ? 40 : 50,
-    marginBottom: 0,
+    width: 40,
+    height: 40,
+    marginBottom: 5,
   },
   rainAdverb: {
-    color: 'skyblue',
     fontSize: 12,
-    marginTop: 5,
+
     marginBottom: 0,
     textAlign: 'center',
   },
   adverbText: {
-    color: '#fff',
     fontSize: 12,
-    marginTop: 5,
-    marginBottom: 0,
+    marginBottom: 1,
+    textAlign: 'center',
+  },
+  tmpText: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: '#000',
+    marginBottom: 7,
     textAlign: 'center',
   },
   rainText: {
-    color: 'skyblue',
-    fontSize: Platform.OS === 'ios' ? 13 : 14,
-    marginVertical: Platform.OS === 'ios' ? 4 : 1,
+    fontSize: 13,
+    color: '#555',
     textAlign: 'center',
-    marginBottom: 5,
-  },
-  tmpText: {
-    color: '#fff',
-    fontSize: Platform.OS === 'ios' ? 14 : 15,
-    marginVertical: Platform.OS === 'ios' ? 4 : 1,
-    textAlign: 'center',
-  },
-  adverbPlaceholder: {
-    height: 14,
-  },
-  noAdverb: {
-    height: 0,
   },
 });
 

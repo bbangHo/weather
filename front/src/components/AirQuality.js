@@ -1,7 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import {View, Text, StyleSheet, Dimensions} from 'react-native';
-import globalStyles from '../globalStyles';
+import LinearGradient from 'react-native-linear-gradient';
 import {fetchExtraWeatherInfo} from '../api/api';
+
+const {width} = Dimensions.get('window');
 
 const AirQuality = ({accessToken}) => {
   const [extraWeatherInfo, setExtraWeatherInfo] = useState({
@@ -27,18 +29,18 @@ const AirQuality = ({accessToken}) => {
     }
   };
 
-  const getGradeColor = grade => {
+  const getGradientColors = grade => {
     switch (grade) {
       case 1:
-        return '#81BEF7';
+        return ['#EFF6FF', '#DBEAFE'];
       case 2:
-        return '#A9F5A9';
+        return ['#F0FDF4', '#DCFCE7'];
       case 3:
-        return '#F78181';
+        return ['#FFF7ED', '#FFEDD5'];
       case 4:
-        return '#F78181';
+        return ['#FEF2F2', '#FEE2E2'];
       default:
-        return '#c4c4c4';
+        return ['#F4F4F5', '#E4E4E7'];
     }
   };
 
@@ -62,93 +64,75 @@ const AirQuality = ({accessToken}) => {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.box, globalStyles.transparentBackground]}>
-        <Text style={styles.title}>초미세먼지</Text>
-        <Text
-          style={[
-            styles.value,
-            {color: getGradeColor(extraWeatherInfo.pm25Grade)},
-          ]}>
-          {getGradeText(extraWeatherInfo.pm25Grade)}
-        </Text>
+      <View style={styles.row}>
+        {['pm10Grade', 'pm25Grade'].map((key, index) => (
+          <LinearGradient
+            key={index}
+            colors={getGradientColors(extraWeatherInfo[key])}
+            style={styles.box}>
+            <Text style={styles.title}>
+              {key === 'pm25Grade' ? '초미세먼지' : '미세먼지'}
+            </Text>
+            <Text style={styles.value}>
+              {getGradeText(extraWeatherInfo[key])}
+            </Text>
+          </LinearGradient>
+        ))}
       </View>
-      <View style={[styles.box, globalStyles.transparentBackground]}>
-        <Text style={styles.title}>미세먼지</Text>
-        <Text
-          style={[
-            styles.value,
-            {color: getGradeColor(extraWeatherInfo.pm10Grade)},
-          ]}>
-          {getGradeText(extraWeatherInfo.pm10Grade)}
-        </Text>
-      </View>
-      <View style={[styles.box, globalStyles.transparentBackground]}>
-        <Text style={styles.title}>자외선</Text>
-        <Text
-          style={[
-            styles.value,
-            {color: getGradeColor(extraWeatherInfo.uvGrade)},
-          ]}>
-          {getGradeText(extraWeatherInfo.uvGrade)}
-        </Text>
-      </View>
-      <View style={[styles.box, globalStyles.transparentBackground]}>
-        <Text style={styles.title}>오존</Text>
-        <Text
-          style={[
-            styles.value,
-            {color: getGradeColor(extraWeatherInfo.o3Grade)},
-          ]}>
-          {getGradeText(extraWeatherInfo.o3Grade)}
-        </Text>
+      <View style={styles.row}>
+        {['uvGrade', 'o3Grade'].map((key, index) => (
+          <LinearGradient
+            key={index}
+            colors={getGradientColors(extraWeatherInfo[key])}
+            style={styles.box}>
+            <Text style={styles.title}>
+              {key === 'uvGrade' ? '자외선' : '오존'}
+            </Text>
+            <Text style={styles.value}>
+              {getGradeText(extraWeatherInfo[key])}
+            </Text>
+          </LinearGradient>
+        ))}
       </View>
     </View>
   );
 };
 
-const {width} = Dimensions.get('window');
-
 const styles = StyleSheet.create({
   container: {
+    flexDirection: 'column',
+    justifyContent: 'center',
+    marginTop: 10,
+  },
+  row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: 2,
-    marginHorizontal: 5,
-    marginVertical: 5,
-    marginBottom: -5,
-    padding: 9,
-    borderRadius: 10,
-  },
-  loadingText: {
-    fontSize: 16,
-    color: '#fff',
-    textAlign: 'center',
-    marginTop: 20,
-  },
-  errorText: {
-    fontSize: 16,
-    color: '#fff',
-    textAlign: 'center',
-    marginTop: 20,
+    marginBottom: 10,
+    paddingHorizontal: 10,
   },
   box: {
+    width: width * 0.45,
+    height: 77,
     borderRadius: 10,
-    padding: 10,
-    paddingVertical: 15,
+    paddingVertical: 12,
     alignItems: 'center',
-    margin: 3,
-    width: '23%',
+    justifyContent: 'center',
+    elevation: 2,
   },
   title: {
     fontSize: 13,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 8,
+    color: '#333',
+    marginBottom: 5,
   },
   value: {
-    fontSize: 14,
-    marginBottom: 5,
-    marginTop: 5,
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  unitText: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 2,
   },
 });
 

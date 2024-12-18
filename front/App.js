@@ -8,8 +8,7 @@ import MyScreen from './src/screens/MyScreen';
 import RegisterProfileScreen from './src/screens/RegisterProfileScreen';
 import PostCreationScreen from './src/screens/PostCreationScreen';
 import LoginScreen from './src/screens/LoginScreen';
-import InterestScreen from './src/screens/InterestScreen';
-import InterestPostCreationScreen from './src/screens/InterestPostCreationScreen';
+import ProfileScreen from './src/screens/ProfileScreen';
 import {StatusBar, Image, Platform} from 'react-native';
 
 const Tab = createBottomTabNavigator();
@@ -45,20 +44,27 @@ const HomeStack = ({accessToken}) => (
   </Stack.Navigator>
 );
 
-const InterestStack = ({accessToken, locationId}) => (
+const MyStack = ({
+  accessToken,
+  setIsNewMember,
+  setLocationId,
+  setIsLoggedIn,
+  setAccessToken,
+}) => (
   <Stack.Navigator screenOptions={{headerShown: false}}>
-    <Stack.Screen name="InterestScreen">
-      {props => <InterestScreen {...props} accessToken={accessToken} />}
-    </Stack.Screen>
-    <Stack.Screen name="InterestPostCreationScreen">
+    <Stack.Screen name="MyScreen">
       {props => (
-        <InterestPostCreationScreen
+        <MyScreen
           {...props}
           accessToken={accessToken}
-          locationId={locationId}
+          setIsNewMember={setIsNewMember}
+          setLocationId={setLocationId}
+          setIsLoggedIn={setIsLoggedIn}
+          setAccessToken={setAccessToken}
         />
       )}
     </Stack.Screen>
+    <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
   </Stack.Navigator>
 );
 
@@ -70,7 +76,11 @@ const App = () => {
 
   return (
     <>
-      <StatusBar hidden={true} />
+      <StatusBar
+        translucent
+        backgroundColor="transparent"
+        barStyle="dark-content"
+      />
       <NavigationContainer>
         {isLoggedIn ? (
           isNewMember ? (
@@ -101,10 +111,6 @@ const App = () => {
                     case 'Community':
                       iconSource = require('./assets/images/icon_tab_community.png');
                       size = 22;
-                      break;
-                    case 'InterestStack':
-                      iconSource = require('./assets/images/icon_interest_run.png');
-                      size = 27;
                       break;
                     case 'My':
                       iconSource = require('./assets/images/icon_tab_my.png');
@@ -139,41 +145,28 @@ const App = () => {
               })}
               initialRouteName="HomeStack">
               <Tab.Screen
+                name="HomeStack"
+                options={{
+                  tabBarLabel: '홈',
+                }}>
+                {props => <HomeStack {...props} accessToken={accessToken} />}
+              </Tab.Screen>
+              <Tab.Screen
                 name="Community"
                 options={{
-                  tabBarLabel: 'Community',
+                  tabBarLabel: '탐색',
                 }}>
                 {props => (
                   <CommunityScreen {...props} accessToken={accessToken} />
                 )}
               </Tab.Screen>
               <Tab.Screen
-                name="InterestStack"
-                options={{
-                  tabBarLabel: 'Interest',
-                }}>
-                {props => (
-                  <InterestStack
-                    {...props}
-                    accessToken={accessToken}
-                    locationId={locationId}
-                  />
-                )}
-              </Tab.Screen>
-              <Tab.Screen
-                name="HomeStack"
-                options={{
-                  tabBarLabel: 'Home',
-                }}>
-                {props => <HomeStack {...props} accessToken={accessToken} />}
-              </Tab.Screen>
-              <Tab.Screen
                 name="My"
                 options={{
-                  tabBarLabel: 'My',
+                  tabBarLabel: '프로필',
                 }}>
                 {props => (
-                  <MyScreen
+                  <MyStack
                     {...props}
                     accessToken={accessToken}
                     setIsNewMember={setIsNewMember}

@@ -1,15 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import {View, StyleSheet, Dimensions, ActivityIndicator} from 'react-native';
-import Svg, {Path, Line, Text as SvgText} from 'react-native-svg';
-import globalStyles from '../globalStyles';
+import Svg, {Path, Circle, Text as SvgText, Rect} from 'react-native-svg';
 import {fetchWeatherData} from '../api/api';
 
-const WeatherGraph = ({accessToken}) => {
-  const {width} = Dimensions.get('window');
-  const graphWidth = width - 40;
-  const graphHeight = 200;
-  const paddingLeft = 60;
+const {width} = Dimensions.get('window');
+const graphWidth = width - 40;
+const graphHeight = 160;
 
+const WeatherGraph = ({accessToken}) => {
   const [temperatureData, setTemperatureData] = useState([]);
   const [maxTmp, setMaxTmp] = useState(null);
   const [minTmp, setMinTmp] = useState(null);
@@ -30,8 +28,6 @@ const WeatherGraph = ({accessToken}) => {
               tmp: item.tmp,
             }));
           setTemperatureData(tempData);
-        } else {
-          console.error('Failed to fetch weather data:', weatherData.message);
         }
       } catch (error) {
         console.error('Error fetching weather data:', error.message);
@@ -44,13 +40,12 @@ const WeatherGraph = ({accessToken}) => {
   }, [accessToken]);
 
   const getX = index => {
-    if (temperatureData.length === 0) return 0;
-    const interval = (graphWidth - paddingLeft) / (temperatureData.length - 1);
-    return paddingLeft + interval * index;
+    const interval = (graphWidth - 40) / (temperatureData.length - 1);
+    return 20 + interval * index;
   };
 
   const getY = temperature => {
-    if (maxTmp === null || minTmp === null || temperature === null) return 0;
+    if (!maxTmp || !minTmp) return 0;
     const scale = (graphHeight - 40) / (maxTmp - minTmp);
     return graphHeight - (temperature - minTmp) * scale - 20;
   };
@@ -68,75 +63,74 @@ const WeatherGraph = ({accessToken}) => {
 
   const formatHour = isoString => {
     const date = new Date(isoString);
-    const hours = date.getHours().toString().padStart(2, '0');
-    return `${hours}시`;
+    return `${date.getHours()}시`;
   };
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#fff" />;
+    return <ActivityIndicator size="large" color="#3f7dfd" />;
   }
 
   return (
-    <View style={[styles.container, globalStyles.transparentBackground]}>
+    <View style={styles.container}>
       <Svg height={graphHeight} width={graphWidth}>
-        {maxTmp !== null && (
-          <>
-            <Line
-              x1={paddingLeft}
-              y1={getY(maxTmp)}
-              x2={graphWidth}
-              y2={getY(maxTmp)}
-              stroke="white"
-              strokeWidth="0.5"
-            />
-            <SvgText
-              x="0"
-              y={getY(maxTmp) + 5}
-              fill="white"
-              fontSize="10"
-              fontWeight="bold">
-              최고({maxTmp}°C)
-            </SvgText>
-          </>
+        <Rect
+          x="20"
+          y="20"
+          width={graphWidth - 40}
+          height={graphHeight - 40}
+          fill="#fff"
+          rx="10"
+        />
+
+        {pathData && (
+          <Path
+            d={`${pathData} L ${getX(temperatureData.length - 1)} ${
+              graphHeight - 20
+            } L 20 ${graphHeight - 20} Z`}
+            fill="rgba(63, 125, 253, 0.3)"
+          />
         )}
 
-        {minTmp !== null && (
-          <>
-            <Line
-              x1={paddingLeft}
-              y1={getY(minTmp)}
-              x2={graphWidth}
-              y2={getY(minTmp)}
-              stroke="white"
-              strokeWidth="0.5"
-            />
-            <SvgText
-              x="0"
-              y={getY(minTmp) + 5}
-              fill="white"
-              fontSize="10"
-              fontWeight="bold">
-              최저({minTmp}°C)
-            </SvgText>
-          </>
+        {pathData && (
+          <Path d={pathData} fill="none" stroke="#3f7dfd" strokeWidth="2" />
         )}
 
-        {temperatureData.length > 0 &&
-          temperatureData.map((item, index) => (
-            <SvgText
-              key={index}
-              x={getX(index)}
-              y={graphHeight - 5}
-              fill="white"
-              fontSize="10"
-              textAnchor="middle">
-              {formatHour(item.hour)}
-            </SvgText>
-          ))}
+        {temperatureData.map((item, index) => (
+          <Circle
+            key={index}
+            cx={getX(index)}
+            cy={getY(item.tmp)}
+            r="4.5"
+            fill="#3f7dfd"
+            stroke="#fff"
+            strokeWidth="1"
+          />
+        ))}
 
-        {temperatureData.length > 0 && (
-          <Path d={pathData} fill="none" stroke="white" strokeWidth="2" />
-        )}
+        {temperatureData.map((item, index) => (
+          <SvgText
+            key={index}
+            x={getX(index)}
+            y={graphHeight - 5}
+            fill="#777"
+            fontSize="10"
+            textAnchor="middle">
+            {formatHour(item.hour)}
+          </SvgText>
+        ))}
+
+        {temperatureData.map((item, index) => (
+          <SvgText
+            key={index}
+            x={getX(index)}
+            y={getY(item.tmp) - 10}
+            fill="#333"
+            fontSize="10"
+            fontWeight="bold"
+            textAnchor="middle">
+            {item.tmp}°
+          </SvgText>
+        ))}
       </Svg>
     </View>
   );
@@ -144,14 +138,15 @@ const WeatherGraph = ({accessToken}) => {
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
-    marginVertical: 10,
+    backgroundColor: '#fff',
     borderRadius: 10,
-    padding: 20,
-  },
-  text: {
-    color: '#fff',
-    marginBottom: 10,
+    marginHorizontal: 10,
+    marginTop: 10,
+    marginBottom: 20,
+    paddingVertical: 5,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    elevation: 3,
   },
 });
 

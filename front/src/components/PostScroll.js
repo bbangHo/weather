@@ -113,28 +113,23 @@ const PostScroll = ({accessToken, refreshPosts, onRefreshComplete}) => {
     <View style={styles.section}>
       <Card containerStyle={[styles.card, globalStyles.transparentBackground]}>
         <View style={styles.header}>
-          <View style={styles.profileInfo}>
-            <Image
-              source={
-                item.memberInfo.profileImageUrl
-                  ? {uri: item.memberInfo.profileImageUrl}
-                  : require('../../assets/images/profile.png')
-              }
-              style={styles.profileImage}
-              onError={() => {}}
-            />
-            <View style={styles.userInfo}>
-              <View style={styles.userRow}>
-                <Text style={styles.username}>
-                  {item.memberInfo.memberName}
-                </Text>
-                <Image
-                  source={getUserIcon(item.memberInfo.sensitivity)}
-                  style={styles.userIcon}
-                />
-              </View>
-              <Text style={styles.timeAgo}>{item.postInfo.createdAt}</Text>
+          <Image
+            source={
+              item.memberInfo.profileImageUrl
+                ? {uri: item.memberInfo.profileImageUrl}
+                : require('../../assets/images/profile.png')
+            }
+            style={styles.profileImage}
+          />
+          <View style={styles.userInfoContainer}>
+            <View style={styles.userRow}>
+              <Text style={styles.username}>{item.memberInfo.memberName}</Text>
+              <Image
+                source={getUserIcon(item.memberInfo.sensitivity)}
+                style={styles.userIcon}
+              />
             </View>
+            <Text style={styles.timeAgo}>{item.postInfo.createdAt}</Text>
           </View>
           <TouchableOpacity
             style={styles.likeContainer}
@@ -157,6 +152,7 @@ const PostScroll = ({accessToken, refreshPosts, onRefreshComplete}) => {
             <Text style={styles.likeCount}>{item.postInfo.likeCount}</Text>
           </TouchableOpacity>
         </View>
+
         <Text style={styles.content}>{item.postInfo.content}</Text>
       </Card>
     </View>
@@ -180,89 +176,77 @@ const PostScroll = ({accessToken, refreshPosts, onRefreshComplete}) => {
 };
 
 const styles = StyleSheet.create({
-  contentContainer: {
-    alignItems: 'center',
-    marginBottom: '100',
-  },
   section: {
     justifyContent: 'center',
     alignItems: 'center',
   },
   card: {
     borderRadius: 10,
-    borderColor: 'rgba(255, 255, 255, 0)',
+    backgroundColor: '#fff',
     padding: 15,
-    marginTop: 0,
-    marginBottom: 10,
-    width: windowWidth * 0.93,
-    height: Platform.OS === 'ios' ? 130 : 155,
-    justifyContent: 'space-between',
-    position: 'relative',
+    marginVertical: 10,
+    marginHorizontal: 10,
+    width: '95%',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    elevation: 3,
+    minHeight: 130,
   },
   header: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  profileInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    marginBottom: 5,
   },
   profileImage: {
-    width: 35,
-    height: 35,
+    width: 40,
+    height: 40,
     borderRadius: 20,
     marginRight: 10,
   },
-  userInfo: {
+  userInfoContainer: {
     flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
   },
   userRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   username: {
-    color: '#fff',
     fontWeight: 'bold',
+    color: '#333',
+    fontSize: 14,
+    marginRight: 5,
   },
   userIcon: {
     width: 18,
     height: 18,
-    marginLeft: 7,
   },
   timeAgo: {
-    color: '#ddd',
     fontSize: 12,
+    color: '#888',
     marginTop: 2,
   },
   likeContainer: {
-    position: 'absolute',
-    top: -3,
-    right: 0,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   likeIcon: {
     width: 20,
     height: 20,
-    marginBottom: 1,
   },
   likeCount: {
-    color: '#fff',
-    fontSize: 13,
+    color: '#777',
+    fontSize: 12,
+    textAlign: 'center',
+    marginTop: 2,
   },
   content: {
-    color: '#fff',
-    marginTop: 13,
-  },
-  loadingText: {
-    textAlign: 'center',
-    padding: 10,
-    color: '#fff',
-  },
-  noPostText: {
-    color: '#fff',
-    textAlign: 'center',
-    marginTop: 20,
+    marginTop: 10,
+    color: '#444',
+    fontSize: 14,
+    lineHeight: 20,
   },
 });
 
