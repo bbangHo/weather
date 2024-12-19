@@ -64,7 +64,9 @@ const MyStack = ({
         />
       )}
     </Stack.Screen>
-    <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+    <Stack.Screen name="ProfileScreen">
+      {props => <ProfileScreen {...props} accessToken={accessToken} />}
+    </Stack.Screen>
   </Stack.Navigator>
 );
 

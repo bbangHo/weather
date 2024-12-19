@@ -1,12 +1,5 @@
 import React, {useState, useCallback} from 'react';
-import {
-  ScrollView,
-  View,
-  StyleSheet,
-  Dimensions,
-  StatusBar,
-  RefreshControl,
-} from 'react-native';
+import {ScrollView, View, StatusBar, RefreshControl} from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
 import WeatherHeader from '../components/WeatherHeader';
 import HourlyForecast from '../components/HourlyForecast';
@@ -15,8 +8,7 @@ import WeatherGraph from '../components/WeatherGraph';
 import Posts from '../components/Posts';
 import ToggleViewButton from '../components/ToggleViewButton';
 import FloatingActionButton from '../components/FloatingActionButton';
-
-const {width: windowWidth} = Dimensions.get('window');
+import globalStyles from '../globalStyles';
 
 const HomeScreen = ({accessToken, navigation}) => {
   const [showText, setShowText] = useState(false);
@@ -37,12 +29,12 @@ const HomeScreen = ({accessToken, navigation}) => {
   );
 
   return (
-    <View style={styles.container}>
+    <View style={globalStyles.container}>
       <StatusBar hidden={true} />
       <WeatherHeader accessToken={accessToken} onToggleChange={setShowText} />
 
       <ScrollView
-        style={styles.content}
+        style={globalStyles.container}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -62,12 +54,5 @@ const HomeScreen = ({accessToken, navigation}) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f7fc',
-  },
-});
 
 export default HomeScreen;

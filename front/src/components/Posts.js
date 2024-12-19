@@ -10,14 +10,11 @@ import {
   Dimensions,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import {Card} from 'react-native-elements';
-import globalStyles from '../globalStyles';
 import {fetchPopularPosts, toggleLikePost} from '../api/api';
 
-const {width: windowWidth} = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 
 const Posts = ({accessToken}) => {
-  const screenWidth = Dimensions.get('window').width;
   const navigation = useNavigation();
   const [newPosts, setNewPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -88,8 +85,8 @@ const Posts = ({accessToken}) => {
   };
 
   const renderPost = ({item}) => (
-    <View style={[styles.section, {width: screenWidth}]}>
-      <Card containerStyle={[styles.card, globalStyles.transparentBackground]}>
+    <View style={styles.shadowContainer}>
+      <View style={styles.card}>
         <View style={styles.header}>
           <Image
             source={
@@ -132,7 +129,7 @@ const Posts = ({accessToken}) => {
           </TouchableOpacity>
         </View>
         <Text style={styles.content}>{item.postInfo.content}</Text>
-      </Card>
+      </View>
     </View>
   );
 
@@ -145,15 +142,14 @@ const Posts = ({accessToken}) => {
       showsHorizontalScrollIndicator={false}
       ItemSeparatorComponent={() => <View style={{width: 5}} />}
       ListFooterComponent={
-        <View style={[styles.section, {width: screenWidth}]}>
-          <Card
-            containerStyle={[styles.card, globalStyles.transparentBackground]}>
+        <View style={styles.shadowContainer}>
+          <View style={styles.card}>
             <TouchableOpacity
               style={styles.moreContainer}
               onPress={() => navigation.navigate('Community')}>
               <Text style={styles.moreText}>더 보기</Text>
             </TouchableOpacity>
-          </Card>
+          </View>
         </View>
       }
     />
@@ -161,35 +157,33 @@ const Posts = ({accessToken}) => {
 };
 
 const styles = StyleSheet.create({
-  contentContainer: {
-    alignItems: 'center',
-  },
-  section: {
+  shadowContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  card: {
-    borderRadius: 10,
+    width: width * 0.94,
     backgroundColor: '#fff',
-    padding: 15,
+    borderRadius: 10,
     marginVertical: 10,
     marginHorizontal: 10,
-    width: '95%',
     shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
-    elevation: 3,
-    minHeight: 130, // Home 탭 게시글 높이 제한 고려
+    shadowRadius: 6,
+    elevation: 6,
+  },
+  card: {
+    width: '95%',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    minHeight: 150,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 5,
-  },
-  profileInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
   },
   profileImage: {
     width: 40,
@@ -241,34 +235,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
   },
-  sectionText: {
-    color: '#333',
-    fontSize: 16,
-    textAlign: 'center',
-    marginBottom: 7,
-    marginTop: 5,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 10,
-  },
-  button: {
-    flex: 1,
-    backgroundColor: '#f0f0f0',
-    padding: 10,
-    borderRadius: 5,
-    marginHorizontal: 5,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#333',
-    fontSize: 14,
-  },
   moreContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    width: '100%',
     height: 110,
   },
   moreText: {

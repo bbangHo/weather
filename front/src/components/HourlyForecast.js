@@ -64,42 +64,43 @@ const HourlyForecast = ({accessToken, showText}) => {
       contentContainerStyle={styles.scrollContent}
       style={styles.container}>
       {hourlyData.map((item, i) => (
-        <Card
-          key={i}
-          containerStyle={[styles.card, globalStyles.transparentBackground]}>
-          <View style={styles.content}>
-            <Text style={styles.textTime}>{formatHour(item.hour)}</Text>
+        <View key={i} style={styles.shadowContainer}>
+          <Card
+            containerStyle={[styles.card, globalStyles.transparentBackground]}>
+            <View style={styles.content}>
+              <Text style={styles.textTime}>{formatHour(item.hour)}</Text>
 
-            <Image
-              source={getWeatherIcon(item.skyType, item.rain)}
-              style={styles.icon}
-            />
-
-            {showText && item.tmpAdverb ? (
-              <Text style={styles.adverbText}>{item.tmpAdverb}</Text>
-            ) : (
-              <View
-                style={showText ? styles.adverbPlaceholder : styles.noAdverb}
+              <Image
+                source={getWeatherIcon(item.skyType, item.rain)}
+                style={styles.icon}
               />
-            )}
 
-            <Text style={styles.tmpText}>
-              {showText ? item.tmpText : `${item.tmp}°C`}
-            </Text>
+              {showText && item.tmpAdverb ? (
+                <Text style={styles.adverbText}>{item.tmpAdverb}</Text>
+              ) : (
+                <View
+                  style={showText ? styles.adverbPlaceholder : styles.noAdverb}
+                />
+              )}
 
-            {showText && item.rainAdverb ? (
-              <Text style={styles.rainAdverb}>{item.rainAdverb}</Text>
-            ) : (
-              <View
-                style={showText ? styles.adverbPlaceholder : styles.noAdverb}
-              />
-            )}
+              <Text style={styles.tmpText}>
+                {showText ? item.tmpText : `${item.tmp}°C`}
+              </Text>
 
-            <Text style={styles.rainText}>
-              {showText ? item.rainText : `${item.rain}mm`}
-            </Text>
-          </View>
-        </Card>
+              {showText && item.rainAdverb ? (
+                <Text style={styles.rainAdverb}>{item.rainAdverb}</Text>
+              ) : (
+                <View
+                  style={showText ? styles.adverbPlaceholder : styles.noAdverb}
+                />
+              )}
+
+              <Text style={styles.rainText}>
+                {showText ? item.rainText : `${item.rain}mm`}
+              </Text>
+            </View>
+          </Card>
+        </View>
       ))}
     </ScrollView>
   );
@@ -109,19 +110,26 @@ const styles = StyleSheet.create({
   container: {
     marginTop: -width * 0.16,
   },
-
+  shadowContainer: {
+    marginLeft: width * 0.025,
+    marginVertical: 10,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: {width: 1, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 6,
+  },
   card: {
     borderRadius: 12,
-    paddingVertical: 15,
-    width: width * 0.22,
-    height: 150,
-    marginRight: -width * 0.01,
-    marginLeft: width * 0.025,
+    borderColor: '#fff',
+    padding: -30,
+    width: width * 0.13,
+    height: 140,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    elevation: 2,
+    backgroundColor: '#fff',
   },
   content: {
     flex: 1,
@@ -134,6 +142,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     fontWeight: '600',
     textAlign: 'center',
+    marginTop: -20,
   },
   icon: {
     width: 40,
@@ -142,7 +151,6 @@ const styles = StyleSheet.create({
   },
   rainAdverb: {
     fontSize: 12,
-
     marginBottom: 0,
     textAlign: 'center',
   },
