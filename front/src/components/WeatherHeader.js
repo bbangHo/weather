@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import LinearGradient from 'react-native-linear-gradient';
 import {
   fetchUserLocation,
   fetchWeatherData,
@@ -24,6 +25,33 @@ const WeatherHeader = ({accessToken, onToggleChange}) => {
   const [weatherTags, setWeatherTags] = useState([]);
   const [isToggled, setIsToggled] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [backgroundColors, setBackgroundColors] = useState([]);
+
+  const isNightTime = () => {
+    const currentHour = new Date().getHours();
+    return currentHour >= 18 || currentHour < 6;
+  };
+
+  const isCloudyOrRainyCondition = () => {
+    if (!weatherData || !weatherData.weatherPerHourList) return false;
+
+    const currentHour = new Date().getHours();
+    const dayConditions = weatherData.weatherPerHourList.filter(item => {
+      const hour = new Date(item.hour).getHours();
+
+      console.log(
+        `Hour: ${hour}, SkyType: ${item.skyType}, Rain: ${item.rain}`,
+      );
+
+      if (hour > currentHour) return false;
+
+      return (
+        hour >= 6 && hour < 18 && (item.skyType === 'CLOUDY' || item.rain > 0)
+      );
+    });
+
+    return dayConditions.length > 0;
+  };
 
   useEffect(() => {
     const loadData = async () => {
@@ -46,6 +74,8 @@ const WeatherHeader = ({accessToken, onToggleChange}) => {
           onToggleChange(parsedState);
         }
 
+        updateBackgroundColors(weather?.result);
+
         setLoading(false);
       } catch (error) {
         Alert.alert('Error', '데이터를 불러오는 데 실패했습니다.');
@@ -55,6 +85,24 @@ const WeatherHeader = ({accessToken, onToggleChange}) => {
 
     loadData();
   }, [accessToken, onToggleChange]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      updateBackgroundColors(weatherData);
+    }, 60000);
+
+    return () => clearInterval(interval);
+  }, [weatherData]);
+
+  const updateBackgroundColors = data => {
+    if (isNightTime()) {
+      setBackgroundColors(['#2e3947', '#1D2837', '#161B2C']);
+    } else if (isCloudyOrRainyCondition()) {
+      setBackgroundColors(['#a2c8db', '#8BAEBF', '#7998a6']);
+    } else {
+      setBackgroundColors(['#4e9cf5', '#498bf5', '#3f6be8', '#3564e8']);
+    }
+  };
 
   const handleToggle = async () => {
     const newState = !isToggled;
@@ -85,7 +133,11 @@ const WeatherHeader = ({accessToken, onToggleChange}) => {
   }
 
   return (
-    <View style={styles.headerContainer}>
+    <LinearGradient
+      colors={backgroundColors}
+      start={{x: 0, y: 0}}
+      end={{x: 1, y: 1}}
+      style={styles.headerContainer}>
       <Switch
         value={isToggled}
         onValueChange={handleToggle}
@@ -115,7 +167,7 @@ const WeatherHeader = ({accessToken, onToggleChange}) => {
           </View>
         ))}
       </View>
-    </View>
+    </LinearGradient>
   );
 };
 
@@ -123,7 +175,6 @@ const styles = StyleSheet.create({
   headerContainer: {
     width: width,
     height: height * 0.23,
-    backgroundColor: '#3f7dfd',
     paddingVertical: 20,
     paddingHorizontal: 20,
     paddingLeft: width * 0.07,
