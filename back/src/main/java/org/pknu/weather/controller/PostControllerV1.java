@@ -20,13 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1")
 @Validated
 public class PostControllerV1 {
-    private final PostRequestConverter postRequestConverter;
     private final PostService postService;
 
     @PostMapping("/post")
     public ApiResponse<Object> createWeatherPost(@RequestHeader("Authorization") String authorization,
                                                  @Valid @RequestBody PostRequest.Params params) {
-        PostRequest.CreatePost createPost = postRequestConverter.toCreatePost(params);
+        PostRequest.CreatePost createPost = PostRequestConverter.toCreatePost(params);
         String email = TokenConverter.getEmailByToken(authorization);
         boolean isSuccess = postService.createWeatherPost(email, createPost);
         return ApiResponse.of(isSuccess);

@@ -2,6 +2,7 @@ package org.pknu.weather.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.pknu.weather.common.mapper.EnumTagMapper;
 import org.pknu.weather.domain.*;
 import org.pknu.weather.domain.common.PostType;
 import org.pknu.weather.dto.PostRequest;
@@ -26,7 +27,7 @@ public class PostService {
     private final LocationRepository locationRepository;
     private final TagWeatherRepository tagWeatherRepository;
     private final WeatherRepository weatherRepository;
-    private static final int DISTANCE = 3000;
+    private final EnumTagMapper enumTagMapper;
 
     @Transactional(readOnly = true)
     public List<Post> getPosts(Long memberId, Long lastPostId, Long size, String postType, Long locationId) {
@@ -45,16 +46,21 @@ public class PostService {
         return postList;
     }
 
+    /**
+     * 게시글과 날씨 태그를 생성합니다.
+     * @param email
+     * @param createPost
+     * @return
+     */
     @Transactional
     public boolean createWeatherPost(String email, PostRequest.CreatePost createPost) {
         Member member = memberRepository.safeFindByEmail(email);
         Location location = member.getLocation();
         Tag tag = TagConverter.toTag(createPost, location);
-        Post post = PostConverter.toPost(member, location, tag, createPost);
+        Post post = PostConverter.toPost(member, tag, createPost.getContent());
 
-        post = postRepository.save(post);
         post.addTag(tag);
-        tag = tagRepository.save(tag);
+        post = postRepository.save(post);
 
         Weather weather = weatherRepository.findByLocationClosePresentationTime(location);
         TagWeather tagWeather = TagWeatherConverter.toTagWeather(tag, weather);
@@ -63,15 +69,60 @@ public class PostService {
         return true;
     }
 
+
+    @Transactional
+    public boolean createWeatherPostV2(String email, PostRequest.CreatePostAndTagParameters params) {
+        Member member = memberRepository.safeFindByEmail(email);
+        Location location = member.getLocation();
+
+        if(!params.parametersIsEmpty()) {
+            Post post = PostConverter.toPost(member, params.getContent());
+            Tag tag = TagConverter.toTag(params, location, enumTagMapper);
+            post.addTag(tag);
+            postRepository.save(post);
+
+            Weather weather = weatherRepository.findByLocationClosePresentationTime(location);
+            TagWeather tagWeather = TagWeatherConverter.toTagWeather(tag, weather);
+            tagWeatherRepository.save(tagWeather);
+            return true;
+        }
+
+        if(params.contentIsEmpty()) {
+            Post post = PostConverter.toContentEmptyPost(member);
+            Tag tag = TagConverter.toTag(params, location, enumTagMapper);
+            post.addTag(tag);
+            postRepository.save(post);
+
+            Weather weather = weatherRepository.findByLocationClosePresentationTime(location);
+            TagWeather tagWeather = TagWeatherConverter.toTagWeather(tag, weather);
+            tagWeatherRepository.save(tagWeather);
+            return true;
+        }
+
+        if(params.tagKeyStringIsEmpty()) {
+            Post post = PostConverter.toPost(member, params.getContent());
+            postRepository.save(post);
+            return true;
+        }
+
+        return true;
+    }
+
     @Transactional
     public boolean createHobbyPost(String email, PostRequest.HobbyParams params) {
         Member member = memberRepository.safeFindByEmail(email);
         Location location = locationRepository.safeFindById(params.getLocationId());
-        Post post = PostConverter.toPost(member, location, params);
+        Post post = PostConverter.toPost(member, params);
         postRepository.save(post);
         return true;
     }
 
+    /**
+     * 좋아요, 좋아요 취소를 수행합니다.
+     * @param email
+     * @param postId
+     * @return
+     */
     @Transactional
     public boolean addRecommendation(String email, Long postId) {
         Member member = memberRepository.safeFindByEmail(email);

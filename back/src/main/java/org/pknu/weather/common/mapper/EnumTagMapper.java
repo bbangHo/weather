@@ -15,10 +15,17 @@ public class EnumTagMapper {
                 .collect(Collectors.toList());
     }
 
+    private void isDuplicateTagKeyName(String tagKeyName) {
+        if(map.containsKey(tagKeyName)) {
+            throw new IllegalArgumentException("EnumTag의 Key가 중복입니다.: " + tagKeyName);
+        }
+    }
+
     public void put(Class<? extends EnumTag> e) {
         List<EnumTag> enumTagValues = toEnumTagValues(e);
 
         for (EnumTag enumTagValue : enumTagValues) {
+            isDuplicateTagKeyName(enumTagValue.getKey());
             map.put(enumTagValue.getKey(), enumTagValue);
         }
     }

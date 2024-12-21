@@ -1,23 +1,24 @@
 package org.pknu.weather.dto.converter;
 
-import lombok.RequiredArgsConstructor;
 import org.pknu.weather.domain.tag.*;
 import org.pknu.weather.dto.PostRequest;
-import org.springframework.stereotype.Component;
 
-@Component
-@RequiredArgsConstructor
+import java.util.Arrays;
+
 public class PostRequestConverter {
-    private final TagConverter tagConverter;
-
-    public PostRequest.CreatePost toCreatePost(PostRequest.Params params) {
+    public static PostRequest.CreatePost toCreatePost(PostRequest.Params params) {
         return PostRequest.CreatePost.builder()
                 .content(params.getContent())
-                .temperatureTag((TemperatureTag) tagConverter.toTagFromCode(params.getTemperatureTagCode(), TemperatureTag.class))
-                .skyTag((SkyTag) tagConverter.toTagFromCode(params.getSkyTagCode(), SkyTag.class))
-                .windTag((WindTag) tagConverter.toTagFromCode(params.getWindTagCode(), WindTag.class))
-                .humidityTag((HumidityTag) tagConverter.toTagFromCode(params.getHumidityTagCode(), HumidityTag.class))
-                .dustTag((DustTag) tagConverter.toTagFromCode(params.getDustTagCode(), DustTag.class))
+                .temperatureTag((TemperatureTag) toTagFromCode(params.getTemperatureTagCode(), TemperatureTag.class))
+                .skyTag((SkyTag) toTagFromCode(params.getSkyTagCode(), SkyTag.class))
+                .windTag((WindTag) toTagFromCode(params.getWindTagCode(), WindTag.class))
+                .humidityTag((HumidityTag) toTagFromCode(params.getHumidityTagCode(), HumidityTag.class))
+                .dustTag((DustTag) toTagFromCode(params.getDustTagCode(), DustTag.class))
                 .build();
+    }
+
+    public static EnumTag toTagFromCode(int code, Class<? extends EnumTag> enumTag) {
+        EnumTag tag = Arrays.stream(enumTag.getEnumConstants()).toList().get(0);
+        return tag.findByCode(code);
     }
 }

@@ -4,7 +4,7 @@ import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.EnumPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.pknu.weather.common.utils.QueryUtils;
+import org.pknu.weather.common.BoundingBox;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.tag.EnumTag;
 import org.pknu.weather.dto.TagQueryResult;
@@ -35,12 +35,15 @@ public class TagCustomRepositoryImpl implements TagCustomRepository {
     }
 
     private TagQueryResult getTagTuple(Location locationEntity, EnumPath<? extends EnumTag> pTag) {
+        BoundingBox box = BoundingBox.calculateBoundingBox(locationEntity);
+
         Tuple tuple = jpaQueryFactory
                 .select(pTag.count(), pTag)
                 .from(tag)
                 .join(tag.location, location)
                 .where(
-                        QueryUtils.isContains(locationEntity)
+                        location.latitude.between(box.getLeftLat(), box.getRightLat()),
+                        location.longitude.between(box.getLeftLon(), box.getRightLon())
                 )
                 .groupBy(pTag)
                 .orderBy(pTag.count().desc())

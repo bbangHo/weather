@@ -4,13 +4,14 @@ import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.pknu.weather.common.TestDataCreator;
 import org.pknu.weather.domain.*;
 import org.pknu.weather.domain.common.PostType;
 import org.pknu.weather.domain.tag.*;
 import org.pknu.weather.dto.PostRequest;
 import org.pknu.weather.dto.PostRequest.HobbyParams;
-import org.pknu.weather.dto.converter.PostRequestConverter;
 import org.pknu.weather.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -39,9 +40,6 @@ class PostServiceTest {
 
     @Autowired
     RecommendationRepository recommendationRepository;
-
-    @Autowired
-    PostRequestConverter postRequestConverter;
 
     @Autowired
     TagWeatherRepository tagWeatherRepository;
@@ -120,6 +118,54 @@ class PostServiceTest {
         assertThat(post.getContent()).isEqualTo("test");
         assertThat(post.getMember().getId()).isEqualTo(member.getId());
         assertThat(tagWeathers.size()).isEqualTo(1);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "content, HOT, HUMID, RAIN, GOOD, NONE",
+            " , HOT, HUMID, RAIN, GOOD, NONE",
+            "content, , , , , ,"
+    })
+    @Transactional
+    void post_저장_테스트_v2(String content, String tempKey, String humidKey, String skyKey, String dustKey, String windKey) {
+        // given
+        Location location = TestDataCreator.getBusanLocation();
+        LocalDateTime now = LocalDateTime.now().withMinute(0).withSecond(0).withNano(0);
+
+        Weather weather = Weather.builder()
+                .location(location)
+                .presentationTime(now)
+                .basetime(now)
+                .temperature(14)
+                .humidity(50)
+                .windSpeed(1.3)
+                .build();
+
+        weatherRepository.save(weather);
+
+        PostRequest.CreatePostAndTagParameters createPost = PostRequest.CreatePostAndTagParameters.builder()
+                .content(content)
+                .temperatureTagKey(tempKey)
+                .humidityTagKey(humidKey)
+                .skyTagKey(skyKey)
+                .windTagKey(windKey)
+                .dustTagKey(dustKey)
+                .build();
+
+        Member member = memberRepository.save(Member.builder()
+                .location(location)
+                .nickname("member")
+                .email("test@naver.com")
+                .build());
+
+        // when
+        boolean result = postService.createWeatherPostV2(member.getEmail(), createPost);
+
+        // then
+        Post post = postRepository.findAll().get(0);
+        List<TagWeather> tagWeathers = tagWeatherRepository.findAll();
+        assertThat(post.getContent()).isEqualTo(content);
+        assertThat(post.getMember().getId()).isEqualTo(member.getId());
     }
 
     @Test

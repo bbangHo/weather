@@ -8,7 +8,7 @@ import com.querydsl.core.types.dsl.StringPath;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.pknu.weather.common.utils.QueryUtils;
+import org.pknu.weather.common.BoundingBox;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Post;
 import org.pknu.weather.domain.common.PostType;
@@ -37,13 +37,16 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
      */
     // TODO: tag 도 함께 페치 조인하여 n + 1 문제를 해결해야함(적용하니까 쿼리 결과가 0개 날라와서 일단 주석처리)
     public List<Post> findAllWithinDistance(Long lastPostId, Long size, Location locationEntity, PostType postType) {
+        BoundingBox box = BoundingBox.calculateBoundingBox(locationEntity);
+
         return jpaQueryFactory.selectFrom(post)
                 .join(post.location, location).fetchJoin()
                 .join(post.member, member).fetchJoin()
 //                .join(post.tag, tag)
                 .where(
+                        location.latitude.between(box.getLeftLat(), box.getRightLat()),
+                        location.longitude.between(box.getLeftLon(), box.getRightLon()),
                         goeLastPostId(lastPostId),
-                        QueryUtils.isContains(locationEntity),
                         post.postType.eq(postType),
                         post.content.isNotEmpty()
                 )

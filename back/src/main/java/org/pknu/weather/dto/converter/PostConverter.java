@@ -1,6 +1,5 @@
 package org.pknu.weather.dto.converter;
 
-import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.Post;
 import org.pknu.weather.domain.Tag;
@@ -9,21 +8,37 @@ import org.pknu.weather.dto.PostRequest;
 
 public class PostConverter {
 
-    public static Post toPost(Member member, Location location, Tag tag, PostRequest.CreatePost createPost) {
+    public static Post toPost(Member member, Tag tag, String content) {
         return Post.builder()
                 .member(member)
-                .location(location)
+                .location(member.getLocation())
                 .tag(tag)
-                .content(createPost.getContent())
+                .content(content)
                 .build();
     }
 
-    public static Post toPost(Member member, Location location, PostRequest.HobbyParams params) {
+    public static Post toPost(Member member, String content) {
         return Post.builder()
                 .member(member)
-                .location(location)
+                .location(member.getLocation())
+                .content(content)
+                .build();
+    }
+
+    public static Post toPost(Member member, PostRequest.HobbyParams params) {
+        return Post.builder()
+                .member(member)
+                .location(member.getLocation())
                 .content(params.getContent())
                 .postType(PostType.toPostType(params.getPostType()))
+                .build();
+    }
+
+    public static Post toContentEmptyPost(Member member) {
+        return Post.builder()
+                .member(member)
+                .location(member.getLocation())
+                .content(null)
                 .build();
     }
 }

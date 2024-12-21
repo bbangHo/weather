@@ -25,7 +25,7 @@ public class Tag extends BaseEntity {
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id")
+    @JoinColumn(name = "post_id", nullable = true)
     private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -34,7 +34,7 @@ public class Tag extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private TemperatureTag temperTag;
-
+    
     @Enumerated(EnumType.STRING)
     private WindTag windTag;
 

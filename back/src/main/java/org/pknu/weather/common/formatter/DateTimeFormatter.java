@@ -52,9 +52,9 @@ public final class DateTimeFormatter {
      * @return HHmm, String 형태의 formatted time
      */
     public static String getFormattedTimeByThreeHour() {
-        LocalTime currentTime = getBaseTimeCloseToNow(LocalTime.now());
+        LocalDate currentDateTime = getBaseTimeCloseToNow().toLocalDate();
         java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("HHmm");
-        return currentTime.format(formatter);
+        return currentDateTime.format(formatter);
     }
 
     /**
@@ -92,21 +92,25 @@ public final class DateTimeFormatter {
         return LocalDateTime.parse(dateTime, formatter);
     }
 
-    public static LocalTime getBaseTimeCloseToNow(LocalTime currentTime) {
-        List<LocalTime> predefinedTimes = Arrays.asList(
-                LocalTime.of(2, 0),
-                LocalTime.of(5, 0),
-                LocalTime.of(8, 0),
-                LocalTime.of(11, 0),
-                LocalTime.of(14, 0),
-                LocalTime.of(17, 0),
-                LocalTime.of(20, 0),
-                LocalTime.of(23, 0)
-        );
+    /**
+     * 0200, 0500, 0800, 1100, 1400, 1700, 2000, 2300 시 중 현재보다 과거이면서 가장가까운 값을 반환합니다.
+     * @return LocalDateTime
+     */
+    public static LocalDateTime getBaseTimeCloseToNow() {
+        LocalDateTime currentLocalDateTime = LocalDateTime.now();
+        return findBaseTime(currentLocalDateTime);
+    }
 
-        LocalTime closestPastTime = predefinedTimes.get(0);
-        for (LocalTime time : predefinedTimes) {
-            if (time.isBefore(currentTime)) {
+    public static LocalDateTime getBaseTimeCloseToNow(LocalDateTime currentLocalDateTime) {
+        return findBaseTime(currentLocalDateTime);
+    }
+
+    private static LocalDateTime findBaseTime(LocalDateTime currentLocalDateTime) {
+        List<LocalDateTime> predefinedTimes = getPredefinedTimes(currentLocalDateTime);
+
+        LocalDateTime closestPastTime = predefinedTimes.get(0);
+        for (LocalDateTime time : predefinedTimes) {
+            if (time.isBefore(currentLocalDateTime)) {
                 closestPastTime = time;
             } else {
                 break;
@@ -116,30 +120,19 @@ public final class DateTimeFormatter {
         return closestPastTime;
     }
 
-    public static LocalDateTime getBaseTimeCloseToNow() {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDate dateNow = now.toLocalDate();
+    private static List<LocalDateTime> getPredefinedTimes(LocalDateTime currentLocalDateTime) {
+        LocalDate currentLocalDate = currentLocalDateTime.toLocalDate();
 
-        List<LocalDateTime> predefinedTimes = Arrays.asList(
-                LocalDateTime.of(dateNow, LocalTime.of(2, 0)),
-                LocalDateTime.of(dateNow, LocalTime.of(5, 0)),
-                LocalDateTime.of(dateNow, LocalTime.of(8, 0)),
-                LocalDateTime.of(dateNow, LocalTime.of(11, 0)),
-                LocalDateTime.of(dateNow, LocalTime.of(14, 0)),
-                LocalDateTime.of(dateNow, LocalTime.of(17, 0)),
-                LocalDateTime.of(dateNow, LocalTime.of(20, 0)),
-                LocalDateTime.of(dateNow, LocalTime.of(23, 0))
+        return Arrays.asList(
+                LocalDateTime.of(currentLocalDate.minusDays(1), LocalTime.of(23, 0)),
+                LocalDateTime.of(currentLocalDate, LocalTime.of(2, 0)),
+                LocalDateTime.of(currentLocalDate, LocalTime.of(5, 0)),
+                LocalDateTime.of(currentLocalDate, LocalTime.of(8, 0)),
+                LocalDateTime.of(currentLocalDate, LocalTime.of(11, 0)),
+                LocalDateTime.of(currentLocalDate, LocalTime.of(14, 0)),
+                LocalDateTime.of(currentLocalDate, LocalTime.of(17, 0)),
+                LocalDateTime.of(currentLocalDate, LocalTime.of(20, 0)),
+                LocalDateTime.of(currentLocalDate, LocalTime.of(23, 0))
         );
-
-        LocalDateTime closestPastTime = predefinedTimes.get(0);
-        for (LocalDateTime time : predefinedTimes) {
-            if (time.isBefore(now)) {
-                closestPastTime = time;
-            } else {
-                break;
-            }
-        }
-
-        return closestPastTime;
     }
 }

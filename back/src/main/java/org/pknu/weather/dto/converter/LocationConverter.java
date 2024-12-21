@@ -4,8 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.dto.LocationDTO;
 
-import static org.pknu.weather.common.utils.GeometryUtils.getPoint;
-
 @Slf4j
 public class LocationConverter {
 
@@ -16,7 +14,6 @@ public class LocationConverter {
                 .province(locationDTO.getProvince())
                 .city(locationDTO.getCity())
                 .street(locationDTO.getStreet())
-                .point(getPoint(locationDTO.getLatitude(), locationDTO.getLongitude()))
                 .build();
     }
 

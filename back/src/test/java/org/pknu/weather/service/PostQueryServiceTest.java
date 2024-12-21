@@ -1,13 +1,8 @@
 package org.pknu.weather.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.pknu.weather.common.utils.GeometryUtils;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.Post;
@@ -21,6 +16,11 @@ import org.pknu.weather.repository.PostRepository;
 import org.pknu.weather.repository.RecommendationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 @SpringBootTest
@@ -53,7 +53,6 @@ class PostQueryServiceTest {
     void init() {
         for (int i = 1; i <= 30; i++) {
             Location location = Location.builder()
-                    .point(GeometryUtils.getPoint(LATITUDE, LONGITUDE))
                     .city("city")
                     .province("province")
                     .street("street")
