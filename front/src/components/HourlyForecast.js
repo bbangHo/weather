@@ -75,25 +75,21 @@ const HourlyForecast = ({accessToken, showText}) => {
                 style={styles.icon}
               />
 
-              {showText && item.tmpAdverb ? (
-                <Text style={styles.adverbText}>{item.tmpAdverb}</Text>
-              ) : (
-                <View
-                  style={showText ? styles.adverbPlaceholder : styles.noAdverb}
-                />
-              )}
+              <View style={styles.placeholder}>
+                {showText && item.tmpAdverb ? (
+                  <Text style={styles.adverbText}>{item.tmpAdverb}</Text>
+                ) : null}
+              </View>
 
               <Text style={styles.tmpText}>
                 {showText ? item.tmpText : `${item.tmp}°C`}
               </Text>
 
-              {showText && item.rainAdverb ? (
-                <Text style={styles.rainAdverb}>{item.rainAdverb}</Text>
-              ) : (
-                <View
-                  style={showText ? styles.adverbPlaceholder : styles.noAdverb}
-                />
-              )}
+              <View style={styles.placeholder}>
+                {showText && item.rainAdverb ? (
+                  <Text style={styles.rainAdverb}>{item.rainAdverb}</Text>
+                ) : null}
+              </View>
 
               <Text style={styles.rainText}>
                 {showText ? item.rainText : `${item.rain}mm`}
@@ -136,18 +132,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  placeholder: {
+    height: 12,
+    justifyContent: 'center',
+  },
   textTime: {
     fontSize: 14,
     color: '#333',
-    marginBottom: 5,
+    marginBottom: -10,
     fontWeight: '600',
     textAlign: 'center',
     marginTop: -20,
   },
   icon: {
-    width: 40,
-    height: 40,
-    marginBottom: 5,
+    width: 45,
+    height: 45,
+    marginBottom: -5,
+    marginTop: 8,
   },
   rainAdverb: {
     fontSize: 12,
@@ -163,7 +164,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: 'bold',
     color: '#000',
-    marginBottom: 7,
+    marginBottom: -5,
     textAlign: 'center',
   },
   rainText: {
