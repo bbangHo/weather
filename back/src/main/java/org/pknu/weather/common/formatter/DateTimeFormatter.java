@@ -20,10 +20,10 @@ public final class DateTimeFormatter {
         LocalDateTime comparison = createdAt;
         Duration diff = Duration.between(createdAt, now);
 
-        if(comparison.plusDays(1).isBefore(now)) {
+        if (comparison.plusDays(1).isBefore(now)) {
             return diff.toDays() + "일 전";
         } else if (comparison.plusHours(1).isBefore(now)) {
-                return diff.toHours() + "시간 전";
+            return diff.toHours() + "시간 전";
         } else {
             return diff.toMinutes() + "분 전";
         }
@@ -46,15 +46,14 @@ public final class DateTimeFormatter {
     }
 
     /**
-     * LocalTime을 HHmm 형태로 반환합니다.
-     * 0200, 0500, 0800, 1100, 1400, 1700, 2000, 2300 중 현재보다 과거이면서 가장가까운 값을 반환합니다.
+     * LocalTime을 HHmm 형태로 반환합니다. 0200, 0500, 0800, 1100, 1400, 1700, 2000, 2300 중 현재보다 과거이면서 가장가까운 값을 반환합니다.
      *
      * @return HHmm, String 형태의 formatted time
      */
     public static String getFormattedTimeByThreeHour() {
-        LocalDate currentDateTime = getBaseTimeCloseToNow().toLocalDate();
+        LocalDateTime currentLocalDateTime = getBaseTimeCloseToNow();
         java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("HHmm");
-        return currentDateTime.format(formatter);
+        return currentLocalDateTime.format(formatter);
     }
 
     /**
@@ -94,6 +93,7 @@ public final class DateTimeFormatter {
 
     /**
      * 0200, 0500, 0800, 1100, 1400, 1700, 2000, 2300 시 중 현재보다 과거이면서 가장가까운 값을 반환합니다.
+     *
      * @return LocalDateTime
      */
     public static LocalDateTime getBaseTimeCloseToNow() {
