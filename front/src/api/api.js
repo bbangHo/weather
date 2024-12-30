@@ -102,7 +102,6 @@ export const fetchWeatherData = async (accessToken, locationId) => {
     }
 
     const data = await response.json();
-    console.log('Backend response:', data);
 
     if (!data.isSuccess) {
       console.error('Backend error:', data.code, data.message);

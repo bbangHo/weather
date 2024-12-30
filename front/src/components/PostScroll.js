@@ -5,6 +5,7 @@ import {
   View,
   StyleSheet,
   Image,
+  ActivityIndicator,
   Alert,
   TouchableOpacity,
   Dimensions,
@@ -166,7 +167,9 @@ const PostScroll = ({accessToken, refreshPosts, onRefreshComplete}) => {
       contentContainerStyle={styles.contentContainer}
       ListEmptyComponent={
         loading ? (
-          <Text style={styles.loadingText}>Loading...</Text>
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#999999" />
+          </View>
         ) : (
           <Text style={styles.noPostText}>불러올 게시글이 없습니다.</Text>
         )
@@ -258,6 +261,12 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     paddingBottom: 10,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 20,
   },
 });
 
