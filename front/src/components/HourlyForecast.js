@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Image,
   Dimensions,
+  ActivityIndicator,
 } from 'react-native';
 import {Card} from 'react-native-elements';
 import globalStyles from '../globalStyles';
@@ -15,6 +16,7 @@ const {width} = Dimensions.get('window');
 
 const HourlyForecast = ({accessToken, showText}) => {
   const [hourlyData, setHourlyData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const getWeatherData = async () => {
@@ -30,6 +32,8 @@ const HourlyForecast = ({accessToken, showText}) => {
         }
       } catch (error) {
         console.error('Error fetching weather data:', error.message);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -58,42 +62,50 @@ const HourlyForecast = ({accessToken, showText}) => {
     }
   };
 
+  const placeholderData = Array(8).fill({});
+
   return (
     <ScrollView
       horizontal
       contentContainerStyle={styles.scrollContent}
       style={styles.container}>
-      {hourlyData.map((item, i) => (
+      {(loading ? placeholderData : hourlyData).map((item, i) => (
         <View key={i} style={styles.shadowContainer}>
           <Card
             containerStyle={[styles.card, globalStyles.transparentBackground]}>
             <View style={styles.content}>
-              <Text style={styles.textTime}>{formatHour(item.hour)}</Text>
+              {loading ? (
+                <ActivityIndicator size="small" color="#999999" />
+              ) : (
+                <>
+                  <Text style={styles.textTime}>{formatHour(item.hour)}</Text>
 
-              <Image
-                source={getWeatherIcon(item.skyType, item.rain)}
-                style={styles.icon}
-              />
+                  <Image
+                    source={getWeatherIcon(item.skyType, item.rain)}
+                    style={styles.icon}
+                  />
 
-              <View style={styles.placeholder}>
-                {showText && item.tmpAdverb ? (
-                  <Text style={styles.adverbText}>{item.tmpAdverb}</Text>
-                ) : null}
-              </View>
+                  <View style={styles.placeholder}>
+                    {showText && item.tmpAdverb ? (
+                      <Text style={styles.adverbText}>{item.tmpAdverb}</Text>
+                    ) : null}
+                  </View>
 
-              <Text style={styles.tmpText}>
-                {showText ? item.tmpText : `${item.tmp}°C`}
-              </Text>
+                  <Text style={styles.tmpText}>
+                    {showText ? item.tmpText : `${item.tmp}°C`}
+                  </Text>
 
-              <View style={styles.placeholder}>
-                {showText && item.rainAdverb ? (
-                  <Text style={styles.rainAdverb}>{item.rainAdverb}</Text>
-                ) : null}
-              </View>
+                  <View style={styles.placeholder}>
+                    {showText && item.rainAdverb ? (
+                      <Text style={styles.rainAdverb}>{item.rainAdverb}</Text>
+                    ) : null}
+                  </View>
 
-              <Text style={styles.rainText}>
-                {showText ? item.rainText : `${item.rain}mm`}
-              </Text>
+                  <Text style={styles.rainText}>
+                    {showText ? item.rainText : `${item.rain}mm`}
+                  </Text>
+                </>
+              )}
             </View>
           </Card>
         </View>

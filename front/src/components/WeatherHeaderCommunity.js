@@ -31,7 +31,6 @@ const WeatherHeaderCommunity = ({accessToken}) => {
       const hour = new Date(item.hour).getHours();
 
       if (hour > currentHour) return false;
-
       return (
         hour >= 6 && hour < 18 && (item.skyType === 'CLOUDY' || item.rain > 0)
       );
@@ -43,6 +42,8 @@ const WeatherHeaderCommunity = ({accessToken}) => {
   useEffect(() => {
     const loadData = async () => {
       try {
+        updateBackgroundColors();
+
         const location = await fetchUserLocation(accessToken);
         const weather = await fetchWeatherData(accessToken);
 
@@ -61,20 +62,19 @@ const WeatherHeaderCommunity = ({accessToken}) => {
     };
 
     loadData();
-  }, [accessToken]);
 
-  useEffect(() => {
     const interval = setInterval(() => {
-      updateBackgroundColors(weatherData);
+      console.log('Refreshing community weather data...');
+      loadData();
     }, 60000);
 
     return () => clearInterval(interval);
-  }, [weatherData]);
+  }, [accessToken]);
 
-  const updateBackgroundColors = data => {
+  const updateBackgroundColors = (data = null) => {
     if (isNightTime()) {
-      setBackgroundColors(['#2e3947', '#1D2837', '#161B2C']);
-    } else if (isCloudyOrRainyCondition()) {
+      setBackgroundColors(['#405063', '#1D2837', '#161B2C']);
+    } else if (data && isCloudyOrRainyCondition()) {
       setBackgroundColors(['#a2c8db', '#8BAEBF', '#7998a6']);
     } else {
       setBackgroundColors(['#4e9cf5', '#498bf5', '#3f6be8', '#3564e8']);
@@ -153,6 +153,7 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     marginTop: height * 0.02,
+    marginRight: height * 0.02,
     width: width * 0.25,
     height: width * 0.25,
     justifyContent: 'center',

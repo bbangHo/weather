@@ -3,13 +3,16 @@ import {
   View,
   Text,
   Alert,
+  Image,
   StyleSheet,
   TextInput,
   TouchableHighlight,
   Platform,
   PermissionsAndroid,
   Linking,
+  Dimensions,
 } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import {login} from '@react-native-seoul/kakao-login';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import appleAuth, {
@@ -21,6 +24,8 @@ import {
   sendLocationToBackend,
   refreshAccessToken,
 } from '../api/api';
+
+const {width, height} = Dimensions.get('window');
 
 const LoginScreen = ({
   setIsLoggedIn,
@@ -37,6 +42,9 @@ const LoginScreen = ({
         requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL],
       });
 
+      const {authorizationCode, identityToken, fullName, email} =
+        appleAuthRequestResponse;
+
       const credentialState = await appleAuth.getCredentialStateForUser(
         appleAuthRequestResponse.user,
       );
@@ -44,10 +52,11 @@ const LoginScreen = ({
       if (credentialState === appleAuth.State.AUTHORIZED) {
         console.log('Apple Login Successful:', appleAuthRequestResponse);
 
-        console.log('Identity Token:', appleAuthRequestResponse.identityToken);
+        console.log('Authorization Code:', authorizationCode);
+        console.log('Identity Token:', identityToken);
         console.log('User ID:', appleAuthRequestResponse.user);
-        console.log('Full Name:', appleAuthRequestResponse.fullName);
-        console.log('Email:', appleAuthRequestResponse.email);
+        console.log('Full Name:', fullName);
+        console.log('Email:', email);
 
         Alert.alert('애플 로그인 성공', '로그를 확인해주세요.');
       } else {
@@ -81,6 +90,8 @@ const LoginScreen = ({
           'refreshToken',
           response.result.refreshToken,
         );
+
+        await AsyncStorage.removeItem('logoutState');
       } else {
         console.error('Login failed, server response:', response);
         Alert.alert(
@@ -200,39 +211,55 @@ const LoginScreen = ({
   };
 
   useEffect(() => {
-    const refreshTokenImmediately = async () => {
-      try {
-        console.log('Attempting to refresh token immediately...');
-        const newAccessToken = await refreshAccessToken();
-        console.log('Refreshed access token immediately:', newAccessToken);
+    const checkStoredTokens = async () => {
+      const logoutState = await AsyncStorage.getItem('logoutState');
+      if (logoutState === 'true') {
+        console.log('Logout state detected, skipping auto-login.');
+        return;
+      }
 
-        setAccessToken(newAccessToken);
-        setIsLoggedIn(true);
-      } catch (err) {
-        console.error('Failed to refresh token immediately:', err);
-        handleLogout();
+      const refreshToken = await AsyncStorage.getItem('refreshToken');
+      if (refreshToken) {
+        try {
+          const newAccessToken = await refreshAccessToken();
+          setAccessToken(newAccessToken);
+          setIsLoggedIn(true);
+        } catch (error) {
+          console.error('Failed to refresh token:', error.message);
+        }
       }
     };
 
-    refreshTokenImmediately();
+    checkStoredTokens();
 
     const interval = setInterval(async () => {
-      try {
-        console.log('Attempting to refresh token...');
-        const newAccessToken = await refreshAccessToken();
-        console.log('Refreshed access token:', newAccessToken);
-        setAccessToken(newAccessToken);
-      } catch (err) {
-        console.error('Failed to refresh token:', err);
-        handleLogout();
+      const refreshToken = await AsyncStorage.getItem('refreshToken');
+      if (refreshToken) {
+        try {
+          const newAccessToken = await refreshAccessToken();
+          console.log('Refreshed access token:', newAccessToken);
+          setAccessToken(newAccessToken);
+        } catch (error) {
+          console.error('Failed to refresh token:', error.message);
+          await AsyncStorage.removeItem('accessToken');
+          await AsyncStorage.removeItem('refreshToken');
+          setIsLoggedIn(false);
+        }
       }
     }, 15 * 60 * 1000);
+
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>임시 로그인</Text>
+    <LinearGradient colors={['#2F5AF4', '#0FA2AB']} style={styles.container}>
+      <Image
+        source={require('../../assets/images/icon_app.png')}
+        style={styles.appIcon}
+      />
+
+      <Text style={styles.appTitle}>날씨 요정</Text>
+      <Text style={styles.appSubtitle}>당신의 일상에 맞춤형 날씨 정보를</Text>
 
       <TextInput
         style={styles.input}
@@ -241,7 +268,7 @@ const LoginScreen = ({
         onChangeText={setToken}
         autoCapitalize="none"
         multiline={true}
-        placeholderTextColor="#000"
+        placeholderTextColor="#333"
       />
 
       <TouchableHighlight
@@ -256,17 +283,13 @@ const LoginScreen = ({
 
       {Platform.OS === 'ios' && (
         <AppleButton
-          buttonStyle={AppleButton.Style.WHITE}
+          buttonStyle={AppleButton.Style.BLACK}
           buttonType={AppleButton.Type.SIGN_IN}
-          style={{
-            width: '100%',
-            height: 45,
-            marginTop: 20,
-          }}
+          style={styles.appleButton}
           onPress={handleSignInApple}
         />
       )}
-    </View>
+    </LinearGradient>
   );
 };
 
@@ -274,46 +297,68 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    padding: 20,
     alignItems: 'center',
+    padding: 20,
+  },
+  appIcon: {
+    width: width * 0.27,
+    height: width * 0.27,
+    marginTop: -width * 0.1,
+    marginBottom: 20,
+    borderRadius: 20,
+  },
+  appTitle: {
+    fontSize: 22,
+    color: '#fff',
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  appSubtitle: {
+    fontSize: 16,
+    color: '#fff',
+    marginBottom: width * 0.5,
   },
   title: {
-    fontSize: 16,
+    fontSize: 20,
+    color: '#fff',
     marginBottom: 20,
-    color: '#000',
   },
   input: {
-    width: '100%',
+    width: '90%',
     padding: 10,
     borderWidth: 1,
-    borderColor: '#ccc',
-    marginBottom: 10,
-    borderRadius: 5,
-    height: 80,
-    textAlignVertical: 'top',
+    borderColor: '#fff',
+    marginBottom: 20,
+    borderRadius: 8,
+    backgroundColor: '#fff',
+    height: 60,
+    marginTop: -width * 0.3,
   },
   kakaoButton: {
+    width: '90%',
     backgroundColor: '#FEE500',
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 5,
+    paddingVertical: 15,
+    borderRadius: 8,
     alignItems: 'center',
-    width: '100%',
-    marginTop: 70,
+    marginBottom: Platform.OS === 'ios' ? 20 : 30,
   },
   kakaoButtonText: {
-    color: '#3C1E1E',
     fontSize: 16,
+    color: '#3C1E1E',
     fontWeight: 'bold',
   },
+  appleButton: {
+    width: '90%',
+    height: 45,
+    borderRadius: 8,
+  },
   loginButton: {
+    width: '90%',
     backgroundColor: '#0066cc',
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 5,
+    paddingVertical: 12,
+    borderRadius: 8,
     alignItems: 'center',
-    width: '100%',
-    marginTop: 10,
+    marginBottom: Platform.OS === 'ios' ? 70 : 80,
   },
   loginButtonText: {
     color: '#FFFFFF',

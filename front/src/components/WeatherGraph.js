@@ -67,7 +67,7 @@ const WeatherGraph = ({accessToken}) => {
   };
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#3f7dfd" />;
+    return <ActivityIndicator size="large" color="#999999" />;
   }
 
   return (
