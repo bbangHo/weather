@@ -8,11 +8,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.apiPayload.ApiResponse;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
 import org.pknu.weather.security.exception.TokenException;
 import org.pknu.weather.security.util.JWTUtil;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -22,7 +24,8 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
 
-@Log4j2
+@Slf4j
+@Component
 @RequiredArgsConstructor
 public class RefreshTokenFilter extends OncePerRequestFilter {
 
