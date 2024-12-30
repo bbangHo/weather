@@ -1,25 +1,13 @@
 package org.pknu.weather.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
-import java.time.LocalDateTime;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 import org.pknu.weather.common.utils.SensibleTemperatureUtils;
 import org.pknu.weather.domain.common.RainType;
 import org.pknu.weather.domain.common.SkyType;
 import org.pknu.weather.dto.WeatherApiResponse;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -61,7 +49,7 @@ public class Weather extends BaseEntity {
 
     @PrePersist
     @PreUpdate
-    private void updateSensibleTemperature() {
+    public void updateSensibleTemperature() {
         double sensibleTemperature = SensibleTemperatureUtils.getSensibleTemperature(getTemperature(), getHumidity(),
                 getWindSpeed());
 
