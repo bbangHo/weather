@@ -31,12 +31,14 @@ public class WeatherResponseConverter {
 
         Location location = member.getLocation();
         Weather now = weatherList.get(0);
+        now.updateSensibleTemperature();
 
         return WeatherResponse.MainPageWeatherData.builder()
                 .city(location.getCity())
                 .street(location.getStreet())
                 .currentSkyType(now.getSkyType())
                 .currentTmp(now.getTemperature())
+                .currentSensibleTmp(now.getSensibleTemperature())
                 .weatherPerHourList(weatherPerHourList)
                 .temperature(toTemperature(max, min))
                 .build();
