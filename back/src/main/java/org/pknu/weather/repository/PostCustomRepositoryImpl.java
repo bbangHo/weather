@@ -61,6 +61,7 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
         return post.id.goe(lastPostId);
     }
 
+
     public List<Post> getPopularPostList(Location location) {
         StringPath likeCount = Expressions.stringPath("like_count");
 
@@ -84,5 +85,15 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
         }
 
         return postList;
+    }
+
+    @Override
+    public List<Post> getLatestPostList(Location location) {
+        return jpaQueryFactory
+                .select(post)
+                .from(post)
+                .orderBy(post.createdAt.desc())
+                .limit(5)
+                .fetch();
     }
 }

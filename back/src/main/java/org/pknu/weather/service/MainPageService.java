@@ -1,7 +1,5 @@
 package org.pknu.weather.service;
 
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.domain.Location;
@@ -15,6 +13,9 @@ import org.pknu.weather.repository.LocationRepository;
 import org.pknu.weather.repository.MemberRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 메인페이지에서 사용되는 API를 위한 서비스 즉, 화면에 맞춰진 로직을 관리한다. 해당 서비스는 서비스를 의존할 수 있다. 단 핵심 비즈니스 로직만 의존한다. 서비스를 참조하는 서비스를 한 곳으로 몰아서
@@ -70,13 +71,13 @@ public class MainPageService {
     }
 
     /**
-     * 사용자의 지역에서 가장 좋아요를 많이 받은 글 5개를 반환한다.
+     * 사용자의 지역에서 가장 최근에 작성된 글 5개를 반환한다.
      *
      * @param email
      * @return
      */
-    public List<PostResponse.Post> getPopularPosts(String email) {
-        return postQueryService.getPopularPosts(email);
+    public List<PostResponse.Post> getLatestPostList(String email) {
+        return postQueryService.getLatestPostList(email);
     }
 
     public List<TagDto.SimpleTag> getMostSelectedTags(String email) {

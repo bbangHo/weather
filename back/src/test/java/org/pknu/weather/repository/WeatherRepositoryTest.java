@@ -1,14 +1,15 @@
 package org.pknu.weather.repository;
 
-import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.pknu.weather.common.TestDataCreator;
 import org.pknu.weather.common.formatter.DateTimeFormatter;
+import org.pknu.weather.config.TestConfig;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Weather;
 import org.pknu.weather.dto.WeatherQueryResult;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -18,8 +19,8 @@ import java.time.LocalTime;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-@SpringBootTest
-@RequiredArgsConstructor
+@DataJpaTest
+@Import(TestConfig.class)
 class WeatherRepositoryTest {
     @Autowired
     WeatherRepository weatherRepository;
