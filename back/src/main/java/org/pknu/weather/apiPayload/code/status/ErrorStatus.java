@@ -41,12 +41,13 @@ public enum ErrorStatus implements BaseErrorCode {
     _PROVINCE_NOT_FOUND(HttpStatus.BAD_REQUEST, "LOCATION_400_2", "도(광역시)의 정보가 필요합니다."),
     _MALFORMED_ADDRESS_INFORMATION(HttpStatus.BAD_REQUEST,"LOCATION_400_3", "주소의 일부 정보가 누락되었습니다."),
 
-
     // member
     _MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER_404_1", "사용자를 찾을 수 없습니다."),
     _MEMBER_NOT_FOUND_LOCATION(HttpStatus.NOT_FOUND, "MEMBER_404_2", "사용자의 기본 주소지가 설정되어 있지 않습니다."),
     _DUPILICATED_NICKNAME(HttpStatus.BAD_REQUEST, "MEMBER_400_3", "사용자의 닉네임이 중복됩니다."),
 
+    // 약관동의
+    _ESSENTIAL_TERMS_IS_REQUIRED(HttpStatus.BAD_REQUEST, "TERMS_400_1", "필수 약관 동의는 필수입니다."),
 
     //sigs
     _SGIS_BAD_AUTHENTICATION_PARAMETER(HttpStatus.UNAUTHORIZED, "SGIS_401_1",

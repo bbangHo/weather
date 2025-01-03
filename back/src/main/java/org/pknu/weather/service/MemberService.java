@@ -1,6 +1,5 @@
 package org.pknu.weather.service;
 
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
@@ -9,10 +8,15 @@ import org.pknu.weather.common.utils.KakaoLoginUtils;
 import org.pknu.weather.common.utils.LocalUploaderUtils;
 import org.pknu.weather.common.utils.S3UploaderUtils;
 import org.pknu.weather.domain.Member;
+import org.pknu.weather.domain.MemberTerms;
+import org.pknu.weather.domain.Terms;
 import org.pknu.weather.dto.MemberJoinDTO;
 import org.pknu.weather.dto.MemberResponse;
+import org.pknu.weather.dto.TermsDto;
+import org.pknu.weather.dto.converter.TermsConverter;
 import org.pknu.weather.exception.GeneralException;
 import org.pknu.weather.repository.MemberRepository;
+import org.pknu.weather.repository.TermsRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +24,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.pknu.weather.dto.converter.MemberResponseConverter.toMemberResponseDTO;
@@ -35,42 +41,51 @@ public class MemberService {
     private final LocalUploaderUtils localUploaderUtils;
     private final S3UploaderUtils s3UploaderUtils;
     private final KakaoLoginUtils kakaoLoginUtils;
+    private final TermsRepository termsRepository;
 
 
-    public Member saveMember(Member member){
+    public Member saveMember(Member member) {
         return memberRepository.save(member);
     }
 
-    public Optional<Member> findMemberByEmail(String email){
+    public Optional<Member> findMemberByEmail(String email) {
         return memberRepository.findMemberByEmail(email);
     }
-    public MemberResponse.MemberResponseWithAddressDTO findFullMemberInfoByEmail(String email){
+
+    public MemberResponse.MemberResponseWithAddressDTO findFullMemberInfoByEmail(String email) {
         Member member = memberRepository.findMemberByEmail(email).orElseThrow(() -> new GeneralException(ErrorStatus._MEMBER_NOT_FOUND));
         return toMemberResponseWithAddressDTO(member);
     }
 
     @Transactional
-    public MemberResponse.MemberResponseDTO checkNicknameAndSave(String email, MemberJoinDTO memberJoinDTO){
+    public MemberResponse.MemberResponseDTO checkNicknameAndSave(String email, MemberJoinDTO memberJoinDTO, TermsDto agreed) {
 
         Member member = memberRepository.findMemberByEmail(email)
                 .orElseThrow(() -> new GeneralException(ErrorStatus._MEMBER_NOT_FOUND));
 
         MultipartFile profileImg = memberJoinDTO.getProfileImg();
 
-        if (!profileImg.isEmpty() && profileImg.getContentType().startsWith("image")){
+        if (!profileImg.isEmpty() && profileImg.getContentType().startsWith("image")) {
             uploadProfileImageToS3(memberJoinDTO, profileImg);
             removeExProfileImage(member);
         }
 
         member.setMemberInfo(memberJoinDTO);
 
+        List<Terms> termsList = termsRepository.findAll();
+        List<MemberTerms> memberTermsList = TermsConverter.toMemberTermsList(member, agreed, termsList);
+
         Member savedMember = checkNicknameAndSave(member);
 
         return toMemberResponseDTO(savedMember);
     }
 
+    private void setTerms() {
+
+    }
+
     @Transactional
-    public void deleteMember(Map<String, Object> memberInfo){
+    public void deleteMember(Map<String, Object> memberInfo) {
 
         String email = String.valueOf(memberInfo.get("email"));
         Long id = Long.parseLong(String.valueOf(memberInfo.get("kakaoId")));

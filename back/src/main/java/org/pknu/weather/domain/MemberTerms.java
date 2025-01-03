@@ -22,4 +22,7 @@ public class MemberTerms {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "terms_id")
     private Terms terms;
+
+    @Column(nullable = false)
+    private Boolean agreed;
 }
