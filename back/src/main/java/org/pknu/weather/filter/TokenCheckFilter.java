@@ -15,6 +15,7 @@ import org.pknu.weather.repository.MemberRepository;
 import org.pknu.weather.security.exception.TokenException;
 import org.pknu.weather.security.util.JWTUtil;
 import org.pknu.weather.service.MemberService;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -22,6 +23,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
+@Component
 @RequiredArgsConstructor
 public class TokenCheckFilter extends OncePerRequestFilter {
 

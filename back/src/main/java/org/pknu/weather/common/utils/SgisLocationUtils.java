@@ -84,30 +84,35 @@ public class SgisLocationUtils {
         log.info("SgisLocationUtils - checkAccessToken method start .....................");
 
         if (accessToken == null || accessToken.isEmpty() || expTime.isBefore(LocalDateTime.now().minusMinutes(10))) {
-
             getSgisAccessToken();
         }
     }
 
     public synchronized void getSgisAccessToken(){
 
-        log.info("SgisLocationUtils - getSgisAccessToken method start .....................");
+        if (accessToken == null || accessToken.isEmpty() || expTime.isBefore(LocalDateTime.now().minusMinutes(10))) {
 
-        SgisAccessTokenResponseDTO sgisAccessToken = sgisClient.getSgisAccessToken(consumerKey,consumerSecret);
+            log.info("SgisLocationUtils - getSgisAccessToken method start .....................");
 
-        log.debug(sgisAccessToken.getErrMsg());
-        switch (sgisAccessToken.getErrCd()){
-            case (401):
-                throw new GeneralException(ErrorStatus._SGIS_BAD_AUTHENTICATION_PARAMETER);
-            case (100):
-                throw new GeneralException(ErrorStatus._SGIS_NOT_FOUND_RESULT);
-            case(0):
-                this.accessToken = sgisAccessToken.getResult().getAccessToken();
-                this.expTime = convertMillis(sgisAccessToken.getResult().getAccessTimeout());
-                break;
-            default:
-                throw new RuntimeException();
+            SgisAccessTokenResponseDTO sgisAccessToken = sgisClient.getSgisAccessToken(consumerKey,consumerSecret);
+
+            log.debug(sgisAccessToken.getErrMsg());
+
+            switch (sgisAccessToken.getErrCd()){
+                case (401):
+                    throw new GeneralException(ErrorStatus._SGIS_BAD_AUTHENTICATION_PARAMETER);
+                case (100):
+                    throw new GeneralException(ErrorStatus._SGIS_NOT_FOUND_RESULT);
+                case(0):
+                    this.accessToken = sgisAccessToken.getResult().getAccessToken();
+                    this.expTime = convertMillis(sgisAccessToken.getResult().getAccessTimeout());
+                    break;
+                default:
+                    throw new RuntimeException();
+            }
+
         }
+
     }
 
     public LocalDateTime convertMillis(long timeMillis){

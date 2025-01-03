@@ -30,6 +30,8 @@ public enum ErrorStatus implements BaseErrorCode {
     MALFORMED_REFRESH_TOKEN(HttpStatus.FORBIDDEN, "JWT_401_7", "Refresh Token의 값이 올바르게 설정되지 않았습니다. "),
     EXPIRED_REFRESH_TOKEN(HttpStatus.FORBIDDEN, "JWT_401_8", "Refresh Token이 만료되었습니다."),
     TOKENS_NOT_ACCEPTED(HttpStatus.UNAUTHORIZED, "Jwt_401_9", "Access Token과 refresh Token이 존재하지 않습니다."),
+    TYPE_NOT_ACCEPTED(HttpStatus.BAD_REQUEST, "Jwt_400_10", "소셜 로그인의 타입에 문제가 있습니다."),
+
 
     //KaKaoAccessTokenException
     KAKAO_SERVER_ERROR(HttpStatus.BAD_REQUEST, "Kakao_400_1", "카카오 서버의 일시적인 장애입니다."),
