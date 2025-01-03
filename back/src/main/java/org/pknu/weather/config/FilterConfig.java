@@ -1,13 +1,9 @@
 package org.pknu.weather.config;
 
 import lombok.RequiredArgsConstructor;
-import org.pknu.weather.filter.OauthTokenFilter;
 import org.pknu.weather.filter.RefreshTokenFilter;
+import org.pknu.weather.filter.GenerateTokenFilter;
 import org.pknu.weather.filter.TokenCheckFilter;
-import org.pknu.weather.filter.TokenGenerateFilter;
-import org.pknu.weather.feignClient.KaKaoLoginClient;
-import org.pknu.weather.security.util.JWTUtil;
-import org.pknu.weather.service.MemberService;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,14 +12,14 @@ import org.springframework.context.annotation.Configuration;
 @RequiredArgsConstructor
 public class FilterConfig {
 
-    private final KaKaoLoginClient kaKaoLoginClient;
-    private final MemberService memberservice;
-    private final JWTUtil jwtUtil;
+    private final GenerateTokenFilter generateTokenFilter;
+    private final TokenCheckFilter tokencheckFilter;
+    private final RefreshTokenFilter refreshTokenFilter;
 
     @Bean
     public FilterRegistrationBean<RefreshTokenFilter> refreshTokenFilterRegister() {
         FilterRegistrationBean<RefreshTokenFilter> registrationBean = new FilterRegistrationBean<>();
-        registrationBean.setFilter(new RefreshTokenFilter(jwtUtil));
+        registrationBean.setFilter(refreshTokenFilter);
         registrationBean.addUrlPatterns("/refreshToken");
         registrationBean.setOrder(1);
         return registrationBean;
@@ -31,28 +27,19 @@ public class FilterConfig {
 
 
     @Bean
-    public FilterRegistrationBean<OauthTokenFilter> oauthTokenCheckFilterRegister() {
-        FilterRegistrationBean<OauthTokenFilter> registrationBean = new FilterRegistrationBean<>();
-        registrationBean.setFilter(new OauthTokenFilter(kaKaoLoginClient));
+    public FilterRegistrationBean<GenerateTokenFilter> socialLoginFilterRegister() {
+        FilterRegistrationBean<GenerateTokenFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(generateTokenFilter);
         registrationBean.addUrlPatterns("/token");
         registrationBean.setOrder(2);
         return registrationBean;
     }
 
     @Bean
-    public FilterRegistrationBean<TokenGenerateFilter> tokenGenerateFilterRegister() {
-        FilterRegistrationBean<TokenGenerateFilter> registrationBean = new FilterRegistrationBean<>();
-        registrationBean.setFilter(new TokenGenerateFilter(memberservice,jwtUtil));
-        registrationBean.addUrlPatterns("/token");
-        registrationBean.setOrder(3);
-        return registrationBean;
-    }
-
-    @Bean
     public FilterRegistrationBean<TokenCheckFilter> tokenCheckFilterRegister() {
         FilterRegistrationBean<TokenCheckFilter> registrationBean = new FilterRegistrationBean<>();
-        registrationBean.setFilter(new TokenCheckFilter(jwtUtil));
-        registrationBean.setOrder(4);
+        registrationBean.setFilter(tokencheckFilter);
+        registrationBean.setOrder(3);
         return registrationBean;
     }
 

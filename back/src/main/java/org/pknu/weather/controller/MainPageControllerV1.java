@@ -40,11 +40,11 @@ public class MainPageControllerV1 {
     }
 
     @GetMapping("/posts/popular")
-    public ApiResponse<List<PostResponse.Post>> getPopularPostList(
+    public ApiResponse<List<PostResponse.Post>> getLatestPostList(
             @RequestHeader("Authorization") String authorization) {
 
         String email = TokenConverter.getEmailByToken(authorization);
-        List<PostResponse.Post> popularPosts = mainPageService.getPopularPosts(email);
+        List<PostResponse.Post> popularPosts = mainPageService.getLatestPostList(email);
         return ApiResponse.onSuccess(popularPosts);
     }
 

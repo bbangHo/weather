@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Component
 @FeignClient(value = "login", url = "https://kapi.kakao.com")
-public interface KaKaoLoginClient {
+public interface KaKaoAuthClient {
 
     @GetMapping("/v1/user/access_token_info")
     Response checkKakaoAccessToken(@RequestHeader("Authorization") String accessToken);

@@ -5,7 +5,7 @@ import feign.Response;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.pknu.weather.feignClient.KaKaoLoginClient;
+import org.pknu.weather.feignClient.KaKaoAuthClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -14,7 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class KaKaoFeignTest {
 
     @Autowired
-    KaKaoLoginClient kaKaoLoginClient;
+    KaKaoAuthClient kaKaoLoginClient;
 
     @Test
     public void getSigsAccessToken() throws IOException {

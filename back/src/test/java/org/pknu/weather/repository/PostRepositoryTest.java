@@ -3,27 +3,26 @@ package org.pknu.weather.repository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.pknu.weather.config.TestConfig;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.Post;
 import org.pknu.weather.domain.Recommendation;
 import org.pknu.weather.domain.common.Sensitivity;
-import org.pknu.weather.service.PostQueryService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@SpringBootTest
+@DataJpaTest
+@Import(TestConfig.class)
 class PostRepositoryTest {
 
     @Autowired
     PostRepository postRepository;
-
-    @Autowired
-    PostQueryService postQueryService;
 
     @Autowired
     MemberRepository memberRepository;

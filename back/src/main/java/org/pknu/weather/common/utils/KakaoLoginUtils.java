@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
 import org.pknu.weather.exception.GeneralException;
-import org.pknu.weather.feignClient.KaKaoLoginClient;
+import org.pknu.weather.feignClient.KaKaoAuthClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class KakaoLoginUtils {
 
-    private final KaKaoLoginClient kaKaoLoginClient;
+    private final KaKaoAuthClient kaKaoAuthClient;
     private static final String targetIdType = "user_id";
 
     @Value("${spring.kakao.admin_key}")
@@ -22,7 +22,7 @@ public class KakaoLoginUtils {
 
     public void unlinkMember(Long targetId) {
         String adminKeyFormat = "KakaoAK " + adminKey;
-        Response result = kaKaoLoginClient.deleteMemberData(adminKeyFormat, targetIdType, targetId);
+        Response result = kaKaoAuthClient.deleteMemberData(adminKeyFormat, targetIdType, targetId);
 
         validateResponse(result);
     }

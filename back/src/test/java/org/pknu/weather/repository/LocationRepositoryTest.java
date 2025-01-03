@@ -7,10 +7,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.pknu.weather.common.TestDataCreator;
 import org.pknu.weather.common.formatter.DateTimeFormatter;
+import org.pknu.weather.config.TestConfig;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Weather;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -20,7 +22,8 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
+@DataJpaTest
+@Import(TestConfig.class)
 class LocationRepositoryTest {
 
     @Autowired
