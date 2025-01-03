@@ -7,6 +7,7 @@ import {
   Image,
   Dimensions,
   ActivityIndicator,
+  Platform,
 } from 'react-native';
 import {Card} from 'react-native-elements';
 import globalStyles from '../globalStyles';
@@ -14,31 +15,37 @@ import {fetchWeatherData} from '../api/api';
 
 const {width} = Dimensions.get('window');
 
-const HourlyForecast = ({accessToken, showText}) => {
+const HourlyForecast = ({accessToken, showText, refreshing}) => {
   const [hourlyData, setHourlyData] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const getWeatherData = async () => {
-      try {
-        const weatherData = await fetchWeatherData(accessToken);
+  const getWeatherData = async () => {
+    try {
+      const weatherData = await fetchWeatherData(accessToken);
+      console.log('Hourly Weather data:', JSON.stringify(weatherData, null, 2));
 
-        console.log('Backend response:', JSON.stringify(weatherData, null, 2));
-
-        if (weatherData.isSuccess) {
-          setHourlyData(weatherData.result.weatherPerHourList);
-        } else {
-          console.error('Failed to fetch weather data:', weatherData.message);
-        }
-      } catch (error) {
-        console.error('Error fetching weather data:', error.message);
-      } finally {
-        setLoading(false);
+      if (weatherData.isSuccess) {
+        setHourlyData(weatherData.result.weatherPerHourList);
+      } else {
+        console.error('Failed to fetch weather data:', weatherData.message);
       }
-    };
+    } catch (error) {
+      console.error('Error fetching weather data:', error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     getWeatherData();
-  }, [accessToken]);
+
+    const interval = setInterval(() => {
+      console.log('Updating hourly weather data...');
+      getWeatherData();
+    }, 300000);
+
+    return () => clearInterval(interval);
+  }, [accessToken, refreshing]);
 
   const formatHour = isoString => {
     const date = new Date(isoString);
@@ -169,20 +176,23 @@ const styles = StyleSheet.create({
   },
   adverbText: {
     fontSize: 12,
-    marginBottom: 1,
+    marginBottom: Platform.OS === 'ios' ? -5 : -8,
     textAlign: 'center',
+    marginTop: 5,
   },
   tmpText: {
     fontSize: 15,
     fontWeight: 'bold',
     color: '#000',
-    marginBottom: -5,
+    marginBottom: -8,
+    marginTop: 5,
     textAlign: 'center',
   },
   rainText: {
     fontSize: 13,
     color: '#555',
     textAlign: 'center',
+    marginTop: 5,
   },
 });
 

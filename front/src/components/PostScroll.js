@@ -43,7 +43,7 @@ const PostScroll = ({accessToken, refreshPosts, onRefreshComplete}) => {
         null,
         100000000,
       );
-      console.log('Fetched posts:', fetchedPosts);
+      console.log('Fetched scroll posts:', fetchedPosts);
 
       setPosts(
         fetchedPosts.map(post => ({
@@ -68,6 +68,7 @@ const PostScroll = ({accessToken, refreshPosts, onRefreshComplete}) => {
   const handleLikePress = async postId => {
     try {
       const response = await toggleLikePost(accessToken, postId);
+
       if (response.isSuccess) {
         setPosts(prevPosts =>
           prevPosts.map(post =>
@@ -153,7 +154,6 @@ const PostScroll = ({accessToken, refreshPosts, onRefreshComplete}) => {
             <Text style={styles.likeCount}>{item.postInfo.likeCount}</Text>
           </TouchableOpacity>
         </View>
-
         <Text style={styles.content}>{item.postInfo.content}</Text>
       </Card>
     </View>
@@ -164,14 +164,19 @@ const PostScroll = ({accessToken, refreshPosts, onRefreshComplete}) => {
       data={posts}
       renderItem={renderPost}
       keyExtractor={item => item.postInfo.postId.toString()}
-      contentContainerStyle={styles.contentContainer}
+      contentContainerStyle={[
+        styles.contentContainer,
+        posts.length === 0 && !loading ? styles.emptyContainer : null,
+      ]}
       ListEmptyComponent={
         loading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color="#999999" />
           </View>
         ) : (
-          <Text style={styles.noPostText}>불러올 게시글이 없습니다.</Text>
+          <View style={styles.emptyStateContainer}>
+            <Text style={styles.emptyStateText}>불러올 게시글이 없습니다.</Text>
+          </View>
         )
       }
     />
@@ -267,6 +272,23 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 20,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyStateContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  emptyStateText: {
+    fontSize: 16,
+    color: '#888',
+    textAlign: 'center',
+    marginTop: 20,
   },
 });
 
