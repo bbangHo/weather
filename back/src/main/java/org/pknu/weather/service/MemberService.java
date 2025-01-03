@@ -16,6 +16,7 @@ import org.pknu.weather.dto.TermsDto;
 import org.pknu.weather.dto.converter.TermsConverter;
 import org.pknu.weather.exception.GeneralException;
 import org.pknu.weather.repository.MemberRepository;
+import org.pknu.weather.repository.MemberTermsRepository;
 import org.pknu.weather.repository.TermsRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -42,6 +43,7 @@ public class MemberService {
     private final S3UploaderUtils s3UploaderUtils;
     private final KakaoLoginUtils kakaoLoginUtils;
     private final TermsRepository termsRepository;
+    private final MemberTermsRepository memberTermsRepository;
 
 
     public Member saveMember(Member member) {
@@ -74,14 +76,11 @@ public class MemberService {
 
         List<Terms> termsList = termsRepository.findAll();
         List<MemberTerms> memberTermsList = TermsConverter.toMemberTermsList(member, agreed, termsList);
+        memberTermsRepository.saveAll(memberTermsList);
 
         Member savedMember = checkNicknameAndSave(member);
 
         return toMemberResponseDTO(savedMember);
-    }
-
-    private void setTerms() {
-
     }
 
     @Transactional
