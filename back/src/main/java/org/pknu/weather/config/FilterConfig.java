@@ -27,7 +27,7 @@ public class FilterConfig {
 
 
     @Bean
-    public FilterRegistrationBean<GenerateTokenFilter> testFilterRegister() {
+    public FilterRegistrationBean<GenerateTokenFilter> socialLoginFilterRegister() {
         FilterRegistrationBean<GenerateTokenFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(generateTokenFilter);
         registrationBean.addUrlPatterns("/token");
