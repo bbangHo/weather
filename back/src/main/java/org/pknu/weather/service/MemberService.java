@@ -5,7 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
-import org.pknu.weather.common.utils.KakaoLoginUtils;
+import org.pknu.weather.security.util.logout.AppleUnlinker;
+import org.pknu.weather.security.util.logout.KakaoUnlinker;
 import org.pknu.weather.common.utils.LocalUploaderUtils;
 import org.pknu.weather.common.utils.S3UploaderUtils;
 import org.pknu.weather.domain.Member;
@@ -34,8 +35,8 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final LocalUploaderUtils localUploaderUtils;
     private final S3UploaderUtils s3UploaderUtils;
-    private final KakaoLoginUtils kakaoLoginUtils;
-
+    private final KakaoUnlinker kakaoUnlinker;
+    private final AppleUnlinker appleUnlinker;
 
     public Member saveMember(Member member){
         return memberRepository.save(member);
@@ -70,18 +71,20 @@ public class MemberService {
     }
 
     @Transactional
-    public void deleteMember(Map<String, Object> memberInfo){
+    public void deleteMember(Map<String, Object> memberInfo, String authenticationCode){
 
-        String email = String.valueOf(memberInfo.get("email"));
-        Long id = Long.parseLong(String.valueOf(memberInfo.get("kakaoId")));
+        String type = String.valueOf(memberInfo.get("type"));
 
-        kakaoLoginUtils.unlinkMember(id);
+        if (type.equals("kakao")) {
+            kakaoUnlinker.unlinkUser(String.valueOf(memberInfo.get("kakaoId")));
+        } else if (type.equals("apple")) {
+            appleUnlinker.unlinkUser(authenticationCode);
+        }
 
-        Member member = memberRepository.findMemberByEmail(email)
+        Member member = memberRepository.findMemberByEmail(String.valueOf(memberInfo.get("email")))
                 .orElseThrow(() -> new GeneralException(ErrorStatus._MEMBER_NOT_FOUND));
 
         memberRepository.delete(member);
-
     }
 
     private Member checkNicknameAndSave(Member member) {

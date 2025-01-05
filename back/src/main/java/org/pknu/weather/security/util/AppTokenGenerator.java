@@ -1,11 +1,12 @@
 package org.pknu.weather.security.util;
 
-import com.google.gson.Gson;
 import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.domain.Member;
+import org.pknu.weather.security.dto.SocialUserInfo;
+import org.pknu.weather.security.util.signup.UserInfoStrategy;
 import org.pknu.weather.service.MemberService;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +17,7 @@ public class AppTokenGenerator {
     private final MemberService memberService;
     private final JWTUtil jwtUtil;
 
-    public Map<String, Object> getUserInfo(UserInfoStrategy userInfoStrategy, String token) {
+    public SocialUserInfo getUserInfo(UserInfoStrategy userInfoStrategy, String token) {
         return userInfoStrategy.getUserInfo(token);
     }
 
