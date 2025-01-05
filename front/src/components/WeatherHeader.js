@@ -44,7 +44,6 @@ const WeatherHeader = ({accessToken, onToggleChange}) => {
       );
 
       if (hour > currentHour) return false;
-
       return (
         hour >= 6 && hour < 18 && (item.skyType === 'CLOUDY' || item.rain > 0)
       );
@@ -56,6 +55,8 @@ const WeatherHeader = ({accessToken, onToggleChange}) => {
   useEffect(() => {
     const loadData = async () => {
       try {
+        updateBackgroundColors();
+
         const location = await fetchUserLocation(accessToken);
         const weather = await fetchWeatherData(accessToken);
         const tags = await fetchWeatherTags(accessToken);
@@ -84,20 +85,19 @@ const WeatherHeader = ({accessToken, onToggleChange}) => {
     };
 
     loadData();
-  }, [accessToken, onToggleChange]);
 
-  useEffect(() => {
     const interval = setInterval(() => {
-      updateBackgroundColors(weatherData);
+      console.log('Refreshing weather data...');
+      loadData();
     }, 60000);
 
     return () => clearInterval(interval);
-  }, [weatherData]);
+  }, [accessToken, onToggleChange]);
 
-  const updateBackgroundColors = data => {
+  const updateBackgroundColors = (data = null) => {
     if (isNightTime()) {
-      setBackgroundColors(['#2e3947', '#1D2837', '#161B2C']);
-    } else if (isCloudyOrRainyCondition()) {
+      setBackgroundColors(['#405063', '#1D2837', '#161B2C']);
+    } else if (data && isCloudyOrRainyCondition()) {
       setBackgroundColors(['#a2c8db', '#8BAEBF', '#7998a6']);
     } else {
       setBackgroundColors(['#4e9cf5', '#498bf5', '#3f6be8', '#3564e8']);
@@ -126,9 +126,15 @@ const WeatherHeader = ({accessToken, onToggleChange}) => {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#fff" />
-      </View>
+      <LinearGradient
+        colors={backgroundColors}
+        start={{x: 0, y: 0}}
+        end={{x: 1, y: 1}}
+        style={styles.headerContainer}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#fff" />
+        </View>
+      </LinearGradient>
     );
   }
 
@@ -150,7 +156,7 @@ const WeatherHeader = ({accessToken, onToggleChange}) => {
         </Text>
         <Text style={styles.temperature}>{weatherData?.currentTmp}°C</Text>
         <Text style={styles.feelsLike}>
-          체감 {weatherData?.temperature?.feelsLike}°C
+          체감 {weatherData?.currentSensibleTmp}°C
         </Text>
       </View>
 

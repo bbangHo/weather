@@ -4,6 +4,7 @@ import {
   Text,
   View,
   StyleSheet,
+  ActivityIndicator,
   Image,
   TouchableOpacity,
   Alert,
@@ -12,7 +13,6 @@ import {
 import {useFocusEffect} from '@react-navigation/native';
 import {fetchMemberInfo, deleteMember} from '../api/api';
 import profilePlaceholder from '../../assets/images/profile.png';
-import loadingIcon from '../../assets/images/icon_loading.png';
 import {logout} from '@react-native-seoul/kakao-login';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -62,18 +62,27 @@ const MyScreen = ({
     try {
       console.log('Starting Kakao logout...');
       await logout();
-      setIsLoggedIn(false);
       setAccessToken(null);
+      setIsLoggedIn(false);
+
+      await AsyncStorage.setItem('logoutState', 'true');
+
       await AsyncStorage.removeItem('accessToken');
       await AsyncStorage.removeItem('refreshToken');
-      Alert.alert('로그아웃 성공', '성공적으로 로그아웃되었습니다.');
+
+      navigation.replace('LoginScreen');
+
+      console.log('Logout successful');
     } catch (err) {
       console.error('Logout failed:', err.message);
       Alert.alert('로그아웃 실패', '이미 로그아웃된 상태입니다.');
-      setIsLoggedIn(false);
       setAccessToken(null);
+      setIsLoggedIn(false);
+
       await AsyncStorage.removeItem('accessToken');
       await AsyncStorage.removeItem('refreshToken');
+
+      navigation.replace('LoginScreen');
     }
   };
 
@@ -113,7 +122,7 @@ const MyScreen = ({
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <Image source={loadingIcon} style={styles.loadingIcon} />
+        <ActivityIndicator size="large" color="#999999" />
       </View>
     );
   }
@@ -287,10 +296,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  loadingIcon: {
-    width: 40,
-    height: 40,
   },
 });
 

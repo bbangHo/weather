@@ -220,7 +220,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     right: width * 0.4,
-    backgroundColor: '#3f7dfd',
+    /*backgroundColor: '#3f51b5',*/
+    backgroundColor: '#2f5af4',
     borderRadius: 20,
     paddingVertical: 4,
     paddingHorizontal: 8,
@@ -284,7 +285,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   selectedButton: {
-    backgroundColor: '#3f7dfd',
+    backgroundColor: '#2f5af4',
   },
   selectedButtonText: {
     color: '#fff',
@@ -292,7 +293,7 @@ const styles = StyleSheet.create({
   saveButton: {
     marginTop: height * 0.126,
     marginHorizontal: 20,
-    backgroundColor: '#F2F3F5',
+    backgroundColor: '#f2f3f5',
     paddingVertical: 15,
     borderRadius: 8,
     alignItems: 'center',

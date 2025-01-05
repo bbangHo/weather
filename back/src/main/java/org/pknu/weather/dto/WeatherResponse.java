@@ -20,6 +20,7 @@ public class WeatherResponse {
         String street;  // 읍면동
         SkyType currentSkyType;
         Integer currentTmp;
+        Double currentSensibleTmp;
         List<WeatherPerHour> weatherPerHourList;
         Temperature temperature;
     }

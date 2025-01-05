@@ -108,15 +108,15 @@ const App = () => {
                   switch (route.name) {
                     case 'HomeStack':
                       iconSource = require('./assets/images/icon_tab_home.png');
-                      size = 28;
+                      size = 26;
                       break;
                     case 'Community':
                       iconSource = require('./assets/images/icon_tab_community.png');
-                      size = 22;
+                      size = 24;
                       break;
                     case 'My':
                       iconSource = require('./assets/images/icon_tab_my.png');
-                      size = 28;
+                      size = 29;
                       break;
                     default:
                       size = 25;

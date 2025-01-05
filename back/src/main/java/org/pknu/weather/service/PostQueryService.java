@@ -1,6 +1,5 @@
 package org.pknu.weather.service;
 
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.domain.Member;
@@ -11,6 +10,8 @@ import org.pknu.weather.repository.MemberRepository;
 import org.pknu.weather.repository.PostRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Slf4j
@@ -28,9 +29,9 @@ public class PostQueryService {
         return PostResponseConverter.toPostList(postList, postList.size() > size);
     }
 
-    public List<PostResponse.Post> getPopularPosts(String email) {
+    public List<PostResponse.Post> getLatestPostList(String email) {
         Member member = memberRepository.safeFindByEmail(email);
-        List<Post> popularPostList = postRepository.getPopularPostList(member.getLocation());
+        List<Post> popularPostList = postRepository.getLatestPostList(member.getLocation());
         return PostResponseConverter.toPopularPostList(member, popularPostList);
     }
 }
