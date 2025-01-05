@@ -14,7 +14,7 @@ import {fetchPopularPosts, toggleLikePost} from '../api/api';
 
 const {width} = Dimensions.get('window');
 
-const Posts = ({accessToken}) => {
+const Posts = ({accessToken, refreshing}) => {
   const navigation = useNavigation();
   const [newPosts, setNewPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,31 +33,29 @@ const Posts = ({accessToken}) => {
     };
 
     loadPosts();
-  }, [accessToken]);
+  }, [accessToken, refreshing]);
 
   const handleLikePress = async postId => {
     try {
       const response = await toggleLikePost(accessToken, postId);
       console.log('Like/unlike response:', response);
 
-      if (response && response.isSuccess) {
+      if (response.isSuccess) {
         setNewPosts(prevPosts =>
-          prevPosts.map(post => {
-            if (post.postInfo.postId === postId) {
-              const isCurrentlyLiked = post.postInfo.likeClickable;
-              return {
-                ...post,
-                postInfo: {
-                  ...post.postInfo,
-                  likeClickable: !isCurrentlyLiked,
-                  likeCount: isCurrentlyLiked
-                    ? Math.max(post.postInfo.likeCount - 1, 0)
-                    : post.postInfo.likeCount + 1,
-                },
-              };
-            }
-            return post;
-          }),
+          prevPosts.map(post =>
+            post.postInfo.postId === postId
+              ? {
+                  ...post,
+                  postInfo: {
+                    ...post.postInfo,
+                    likeClickable: !post.postInfo.likeClickable,
+                    likeCount: post.postInfo.likeClickable
+                      ? post.postInfo.likeCount + 1
+                      : Math.max(post.postInfo.likeCount - 1, 0),
+                  },
+                }
+              : post,
+          ),
         );
       } else {
         Alert.alert('Error', '좋아요를 처리할 수 없습니다. 다시 시도해주세요.');
@@ -112,14 +110,14 @@ const Posts = ({accessToken}) => {
             onPress={() => handleLikePress(item.postInfo.postId)}>
             <Image
               source={
-                item.postInfo.likeClickable
+                !item.postInfo.likeClickable
                   ? require('../../assets/images/icon_heart2.png')
                   : require('../../assets/images/icon_heart0.png')
               }
               style={[
                 styles.likeIcon,
                 {
-                  tintColor: item.postInfo.likeClickable
+                  tintColor: !item.postInfo.likeClickable
                     ? '#da4133'
                     : '#d3d3d3',
                 },
@@ -177,7 +175,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: 12,
     paddingHorizontal: 8,
-    minHeight: 150,
+    minHeight: Platform.OS === 'ios' ? 150 : 160,
   },
   header: {
     flexDirection: 'row',

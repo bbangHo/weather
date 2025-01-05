@@ -82,8 +82,11 @@ const LoginScreen = ({
         setAccessToken(response.result.accessToken);
         // 테스트를 위해 false 값으로 설정합니다.
         // 구현 완료 후 true 값으로 변경해야 합니다.
-        setIsNewMember(response.result.isNewMember === 'true');
-        setIsLoggedIn(true);
+        if (response.result.isNewMember === 'true') {
+          navigation.navigate('TermsAgreementScreen');
+        } else {
+          setIsLoggedIn(true);
+        }
 
         await AsyncStorage.setItem('accessToken', response.result.accessToken);
         await AsyncStorage.setItem(
@@ -104,6 +107,45 @@ const LoginScreen = ({
       Alert.alert('로그인 실패', err.message);
     }
   };
+
+  /*
+  const handleKakaoLogin = async () => {
+    try {
+      console.log('Starting Kakao login...');
+      const token = await login();
+      console.log('Kakao login successful, token:', token.accessToken);
+      const response = await sendAccessTokenToBackend(token.accessToken);
+
+      if (response.isSuccess) {
+        console.log('Login successful, server response:', response);
+        setAccessToken(response.result.accessToken);
+
+        if (isTesting || response.result.isNewMember === 'true') {
+          navigation.navigate('TermsAgreementScreen');
+        } else {
+          setIsLoggedIn(true);
+        }
+
+        await AsyncStorage.setItem('accessToken', response.result.accessToken);
+        await AsyncStorage.setItem(
+          'refreshToken',
+          response.result.refreshToken,
+        );
+
+        await AsyncStorage.removeItem('logoutState');
+      } else {
+        console.error('Login failed, server response:', response);
+        Alert.alert(
+          '로그인 실패',
+          response.message || '서버 오류가 발생했습니다.',
+        );
+      }
+    } catch (err) {
+      console.error('Kakao Login Failed:', err.message);
+      Alert.alert('로그인 실패', err.message);
+    }
+  };
+  */
 
   const handleRegularLogin = async () => {
     try {
@@ -252,7 +294,11 @@ const LoginScreen = ({
   }, []);
 
   return (
-    <LinearGradient colors={['#2F5AF4', '#0FA2AB']} style={styles.container}>
+    <LinearGradient
+      colors={['#2F5AF4', '#0FA2AB']}
+      start={{x: 0, y: 0}}
+      end={{x: 1, y: 1}}
+      style={styles.container}>
       <Image
         source={require('../../assets/images/icon_app.png')}
         style={styles.appIcon}

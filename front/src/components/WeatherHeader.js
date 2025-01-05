@@ -25,7 +25,12 @@ const WeatherHeader = ({accessToken, onToggleChange}) => {
   const [weatherTags, setWeatherTags] = useState([]);
   const [isToggled, setIsToggled] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [backgroundColors, setBackgroundColors] = useState([]);
+  const [backgroundColors, setBackgroundColors] = useState([
+    '#4e9cf5',
+    '#498bf5',
+    '#3f6be8',
+    '#3564e8',
+  ]);
 
   const isNightTime = () => {
     const currentHour = new Date().getHours();
@@ -76,7 +81,6 @@ const WeatherHeader = ({accessToken, onToggleChange}) => {
         }
 
         updateBackgroundColors(weather?.result);
-
         setLoading(false);
       } catch (error) {
         Alert.alert('Error', '데이터를 불러오는 데 실패했습니다.');
@@ -151,12 +155,18 @@ const WeatherHeader = ({accessToken, onToggleChange}) => {
       />
 
       <View style={styles.infoContainer}>
-        <Text style={styles.location}>
-          {userLocation.city} {userLocation.street}
-        </Text>
+        <View style={styles.locationContainer}>
+          <Image
+            source={require('../../assets/images/icon_location.png')}
+            style={styles.locationIcon}
+          />
+          <Text style={styles.location}>
+            {userLocation.city} {userLocation.street}
+          </Text>
+        </View>
         <Text style={styles.temperature}>{weatherData?.currentTmp}°C</Text>
         <Text style={styles.feelsLike}>
-          체감 {weatherData?.currentSensibleTmp}°C
+          체감 {weatherData?.currentSensibleTmp?.toFixed(2)}°C
         </Text>
       </View>
 
@@ -198,6 +208,17 @@ const styles = StyleSheet.create({
     marginTop: height * 0.03,
     marginBottom: 40,
   },
+  locationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: Platform.OS === 'ios' ? 5 : 1,
+  },
+  locationIcon: {
+    tintColor: '#fff',
+    width: width * 0.05,
+    height: width * 0.05,
+    marginRight: 5,
+  },
   location: {
     color: '#fff',
     fontSize: width * 0.04,
@@ -211,7 +232,7 @@ const styles = StyleSheet.create({
   feelsLike: {
     color: '#fff',
     fontSize: width * 0.04,
-    marginTop: 5,
+    marginTop: Platform.OS === 'ios' ? 5 : -3,
   },
   weatherIcon: {
     position: 'absolute',

@@ -16,7 +16,12 @@ const WeatherHeaderCommunity = ({accessToken}) => {
   const [userLocation, setUserLocation] = useState({city: '', street: ''});
   const [weatherData, setWeatherData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [backgroundColors, setBackgroundColors] = useState([]);
+  const [backgroundColors, setBackgroundColors] = useState([
+    '#4e9cf5',
+    '#498bf5',
+    '#3f6be8',
+    '#3564e8',
+  ]);
 
   const isNightTime = () => {
     const currentHour = new Date().getHours();
@@ -96,7 +101,7 @@ const WeatherHeaderCommunity = ({accessToken}) => {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
+      <View style={[styles.loadingContainer, {backgroundColor: '#405063'}]}>
         <ActivityIndicator size="large" color="#fff" />
       </View>
     );
@@ -109,11 +114,18 @@ const WeatherHeaderCommunity = ({accessToken}) => {
       end={{x: 1, y: 1}}
       style={styles.headerContainer}>
       <View style={styles.textContainer}>
-        <Text style={styles.location}>
-          {userLocation.city} {userLocation.street}
-        </Text>
+        <View style={styles.locationContainer}>
+          <Image
+            source={require('../../assets/images/icon_location.png')}
+            style={styles.locationIcon}
+          />
+          <Text style={styles.location}>
+            {userLocation.city} {userLocation.street}
+          </Text>
+        </View>
         <Text style={styles.temperature}>{weatherData?.currentTmp}°C</Text>
       </View>
+
       <View style={styles.iconContainer}>
         <Image
           source={getWeatherIcon(weatherData?.currentSkyType)}
@@ -140,11 +152,21 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center',
   },
+  locationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 5,
+    marginTop: height * 0.04,
+  },
+  locationIcon: {
+    tintColor: '#fff',
+    width: width * 0.05,
+    height: width * 0.05,
+    marginRight: 5,
+  },
   location: {
-    marginTop: height * 0.03,
     color: '#fff',
     fontSize: width * 0.04,
-    marginBottom: 5,
   },
   temperature: {
     color: '#fff',

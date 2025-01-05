@@ -5,7 +5,7 @@ import {fetchExtraWeatherInfo} from '../api/api';
 
 const {width} = Dimensions.get('window');
 
-const AirQuality = ({accessToken}) => {
+const AirQuality = ({accessToken, refreshing}) => {
   const [extraWeatherInfo, setExtraWeatherInfo] = useState({
     pm25Grade: 0,
     pm10Grade: 0,
@@ -73,7 +73,7 @@ const AirQuality = ({accessToken}) => {
     if (accessToken) {
       loadExtraWeatherInfo();
     }
-  }, [accessToken]);
+  }, [accessToken, refreshing]);
 
   return (
     <View style={styles.container}>

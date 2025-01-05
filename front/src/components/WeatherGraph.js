@@ -1,5 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {View, StyleSheet, Dimensions, ActivityIndicator} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Dimensions,
+  ActivityIndicator,
+  Text,
+} from 'react-native';
 import Svg, {Path, Circle, Text as SvgText, Rect} from 'react-native-svg';
 import {fetchWeatherData} from '../api/api';
 
@@ -9,24 +15,27 @@ const graphHeight = 160;
 
 const WeatherGraph = ({accessToken}) => {
   const [temperatureData, setTemperatureData] = useState([]);
-  const [maxTmp, setMaxTmp] = useState(null);
-  const [minTmp, setMinTmp] = useState(null);
+  const [maxTmp, setMaxTmp] = useState(0);
+  const [minTmp, setMinTmp] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const getWeatherData = async () => {
       try {
         const weatherData = await fetchWeatherData(accessToken);
+        console.log('Fetched weather data:', weatherData);
         if (weatherData.isSuccess) {
-          setMaxTmp(weatherData.result.temperature.maxTmp);
-          setMinTmp(weatherData.result.temperature.minTmp);
+          const {maxTmp, minTmp} = weatherData.result.temperature;
 
           const tempData = weatherData.result.weatherPerHourList
             .slice(0, 12)
             .map(item => ({
-              hour: item.hour,
-              tmp: item.tmp,
+              hour: item.hour || '',
+              tmp: item.tmp ?? 0,
             }));
+
+          setMaxTmp(maxTmp ?? 0);
+          setMinTmp(minTmp ?? 0);
           setTemperatureData(tempData);
         }
       } catch (error) {
@@ -40,12 +49,13 @@ const WeatherGraph = ({accessToken}) => {
   }, [accessToken]);
 
   const getX = index => {
+    if (!temperatureData.length) return 20;
     const interval = (graphWidth - 40) / (temperatureData.length - 1);
     return 20 + interval * index;
   };
 
   const getY = temperature => {
-    if (!maxTmp || !minTmp) return 0;
+    if (maxTmp === minTmp) return graphHeight / 2;
     const scale = (graphHeight - 40) / (maxTmp - minTmp);
     return graphHeight - (temperature - minTmp) * scale - 20;
   };
@@ -67,7 +77,19 @@ const WeatherGraph = ({accessToken}) => {
   };
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#999999" />;
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#999999" />
+      </View>
+    );
+  }
+
+  if (!temperatureData.length) {
+    return (
+      <View style={styles.emptyContainer}>
+        <Text style={styles.emptyText}>불러올 데이터가 없습니다.</Text>
+      </View>
+    );
   }
 
   return (
@@ -97,7 +119,7 @@ const WeatherGraph = ({accessToken}) => {
 
         {temperatureData.map((item, index) => (
           <Circle
-            key={index}
+            key={`circle-${index}`}
             cx={getX(index)}
             cy={getY(item.tmp)}
             r="4.5"
@@ -109,7 +131,7 @@ const WeatherGraph = ({accessToken}) => {
 
         {temperatureData.map((item, index) => (
           <SvgText
-            key={index}
+            key={`hour-${index}`}
             x={getX(index)}
             y={graphHeight - 5}
             fill="#777"
@@ -121,7 +143,7 @@ const WeatherGraph = ({accessToken}) => {
 
         {temperatureData.map((item, index) => (
           <SvgText
-            key={index}
+            key={`temp-${index}`}
             x={getX(index)}
             y={getY(item.tmp) - 10}
             fill="#333"
@@ -149,6 +171,22 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 15,
     elevation: 6,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 20,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 20,
+  },
+  emptyText: {
+    color: '#777',
+    fontSize: 14,
   },
 });
 

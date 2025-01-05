@@ -1,4 +1,4 @@
-import React, {useState, useCallback} from 'react';
+import React, {useState, useCallback, useEffect} from 'react';
 import {
   ScrollView,
   View,
@@ -17,17 +17,51 @@ import WeatherGraph from '../components/WeatherGraph';
 import Posts from '../components/Posts';
 import ToggleViewButton from '../components/ToggleViewButton';
 import globalStyles from '../globalStyles';
+import {fetchWeatherData} from '../api/api';
 
 const {width, height} = Dimensions.get('window');
 
 const HomeScreen = ({accessToken, navigation}) => {
   const [showText, setShowText] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [buttonBackgroundColor, setButtonBackgroundColor] = useState('#3f7dfd');
+
+  const isNightTime = () => {
+    const currentHour = new Date().getHours();
+    return currentHour >= 18 || currentHour < 6;
+  };
+
+  const updateButtonBackgroundColor = async () => {
+    try {
+      const weatherData = await fetchWeatherData(accessToken);
+      const isCloudyOrRainy = weatherData?.result?.weatherPerHourList.some(
+        item => {
+          const hour = new Date(item.hour).getHours();
+          return (
+            hour >= 6 &&
+            hour < 18 &&
+            (item.skyType === 'CLOUDY' || item.rain > 0)
+          );
+        },
+      );
+
+      if (isNightTime()) {
+        setButtonBackgroundColor('#1D2837');
+      } else if (isCloudyOrRainy) {
+        setButtonBackgroundColor('#7998a6');
+      } else {
+        setButtonBackgroundColor('#3f7dfd');
+      }
+    } catch (error) {
+      console.error('Error updating button background color:', error);
+    }
+  };
 
   const loadData = async (showRefreshIndicator = false) => {
     if (showRefreshIndicator) {
       setRefreshing(true);
     }
+    await updateButtonBackgroundColor();
     await new Promise(resolve => setTimeout(resolve, 1000));
     setRefreshing(false);
   };
@@ -37,6 +71,14 @@ const HomeScreen = ({accessToken, navigation}) => {
       loadData(false);
     }, []),
   );
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      console.log('Updating button background color...');
+      updateButtonBackgroundColor();
+    }, 60000);
+    return () => clearInterval(interval);
+  }, [accessToken]);
 
   return (
     <View style={globalStyles.container}>
@@ -51,15 +93,22 @@ const HomeScreen = ({accessToken, navigation}) => {
             onRefresh={() => loadData(true)}
           />
         }>
-        <Posts accessToken={accessToken} />
+        <Posts accessToken={accessToken} refreshing={refreshing} />
         <ToggleViewButton showText={showText} setShowText={setShowText} />
-        <HourlyForecast accessToken={accessToken} showText={showText} />
-        <AirQuality accessToken={accessToken} />
-        <WeatherGraph accessToken={accessToken} />
+        <HourlyForecast
+          accessToken={accessToken}
+          showText={showText}
+          refreshing={refreshing}
+        />
+        <AirQuality accessToken={accessToken} refreshing={refreshing} />
+        <WeatherGraph accessToken={accessToken} refreshing={refreshing} />
       </ScrollView>
 
       <TouchableOpacity
-        style={styles.floatingButton}
+        style={[
+          styles.floatingButton,
+          {backgroundColor: buttonBackgroundColor},
+        ]}
         onPress={() => navigation.navigate('PostCreationScreen')}>
         <Image
           source={require('../../assets/images/icon_pencil.png')}
@@ -77,8 +126,7 @@ const styles = StyleSheet.create({
     right: width * 0.05,
     width: width * 0.16,
     height: width * 0.16,
-    backgroundColor: '#3f7dfd',
-    borderRadius: 30,
+    borderRadius: 999,
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',

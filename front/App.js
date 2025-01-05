@@ -1,15 +1,17 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';
 import HomeScreen from './src/screens/HomeScreen';
 import CommunityScreen from './src/screens/CommunityScreen';
 import MyScreen from './src/screens/MyScreen';
+import TermsAgreementScreen from './src/screens/TermsAgreementScreen';
 import RegisterProfileScreen from './src/screens/RegisterProfileScreen';
 import PostCreationScreen from './src/screens/PostCreationScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
-import {StatusBar, Image, Platform} from 'react-native';
+import {StatusBar, Image, Platform, View, StyleSheet} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -26,6 +28,10 @@ const AuthStack = ({setIsLoggedIn, setAccessToken, setIsNewMember}) => (
         />
       )}
     </Stack.Screen>
+    <Stack.Screen
+      name="TermsAgreementScreen"
+      component={TermsAgreementScreen}
+    />
     <Stack.Screen
       name="RegisterProfileScreen"
       component={RegisterProfileScreen}
@@ -72,9 +78,27 @@ const MyStack = ({
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAutoLoggingIn, setIsAutoLoggingIn] = useState(true);
   const [accessToken, setAccessToken] = useState(null);
   const [isNewMember, setIsNewMember] = useState(false);
   const [locationId, setLocationId] = useState(null);
+
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      const storedAccessToken = await AsyncStorage.getItem('accessToken');
+      if (storedAccessToken) {
+        setAccessToken(storedAccessToken);
+        setIsLoggedIn(true);
+      }
+      setIsAutoLoggingIn(false);
+    };
+
+    checkLoginStatus();
+  }, []);
+
+  if (isAutoLoggingIn) {
+    return <View style={styles.autoLoginBackground} />;
+  }
 
   return (
     <>
@@ -191,5 +215,12 @@ const App = () => {
     </>
   );
 };
+
+const styles = StyleSheet.create({
+  autoLoginBackground: {
+    flex: 1,
+    backgroundColor: '#f5f6fA',
+  },
+});
 
 export default App;
