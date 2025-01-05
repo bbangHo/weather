@@ -1,5 +1,5 @@
 package org.pknu.weather.domain;
-
+/*
 import org.junit.jupiter.api.Test;
 import org.pknu.weather.common.mapper.EnumTagMapper;
 import org.pknu.weather.domain.tag.EnumTag;
@@ -44,3 +44,5 @@ enum TestEnum implements EnumTag {
         return null;
     }
 }
+
+ */

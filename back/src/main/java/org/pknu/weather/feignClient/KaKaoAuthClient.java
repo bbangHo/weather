@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 
 @Component
 @FeignClient(value = "login", url = "https://kapi.kakao.com")
@@ -21,9 +22,9 @@ public interface KaKaoAuthClient {
     KakaoUserResponseDTO getMemberData(@RequestHeader("Authorization") String accessToken,
                                        @RequestHeader("Content-type") String contentType);
 
-    @PostMapping(value = "/v1/user/unlink", consumes = "application/x-www-form-urlencoded")
+    @PostMapping(value = "/v1/user/logout", consumes = "application/x-www-form-urlencoded")
     Response deleteMemberData(@RequestHeader("Authorization") String kakaoAdminKey,
-                              @RequestParam(value = "target_id_type", defaultValue = "user_id") String targetIdType,
-                              @RequestParam(value = "target_id") Long targetId);
+                              @RequestPart(value = "target_id_type") String targetIdType,
+                              @RequestPart(value = "target_id") Long targetId);
 
 }

@@ -7,8 +7,14 @@ import org.pknu.weather.dto.MemberJoinDTO;
 import org.pknu.weather.dto.MemberResponse;
 import org.pknu.weather.dto.TermsDto;
 import org.pknu.weather.service.MemberService;
-import org.pknu.weather.service.WeatherService;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -23,7 +29,6 @@ import static org.pknu.weather.common.converter.TokenConverter.getMemberInfoFrom
 public class MemberControllerV1 {
 
     private final MemberService memberService;
-    private final WeatherService weatherService;
 
     @PostMapping(value = "/info", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<MemberResponse.MemberResponseDTO> saveMemberInfo(
@@ -51,10 +56,11 @@ public class MemberControllerV1 {
     }
 
     @DeleteMapping
-    public ApiResponse<Object> deleteMember(@RequestHeader("Authorization") String authorization) {
+    public ApiResponse<Object> deleteMember(@RequestHeader("Authorization") String authorization,
+                                            @RequestBody(required = false) Map<String, String> authInfo) {
 
         Map<String, Object> memberInfo = getMemberInfoFromAuth(authorization);
-        memberService.deleteMember(memberInfo);
+        memberService.deleteMember(memberInfo, authInfo.get("authenticationCode"));
 
         return ApiResponse.onSuccess();
     }

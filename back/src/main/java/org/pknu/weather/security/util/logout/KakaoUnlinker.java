@@ -1,4 +1,4 @@
-package org.pknu.weather.common.utils;
+package org.pknu.weather.security.util.logout;
 
 import feign.Response;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class KakaoLoginUtils {
+public class KakaoUnlinker implements UserUnlinker {
 
     private final KaKaoAuthClient kaKaoAuthClient;
     private static final String targetIdType = "user_id";
@@ -20,9 +20,9 @@ public class KakaoLoginUtils {
     @Value("${spring.kakao.admin_key}")
     private String adminKey;
 
-    public void unlinkMember(Long targetId) {
+    public void unlinkUser(String targetId) {
         String adminKeyFormat = "KakaoAK " + adminKey;
-        Response result = kaKaoAuthClient.deleteMemberData(adminKeyFormat, targetIdType, targetId);
+        Response result = kaKaoAuthClient.deleteMemberData(adminKeyFormat, targetIdType, Long.parseLong(targetId));
 
         validateResponse(result);
     }

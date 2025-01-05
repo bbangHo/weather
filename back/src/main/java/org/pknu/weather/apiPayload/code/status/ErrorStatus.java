@@ -38,6 +38,10 @@ public enum ErrorStatus implements BaseErrorCode {
     KAKAO_ACCESS_TOKEN_BAT_TYPE(HttpStatus.BAD_REQUEST, "Kakao_400_2", "주어진 액세스 토큰 정보가 잘못된 형식입니다."),
     MALFORMED_KAKAO_ACCESS_TOKEN(HttpStatus.FORBIDDEN, "Kakao_401_3", "토큰 값이 유효하지 않습니다."),
 
+    //appleTokenException
+    MALFORMED_APPLE_TOKEN(HttpStatus.FORBIDDEN, "Apple_401_1", "잘못된 애플 identitiy Token입니다.."),
+
+
     // location
     _LOCATION_NOT_FOUND(HttpStatus.NOT_FOUND, "LOCATION_404_1", "존재하지 않는 지역입니다. 범위에 해당하는 위도와 경도 값을 입력하세요 "),
     _PROVINCE_NOT_FOUND(HttpStatus.BAD_REQUEST, "LOCATION_400_2", "도(광역시)의 정보가 필요합니다."),

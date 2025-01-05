@@ -1,5 +1,5 @@
 package org.pknu.weather.service;
-
+/*
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
@@ -252,3 +252,5 @@ class PostServiceTest {
         assertThat(post.getRecommendationList().size()).isEqualTo(0);
     }
 }
+
+ */

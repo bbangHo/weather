@@ -1,5 +1,6 @@
 package org.pknu.weather.config;
 
+import feign.Logger;
 import org.pknu.weather.common.mapper.EnumTagMapper;
 import org.pknu.weather.domain.tag.*;
 import org.springframework.context.annotation.Bean;
