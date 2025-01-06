@@ -11,7 +11,7 @@ import CheckBox from '@react-native-community/checkbox';
 
 const {width, height} = Dimensions.get('window');
 
-const TermsAgreementScreen = ({navigation}) => {
+const TermsAgreementScreen = ({navigation, route}) => {
   const [agreements, setAgreements] = useState({
     service: false,
     location: false,
@@ -20,6 +20,8 @@ const TermsAgreementScreen = ({navigation}) => {
   });
 
   const [allChecked, setAllChecked] = useState(false);
+
+  const {accessToken} = route.params;
 
   useEffect(() => {
     const isAllChecked = Object.values(agreements).every(
@@ -54,7 +56,11 @@ const TermsAgreementScreen = ({navigation}) => {
       Alert.alert('약관 동의', '필수 약관에 동의해주세요.');
       return;
     }
-    navigation.navigate('RegisterProfileScreen');
+
+    navigation.navigate('RegisterProfileScreen', {
+      accessToken,
+      agreements,
+    });
   };
 
   return (

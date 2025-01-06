@@ -19,11 +19,13 @@ import {registerProfile, sendLocationToBackend} from '../api/api';
 
 const {width, height} = Dimensions.get('window');
 
-const RegisterProfileScreen = ({setIsNewMember, accessToken}) => {
+const RegisterProfileScreen = ({route, navigation}) => {
   const [nickname, setNickname] = useState('');
   const [profileImage, setProfileImage] = useState(null);
   const [selectedType, setSelectedType] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  const {accessToken, agreements} = route.params;
 
   useEffect(() => {
     if (Platform.OS === 'android') {
@@ -89,6 +91,12 @@ const RegisterProfileScreen = ({setIsNewMember, accessToken}) => {
         sensitivityMap[selectedType],
         profileImage,
         accessToken,
+        {
+          isServiceTermsAgreed: agreements.service,
+          isPrivacyPolicyAgreed: agreements.personalInfo,
+          isLocationServiceTermsAgreed: agreements.location,
+          isPushNotificationAgreed: agreements.pushNotification,
+        },
       );
 
       console.log('registered new member info:', result);
@@ -158,7 +166,7 @@ const RegisterProfileScreen = ({setIsNewMember, accessToken}) => {
 
           Alert.alert('위치 등록 완료', '위치 정보가 등록되었습니다.');
           setLoading(false);
-          setIsNewMember(false);
+          navigation.navigate('HomeScreen');
         } catch (error) {
           console.error('Error sending location data:', error);
           Alert.alert(

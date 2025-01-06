@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   iconContainer: {
-    marginTop: height * 0.02,
+    marginTop: height * 0.03,
     marginRight: height * 0.02,
     width: width * 0.25,
     height: width * 0.25,

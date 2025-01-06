@@ -1,18 +1,19 @@
 const BASE_URL = 'http://13.125.128.147:8080';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export const sendAccessTokenToBackend = async accessToken => {
+export const sendAccessTokenToBackend = async (accessToken, type) => {
   try {
-    console.log('Sending access token to backend...');
+    console.log('Sending access token and type to backend...');
     console.log('Request URL:', `${BASE_URL}/token`);
     console.log('Access token:', accessToken);
+    console.log('Type:', type);
 
     const response = await fetch(`${BASE_URL}/token`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({accessToken}),
+      body: JSON.stringify({accessToken, type}),
     });
 
     console.log('Response status:', response.status);
@@ -501,6 +502,7 @@ export const registerProfile = async (
   sensitivity,
   profileImage,
   accessToken,
+  agreements,
 ) => {
   const formData = new FormData();
 
@@ -515,14 +517,19 @@ export const registerProfile = async (
     });
   }
 
+  formData.append('isServiceTermsAgreed', agreements.isServiceTermsAgreed);
+  formData.append('isPrivacyPolicyAgreed', agreements.isPrivacyPolicyAgreed);
+  formData.append(
+    'isLocationServiceTermsAgreed',
+    agreements.isLocationServiceTermsAgreed,
+  );
+  formData.append(
+    'isPushNotificationAgreed',
+    agreements.isPushNotificationAgreed,
+  );
+
   formData._parts.forEach(part => {
     console.log(`FormData key: ${part[0]}, value: ${JSON.stringify(part[1])}`);
-  });
-
-  console.log('Profile Image Details:', {
-    uri: profileImage.uri,
-    type: profileImage.type,
-    name: profileImage.name,
   });
 
   try {
@@ -534,10 +541,14 @@ export const registerProfile = async (
       body: formData,
     });
 
+    console.log('Full Response:', response);
+
     const responseData = await response.json();
 
+    console.log('Parsed Response Data:', responseData);
+
     if (!response.ok) {
-      console.error('Backend error:', responseData);
+      console.error('Server Error Details:', responseData);
       throw new Error(responseData.message || '프로필 저장 실패');
     }
 

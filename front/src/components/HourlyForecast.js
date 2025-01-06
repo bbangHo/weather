@@ -24,13 +24,15 @@ const HourlyForecast = ({accessToken, showText, refreshing}) => {
       const weatherData = await fetchWeatherData(accessToken);
       console.log('Hourly Weather data:', JSON.stringify(weatherData, null, 2));
 
-      if (weatherData.isSuccess) {
+      if (weatherData.isSuccess && weatherData.result?.weatherPerHourList) {
         setHourlyData(weatherData.result.weatherPerHourList);
       } else {
         console.error('Failed to fetch weather data:', weatherData.message);
+        setHourlyData([]);
       }
     } catch (error) {
       console.error('Error fetching weather data:', error.message);
+      setHourlyData([]);
     } finally {
       setLoading(false);
     }
@@ -76,14 +78,14 @@ const HourlyForecast = ({accessToken, showText, refreshing}) => {
       horizontal
       contentContainerStyle={styles.scrollContent}
       style={styles.container}>
-      {(loading ? placeholderData : hourlyData).map((item, i) => (
+      {(loading ? placeholderData : hourlyData || []).map((item, i) => (
         <View key={i} style={styles.shadowContainer}>
           <Card
             containerStyle={[styles.card, globalStyles.transparentBackground]}>
             <View style={styles.content}>
               {loading ? (
                 <ActivityIndicator size="small" color="#999999" />
-              ) : (
+              ) : item ? (
                 <>
                   <Text style={styles.textTime}>{formatHour(item.hour)}</Text>
 
@@ -112,7 +114,7 @@ const HourlyForecast = ({accessToken, showText, refreshing}) => {
                     {showText ? item.rainText : `${item.rain}mm`}
                   </Text>
                 </>
-              )}
+              ) : null}
             </View>
           </Card>
         </View>
@@ -170,8 +172,8 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   rainAdverb: {
-    fontSize: 12,
-    marginBottom: 0,
+    fontSize: 11,
+    marginBottom: -13,
     textAlign: 'center',
   },
   adverbText: {
@@ -184,7 +186,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: 'bold',
     color: '#000',
-    marginBottom: -8,
+    marginBottom: -4,
     marginTop: 5,
     textAlign: 'center',
   },
@@ -193,6 +195,7 @@ const styles = StyleSheet.create({
     color: '#555',
     textAlign: 'center',
     marginTop: 5,
+    marginBottom: -5,
   },
 });
 

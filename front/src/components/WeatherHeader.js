@@ -6,7 +6,6 @@ import {
   Image,
   Dimensions,
   Switch,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -41,37 +40,51 @@ const WeatherHeader = ({accessToken, onToggleChange}) => {
     if (!weatherData || !weatherData.weatherPerHourList) return false;
 
     const currentHour = new Date().getHours();
-    const dayConditions = weatherData.weatherPerHourList.filter(item => {
+    return weatherData.weatherPerHourList.some(item => {
       const hour = new Date(item.hour).getHours();
 
       console.log(
         `Hour: ${hour}, SkyType: ${item.skyType}, Rain: ${item.rain}`,
       );
-
-      if (hour > currentHour) return false;
       return (
-        hour >= 6 && hour < 18 && (item.skyType === 'CLOUDY' || item.rain > 0)
+        hour <= currentHour &&
+        hour >= 6 &&
+        hour < 18 &&
+        (item.skyType === 'CLOUDY' || item.rain > 0)
       );
     });
-
-    return dayConditions.length > 0;
   };
 
   useEffect(() => {
     const loadData = async () => {
       try {
+        console.log('Header data...');
         updateBackgroundColors();
 
         const location = await fetchUserLocation(accessToken);
+        console.log('Header user location:', location);
+
         const weather = await fetchWeatherData(accessToken);
-        const tags = await fetchWeatherTags(accessToken);
+        console.log('Header weather data:', weather);
+
+        try {
+          const tags = await fetchWeatherTags(accessToken);
+          console.log('Header weather tags:', tags);
+          if (Array.isArray(tags)) {
+            setWeatherTags(tags);
+          } else {
+            throw new Error('Invalid weather tags');
+          }
+        } catch (tagError) {
+          console.error('Error fetching weather tags:', tagError);
+          setWeatherTags([]);
+        }
 
         setUserLocation({
           city: location?.city || '',
           street: location?.street || '',
         });
-        setWeatherData(weather?.result);
-        setWeatherTags(tags);
+        setWeatherData(weather?.result || {});
 
         const storedState = await AsyncStorage.getItem('switchState');
         if (storedState !== null) {
@@ -81,9 +94,9 @@ const WeatherHeader = ({accessToken, onToggleChange}) => {
         }
 
         updateBackgroundColors(weather?.result);
-        setLoading(false);
       } catch (error) {
-        Alert.alert('Error', '데이터를 불러오는 데 실패했습니다.');
+        console.error('Error fetching data:', error);
+      } finally {
         setLoading(false);
       }
     };
@@ -177,11 +190,19 @@ const WeatherHeader = ({accessToken, onToggleChange}) => {
       />
 
       <View style={styles.tagsContainer}>
-        {weatherTags.map((tag, index) => (
-          <View key={index} style={styles.tag}>
-            <Text style={styles.tagText}>{tag.text}</Text>
+        {weatherTags.length > 0 ? (
+          weatherTags.map((tag, index) => (
+            <View key={index} style={styles.tag}>
+              <Text style={styles.tagText}>{tag.text}</Text>
+            </View>
+          ))
+        ) : (
+          <View style={styles.tag}>
+            <Text style={styles.tagText}>
+              게시글을 작성해서 태그를 공유해 주세요!
+            </Text>
           </View>
-        ))}
+        )}
       </View>
     </LinearGradient>
   );
