@@ -140,7 +140,7 @@ const WeatherHeaderCommunity = ({accessToken}) => {
 const styles = StyleSheet.create({
   headerContainer: {
     width: width,
-    height: height * 0.15,
+    height: Platform.OS === 'ios' ? height * 0.15 : height * 0.13,
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
     paddingLeft: width * 0.07,
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 5,
-    marginTop: height * 0.04,
+    marginTop: Platform.OS === 'ios' ? height * 0.04 : height * 0.01,
   },
   locationIcon: {
     tintColor: '#fff',
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   iconContainer: {
-    marginTop: height * 0.03,
+    marginTop: Platform.OS === 'ios' ? height * 0.03 : height * 0.01,
     marginRight: height * 0.02,
     width: width * 0.25,
     height: width * 0.25,

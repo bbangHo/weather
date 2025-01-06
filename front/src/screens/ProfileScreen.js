@@ -99,11 +99,11 @@ const ProfileScreen = ({accessToken, navigation, route}) => {
         Alert.alert('프로필 수정 완료', '프로필 정보가 수정되었습니다.');
         navigation.navigate('MyScreen', {refresh: true});
       } else {
-        Alert.alert('프로필 수정 실패', result.message || '다시 시도해주세요.');
+        /* Alert.alert('프로필 수정 실패', result.message || '다시 시도해주세요.'); */
       }
     } catch (error) {
       console.error('Error registering profile:', error);
-      Alert.alert('프로필 수정 실패', '다시 시도해주세요.');
+      /* Alert.alert('프로필 수정 실패', '다시 시도해주세요.'); */
     } finally {
       setSaving(false);
     }
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginVertical: 20,
     color: '#333',
-    marginTop: height * 0.06,
+    marginTop: Platform.OS === 'ios' ? height * 0.06 : height * 0.045,
   },
   profileSection: {
     alignItems: 'center',
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   saveButton: {
-    marginTop: height * 0.126,
+    marginTop: Platform.OS === 'ios' ? height * 0.126 : height * 0.118,
     marginHorizontal: 20,
     backgroundColor: '#f2f3f5',
     paddingVertical: 15,

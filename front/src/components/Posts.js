@@ -76,7 +76,7 @@ const Posts = ({accessToken, refreshing}) => {
       case 'NONE':
         return require('../../assets/images/icon_partlycloudy.png');
       case 'COLD':
-        return require('../../assets/images/icon_snow2.png');
+        return require('../../assets/images/icon_snow.png');
       default:
         return null;
     }
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: 12,
     paddingHorizontal: 8,
-    minHeight: Platform.OS === 'ios' ? 150 : 160,
+    minHeight: Platform.OS === 'ios' ? 150 : 170,
   },
   header: {
     flexDirection: 'row',
@@ -202,11 +202,11 @@ const styles = StyleSheet.create({
     color: '#333',
     fontWeight: 'bold',
     fontSize: 14,
+    marginRight: 2,
   },
   userIcon: {
     width: 18,
     height: 18,
-    marginLeft: 7,
   },
   timeAgo: {
     color: '#777',

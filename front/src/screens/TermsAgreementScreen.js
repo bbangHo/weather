@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Dimensions,
   Alert,
+  Linking,
 } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
 
@@ -22,6 +23,16 @@ const TermsAgreementScreen = ({navigation, route}) => {
   const [allChecked, setAllChecked] = useState(false);
 
   const {accessToken} = route.params;
+
+  const termsUrls = {
+    service:
+      'https://safe-scabiosa-656.notion.site/16d2f55997ef804b9169f2b2ee6775dd?pvs=4',
+    location:
+      'https://safe-scabiosa-656.notion.site/16d2f55997ef80768b0fd53594df6843?pvs=4',
+    personalInfo:
+      'https://safe-scabiosa-656.notion.site/16d2f55997ef806784c0cc8f3462b80c?pvs=4',
+    pushNotification: 'https://www.notion.so/ghi789...',
+  };
 
   useEffect(() => {
     const isAllChecked = Object.values(agreements).every(
@@ -63,6 +74,17 @@ const TermsAgreementScreen = ({navigation, route}) => {
     });
   };
 
+  const openTermsPage = key => {
+    const url = termsUrls[key];
+    if (url) {
+      Linking.openURL(url).catch(err =>
+        console.error('Failed to open URL:', err),
+      );
+    } else {
+      Alert.alert('오류', '해당 약관 페이지를 찾을 수 없습니다.');
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.header}>약관 동의</Text>
@@ -89,13 +111,21 @@ const TermsAgreementScreen = ({navigation, route}) => {
               <Text style={styles.termText}>
                 {item.label}{' '}
                 {item.required ? (
-                  <Text style={styles.required}>필수</Text>
+                  <View style={styles.requiredContainer}>
+                    <Text style={styles.required}>필수</Text>
+                  </View>
                 ) : (
-                  <Text style={styles.optional}>선택</Text>
+                  <View style={styles.optionalContainer}>
+                    <Text style={styles.optional}>선택</Text>
+                  </View>
                 )}
               </Text>
             </View>
-            {item.required && <Text style={styles.arrow}>&gt;</Text>}
+            {item.key !== 'pushNotification' && (
+              <TouchableOpacity onPress={() => openTermsPage(item.key)}>
+                <Text style={styles.arrow}>&gt;</Text>
+              </TouchableOpacity>
+            )}
           </View>
         ))}
       </View>
@@ -105,7 +135,7 @@ const TermsAgreementScreen = ({navigation, route}) => {
           <CheckBox
             value={allChecked}
             onValueChange={toggleAll}
-            tintColors={{true: '#3f7dfd', false: '#ccc'}}
+            tintColors={{true: '#2f5af4', false: '#ccc'}}
           />
           <Text style={styles.allAgreeText}>전체 동의하기</Text>
         </View>
@@ -130,7 +160,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginVertical: 20,
     color: '#333',
-    marginTop: height * 0.06,
+    marginTop: Platform.OS === 'ios' ? height * 0.07 : height * 0.045,
   },
   separator: {
     borderBottomWidth: 0.9,
@@ -162,18 +192,31 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginLeft: 10,
     color: '#333',
+    marginBottom: Platform.OS === 'ios' ? 0 : 7,
+  },
+  requiredContainer: {
+    backgroundColor: '#EFF6FF',
+    borderRadius: 4,
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+    marginLeft: Platform.OS === 'ios' ? 5 : 9,
+    marginTop: Platform.OS === 'ios' ? -2 : -10,
+  },
+  optionalContainer: {
+    backgroundColor: '#F3F4F6',
+    borderRadius: 4,
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+    marginLeft: 5,
+    marginTop: -2,
   },
   required: {
     color: '#1D4ED8',
-    backgroundColor: '#EFF6FF',
     fontSize: 12,
-    marginLeft: 5,
   },
   optional: {
     color: '#6B7280',
-    backgroundColor: '#F3F4F6',
     fontSize: 12,
-    marginLeft: 5,
   },
   arrow: {
     fontSize: 18,
@@ -203,10 +246,11 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     marginTop: 5,
     marginLeft: width * 0.11,
+    marginBottom: Platform.OS === 'ios' ? 3 : 5,
   },
   completeButton: {
-    marginTop: height * 0.04,
-    backgroundColor: '#3f7dfd',
+    marginTop: height * 0.08,
+    backgroundColor: '#2f5af4',
     paddingVertical: 15,
     borderRadius: 8,
     alignItems: 'center',

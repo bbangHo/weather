@@ -9,12 +9,15 @@ import {
   Alert,
   TouchableOpacity,
   Dimensions,
+  Platform,
 } from 'react-native';
 import {Card} from 'react-native-elements';
 import globalStyles from '../globalStyles';
 import {fetchPosts, toggleLikePost} from '../api/api';
 
-const {width} = Dimensions.get('window');
+const {width, height} = Dimensions.get('window');
+
+const aspectRatio = height / width;
 
 const PostScroll = ({accessToken, refreshPosts, onRefreshComplete}) => {
   const [posts, setPosts] = useState([]);
@@ -206,7 +209,7 @@ const styles = StyleSheet.create({
     paddingTop: -15,
     padding: 15,
     width: '100%',
-    minHeight: 130,
+    minHeight: Platform.OS === 'ios' ? 130 : 140,
   },
   header: {
     flexDirection: 'row',
@@ -233,7 +236,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
     fontSize: 14,
-    marginRight: 5,
+    marginRight: 2,
   },
   userIcon: {
     width: 18,

@@ -32,10 +32,9 @@ const CommunityScreen = ({accessToken, navigation}) => {
       const isCloudyOrRainy = weatherData?.result?.weatherPerHourList.some(
         item => {
           const hour = new Date(item.hour).getHours();
+          const currentHour = new Date().getHours();
           return (
-            hour >= 6 &&
-            hour < 18 &&
-            (item.skyType === 'CLOUDY' || item.rain > 0)
+            hour === currentHour && (item.skyType === 'CLOUDY' || item.rain > 0)
           );
         },
       );
