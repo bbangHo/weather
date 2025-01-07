@@ -9,9 +9,11 @@ import {
 import Svg, {Path, Circle, Text as SvgText, Rect} from 'react-native-svg';
 import {fetchWeatherData} from '../api/api';
 
-const {width} = Dimensions.get('window');
+const {width, height} = Dimensions.get('window');
 const graphWidth = width - 40;
 const graphHeight = 160;
+
+const aspectRatio = height / width;
 
 const WeatherGraph = ({accessToken}) => {
   const [temperatureData, setTemperatureData] = useState([]);

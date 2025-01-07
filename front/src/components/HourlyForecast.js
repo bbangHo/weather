@@ -13,7 +13,9 @@ import {Card} from 'react-native-elements';
 import globalStyles from '../globalStyles';
 import {fetchWeatherData} from '../api/api';
 
-const {width} = Dimensions.get('window');
+const {width, height} = Dimensions.get('window');
+
+const aspectRatio = height / width;
 
 const HourlyForecast = ({accessToken, showText, refreshing}) => {
   const [hourlyData, setHourlyData] = useState([]);
@@ -23,6 +25,7 @@ const HourlyForecast = ({accessToken, showText, refreshing}) => {
     try {
       const weatherData = await fetchWeatherData(accessToken);
       console.log('Hourly Weather data:', JSON.stringify(weatherData, null, 2));
+      console.log('width / height = ', width, '/', height, '=', aspectRatio);
 
       if (weatherData.isSuccess && weatherData.result?.weatherPerHourList) {
         setHourlyData(weatherData.result.weatherPerHourList);
@@ -77,7 +80,10 @@ const HourlyForecast = ({accessToken, showText, refreshing}) => {
     <ScrollView
       horizontal
       contentContainerStyle={styles.scrollContent}
-      style={styles.container}>
+      style={[
+        styles.container,
+        aspectRatio === 2.09999 && {marginTop: -width * 0.13},
+      ]}>
       {(loading ? placeholderData : hourlyData || []).map((item, i) => (
         <View key={i} style={styles.shadowContainer}>
           <Card
@@ -125,7 +131,7 @@ const HourlyForecast = ({accessToken, showText, refreshing}) => {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: -width * 0.16,
+    marginTop: Math.abs(aspectRatio) < 2.1 ? -width * 0.13 : -width * 0.16,
   },
   shadowContainer: {
     marginLeft: width * 0.025,
@@ -143,7 +149,7 @@ const styles = StyleSheet.create({
     borderColor: '#fff',
     padding: -30,
     width: width * 0.13,
-    height: 140,
+    height: Platform.OS === 'ios' ? 140 : 150,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#fff',

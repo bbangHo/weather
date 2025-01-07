@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   Alert,
   Dimensions,
+  Linking,
 } from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
 import {fetchMemberInfo, deleteMember} from '../api/api';
@@ -30,6 +31,28 @@ const MyScreen = ({
   const [email, setEmail] = useState('');
   const [profileImage, setProfileImage] = useState(profilePlaceholder);
   const [loading, setLoading] = useState(true);
+
+  const personalInfoUrl =
+    'https://safe-scabiosa-656.notion.site/16d2f55997ef804d8a16c3c1a5dd1879?pvs=4';
+
+  const openPersonalInfoPage = () => {
+    Linking.openURL(personalInfoUrl).catch(err =>
+      console.error('Failed to open URL:', err),
+    );
+  };
+
+  const termsUrls = {
+    service:
+      'https://safe-scabiosa-656.notion.site/16d2f55997ef804b9169f2b2ee6775dd?pvs=4',
+    location:
+      'https://safe-scabiosa-656.notion.site/16d2f55997ef80768b0fd53594df6843?pvs=4',
+    personalInfo:
+      'https://safe-scabiosa-656.notion.site/16d2f55997ef806784c0cc8f3462b80c?pvs=4',
+  };
+
+  const openTermsView = (title, key) => {
+    navigation.navigate('TermsViewScreen', {title, url: termsUrls[key]});
+  };
 
   const loadMemberInfo = async () => {
     try {
@@ -60,27 +83,35 @@ const MyScreen = ({
 
   const handleLogout = async () => {
     try {
-      console.log('Starting Kakao logout...');
-      await logout();
+      const loginMethod = await AsyncStorage.getItem('loginMethod');
+      console.log('Current login method:', loginMethod);
+
+      if (loginMethod === 'kakao') {
+        console.log('Performing Kakao logout...');
+        await logout();
+      } else if (loginMethod === 'apple') {
+        console.log('Performing Apple logout...');
+        console.log('Apple logout logic executed.');
+      }
+
       setAccessToken(null);
       setIsLoggedIn(false);
 
-      await AsyncStorage.setItem('logoutState', 'true');
-
       await AsyncStorage.removeItem('accessToken');
       await AsyncStorage.removeItem('refreshToken');
+      await AsyncStorage.removeItem('loginMethod');
 
       navigation.replace('LoginScreen');
-
       console.log('Logout successful');
     } catch (err) {
       console.error('Logout failed:', err.message);
-      Alert.alert('로그아웃 실패', '이미 로그아웃된 상태입니다.');
+      Alert.alert('로그아웃', '메인 화면으로 이동합니다.');
       setAccessToken(null);
       setIsLoggedIn(false);
 
       await AsyncStorage.removeItem('accessToken');
       await AsyncStorage.removeItem('refreshToken');
+      await AsyncStorage.removeItem('loginMethod');
 
       navigation.replace('LoginScreen');
     }
@@ -92,31 +123,64 @@ const MyScreen = ({
       return;
     }
 
-    Alert.alert(
-      '회원 탈퇴',
-      '정말 탈퇴하시겠습니까?',
-      [
-        {text: '아니오', style: 'cancel'},
-        {
-          text: '네',
-          onPress: async () => {
-            try {
-              await deleteMember(accessToken);
-              Alert.alert('탈퇴 완료', '회원 탈퇴가 완료되었습니다.');
-              setIsNewMember(true);
-              setIsLoggedIn(false);
-            } catch (error) {
-              console.error('Failed to delete member:', error);
-              Alert.alert(
-                '오류',
-                '회원 탈퇴에 실패했습니다. 다시 시도해주세요.',
-              );
-            }
+    try {
+      const loginMethod = await AsyncStorage.getItem('loginMethod');
+      console.log('Current login method:', loginMethod);
+
+      let authenticationCode = null;
+
+      if (loginMethod === 'apple') {
+        authenticationCode = await AsyncStorage.getItem('authenticationCode');
+        console.log('Stored Apple authenticationCode:', authenticationCode);
+
+        if (!authenticationCode) {
+          Alert.alert(
+            '오류',
+            '애플 인증 코드가 존재하지 않습니다. 다시 로그인 후 시도해주세요.',
+          );
+          return;
+        }
+      }
+
+      Alert.alert(
+        '회원 탈퇴',
+        '정말 탈퇴하시겠습니까?',
+        [
+          {text: '아니오', style: 'cancel'},
+          {
+            text: '네',
+            onPress: async () => {
+              try {
+                await deleteMember(
+                  accessToken,
+                  loginMethod,
+                  authenticationCode,
+                );
+                Alert.alert('탈퇴 완료', '회원 탈퇴가 완료되었습니다.');
+                setIsNewMember(true);
+                setIsLoggedIn(false);
+
+                await AsyncStorage.removeItem('accessToken');
+                await AsyncStorage.removeItem('refreshToken');
+                await AsyncStorage.removeItem('loginMethod');
+                await AsyncStorage.removeItem('authenticationCode');
+
+                navigation.replace('LoginScreen');
+              } catch (error) {
+                console.error('Failed to delete member:', error);
+                Alert.alert(
+                  '회원 탈퇴 실패',
+                  '회원 탈퇴에 실패했습니다. 다시 시도해주세요.',
+                );
+              }
+            },
           },
-        },
-      ],
-      {cancelable: true},
-    );
+        ],
+        {cancelable: true},
+      );
+    } catch (error) {
+      console.error('Error handling delete account:', error);
+    }
   };
 
   if (loading) {
@@ -152,11 +216,15 @@ const MyScreen = ({
           <Text style={styles.menuText}>알림 설정</Text>
           <Text style={styles.menuArrow}>{'>'}</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.menuItem}>
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => openTermsView('이용약관', 'service')}>
           <Text style={styles.menuText}>이용약관</Text>
           <Text style={styles.menuArrow}>{'>'}</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.menuItem}>
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={openPersonalInfoPage}>
           <Text style={styles.menuText}>개인정보 처리방침</Text>
           <Text style={styles.menuArrow}>{'>'}</Text>
         </TouchableOpacity>
@@ -192,7 +260,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginVertical: 20,
     color: '#333',
-    marginTop: height * 0.06,
+    marginTop: Platform.OS === 'ios' ? height * 0.075 : height * 0.045,
   },
   profileSection: {
     alignItems: 'center',
@@ -281,7 +349,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   logoutButton: {
-    marginTop: height * 0.07,
+    marginTop: Platform.OS === 'ios' ? height * 0.053 : height * 0.05,
     marginHorizontal: 20,
     backgroundColor: '#F2F3F5',
     paddingVertical: 15,

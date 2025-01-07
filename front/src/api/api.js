@@ -619,20 +619,31 @@ export const submitAddress = async (accessToken, province, city, street) => {
   }
 };
 
-export const deleteMember = async accessToken => {
+export const deleteMember = async (
+  accessToken,
+  loginMethod,
+  authenticationCode = null,
+) => {
   const url = `${BASE_URL}/api/v1/member`;
 
   console.log('Attempting to delete member with API:', url);
   console.log('Authorization header:', `Bearer ${accessToken}`);
+  console.log('Login method:', loginMethod);
 
   try {
-    const response = await fetch(url, {
+    const options = {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`,
       },
-    });
+    };
+
+    if (loginMethod === 'apple' && authenticationCode) {
+      options.body = JSON.stringify({authenticationCode});
+    }
+
+    const response = await fetch(url, options);
 
     if (!response.ok) {
       const errorResponse = await response.json();
@@ -642,7 +653,7 @@ export const deleteMember = async accessToken => {
 
     return await response.json();
   } catch (error) {
-    console.error('Erroe Deleting member:', error);
+    console.error('Error Deleting member:', error);
     throw error;
   }
 };

@@ -19,13 +19,13 @@ import {registerProfile, sendLocationToBackend} from '../api/api';
 
 const {width, height} = Dimensions.get('window');
 
-const RegisterProfileScreen = ({route, navigation}) => {
+const RegisterProfileScreen = ({route, setIsNewMember, setIsLoggedIn}) => {
   const [nickname, setNickname] = useState('');
   const [profileImage, setProfileImage] = useState(null);
   const [selectedType, setSelectedType] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const {accessToken, agreements} = route.params;
+  const {accessToken, agreements} = route.params || {};
 
   useEffect(() => {
     if (Platform.OS === 'android') {
@@ -146,7 +146,7 @@ const RegisterProfileScreen = ({route, navigation}) => {
         return granted === PermissionsAndroid.RESULTS.GRANTED;
       }
     } catch (error) {
-      console.error('Error requesting location permission:', error);
+      console.error('위치 권한 요청 오류:', error);
       return false;
     }
   };
@@ -166,9 +166,13 @@ const RegisterProfileScreen = ({route, navigation}) => {
 
           Alert.alert('위치 등록 완료', '위치 정보가 등록되었습니다.');
           setLoading(false);
-          navigation.navigate('HomeScreen');
+
+          setIsLoggedIn(true);
+          setIsNewMember(prevState => !prevState);
+          setIsNewMember(false);
+          console.log('isNewMember 변경됨: false');
         } catch (error) {
-          console.error('Error sending location data:', error);
+          console.error('위치 등록 실패:', error);
           Alert.alert(
             '위치 등록 실패',
             '위치 정보를 전송하는 중 오류가 발생했습니다.',
@@ -177,7 +181,7 @@ const RegisterProfileScreen = ({route, navigation}) => {
         }
       },
       error => {
-        console.error('Error getting current position:', error);
+        console.error('위치 정보 가져오기 오류:', error);
         Alert.alert(
           '위치 정보를 가져올 수 없습니다.',
           '위치 권한을 확인해주세요.',
@@ -306,7 +310,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginVertical: 20,
     color: '#333',
-    marginTop: height * 0.06,
+    marginTop: Platform.OS === 'ios' ? height * 0.07 : height * 0.045,
   },
   nickname: {
     color: '#000',
@@ -335,9 +339,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     right: width * 0.4,
-    backgroundColor: '#3f7dfd',
+    backgroundColor: '#2f5af4',
     borderRadius: 20,
-    paddingVertical: 4,
+    paddingVertical: Platform.OS === 'ios' ? 4 : 2,
     paddingHorizontal: 8,
   },
   plusIcon: {
@@ -378,13 +382,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   selectedButton: {
-    backgroundColor: '#3f7dfd',
+    backgroundColor: '#2f5af4',
   },
   selectedButtonText: {
     color: '#fff',
   },
   saveButton: {
-    marginTop: height * 0.07,
+    marginTop: height * 0.11,
     marginHorizontal: 20,
     backgroundColor: '#F2F3F5',
     paddingVertical: 15,

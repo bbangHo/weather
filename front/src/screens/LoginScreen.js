@@ -35,68 +35,14 @@ const LoginScreen = ({
 }) => {
   const [token, setToken] = useState('');
 
-  /*
-  const handleSignInApple = async () => {
+  const saveLoginMethod = async method => {
     try {
-      const appleAuthRequestResponse = await appleAuth.performRequest({
-        requestedOperation: appleAuth.Operation.LOGIN,
-        requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL],
-      });
-
-      const {identityToken, fullName, email} = appleAuthRequestResponse;
-
-      const credentialState = await appleAuth.getCredentialStateForUser(
-        appleAuthRequestResponse.user,
-      );
-
-      if (credentialState === appleAuth.State.AUTHORIZED) {
-        console.log('Apple Login Successful:', appleAuthRequestResponse);
-
-        console.log('Identity Token:', identityToken);
-        console.log('Full Name:', fullName);
-        console.log('Email:', email);
-
-        const response = await sendAccessTokenToBackend(identityToken, 'apple');
-
-        if (response.isSuccess) {
-          console.log('Login successful, server response:', response);
-          setAccessToken(response.result.accessToken);
-
-          if (response.result.isNewMember === 'true') {
-            navigation.navigate('TermsAgreementScreen');
-          } else {
-            setIsLoggedIn(true);
-          }
-
-          await AsyncStorage.setItem(
-            'accessToken',
-            response.result.accessToken,
-          );
-          await AsyncStorage.setItem(
-            'refreshToken',
-            response.result.refreshToken,
-          );
-
-          await AsyncStorage.removeItem('logoutState');
-        } else {
-          console.error('Login failed, server response:', response);
-          Alert.alert(
-            '로그인 실패',
-            response.message || '서버 오류가 발생했습니다.',
-          );
-        }
-      } else {
-        Alert.alert('애플 로그인 실패', '사용자가 인증되지 않았습니다.');
-      }
-    } catch (err) {
-      console.error('Apple Login Error:', err.message);
-      Alert.alert(
-        '애플 로그인 실패',
-        err.message || '알 수 없는 오류가 발생했습니다.',
-      );
+      await AsyncStorage.setItem('loginMethod', method);
+      console.log('Login method saved:', method);
+    } catch (error) {
+      console.error('Failed to save login method:', error);
     }
   };
-  */
 
   const handleSignInApple = async () => {
     try {
@@ -105,8 +51,20 @@ const LoginScreen = ({
         requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL],
       });
 
-      const {identityToken} = appleAuthRequestResponse;
+      console.log('Apple Auth Response:', appleAuthRequestResponse);
 
+      const {identityToken, authorizationCode} = appleAuthRequestResponse;
+
+      if (!authorizationCode) {
+        console.error('Error: authenticationCode is missing!');
+        Alert.alert(
+          '애플 로그인 실패',
+          'authenticationCode를 가져올 수 없습니다.',
+        );
+        return;
+      }
+
+      console.log('Apple authenticationCode:', authorizationCode);
       const credentialState = await appleAuth.getCredentialStateForUser(
         appleAuthRequestResponse.user,
       );
@@ -116,20 +74,26 @@ const LoginScreen = ({
 
         if (response.isSuccess) {
           const accessToken = response.result.accessToken;
-          const isNewMember = response.result.isNewMember === 'false';
+          const refreshToken = response.result.refreshToken;
+          const isNewMember = response.result.isNewMember === 'true';
 
-          console.log('Access Token:', accessToken);
-          console.log('Is New Member:', isNewMember);
+          console.log('Apple Login Success:', {accessToken, isNewMember});
 
-          await AsyncStorage.setItem('accessToken', accessToken);
+          await AsyncStorage.setItem('authenticationCode', authorizationCode);
+          console.log('authenticationCode saved successfully');
 
+          await saveLoginMethod('apple');
+
+          setAccessToken(accessToken);
           if (isNewMember) {
-            navigation.navigate('TermsAgreementScreen', {
-              accessToken,
-            });
+            navigation.navigate('TermsAgreementScreen', {accessToken});
+            setIsNewMember(true);
           } else {
             setIsLoggedIn(true);
           }
+
+          await AsyncStorage.setItem('accessToken', accessToken);
+          await AsyncStorage.setItem('refreshToken', refreshToken);
         } else {
           Alert.alert(
             '로그인 실패',
@@ -140,7 +104,7 @@ const LoginScreen = ({
         Alert.alert('애플 로그인 실패', '사용자가 인증되지 않았습니다.');
       }
     } catch (error) {
-      console.error('Apple Login Error:', error);
+      console.error('Apple Login Error:', error.message);
       Alert.alert(
         '애플 로그인 실패',
         error.message || '알 수 없는 오류가 발생했습니다.',
@@ -148,44 +112,15 @@ const LoginScreen = ({
     }
   };
 
-  /*
-  const handleKakaoLogin = async () => {
+  const saveTokens = async (accessToken, refreshToken) => {
     try {
-      console.log('Starting Kakao login...');
-      const token = await login();
-      console.log('Kakao login successful, token:', token.accessToken);
-      const response = await sendAccessTokenToBackend(token.accessToken);
-      if (response.isSuccess) {
-        console.log('Login successful, server response:', response);
-        setAccessToken(response.result.accessToken);
-        // 테스트를 위해 false 값으로 설정합니다.
-        // 구현 완료 후 true 값으로 변경해야 합니다.
-        if (response.result.isNewMember === 'true') {
-          navigation.navigate('TermsAgreementScreen');
-        } else {
-          setIsLoggedIn(true);
-        }
-
-        await AsyncStorage.setItem('accessToken', response.result.accessToken);
-        await AsyncStorage.setItem(
-          'refreshToken',
-          response.result.refreshToken,
-        );
-
-        await AsyncStorage.removeItem('logoutState');
-      } else {
-        console.error('Login failed, server response:', response);
-        Alert.alert(
-          '로그인 실패',
-          response.message || '서버 오류가 발생했습니다.',
-        );
-      }
-    } catch (err) {
-      console.error('Kakao Login Failed:', err.message);
-      Alert.alert('로그인 실패', err.message);
+      await AsyncStorage.setItem('accessToken', accessToken);
+      await AsyncStorage.setItem('refreshToken', refreshToken);
+      console.log('Tokens saved:', {accessToken, refreshToken});
+    } catch (error) {
+      console.error('Error saving tokens:', error);
     }
   };
-  */
 
   const handleKakaoLogin = async () => {
     try {
@@ -199,24 +134,23 @@ const LoginScreen = ({
       );
 
       if (response.isSuccess) {
-        console.log('Login successful, server response:', response);
-        setAccessToken(response.result.accessToken);
+        const accessToken = response.result.accessToken;
+        const refreshToken = response.result.refreshToken;
+        const isNewMember = response.result.isNewMember === 'true';
 
-        if (response.result.isNewMember === 'true') {
-          navigation.navigate('TermsAgreementScreen');
+        await saveLoginMethod('kakao');
+
+        setAccessToken(accessToken);
+        if (isNewMember) {
+          navigation.navigate('TermsAgreementScreen', {accessToken});
+          setIsNewMember(true);
         } else {
           setIsLoggedIn(true);
         }
 
-        await AsyncStorage.setItem('accessToken', response.result.accessToken);
-        await AsyncStorage.setItem(
-          'refreshToken',
-          response.result.refreshToken,
-        );
-
-        await AsyncStorage.removeItem('logoutState');
+        await AsyncStorage.setItem('accessToken', accessToken);
+        await AsyncStorage.setItem('refreshToken', refreshToken);
       } else {
-        console.error('Login failed, server response:', response);
         Alert.alert(
           '로그인 실패',
           response.message || '서버 오류가 발생했습니다.',
@@ -224,7 +158,6 @@ const LoginScreen = ({
       }
     } catch (err) {
       console.error('Kakao Login Failed:', err.message);
-      Alert.alert('로그인 실패', err.message);
     }
   };
 
@@ -334,7 +267,6 @@ const LoginScreen = ({
   };
 
   useEffect(() => {
-    /*
     const checkStoredTokens = async () => {
       const logoutState = await AsyncStorage.getItem('logoutState');
       if (logoutState === 'true') {
@@ -373,7 +305,6 @@ const LoginScreen = ({
     }, 15 * 60 * 1000);
 
     return () => clearInterval(interval);
-    */
   }, []);
 
   return (

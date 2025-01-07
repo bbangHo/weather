@@ -267,7 +267,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
-    marginTop: 15,
+    marginTop: Platform.OS === 'ios' ? 15 : 10,
   },
   profileImage: {
     width: 50,

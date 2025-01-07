@@ -211,7 +211,7 @@ const WeatherHeader = ({accessToken, onToggleChange}) => {
 const styles = StyleSheet.create({
   headerContainer: {
     width: width,
-    height: height * 0.23,
+    height: Platform.OS === 'ios' ? height * 0.23 : height * 0.2,
     paddingVertical: 20,
     paddingHorizontal: 20,
     paddingLeft: width * 0.07,
@@ -219,14 +219,14 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 20,
   },
   switch: {
-    marginTop: height * 0.03,
+    marginTop: Platform.OS === 'ios' ? height * 0.03 : height * 0.003,
     position: 'absolute',
     top: width * 0.05,
     right: width * 0.07,
     zIndex: 1,
   },
   infoContainer: {
-    marginTop: height * 0.03,
+    marginTop: Platform.OS === 'ios' ? height * 0.03 : height * 0.002,
     marginBottom: 40,
   },
   locationContainer: {
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
   tag: {
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     borderRadius: 20,
-    paddingVertical: 5,
+    paddingVertical: 3,
     paddingHorizontal: 12,
     marginRight: 10,
     marginBottom: 5,
@@ -280,6 +280,7 @@ const styles = StyleSheet.create({
   tagText: {
     color: '#fff',
     fontSize: width * 0.032,
+    paddingBottom: Platform.OS === 'ios' ? 0 : 3,
   },
   loadingContainer: {
     flex: 1,

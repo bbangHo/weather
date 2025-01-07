@@ -10,6 +10,7 @@ import RegisterProfileScreen from './src/screens/RegisterProfileScreen';
 import PostCreationScreen from './src/screens/PostCreationScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
+import TermsViewScreen from './src/screens/TermsViewScreen';
 import {StatusBar, Image, Platform, View, StyleSheet} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -28,20 +29,31 @@ const AuthStack = ({setIsLoggedIn, setAccessToken, setIsNewMember}) => (
         />
       )}
     </Stack.Screen>
-    <Stack.Screen
-      name="TermsAgreementScreen"
-      component={TermsAgreementScreen}
-    />
-    <Stack.Screen
-      name="RegisterProfileScreen"
-      component={RegisterProfileScreen}
-    />
+    <Stack.Screen name="TermsAgreementScreen">
+      {props => (
+        <TermsAgreementScreen
+          {...props}
+          setIsLoggedIn={setIsLoggedIn}
+          setAccessToken={setAccessToken}
+          setIsNewMember={setIsNewMember}
+        />
+      )}
+    </Stack.Screen>
+    <Stack.Screen name="RegisterProfileScreen">
+      {props => (
+        <RegisterProfileScreen
+          {...props}
+          setIsNewMember={setIsNewMember}
+          setIsLoggedIn={setIsLoggedIn}
+        />
+      )}
+    </Stack.Screen>
   </Stack.Navigator>
 );
 
 const HomeStack = ({accessToken}) => (
   <Stack.Navigator screenOptions={{headerShown: false}}>
-    <Stack.Screen name="Home">
+    <Stack.Screen name="HomeScreen">
       {props => <HomeScreen {...props} accessToken={accessToken} />}
     </Stack.Screen>
     <Stack.Screen name="PostCreationScreen">
@@ -73,6 +85,7 @@ const MyStack = ({
     <Stack.Screen name="ProfileScreen">
       {props => <ProfileScreen {...props} accessToken={accessToken} />}
     </Stack.Screen>
+    <Stack.Screen name="TermsViewScreen" component={TermsViewScreen} />
   </Stack.Navigator>
 );
 
@@ -96,6 +109,12 @@ const App = () => {
     checkLoginStatus();
   }, []);
 
+  useEffect(() => {
+    console.log(
+      `현재 상태: isLoggedIn=${isLoggedIn}, isNewMember=${isNewMember}`,
+    );
+  }, [isLoggedIn, isNewMember]);
+
   if (isAutoLoggingIn) {
     return <View style={styles.autoLoginBackground} />;
   }
@@ -117,12 +136,14 @@ const App = () => {
                     {...props}
                     accessToken={accessToken}
                     setIsNewMember={setIsNewMember}
+                    setIsLoggedIn={setIsLoggedIn}
                   />
                 )}
               </Stack.Screen>
             </Stack.Navigator>
           ) : (
             <Tab.Navigator
+              initialRouteName="Home"
               screenOptions={({route}) => ({
                 headerShown: false,
                 tabBarIcon: ({focused, color}) => {
@@ -168,8 +189,7 @@ const App = () => {
                   fontSize: Platform.OS === 'ios' ? 10 : 12,
                   paddingBottom: Platform.OS === 'ios' ? 18 : 10,
                 },
-              })}
-              initialRouteName="HomeStack">
+              })}>
               <Tab.Screen
                 name="HomeStack"
                 options={{
