@@ -37,7 +37,7 @@ public class Member extends BaseEntity {
     @ColumnDefault("'basic.png'")
     private String profileImageName;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location_id")
     private Location location;
 
