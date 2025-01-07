@@ -60,8 +60,17 @@ public class MemberControllerV1 {
                                             @RequestBody(required = false) Map<String, String> authInfo) {
 
         Map<String, Object> memberInfo = getMemberInfoFromAuth(authorization);
-        memberService.deleteMember(memberInfo, authInfo.get("authenticationCode"));
+
+        addAuthCodeToMemberInfo(authInfo, memberInfo);
+
+        memberService.deleteMember(memberInfo);
 
         return ApiResponse.onSuccess();
+    }
+
+    private void addAuthCodeToMemberInfo(Map<String, String> authInfo, Map<String, Object> memberInfo) {
+        if (authInfo != null && authInfo.get("authenticationCode") != null) {
+            memberInfo.put("authenticationCode", authInfo.get("authenticationCode"));
+        }
     }
 }

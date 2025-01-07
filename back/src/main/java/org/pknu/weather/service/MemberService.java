@@ -86,16 +86,21 @@ public class MemberService {
     }
 
     @Transactional
-    public void deleteMember(Map<String, Object> memberInfo, String authenticationCode){
+    public void deleteMember(Map<String, Object> memberInfo){
+
+        deleteMemberFromDB(memberInfo);
 
         String type = String.valueOf(memberInfo.get("type"));
 
         if (type.equals("kakao")) {
             kakaoUnlinker.unlinkUser(String.valueOf(memberInfo.get("kakaoId")));
         } else if (type.equals("apple")) {
-            appleUnlinker.unlinkUser(authenticationCode);
+            appleUnlinker.unlinkUser(String.valueOf(memberInfo.get("authenticationCode")));
         }
 
+    }
+
+    private void deleteMemberFromDB(Map<String, Object> memberInfo) {
         Member member = memberRepository.findMemberByEmail(String.valueOf(memberInfo.get("email")))
                 .orElseThrow(() -> new GeneralException(ErrorStatus._MEMBER_NOT_FOUND));
 
