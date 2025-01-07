@@ -1,5 +1,5 @@
 package org.pknu.weather.repository;
-/*
+
 import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -62,4 +62,4 @@ class PostCustomRepositoryTest {
     }
 }
 
- */
+ 
