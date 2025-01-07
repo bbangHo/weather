@@ -619,6 +619,7 @@ export const submitAddress = async (accessToken, province, city, street) => {
   }
 };
 
+/*
 export const deleteMember = async (
   accessToken,
   loginMethod,
@@ -649,6 +650,69 @@ export const deleteMember = async (
       const errorResponse = await response.json();
       console.error('Failed to delete member:', errorResponse);
       throw new Error('Failed to delete member');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error Deleting member:', error);
+    throw error;
+  }
+};
+*/
+
+export const deleteMember = async (
+  accessToken,
+  loginMethod,
+  authenticationCode = null,
+) => {
+  const url = `${BASE_URL}/api/v1/member`;
+
+  console.log('Attempting to delete member with API:', url);
+  console.log('Authorization header:', `Bearer ${accessToken}`);
+  console.log('Login method:', loginMethod);
+
+  if (!['apple', 'kakao'].includes(loginMethod)) {
+    console.error('Invalid login method:', loginMethod);
+    throw new Error('유효하지 않은 로그인 방식입니다.');
+  }
+
+  try {
+    const options = {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    };
+
+    if (loginMethod === 'apple' && authenticationCode) {
+      options.body = JSON.stringify({authenticationCode});
+    }
+
+    console.log('Request details:', {
+      url,
+      headers: options.headers,
+      method: options.method,
+      body: options.body || null,
+    });
+
+    const response = await fetch(url, options);
+
+    if (!response.ok) {
+      const errorResponse = await response.json();
+      console.error('Failed to delete member:', errorResponse);
+
+      if (response.status === 400) {
+        throw new Error('잘못된 요청입니다.');
+      } else if (response.status === 401) {
+        throw new Error('인증 정보가 유효하지 않습니다.');
+      } else if (response.status === 403) {
+        throw new Error('권한이 없습니다.');
+      } else if (response.status >= 500) {
+        throw new Error('서버 에러가 발생했습니다. 관리자에게 문의하세요.');
+      } else {
+        throw new Error('알 수 없는 에러가 발생했습니다.');
+      }
     }
 
     return await response.json();
