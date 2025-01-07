@@ -17,7 +17,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-const AuthStack = ({setIsLoggedIn, setAccessToken, setIsNewMember}) => (
+const AuthStack = ({
+  setIsLoggedIn,
+  setAccessToken,
+  setIsNewMember,
+  setIsDeleted,
+}) => (
   <Stack.Navigator screenOptions={{headerShown: false}}>
     <Stack.Screen name="LoginScreen">
       {props => (
@@ -26,6 +31,7 @@ const AuthStack = ({setIsLoggedIn, setAccessToken, setIsNewMember}) => (
           setIsLoggedIn={setIsLoggedIn}
           setAccessToken={setAccessToken}
           setIsNewMember={setIsNewMember}
+          setIsDeleted={setIsDeleted}
         />
       )}
     </Stack.Screen>
@@ -68,6 +74,7 @@ const MyStack = ({
   setLocationId,
   setIsLoggedIn,
   setAccessToken,
+  setIsDeleted,
 }) => (
   <Stack.Navigator screenOptions={{headerShown: false}}>
     <Stack.Screen name="MyScreen">
@@ -79,6 +86,7 @@ const MyStack = ({
           setLocationId={setLocationId}
           setIsLoggedIn={setIsLoggedIn}
           setAccessToken={setAccessToken}
+          setIsDeleted={setIsDeleted}
         />
       )}
     </Stack.Screen>
@@ -95,6 +103,7 @@ const App = () => {
   const [accessToken, setAccessToken] = useState(null);
   const [isNewMember, setIsNewMember] = useState(false);
   const [locationId, setLocationId] = useState(null);
+  const [isDeleted, setIsDeleted] = useState(false);
 
   useEffect(() => {
     const checkLoginStatus = async () => {
@@ -111,12 +120,25 @@ const App = () => {
 
   useEffect(() => {
     console.log(
-      `현재 상태: isLoggedIn=${isLoggedIn}, isNewMember=${isNewMember}`,
+      `현재 상태: isLoggedIn=${isLoggedIn}, isNewMember=${isNewMember}, isDeleted=${isDeleted}`,
     );
-  }, [isLoggedIn, isNewMember]);
+  }, [isLoggedIn, isNewMember, isDeleted]);
 
   if (isAutoLoggingIn) {
     return <View style={styles.autoLoginBackground} />;
+  }
+
+  if (isDeleted) {
+    return (
+      <NavigationContainer>
+        <AuthStack
+          setIsLoggedIn={setIsLoggedIn}
+          setAccessToken={setAccessToken}
+          setIsNewMember={setIsNewMember}
+          setIsDeleted={setIsDeleted}
+        />
+      </NavigationContainer>
+    );
   }
 
   return (
@@ -219,6 +241,7 @@ const App = () => {
                     setLocationId={setLocationId}
                     setIsLoggedIn={setIsLoggedIn}
                     setAccessToken={setAccessToken}
+                    setIsDeleted={setIsDeleted}
                   />
                 )}
               </Tab.Screen>
@@ -229,6 +252,7 @@ const App = () => {
             setIsLoggedIn={setIsLoggedIn}
             setAccessToken={setAccessToken}
             setIsNewMember={setIsNewMember}
+            setIsDeleted={setIsDeleted}
           />
         )}
       </NavigationContainer>

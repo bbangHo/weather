@@ -10,12 +10,14 @@ import {
   Alert,
   Dimensions,
   Linking,
+  Platform,
 } from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
 import {fetchMemberInfo, deleteMember} from '../api/api';
 import profilePlaceholder from '../../assets/images/profile.png';
 import {logout} from '@react-native-seoul/kakao-login';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import appleAuth from '@invertase/react-native-apple-authentication';
 
 const {width, height} = Dimensions.get('window');
 
@@ -25,6 +27,7 @@ const MyScreen = ({
   setLocationId,
   setIsLoggedIn,
   setAccessToken,
+  setIsDeleted,
   navigation,
 }) => {
   const [nickname, setNickname] = useState('');
@@ -82,39 +85,55 @@ const MyScreen = ({
   );
 
   const handleLogout = async () => {
-    try {
-      const loginMethod = await AsyncStorage.getItem('loginMethod');
-      console.log('Current login method:', loginMethod);
+    Alert.alert(
+      '로그아웃',
+      '로그아웃 하시겠습니까?',
+      [
+        {
+          text: '취소',
+          style: 'cancel',
+        },
+        {
+          text: '확인',
+          onPress: async () => {
+            try {
+              const loginMethod = await AsyncStorage.getItem('loginMethod');
+              console.log('Current login method:', loginMethod);
 
-      if (loginMethod === 'kakao') {
-        console.log('Performing Kakao logout...');
-        await logout();
-      } else if (loginMethod === 'apple') {
-        console.log('Performing Apple logout...');
-        console.log('Apple logout logic executed.');
-      }
+              if (loginMethod === 'kakao') {
+                console.log('Performing Kakao logout...');
+                await logout();
+              } else if (loginMethod === 'apple') {
+                console.log('Performing Apple logout...');
+                console.log('Apple logout logic executed.');
+              }
 
-      setAccessToken(null);
-      setIsLoggedIn(false);
+              setAccessToken(null);
+              setIsLoggedIn(false);
 
-      await AsyncStorage.removeItem('accessToken');
-      await AsyncStorage.removeItem('refreshToken');
-      await AsyncStorage.removeItem('loginMethod');
+              await AsyncStorage.removeItem('accessToken');
+              await AsyncStorage.removeItem('refreshToken');
+              await AsyncStorage.removeItem('loginMethod');
 
-      navigation.replace('LoginScreen');
-      console.log('Logout successful');
-    } catch (err) {
-      console.error('Logout failed:', err.message);
-      Alert.alert('로그아웃', '메인 화면으로 이동합니다.');
-      setAccessToken(null);
-      setIsLoggedIn(false);
+              navigation.replace('LoginScreen');
+              console.log('Logout successful');
+            } catch (err) {
+              console.error('Logout failed:', err.message);
+              Alert.alert('로그아웃', '메인 화면으로 이동합니다.');
+              setAccessToken(null);
+              setIsLoggedIn(false);
 
-      await AsyncStorage.removeItem('accessToken');
-      await AsyncStorage.removeItem('refreshToken');
-      await AsyncStorage.removeItem('loginMethod');
+              await AsyncStorage.removeItem('accessToken');
+              await AsyncStorage.removeItem('refreshToken');
+              await AsyncStorage.removeItem('loginMethod');
 
-      navigation.replace('LoginScreen');
-    }
+              navigation.replace('LoginScreen');
+            }
+          },
+        },
+      ],
+      {cancelable: true},
+    );
   };
 
   const handleDeleteAccount = async () => {
@@ -130,13 +149,26 @@ const MyScreen = ({
       let authenticationCode = null;
 
       if (loginMethod === 'apple') {
-        authenticationCode = await AsyncStorage.getItem('authenticationCode');
-        console.log('Stored Apple authenticationCode:', authenticationCode);
+        try {
+          const appleCredential = await appleAuth.performRequest({
+            requestedOperation: appleAuth.Operation.LOGIN,
+            requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+          });
 
-        if (!authenticationCode) {
+          authenticationCode = appleCredential.authorizationCode;
+
+          if (!authenticationCode) {
+            Alert.alert(
+              '오류',
+              'Apple 인증 코드가 유효하지 않습니다. 다시 시도해주세요.',
+            );
+            return;
+          }
+        } catch (error) {
+          console.error('Apple authentication error:', error);
           Alert.alert(
-            '오류',
-            '애플 인증 코드가 존재하지 않습니다. 다시 로그인 후 시도해주세요.',
+            'Apple 로그인 실패',
+            '회원 탈퇴를 원하시면 로그인이 필요합니다.',
           );
           return;
         }
@@ -157,15 +189,15 @@ const MyScreen = ({
                   authenticationCode,
                 );
                 Alert.alert('탈퇴 완료', '회원 탈퇴가 완료되었습니다.');
-                setIsNewMember(true);
-                setIsLoggedIn(false);
 
-                await AsyncStorage.removeItem('accessToken');
-                await AsyncStorage.removeItem('refreshToken');
-                await AsyncStorage.removeItem('loginMethod');
-                await AsyncStorage.removeItem('authenticationCode');
+                await AsyncStorage.multiRemove([
+                  'accessToken',
+                  'refreshToken',
+                  'loginMethod',
+                  'appleUserId',
+                ]);
 
-                navigation.replace('LoginScreen');
+                setIsDeleted(true);
               } catch (error) {
                 console.error('Failed to delete member:', error);
                 Alert.alert(
