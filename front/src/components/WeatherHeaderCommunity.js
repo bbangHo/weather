@@ -12,7 +12,7 @@ import {fetchUserLocation, fetchWeatherData} from '../api/api';
 
 const {width, height} = Dimensions.get('window');
 
-const WeatherHeaderCommunity = ({accessToken}) => {
+const WeatherHeaderCommunity = ({accessToken, refreshing}) => {
   const [userLocation, setUserLocation] = useState({city: '', street: ''});
   const [weatherData, setWeatherData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -43,39 +43,40 @@ const WeatherHeaderCommunity = ({accessToken}) => {
     });
   };
 
+  const loadData = async () => {
+    try {
+      const location = await fetchUserLocation(accessToken);
+      const weather = await fetchWeatherData(accessToken);
+
+      setUserLocation({
+        city: location?.city || '',
+        street: location?.street || '',
+      });
+      setWeatherData(weather?.result || null);
+      updateBackgroundColors(weather?.result || null);
+    } catch (error) {
+      console.error('Error fetching data:', error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const location = await fetchUserLocation(accessToken);
-        const weather = await fetchWeatherData(accessToken);
-
-        setUserLocation({
-          city: location?.city || '',
-          street: location?.street || '',
-        });
-        setWeatherData(weather?.result || null);
-      } catch (error) {
-        console.error('Error fetching data:', error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadData();
 
     const interval = setInterval(() => {
       console.log('Refreshing community weather data...');
       loadData();
-    }, 60000);
+    }, 300000);
 
     return () => clearInterval(interval);
   }, [accessToken]);
 
   useEffect(() => {
-    if (weatherData) {
-      updateBackgroundColors(weatherData);
+    if (refreshing) {
+      loadData();
     }
-  }, [weatherData]);
+  }, [refreshing]);
 
   const updateBackgroundColors = data => {
     if (isNightTime()) {

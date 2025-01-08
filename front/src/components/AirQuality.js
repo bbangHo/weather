@@ -136,7 +136,6 @@ const styles = StyleSheet.create({
   shadowContainer: {
     width: width * 0.46,
     borderRadius: 10,
-    backgroundColor: '#fff',
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,

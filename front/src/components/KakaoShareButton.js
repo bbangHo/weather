@@ -121,6 +121,7 @@ const styles = StyleSheet.create({
   shadowContainer: {
     width: width * 0.94,
     borderRadius: 8,
+    backgroundColor: '#fff',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
