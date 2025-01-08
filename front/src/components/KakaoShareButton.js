@@ -1,9 +1,12 @@
 import React, {useState, useEffect} from 'react';
-import {View, StyleSheet, Alert} from 'react-native';
-import {Button, Card} from 'react-native-elements';
+import {View, StyleSheet, Alert, Dimensions, Platform} from 'react-native';
+import {Button} from 'react-native-elements';
+import LinearGradient from 'react-native-linear-gradient';
 import globalStyles from '../globalStyles';
 import KakaoShareLink from 'react-native-kakao-share-link';
 import {fetchWeatherData, fetchRainForecast} from '../api/api';
+
+const {width} = Dimensions.get('window');
 
 const KakaoShareButton = ({accessToken}) => {
   const [weatherInfo, setWeatherInfo] = useState(null);
@@ -64,8 +67,8 @@ const KakaoShareButton = ({accessToken}) => {
     try {
       const response = await KakaoShareLink.sendFeed({
         content: {
-          title: `${city} ${street} 날씨입니다 ~`,
-          description: `현재 ${currentTmp}°C\n${rainComment}\n최고 ${maxTmp}°, 최저 ${minTmp}°`,
+          title: `${weatherEmoji} ${city} ${street} 날씨를 확인하세요!`,
+          description: `현재 ${currentTmp}°C   (↑)${maxTmp}° (↓)${minTmp}°\n${rainComment} ${weatherEmoji}`,
           imageUrl: 'https:이미지 추가할 경우.png',
           link: {
             mobileWebUrl: 'https://링크 추가.com',
@@ -74,7 +77,7 @@ const KakaoShareButton = ({accessToken}) => {
         },
         buttons: [
           {
-            title: '모바일 앱에서 확인해 보세요.',
+            title: '날씨요정 앱에서 확인해 보세요.',
             link: {
               mobileWebUrl: 'https://링크 추가.com',
               webUrl: 'https://링크 추가.com',
@@ -93,37 +96,52 @@ const KakaoShareButton = ({accessToken}) => {
 
   return (
     <View style={styles.container}>
-      <Card containerStyle={[globalStyles.transparentBackground, styles.card]}>
-        <Button
-          title="카카오톡으로 날씨 공유하기"
-          onPress={shareWeatherInfo}
-          buttonStyle={styles.button}
-          titleStyle={styles.buttonTitle}
-        />
-      </Card>
+      <View style={styles.shadowContainer}>
+        <LinearGradient
+          colors={['#FDFCF0', '#FDFAF0']}
+          style={styles.gradientButton}>
+          <Button
+            title="카카오톡 친구에게 날씨 공유하기"
+            onPress={shareWeatherInfo}
+            buttonStyle={styles.button}
+            titleStyle={styles.buttonTitle}
+          />
+        </LinearGradient>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    paddingHorizontal: 10,
+    alignItems: 'center',
+    marginTop: 5,
+    marginBottom: 30,
   },
-  card: {
-    borderRadius: 10,
-    borderColor: 'rgba(255, 255, 255, 0)',
-    padding: 0,
-    paddingHorizontal: 10,
-    paddingVertical: Platform.OS === 'ios' ? 1 : 3,
+  shadowContainer: {
+    width: width * 0.94,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  gradientButton: {
+    borderRadius: 8,
+    padding: 1,
   },
   button: {
     backgroundColor: 'transparent',
-    paddingHorizontal: 10,
+    borderRadius: 8,
+    height: 50,
   },
   buttonTitle: {
-    fontSize: 14,
+    fontSize: 15,
+    color: Platform.OS === 'ios' ? '#6B7280' : '#6B7280',
   },
 });
 

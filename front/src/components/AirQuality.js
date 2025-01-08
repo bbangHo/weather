@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'column',
     justifyContent: 'center',
-    marginTop: 10,
+    marginTop: Platform.OS === 'ios' ? 8 : 8,
   },
   row: {
     flexDirection: 'row',
@@ -139,9 +139,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.12,
-    shadowRadius: 6,
-    elevation: 3,
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
   },
   box: {
     height: 77,

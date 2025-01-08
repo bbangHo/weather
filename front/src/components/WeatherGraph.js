@@ -10,10 +10,11 @@ import Svg, {Path, Circle, Text as SvgText, Rect} from 'react-native-svg';
 import {fetchWeatherData} from '../api/api';
 
 const {width, height} = Dimensions.get('window');
-const graphWidth = width - 40;
-const graphHeight = 160;
-
 const aspectRatio = height / width;
+
+const graphWidth = aspectRatio < 2.09999 ? width * 1.1 : width * 0.95;
+
+const graphHeight = 160;
 
 const WeatherGraph = ({accessToken}) => {
   const [temperatureData, setTemperatureData] = useState([]);
@@ -31,7 +32,7 @@ const WeatherGraph = ({accessToken}) => {
 
           const tempData = weatherData.result.weatherPerHourList
             .slice(0, 12)
-            .map(item => ({
+            .map((item, index) => ({
               hour: item.hour || '',
               tmp: item.tmp ?? 0,
             }));
@@ -95,12 +96,19 @@ const WeatherGraph = ({accessToken}) => {
   }
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        aspectRatio < 2.09999 && {
+          paddingTop: 20,
+          paddingBottom: -10,
+        },
+      ]}>
       <Svg height={graphHeight} width={graphWidth}>
         <Rect
-          x="20"
+          x="10"
           y="20"
-          width={graphWidth - 40}
+          width={graphWidth - 20}
           height={graphHeight - 40}
           fill="#fff"
           rx="10"
@@ -166,13 +174,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginHorizontal: 10,
     marginTop: 10,
-    marginBottom: 20,
-    paddingVertical: 5,
+    marginBottom: 10,
+    paddingVertical: 10,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 6},
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
-    shadowRadius: 15,
-    elevation: 6,
+    shadowRadius: 4,
+    elevation: 4,
   },
   loadingContainer: {
     flex: 1,

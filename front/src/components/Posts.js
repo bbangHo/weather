@@ -140,7 +140,7 @@ const Posts = ({accessToken, refreshing}) => {
       showsHorizontalScrollIndicator={false}
       ItemSeparatorComponent={() => <View style={{width: 5}} />}
       ListFooterComponent={
-        <View style={styles.shadowContainer}>
+        <View style={styles.footerShadowContainer}>
           <View style={styles.card}>
             <TouchableOpacity
               style={styles.moreContainer}
@@ -158,11 +158,28 @@ const styles = StyleSheet.create({
   shadowContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    width: width * 0.94,
+    width: width * 0.92,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    marginTop: 10,
+    marginBottom: 5,
+    marginLeft: 10,
+    marginRight: -3,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  footerShadowContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: width * 0.92,
     backgroundColor: '#fff',
     borderRadius: 10,
     marginVertical: 10,
-    marginHorizontal: 10,
+    marginLeft: 15,
+    marginRight: 10,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,

@@ -87,15 +87,31 @@ const WeatherHeaderCommunity = ({accessToken}) => {
   };
 
   const getWeatherIcon = currentSkyType => {
-    switch (currentSkyType) {
-      case 'CLEAR':
-        return require('../../assets/images/icon_clear.png');
-      case 'PARTLYCLOUDY':
-        return require('../../assets/images/icon_partlycloudy.png');
-      case 'CLOUDY':
-        return require('../../assets/images/icon_cloudy.png');
-      default:
-        return require('../../assets/images/icon_cloudy.png');
+    const currentHour = new Date().getHours();
+    const isNight = currentHour >= 18 || currentHour < 6;
+
+    if (isNight) {
+      switch (currentSkyType) {
+        case 'CLEAR':
+          return require('../../assets/images/icon_clearNight.png');
+        case 'PARTLYCLOUDY':
+          return require('../../assets/images/icon_partlycloudyNight.png');
+        case 'CLOUDY':
+          return require('../../assets/images/icon_cloudyNight.png');
+        default:
+          return require('../../assets/images/icon_cloudyNight.png');
+      }
+    } else {
+      switch (currentSkyType) {
+        case 'CLEAR':
+          return require('../../assets/images/icon_clear.png');
+        case 'PARTLYCLOUDY':
+          return require('../../assets/images/icon_partlycloudy.png');
+        case 'CLOUDY':
+          return require('../../assets/images/icon_cloudy.png');
+        default:
+          return require('../../assets/images/icon_cloudy.png');
+      }
     }
   };
 

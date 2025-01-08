@@ -15,7 +15,7 @@ import HourlyForecast from '../components/HourlyForecast';
 import AirQuality from '../components/AirQuality';
 import WeatherGraph from '../components/WeatherGraph';
 import Posts from '../components/Posts';
-import ToggleViewButton from '../components/ToggleViewButton';
+import KakaoShareButton from '../components/KakaoShareButton';
 import globalStyles from '../globalStyles';
 import {fetchWeatherData} from '../api/api';
 
@@ -82,18 +82,19 @@ const HomeScreen = ({accessToken, navigation}) => {
   return (
     <View style={globalStyles.container}>
       <StatusBar hidden={true} />
-      <WeatherHeader accessToken={accessToken} onToggleChange={setShowText} />
+      <View>
+        <WeatherHeader accessToken={accessToken} onToggleChange={setShowText} />
+        <Posts accessToken={accessToken} refreshing={refreshing} />
+      </View>
 
       <ScrollView
-        style={globalStyles.container}
+        style={styles.scrollView}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
             onRefresh={() => loadData(true)}
           />
         }>
-        <Posts accessToken={accessToken} refreshing={refreshing} />
-        <ToggleViewButton showText={showText} setShowText={setShowText} />
         <HourlyForecast
           accessToken={accessToken}
           showText={showText}
@@ -101,6 +102,7 @@ const HomeScreen = ({accessToken, navigation}) => {
         />
         <AirQuality accessToken={accessToken} refreshing={refreshing} />
         <WeatherGraph accessToken={accessToken} refreshing={refreshing} />
+        <KakaoShareButton accessToken={accessToken} />
       </ScrollView>
 
       <TouchableOpacity
@@ -119,6 +121,9 @@ const HomeScreen = ({accessToken, navigation}) => {
 };
 
 const styles = StyleSheet.create({
+  scrollView: {
+    flex: 1,
+  },
   floatingButton: {
     position: 'absolute',
     bottom: width * 0.05,
