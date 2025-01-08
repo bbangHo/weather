@@ -9,12 +9,14 @@ import org.pknu.weather.apiPayload.code.status.SuccessStatus;
 import org.pknu.weather.common.GlobalParams;
 import org.pknu.weather.common.converter.TokenConverter;
 import org.pknu.weather.service.MemberQueryService;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.net.InetAddress;
 import java.util.Map;
 
 
+@Order(0)
 @Aspect
 @Component
 @RequiredArgsConstructor
@@ -24,7 +26,7 @@ public class LocationCheckAspect {
     /**
      * 사용자가 지역을 등록했는지 확인하는 공통 로직
      *
-     * @param authorization
+     * @param authorization JWT 입니다.
      *
      * @return
      * @throws Throwable
