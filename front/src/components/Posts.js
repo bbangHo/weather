@@ -14,6 +14,9 @@ import {fetchPopularPosts, toggleLikePost} from '../api/api';
 
 const {width} = Dimensions.get('window');
 
+const CARD_WIDTH = width * 0.92;
+const CARD_MARGIN = 10;
+
 const Posts = ({accessToken, refreshing}) => {
   const navigation = useNavigation();
   const [newPosts, setNewPosts] = useState([]);
@@ -72,18 +75,22 @@ const Posts = ({accessToken, refreshing}) => {
   const getUserIcon = sensitivity => {
     switch (sensitivity) {
       case 'HOT':
-        return require('../../assets/images/icon_clear.png');
+        return require('../../assets/images/icon_weather_clear.png');
       case 'NONE':
-        return require('../../assets/images/icon_partlycloudy.png');
+        return require('../../assets/images/icon_weather_partlycloudy.png');
       case 'COLD':
-        return require('../../assets/images/icon_snow.png');
+        return require('../../assets/images/icon_weather_snow.png');
       default:
         return null;
     }
   };
 
-  const renderPost = ({item}) => (
-    <View style={styles.shadowContainer}>
+  const renderPost = ({item, index}) => (
+    <View
+      style={[
+        styles.shadowContainer,
+        index === 0 && {marginLeft: CARD_MARGIN * 0.5},
+      ]}>
       <View style={styles.card}>
         <View style={styles.header}>
           <Image
@@ -138,7 +145,11 @@ const Posts = ({accessToken, refreshing}) => {
       renderItem={renderPost}
       horizontal
       showsHorizontalScrollIndicator={false}
-      ItemSeparatorComponent={() => <View style={{width: 5}} />}
+      snapToInterval={CARD_WIDTH + CARD_MARGIN}
+      snapToAlignment="start"
+      decelerationRate="fast"
+      contentContainerStyle={{paddingHorizontal: CARD_MARGIN / 2}}
+      ItemSeparatorComponent={() => <View style={{width: CARD_MARGIN}} />}
       ListFooterComponent={
         <View style={styles.footerShadowContainer}>
           <View style={styles.card}>
@@ -158,13 +169,11 @@ const styles = StyleSheet.create({
   shadowContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    width: width * 0.92,
+    width: CARD_WIDTH,
     backgroundColor: '#fff',
     borderRadius: 10,
     marginTop: 10,
-    marginBottom: 5,
-    marginLeft: 10,
-    marginRight: -3,
+    marginBottom: 10,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
@@ -174,7 +183,7 @@ const styles = StyleSheet.create({
   footerShadowContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    width: width * 0.92,
+    width: CARD_WIDTH,
     backgroundColor: '#fff',
     borderRadius: 10,
     marginVertical: 10,

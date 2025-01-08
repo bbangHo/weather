@@ -28,27 +28,24 @@ const WeatherHeaderCommunity = ({accessToken}) => {
     return currentHour >= 18 || currentHour < 6;
   };
 
-  const isCloudyOrRainyCondition = () => {
-    if (!weatherData || !weatherData.weatherPerHourList) return false;
+  const isCloudyOrRainyCondition = data => {
+    if (!data || !data.weatherPerHourList) return false;
 
     const currentHour = new Date().getHours();
-    const dayConditions = weatherData.weatherPerHourList.filter(item => {
+    return data.weatherPerHourList.some(item => {
       const hour = new Date(item.hour).getHours();
-
-      if (hour > currentHour) return false;
       return (
-        hour >= 6 && hour < 18 && (item.skyType === 'CLOUDY' || item.rain > 0)
+        hour <= currentHour &&
+        hour >= 6 &&
+        hour < 18 &&
+        (item.skyType === 'CLOUDY' || item.rain > 0)
       );
     });
-
-    return dayConditions.length > 0;
   };
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        updateBackgroundColors();
-
         const location = await fetchUserLocation(accessToken);
         const weather = await fetchWeatherData(accessToken);
 
@@ -56,9 +53,7 @@ const WeatherHeaderCommunity = ({accessToken}) => {
           city: location?.city || '',
           street: location?.street || '',
         });
-        setWeatherData(weather?.result);
-
-        updateBackgroundColors(weather?.result);
+        setWeatherData(weather?.result || null);
       } catch (error) {
         console.error('Error fetching data:', error.message);
       } finally {
@@ -76,41 +71,53 @@ const WeatherHeaderCommunity = ({accessToken}) => {
     return () => clearInterval(interval);
   }, [accessToken]);
 
-  const updateBackgroundColors = (data = null) => {
+  useEffect(() => {
+    if (weatherData) {
+      updateBackgroundColors(weatherData);
+    }
+  }, [weatherData]);
+
+  const updateBackgroundColors = data => {
     if (isNightTime()) {
       setBackgroundColors(['#405063', '#1D2837', '#161B2C']);
-    } else if (data && isCloudyOrRainyCondition()) {
+    } else if (isCloudyOrRainyCondition(data)) {
       setBackgroundColors(['#a2c8db', '#8BAEBF', '#7998a6']);
     } else {
       setBackgroundColors(['#4e9cf5', '#498bf5', '#3f6be8', '#3564e8']);
     }
   };
 
-  const getWeatherIcon = currentSkyType => {
+  const getWeatherIcon = (currentSkyType, rain) => {
     const currentHour = new Date().getHours();
     const isNight = currentHour >= 18 || currentHour < 6;
+
+    if (rain > 0) {
+      return isNight
+        ? require('../../assets/images/icon_weather_rainNight.png')
+        : require('../../assets/images/icon_weather_rain.png');
+    }
 
     if (isNight) {
       switch (currentSkyType) {
         case 'CLEAR':
-          return require('../../assets/images/icon_clearNight.png');
+          return require('../../assets/images/icon_weather_clearNight.png');
         case 'PARTLYCLOUDY':
-          return require('../../assets/images/icon_partlycloudyNight.png');
+          return require('../../assets/images/icon_weather_partlycloudyNight.png');
         case 'CLOUDY':
-          return require('../../assets/images/icon_cloudyNight.png');
+          return require('../../assets/images/icon_weather_partlycloudyNight.png');
         default:
-          return require('../../assets/images/icon_cloudyNight.png');
+          return require('../../assets/images/icon_weather_clearNight.png');
       }
     } else {
       switch (currentSkyType) {
         case 'CLEAR':
-          return require('../../assets/images/icon_clear.png');
+          return require('../../assets/images/icon_weather_clear.png');
         case 'PARTLYCLOUDY':
-          return require('../../assets/images/icon_partlycloudy.png');
+          return require('../../assets/images/icon_weather_partlycloudy.png');
         case 'CLOUDY':
-          return require('../../assets/images/icon_cloudy.png');
+          return require('../../assets/images/icon_weather_cloudy.png');
         default:
-          return require('../../assets/images/icon_cloudy.png');
+          return require('../../assets/images/icon_weather_clear.png');
       }
     }
   };
@@ -144,7 +151,10 @@ const WeatherHeaderCommunity = ({accessToken}) => {
 
       <View style={styles.iconContainer}>
         <Image
-          source={getWeatherIcon(weatherData?.currentSkyType)}
+          source={getWeatherIcon(
+            weatherData?.currentSkyType,
+            weatherData?.rain || 0,
+          )}
           style={styles.weatherIcon}
           resizeMode="contain"
         />

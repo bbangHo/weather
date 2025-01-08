@@ -64,7 +64,7 @@ const HourlyForecast = ({accessToken, showText, refreshing}) => {
 
   const getWeatherIcon = (skyType, rain, hour) => {
     if (rain > 0) {
-      return require('../../assets/images/icon_rain.png');
+      return require('../../assets/images/icon_weather_rain.png');
     }
 
     const isNight = isNightTime(hour);
@@ -72,22 +72,22 @@ const HourlyForecast = ({accessToken, showText, refreshing}) => {
     if (isNight) {
       switch (skyType) {
         case 'CLEAR':
-          return require('../../assets/images/icon_clearNight.png');
+          return require('../../assets/images/icon_weather_clearNight.png');
         case 'PARTLYCLOUDY':
-          return require('../../assets/images/icon_partlycloudyNight.png');
+          return require('../../assets/images/icon_weather_partlycloudyNight.png');
         case 'CLOUDY':
-          return require('../../assets/images/icon_cloudyNight.png');
+          return require('../../assets/images/icon_weather_partlycloudyNight.png');
         default:
           return require('../../assets/images/icon_default.png');
       }
     } else {
       switch (skyType) {
         case 'CLEAR':
-          return require('../../assets/images/icon_clear.png');
+          return require('../../assets/images/icon_weather_clear.png');
         case 'PARTLYCLOUDY':
-          return require('../../assets/images/icon_partlycloudy.png');
+          return require('../../assets/images/icon_weather_partlycloudy.png');
         case 'CLOUDY':
-          return require('../../assets/images/icon_cloudy.png');
+          return require('../../assets/images/icon_weather_cloudy.png');
         default:
           return require('../../assets/images/icon_default.png');
       }
@@ -158,7 +158,6 @@ const styles = StyleSheet.create({
     marginTop: Math.abs(aspectRatio) < 2.1 ? -width * 0.13 : -width * 0.01,
     paddingRight: 10,
     marginRight: 10,
-    marginTop: 0,
   },
   shadowContainer: {
     marginLeft: width * 0.025,
