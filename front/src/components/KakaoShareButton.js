@@ -98,7 +98,7 @@ const KakaoShareButton = ({accessToken}) => {
     <View style={styles.container}>
       <View style={styles.shadowContainer}>
         <LinearGradient
-          colors={['#FDFCF0', '#FDFAF0']}
+          colors={['#FDFCF0', '#f5f4d0']}
           style={styles.gradientButton}>
           <Button
             title="카카오톡 친구에게 날씨 공유하기"
@@ -140,8 +140,9 @@ const styles = StyleSheet.create({
     height: 50,
   },
   buttonTitle: {
-    fontSize: 15,
+    fontSize: 14,
     color: Platform.OS === 'ios' ? '#6B7280' : '#6B7280',
+    fontWeight: 'bold',
   },
 });
 

@@ -20,7 +20,7 @@ const {width, height} = Dimensions.get('window');
 
 const WeatherHeader = ({accessToken, onToggleChange}) => {
   const [userLocation, setUserLocation] = useState({city: '', street: ''});
-  const [weatherData, setWeatherData] = useState({});
+  const [weatherData, setWeatherData] = useState(null);
   const [weatherTags, setWeatherTags] = useState([]);
   const [isToggled, setIsToggled] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -58,33 +58,17 @@ const WeatherHeader = ({accessToken, onToggleChange}) => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        console.log('Header data...');
-        updateBackgroundColors();
-
+        console.log('Loading header data...');
         const location = await fetchUserLocation(accessToken);
-        console.log('Header user location:', location);
-
         const weather = await fetchWeatherData(accessToken);
-        console.log('Header weather data:', weather);
-
-        try {
-          const tags = await fetchWeatherTags(accessToken);
-          console.log('Header weather tags:', tags);
-          if (Array.isArray(tags)) {
-            setWeatherTags(tags);
-          } else {
-            throw new Error('Invalid weather tags');
-          }
-        } catch (tagError) {
-          console.error('Error fetching weather tags:', tagError);
-          setWeatherTags([]);
-        }
+        const tags = await fetchWeatherTags(accessToken);
 
         setUserLocation({
           city: location?.city || '',
           street: location?.street || '',
         });
-        setWeatherData(weather?.result || {});
+        setWeatherData(weather?.result || null);
+        setWeatherTags(Array.isArray(tags) ? tags : []);
 
         const storedState = await AsyncStorage.getItem('switchState');
         if (storedState !== null) {
@@ -92,10 +76,8 @@ const WeatherHeader = ({accessToken, onToggleChange}) => {
           setIsToggled(parsedState);
           onToggleChange(parsedState);
         }
-
-        updateBackgroundColors(weather?.result);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching data:', error.message);
       } finally {
         setLoading(false);
       }
@@ -110,6 +92,12 @@ const WeatherHeader = ({accessToken, onToggleChange}) => {
 
     return () => clearInterval(interval);
   }, [accessToken, onToggleChange]);
+
+  useEffect(() => {
+    if (weatherData) {
+      updateBackgroundColors(weatherData);
+    }
+  }, [weatherData]);
 
   const updateBackgroundColors = (data = null) => {
     if (isNightTime()) {
@@ -128,31 +116,37 @@ const WeatherHeader = ({accessToken, onToggleChange}) => {
     await AsyncStorage.setItem('switchState', JSON.stringify(newState));
   };
 
-  const getWeatherIcon = currentSkyType => {
+  const getWeatherIcon = (currentSkyType, rain) => {
     const currentHour = new Date().getHours();
     const isNight = currentHour >= 18 || currentHour < 6;
+
+    if (rain > 0) {
+      return isNight
+        ? require('../../assets/images/icon_weather_rainNight.png')
+        : require('../../assets/images/icon_weather_rain.png');
+    }
 
     if (isNight) {
       switch (currentSkyType) {
         case 'CLEAR':
-          return require('../../assets/images/icon_clearNight.png');
+          return require('../../assets/images/icon_weather_clearNight.png');
         case 'PARTLYCLOUDY':
-          return require('../../assets/images/icon_partlycloudyNight.png');
+          return require('../../assets/images/icon_weather_partlycloudyNight.png');
         case 'CLOUDY':
-          return require('../../assets/images/icon_cloudyNight.png');
+          return require('../../assets/images/icon_weather_partlycloudyNight.png');
         default:
-          return require('../../assets/images/icon_cloudyNight.png');
+          return require('../../assets/images/icon_default.png');
       }
     } else {
       switch (currentSkyType) {
         case 'CLEAR':
-          return require('../../assets/images/icon_clear.png');
+          return require('../../assets/images/icon_weather_clear.png');
         case 'PARTLYCLOUDY':
-          return require('../../assets/images/icon_partlycloudy.png');
+          return require('../../assets/images/icon_weather_partlycloudy.png');
         case 'CLOUDY':
-          return require('../../assets/images/icon_cloudy.png');
+          return require('../../assets/images/icon_weather_cloudy.png');
         default:
-          return require('../../assets/images/icon_cloudy.png');
+          return require('../../assets/images/icon_default.png');
       }
     }
   };
@@ -200,7 +194,10 @@ const WeatherHeader = ({accessToken, onToggleChange}) => {
       </View>
 
       <Image
-        source={getWeatherIcon(weatherData?.currentSkyType)}
+        source={getWeatherIcon(
+          weatherData?.currentSkyType,
+          weatherData?.rain || 0,
+        )}
         style={styles.weatherIcon}
         resizeMode="contain"
       />

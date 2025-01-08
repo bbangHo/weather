@@ -104,11 +104,11 @@ const PostScroll = ({accessToken, refreshPosts, onRefreshComplete}) => {
   const getUserIcon = sensitivity => {
     switch (sensitivity) {
       case 'HOT':
-        return require('../../assets/images/icon_clear.png');
+        return require('../../assets/images/icon_weather_clear.png');
       case 'NONE':
-        return require('../../assets/images/icon_partlycloudy.png');
+        return require('../../assets/images/icon_weather_partlycloudy.png');
       case 'COLD':
-        return require('../../assets/images/icon_snow2.png');
+        return require('../../assets/images/icon_weather_snow.png');
       default:
         return null;
     }

@@ -31,26 +31,47 @@ const HomeScreen = ({accessToken, navigation}) => {
     return currentHour >= 18 || currentHour < 6;
   };
 
+  const determineBackgroundColor = weatherPerHourList => {
+    if (!weatherPerHourList || weatherPerHourList.length === 0) {
+      return isNightTime() ? '#1D2837' : '#3f7dfd';
+    }
+
+    const currentHour = new Date().getHours();
+
+    if (isNightTime()) {
+      return '#1D2837';
+    }
+
+    const closestWeather = weatherPerHourList.reduce((closest, item) => {
+      const itemHour = new Date(item.hour).getHours();
+      if (
+        !closest ||
+        Math.abs(itemHour - currentHour) <
+          Math.abs(new Date(closest.hour).getHours() - currentHour)
+      ) {
+        return item;
+      }
+      return closest;
+    }, null);
+
+    if (closestWeather?.rain > 0) {
+      return '#7998a6';
+    }
+
+    if (closestWeather?.skyType === 'CLOUDY') {
+      return '#7998a6';
+    }
+
+    return '#3f7dfd';
+  };
+
   const updateButtonBackgroundColor = async () => {
     try {
       const weatherData = await fetchWeatherData(accessToken);
-      const isCloudyOrRainy = weatherData?.result?.weatherPerHourList.some(
-        item => {
-          const hour = new Date(item.hour).getHours();
-          const currentHour = new Date().getHours();
-          return (
-            hour === currentHour && (item.skyType === 'CLOUDY' || item.rain > 0)
-          );
-        },
-      );
+      const weatherPerHourList = weatherData?.result?.weatherPerHourList || [];
 
-      if (isNightTime()) {
-        setButtonBackgroundColor('#1D2837');
-      } else if (isCloudyOrRainy) {
-        setButtonBackgroundColor('#7998a6');
-      } else {
-        setButtonBackgroundColor('#3f7dfd');
-      }
+      const newBackgroundColor = determineBackgroundColor(weatherPerHourList);
+      setButtonBackgroundColor(newBackgroundColor);
     } catch (error) {
       console.error('Error updating button background color:', error);
     }
@@ -82,10 +103,8 @@ const HomeScreen = ({accessToken, navigation}) => {
   return (
     <View style={globalStyles.container}>
       <StatusBar hidden={true} />
-      <View>
-        <WeatherHeader accessToken={accessToken} onToggleChange={setShowText} />
-        <Posts accessToken={accessToken} refreshing={refreshing} />
-      </View>
+
+      <WeatherHeader accessToken={accessToken} onToggleChange={setShowText} />
 
       <ScrollView
         style={styles.scrollView}
@@ -95,6 +114,7 @@ const HomeScreen = ({accessToken, navigation}) => {
             onRefresh={() => loadData(true)}
           />
         }>
+        <Posts accessToken={accessToken} refreshing={refreshing} />
         <HourlyForecast
           accessToken={accessToken}
           showText={showText}
