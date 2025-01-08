@@ -1,5 +1,5 @@
 package org.pknu.weather.domain;
-/*
+
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
@@ -38,5 +38,3 @@ class WeatherTest {
                         weather.getWindSpeed()));
     }
 }
-
- */
