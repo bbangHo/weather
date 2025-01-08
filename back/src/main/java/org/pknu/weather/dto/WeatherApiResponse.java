@@ -12,7 +12,20 @@ import java.util.List;
 public class WeatherApiResponse {
 
     @JsonProperty("response")
+    private Header header;
+
+    @JsonProperty("response")
     private Response response;
+
+    @Getter
+    @NoArgsConstructor
+    public static class Header {
+        @JsonProperty("resultCode")
+        private Integer resultCode;
+
+        @JsonProperty("resultMsg")
+        private String resultMsg;
+    }
 
     @Getter
     @NoArgsConstructor
