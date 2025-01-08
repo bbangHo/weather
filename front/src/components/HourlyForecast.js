@@ -11,46 +11,36 @@ import {
 } from 'react-native';
 import {Card} from 'react-native-elements';
 import globalStyles from '../globalStyles';
-import {fetchWeatherData} from '../api/api';
 
 const {width, height} = Dimensions.get('window');
-
 const aspectRatio = height / width;
 
-const HourlyForecast = ({accessToken, showText, refreshing}) => {
+const HourlyForecast = ({weatherData, showText, refreshing}) => {
   const [hourlyData, setHourlyData] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const getWeatherData = async () => {
-    try {
-      const weatherData = await fetchWeatherData(accessToken);
+  const loadData = () => {
+    if (
+      weatherData?.weatherPerHourList &&
+      weatherData.weatherPerHourList.length > 0
+    ) {
+      setHourlyData(weatherData.weatherPerHourList);
       console.log('Hourly Weather data:', JSON.stringify(weatherData, null, 2));
-      console.log('width / height = ', width, '/', height, '=', aspectRatio);
-
-      if (weatherData.isSuccess && weatherData.result?.weatherPerHourList) {
-        setHourlyData(weatherData.result.weatherPerHourList);
-      } else {
-        console.error('Failed to fetch weather data:', weatherData.message);
-        setHourlyData([]);
-      }
-    } catch (error) {
-      console.error('Error fetching weather data:', error.message);
+    } else {
       setHourlyData([]);
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   useEffect(() => {
-    getWeatherData();
+    loadData();
+  }, []);
 
-    const interval = setInterval(() => {
-      console.log('Updating hourly weather data...');
-      getWeatherData();
-    }, 300000);
-
-    return () => clearInterval(interval);
-  }, [accessToken, refreshing]);
+  useEffect(() => {
+    if (weatherData) {
+      loadData();
+    }
+  }, [weatherData]);
 
   const formatHour = isoString => {
     const date = new Date(isoString);
@@ -228,6 +218,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 5,
     marginBottom: -5,
+  },
+  loadingText: {
+    fontSize: 12,
+    color: '#999',
+    marginTop: 5,
+    textAlign: 'center',
   },
 });
 

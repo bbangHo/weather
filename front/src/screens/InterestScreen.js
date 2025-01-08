@@ -1,3 +1,4 @@
+/*
 import React, {useState, useEffect, useRef} from 'react';
 import {
   View,
@@ -188,3 +189,4 @@ const styles = StyleSheet.create({
 });
 
 export default InterestScreen;
+*/

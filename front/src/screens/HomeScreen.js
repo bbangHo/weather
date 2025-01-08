@@ -22,26 +22,33 @@ import {fetchWeatherData} from '../api/api';
 const {width, height} = Dimensions.get('window');
 
 const HomeScreen = ({accessToken, navigation}) => {
+  const [weatherData, setWeatherData] = useState(null);
   const [showText, setShowText] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [buttonBackgroundColor, setButtonBackgroundColor] = useState('#3f7dfd');
+
+  const fetchWeather = async () => {
+    try {
+      const data = await fetchWeatherData(accessToken);
+      setWeatherData(data.result);
+      updateButtonBackgroundColor(data.result?.weatherPerHourList || []);
+    } catch (error) {
+      console.error('Error fetching weather data:', error);
+    }
+  };
 
   const isNightTime = () => {
     const currentHour = new Date().getHours();
     return currentHour >= 18 || currentHour < 6;
   };
 
-  const determineBackgroundColor = weatherPerHourList => {
+  const updateButtonBackgroundColor = weatherPerHourList => {
     if (!weatherPerHourList || weatherPerHourList.length === 0) {
-      return isNightTime() ? '#1D2837' : '#3f7dfd';
+      setButtonBackgroundColor(isNightTime() ? '#1D2837' : '#3f7dfd');
+      return;
     }
 
     const currentHour = new Date().getHours();
-
-    if (isNightTime()) {
-      return '#1D2837';
-    }
-
     const closestWeather = weatherPerHourList.reduce((closest, item) => {
       const itemHour = new Date(item.hour).getHours();
       if (
@@ -54,49 +61,35 @@ const HomeScreen = ({accessToken, navigation}) => {
       return closest;
     }, null);
 
-    if (closestWeather?.rain > 0) {
-      return '#7998a6';
-    }
-
-    if (closestWeather?.skyType === 'CLOUDY') {
-      return '#7998a6';
-    }
-
-    return '#3f7dfd';
-  };
-
-  const updateButtonBackgroundColor = async () => {
-    try {
-      const weatherData = await fetchWeatherData(accessToken);
-      const weatherPerHourList = weatherData?.result?.weatherPerHourList || [];
-
-      const newBackgroundColor = determineBackgroundColor(weatherPerHourList);
-      setButtonBackgroundColor(newBackgroundColor);
-    } catch (error) {
-      console.error('Error updating button background color:', error);
+    if (isNightTime()) {
+      setButtonBackgroundColor('#1D2837');
+    } else if (
+      closestWeather?.rain > 0 ||
+      closestWeather?.skyType === 'CLOUDY'
+    ) {
+      setButtonBackgroundColor('#7998a6');
+    } else {
+      setButtonBackgroundColor('#3f7dfd');
     }
   };
 
-  const loadData = async (showRefreshIndicator = false) => {
-    if (showRefreshIndicator) {
-      setRefreshing(true);
-    }
-    await updateButtonBackgroundColor();
-    await new Promise(resolve => setTimeout(resolve, 1000));
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchWeather();
     setRefreshing(false);
   };
 
   useFocusEffect(
     useCallback(() => {
-      loadData(false);
+      fetchWeather();
     }, []),
   );
 
   useEffect(() => {
     const interval = setInterval(() => {
-      console.log('Updating button background color...');
-      updateButtonBackgroundColor();
-    }, 60000);
+      console.log('Refreshing weather data...');
+      fetchWeather();
+    }, 300000);
     return () => clearInterval(interval);
   }, [accessToken]);
 
@@ -104,26 +97,52 @@ const HomeScreen = ({accessToken, navigation}) => {
     <View style={globalStyles.container}>
       <StatusBar hidden={true} />
 
-      <WeatherHeader accessToken={accessToken} onToggleChange={setShowText} />
+      <WeatherHeader
+        accessToken={accessToken}
+        weatherData={weatherData}
+        onToggleChange={setShowText}
+      />
 
-      <ScrollView
-        style={styles.scrollView}
-        refreshControl={
-          <RefreshControl
+      {weatherData ? (
+        <ScrollView
+          style={styles.scrollView}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor="transparent"
+              colors={['#3f7dfd', '#ff5733', '#33ff57']}
+            />
+          }>
+          <Posts
+            accessToken={accessToken}
+            weatherData={weatherData}
             refreshing={refreshing}
-            onRefresh={() => loadData(true)}
           />
-        }>
-        <Posts accessToken={accessToken} refreshing={refreshing} />
-        <HourlyForecast
-          accessToken={accessToken}
-          showText={showText}
-          refreshing={refreshing}
-        />
-        <AirQuality accessToken={accessToken} refreshing={refreshing} />
-        <WeatherGraph accessToken={accessToken} refreshing={refreshing} />
-        <KakaoShareButton accessToken={accessToken} />
-      </ScrollView>
+          <HourlyForecast
+            accessToken={accessToken}
+            weatherData={weatherData}
+            showText={showText}
+            refreshing={refreshing}
+          />
+          <AirQuality
+            accessToken={accessToken}
+            weatherData={weatherData}
+            refreshing={refreshing}
+          />
+          <WeatherGraph
+            accessToken={accessToken}
+            weatherData={weatherData}
+            refreshing={refreshing}
+          />
+          <KakaoShareButton
+            accessToken={accessToken}
+            weatherData={weatherData}
+          />
+        </ScrollView>
+      ) : (
+        <View style={styles.emptyContainer} />
+      )}
 
       <TouchableOpacity
         style={[
@@ -142,6 +161,9 @@ const HomeScreen = ({accessToken, navigation}) => {
 
 const styles = StyleSheet.create({
   scrollView: {
+    flex: 1,
+  },
+  emptyContainer: {
     flex: 1,
   },
   floatingButton: {

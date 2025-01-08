@@ -10,17 +10,17 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradient from 'react-native-linear-gradient';
-import {
-  fetchUserLocation,
-  fetchWeatherData,
-  fetchWeatherTags,
-} from '../api/api';
+import {fetchUserLocation, fetchWeatherTags} from '../api/api';
 
 const {width, height} = Dimensions.get('window');
 
-const WeatherHeader = ({accessToken, onToggleChange}) => {
+const WeatherHeader = ({
+  accessToken,
+  weatherData,
+  onToggleChange,
+  refreshing,
+}) => {
   const [userLocation, setUserLocation] = useState({city: '', street: ''});
-  const [weatherData, setWeatherData] = useState(null);
   const [weatherTags, setWeatherTags] = useState([]);
   const [isToggled, setIsToggled] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -55,43 +55,40 @@ const WeatherHeader = ({accessToken, onToggleChange}) => {
     });
   };
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        console.log('Loading header data...');
-        const location = await fetchUserLocation(accessToken);
-        const weather = await fetchWeatherData(accessToken);
-        const tags = await fetchWeatherTags(accessToken);
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      const location = await fetchUserLocation(accessToken);
+      const tags = await fetchWeatherTags(accessToken);
 
-        setUserLocation({
-          city: location?.city || '',
-          street: location?.street || '',
-        });
-        setWeatherData(weather?.result || null);
-        setWeatherTags(Array.isArray(tags) ? tags : []);
+      setUserLocation({
+        city: location?.city || '',
+        street: location?.street || '',
+      });
+      setWeatherTags(Array.isArray(tags) ? tags : []);
 
-        const storedState = await AsyncStorage.getItem('switchState');
-        if (storedState !== null) {
-          const parsedState = JSON.parse(storedState);
-          setIsToggled(parsedState);
-          onToggleChange(parsedState);
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error.message);
-      } finally {
-        setLoading(false);
+      const storedState = await AsyncStorage.getItem('switchState');
+      if (storedState !== null) {
+        const parsedState = JSON.parse(storedState);
+        setIsToggled(parsedState);
+        onToggleChange(parsedState);
       }
-    };
+    } catch (error) {
+      console.error('Error fetching data:', error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     loadData();
+  }, [accessToken]);
 
-    const interval = setInterval(() => {
-      console.log('Refreshing weather data...');
+  useEffect(() => {
+    if (refreshing) {
       loadData();
-    }, 60000);
-
-    return () => clearInterval(interval);
-  }, [accessToken, onToggleChange]);
+    }
+  }, [refreshing, accessToken, onToggleChange]);
 
   useEffect(() => {
     if (weatherData) {
@@ -279,6 +276,13 @@ const styles = StyleSheet.create({
     right: width * 0.05,
     width: width * 0.22,
     height: width * 0.22,
+  },
+  tagsContainer: {
+    position: 'absolute',
+    bottom: 10,
+    left: 20,
+    flexDirection: 'row',
+    flexWrap: 'nowrap',
   },
   tagsContainer: {
     position: 'absolute',

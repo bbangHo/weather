@@ -1,3 +1,4 @@
+/*
 import React, {useState, useEffect} from 'react';
 import {
   View,
@@ -134,3 +135,4 @@ const styles = StyleSheet.create({
 });
 
 export default CurrentLocation;
+*/

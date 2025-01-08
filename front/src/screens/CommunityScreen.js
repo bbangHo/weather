@@ -93,14 +93,17 @@ const CommunityScreen = ({accessToken, navigation}) => {
     const interval = setInterval(() => {
       console.log('Updating button background color in CommunityScreen...');
       updateButtonBackgroundColor();
-    }, 60000);
+    }, 300000);
     return () => clearInterval(interval);
   }, [accessToken]);
 
   return (
     <View style={styles.container}>
       <StatusBar hidden={true} />
-      <WeatherHeaderCommunity accessToken={accessToken} />
+      <WeatherHeaderCommunity
+        accessToken={accessToken}
+        refreshing={refreshing}
+      />
 
       <ScrollView
         refreshControl={

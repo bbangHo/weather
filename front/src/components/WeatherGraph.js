@@ -7,7 +7,6 @@ import {
   Text,
 } from 'react-native';
 import Svg, {Path, Circle, Text as SvgText, Rect} from 'react-native-svg';
-import {fetchWeatherData} from '../api/api';
 
 const {width, height} = Dimensions.get('window');
 const aspectRatio = height / width;
@@ -16,40 +15,53 @@ const graphWidth = aspectRatio < 2.09999 ? width * 0.95 : width * 0.95;
 
 const graphHeight = 160;
 
-const WeatherGraph = ({accessToken}) => {
+const WeatherGraph = ({
+  accessToken,
+  weatherData = {weatherPerHourList: [], temperature: {}},
+  refreshing,
+  onRefreshComplete,
+}) => {
   const [temperatureData, setTemperatureData] = useState([]);
   const [maxTmp, setMaxTmp] = useState(0);
   const [minTmp, setMinTmp] = useState(0);
-  const [loading, setLoading] = useState(true);
+
+  const loadWeatherData = () => {
+    if (
+      weatherData &&
+      weatherData.weatherPerHourList?.length > 0 &&
+      weatherData.temperature
+    ) {
+      const {maxTmp, minTmp} = weatherData.temperature;
+      console.log('Fetched graph data:', weatherData.temperature);
+
+      const tempData = weatherData.weatherPerHourList
+        .slice(0, 12)
+        .map(item => ({
+          hour: item.hour || '',
+          tmp: item.tmp ?? 0,
+        }));
+
+      setMaxTmp(maxTmp ?? 0);
+      setMinTmp(minTmp ?? 0);
+      setTemperatureData(tempData);
+    } else if (weatherData) {
+      setTemperatureData([]);
+    }
+
+    if (onRefreshComplete) {
+      onRefreshComplete();
+    }
+  };
 
   useEffect(() => {
-    const getWeatherData = async () => {
-      try {
-        const weatherData = await fetchWeatherData(accessToken);
-        console.log('Fetched weather data:', weatherData);
-        if (weatherData.isSuccess) {
-          const {maxTmp, minTmp} = weatherData.result.temperature;
+    loadWeatherData();
+  }, [weatherData]);
 
-          const tempData = weatherData.result.weatherPerHourList
-            .slice(0, 12)
-            .map((item, index) => ({
-              hour: item.hour || '',
-              tmp: item.tmp ?? 0,
-            }));
-
-          setMaxTmp(maxTmp ?? 0);
-          setMinTmp(minTmp ?? 0);
-          setTemperatureData(tempData);
-        }
-      } catch (error) {
-        console.error('Error fetching weather data:', error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getWeatherData();
-  }, [accessToken]);
+  useEffect(() => {
+    if (refreshing) {
+      loadWeatherData();
+    }
+  }, [refreshing]);
 
   const getX = index => {
     if (!temperatureData.length) return 20;
@@ -79,18 +91,10 @@ const WeatherGraph = ({accessToken}) => {
     return `${date.getHours()}시`;
   };
 
-  if (loading) {
+  if (!temperatureData.length) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#999999" />
-      </View>
-    );
-  }
-
-  if (!temperatureData.length) {
-    return (
-      <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>불러올 데이터가 없습니다.</Text>
       </View>
     );
   }
