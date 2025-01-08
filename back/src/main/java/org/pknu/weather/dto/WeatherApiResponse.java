@@ -11,9 +11,6 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WeatherApiResponse {
 
-    @JsonProperty("header")
-    private Header header;
-
     @JsonProperty("response")
     private Header header;
 
