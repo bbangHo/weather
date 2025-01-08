@@ -15,7 +15,7 @@ public class Pointcuts {
     @Pointcut("execution(* org.pknu.weather.controller.LocationControllerV1.getMemberDefaultLocation(..))")
     public void getMemberDefaultLocationPointcut() {}
 
-    @Pointcut("execution(* org.pknu.weather.controller..*(..))")
+    @Pointcut("execution(* org.pknu.weather.controller..*.*(..))")
     public void controllerPointcut() {}
 
     @Pointcut("execution(* org.pknu.weather.service.*.*(..))")
@@ -27,11 +27,12 @@ public class Pointcuts {
     @Pointcut("execution(* org.pknu.weather.dto.converter.*.*(..))")
     public void converterPointcut() {}
 
+    @Pointcut("execution(* org.pknu.weather.feignClient..*.*(..))")
+    public void feignClientPointcut() {}
 
-    // 포인트컷 대상 : @Transactional 이 붙은 모든 메서드
     @Pointcut("@annotation(org.springframework.transaction.annotation.Transactional)")
     public void transactionalPointcut(){}
 
-    @Pointcut("controllerPointcut() || servicePointcut() || repositoryPointcut() || converterPointcut()")
-    public void commonLoggingPointcut(){}
+    @Pointcut("controllerPointcut() || servicePointcut()")
+    public void integrationLoggingPointcut(){}
 }
