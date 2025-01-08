@@ -58,19 +58,39 @@ const HourlyForecast = ({accessToken, showText, refreshing}) => {
     return `${hours}시`;
   };
 
-  const getWeatherIcon = (skyType, rain) => {
+  const isNightTime = hour => {
+    return hour >= 18 || hour < 6;
+  };
+
+  const getWeatherIcon = (skyType, rain, hour) => {
     if (rain > 0) {
       return require('../../assets/images/icon_rain.png');
     }
-    switch (skyType) {
-      case 'CLEAR':
-        return require('../../assets/images/icon_clear.png');
-      case 'PARTLYCLOUDY':
-        return require('../../assets/images/icon_partlycloudy.png');
-      case 'CLOUDY':
-        return require('../../assets/images/icon_cloudy.png');
-      default:
-        return require('../../assets/images/icon_default.png');
+
+    const isNight = isNightTime(hour);
+
+    if (isNight) {
+      switch (skyType) {
+        case 'CLEAR':
+          return require('../../assets/images/icon_clearNight.png');
+        case 'PARTLYCLOUDY':
+          return require('../../assets/images/icon_partlycloudyNight.png');
+        case 'CLOUDY':
+          return require('../../assets/images/icon_cloudyNight.png');
+        default:
+          return require('../../assets/images/icon_default.png');
+      }
+    } else {
+      switch (skyType) {
+        case 'CLEAR':
+          return require('../../assets/images/icon_clear.png');
+        case 'PARTLYCLOUDY':
+          return require('../../assets/images/icon_partlycloudy.png');
+        case 'CLOUDY':
+          return require('../../assets/images/icon_cloudy.png');
+        default:
+          return require('../../assets/images/icon_default.png');
+      }
     }
   };
 
@@ -96,7 +116,11 @@ const HourlyForecast = ({accessToken, showText, refreshing}) => {
                   <Text style={styles.textTime}>{formatHour(item.hour)}</Text>
 
                   <Image
-                    source={getWeatherIcon(item.skyType, item.rain)}
+                    source={getWeatherIcon(
+                      item.skyType,
+                      item.rain,
+                      new Date(item.hour).getHours(),
+                    )}
                     style={styles.icon}
                   />
 
@@ -131,7 +155,10 @@ const HourlyForecast = ({accessToken, showText, refreshing}) => {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: Math.abs(aspectRatio) < 2.1 ? -width * 0.13 : -width * 0.16,
+    marginTop: Math.abs(aspectRatio) < 2.1 ? -width * 0.13 : -width * 0.01,
+    paddingRight: 10,
+    marginRight: 10,
+    marginTop: 0,
   },
   shadowContainer: {
     marginLeft: width * 0.025,
@@ -141,8 +168,8 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOffset: {width: 1, height: 2},
     shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 6,
+    shadowRadius: 4,
+    elevation: 4,
   },
   card: {
     borderRadius: 12,
@@ -175,7 +202,7 @@ const styles = StyleSheet.create({
     width: 45,
     height: 45,
     marginBottom: -5,
-    marginTop: 8,
+    marginTop: 10,
   },
   rainAdverb: {
     fontSize: 11,

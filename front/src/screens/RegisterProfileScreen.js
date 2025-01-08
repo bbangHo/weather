@@ -382,6 +382,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   selectedButton: {
+    borderColor: '#2f5af4',
     backgroundColor: '#2f5af4',
   },
   selectedButtonText: {

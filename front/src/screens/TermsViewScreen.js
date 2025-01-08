@@ -35,7 +35,7 @@ const TermsViewScreen = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>약관 조회</Text>
+      <Text style={styles.header}>이용약관</Text>
       <View style={styles.separator} />
 
       <View style={styles.termsContainer}>
