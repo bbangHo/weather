@@ -293,13 +293,15 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 20,
     textAlignVertical: 'top',
+    color: '#333',
   },
   section: {
     marginBottom: 20,
   },
   label: {
-    fontSize: 16,
+    fontSize: Platform.OS === 'ios' ? 15 : 16,
     marginBottom: 10,
+    color: Platform.OS === 'ios' ? '#494949' : '#494949',
   },
   tagContainer: {
     flexDirection: 'row',

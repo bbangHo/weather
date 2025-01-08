@@ -129,15 +129,31 @@ const WeatherHeader = ({accessToken, onToggleChange}) => {
   };
 
   const getWeatherIcon = currentSkyType => {
-    switch (currentSkyType) {
-      case 'CLEAR':
-        return require('../../assets/images/icon_clear.png');
-      case 'PARTLYCLOUDY':
-        return require('../../assets/images/icon_partlycloudy.png');
-      case 'CLOUDY':
-        return require('../../assets/images/icon_cloudy.png');
-      default:
-        return require('../../assets/images/icon_cloudy.png');
+    const currentHour = new Date().getHours();
+    const isNight = currentHour >= 18 || currentHour < 6;
+
+    if (isNight) {
+      switch (currentSkyType) {
+        case 'CLEAR':
+          return require('../../assets/images/icon_clearNight.png');
+        case 'PARTLYCLOUDY':
+          return require('../../assets/images/icon_partlycloudyNight.png');
+        case 'CLOUDY':
+          return require('../../assets/images/icon_cloudyNight.png');
+        default:
+          return require('../../assets/images/icon_cloudyNight.png');
+      }
+    } else {
+      switch (currentSkyType) {
+        case 'CLEAR':
+          return require('../../assets/images/icon_clear.png');
+        case 'PARTLYCLOUDY':
+          return require('../../assets/images/icon_partlycloudy.png');
+        case 'CLOUDY':
+          return require('../../assets/images/icon_cloudy.png');
+        default:
+          return require('../../assets/images/icon_cloudy.png');
+      }
     }
   };
 
@@ -179,7 +195,7 @@ const WeatherHeader = ({accessToken, onToggleChange}) => {
         </View>
         <Text style={styles.temperature}>{weatherData?.currentTmp}°C</Text>
         <Text style={styles.feelsLike}>
-          체감 {weatherData?.currentSensibleTmp?.toFixed(2)}°C
+          체감 {weatherData?.currentSensibleTmp?.toFixed(1)}°C
         </Text>
       </View>
 
@@ -193,7 +209,12 @@ const WeatherHeader = ({accessToken, onToggleChange}) => {
         {weatherTags.length > 0 ? (
           weatherTags.map((tag, index) => (
             <View key={index} style={styles.tag}>
-              <Text style={styles.tagText}>{tag.text}</Text>
+              <Text
+                style={styles.tagText}
+                numberOfLines={1}
+                ellipsizeMode="tail">
+                {tag.text}
+              </Text>
             </View>
           ))
         ) : (
@@ -267,20 +288,22 @@ const styles = StyleSheet.create({
     bottom: 10,
     left: 20,
     flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexWrap: 'nowrap',
   },
   tag: {
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     borderRadius: 20,
     paddingVertical: 3,
     paddingHorizontal: 12,
-    marginRight: 10,
+    marginRight: 8,
     marginBottom: 5,
+    maxWidth: width * 0.4,
   },
   tagText: {
     color: '#fff',
-    fontSize: width * 0.032,
+    fontSize: width * 0.031,
     paddingBottom: Platform.OS === 'ios' ? 0 : 3,
+    overflow: 'hidden',
   },
   loadingContainer: {
     flex: 1,
