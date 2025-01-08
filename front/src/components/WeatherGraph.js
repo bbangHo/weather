@@ -12,7 +12,7 @@ import {fetchWeatherData} from '../api/api';
 const {width, height} = Dimensions.get('window');
 const aspectRatio = height / width;
 
-const graphWidth = aspectRatio < 2.09999 ? width * 1.1 : width * 0.95;
+const graphWidth = aspectRatio < 2.09999 ? width * 0.95 : width * 0.95;
 
 const graphHeight = 160;
 
