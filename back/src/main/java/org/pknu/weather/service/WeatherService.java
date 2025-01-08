@@ -1,12 +1,5 @@
 package org.pknu.weather.service;
 
-import static org.pknu.weather.dto.converter.LocationConverter.toLocationDTO;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
@@ -35,6 +28,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+
+import static org.pknu.weather.dto.converter.LocationConverter.toLocationDTO;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -51,7 +52,7 @@ public class WeatherService {
     private String weatherServiceKey;
 
     /**
-     * 사용자의 위도 경도 및 기타 정보를 받아와 Point(x, y)로 치환하고 weather로 반환한다.
+     * 사용자의 위도 경도 및 기타 정보를 받아와 weather로 반환한다.
      *
      * @return now ~ 24 시간의 Wether 엔티티를 담고있는 List
      * @Location 사용자 위치 엔티티
@@ -103,13 +104,15 @@ public class WeatherService {
         return weatherRepository.saveAll(weatherList);
     }
 
+    /**
+     * 날씨 정보를 저장합니다. 비동기적으로 동작합니다.
+     * @param loc member.getLocation()
+     * @param forecast 공공데이터 API에서 받아온 단기날씨예보 값 list
+     */
     @Async("threadPoolTaskExecutor")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void saveWeatherSynchronization(Location loc, List<Weather> forecast) {
-        Location location = locationRepository.findById(loc.getId()).get();
-        float lon = location.getLongitude().floatValue();
-        float lat = location.getLatitude().floatValue();
-
+    public void saveWeathersAsync(Location loc, List<Weather> forecast) {
+        Location location = locationRepository.safeFindById(loc.getId());
         List<Weather> weatherList = new ArrayList<>(forecast);
 
         weatherList.forEach(w -> w.addLocation(location));
@@ -124,7 +127,7 @@ public class WeatherService {
      */
     @Async("threadPoolTaskExecutor")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void updateWeathers(Location loc) {
+    public void updateWeathersAsync(Location loc) {
         Location location = locationRepository.safeFindById(loc.getId());
         weatherRepository.deleteAllByLocation(location);
 
