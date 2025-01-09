@@ -37,22 +37,16 @@ const WeatherHeader = ({
   };
 
   const isCloudyOrRainyCondition = () => {
-    if (!weatherData || !weatherData.weatherPerHourList) return false;
+    if (
+      !weatherData ||
+      !weatherData.weatherPerHourList ||
+      weatherData.weatherPerHourList.length === 0
+    ) {
+      return false;
+    }
 
-    const currentHour = new Date().getHours();
-    return weatherData.weatherPerHourList.some(item => {
-      const hour = new Date(item.hour).getHours();
-
-      console.log(
-        `Hour: ${hour}, SkyType: ${item.skyType}, Rain: ${item.rain}`,
-      );
-      return (
-        hour <= currentHour &&
-        hour >= 6 &&
-        hour < 18 &&
-        (item.skyType === 'CLOUDY' || item.rain > 0)
-      );
-    });
+    const firstItem = weatherData.weatherPerHourList[0];
+    return firstItem.skyType === 'CLOUDY' || firstItem.rain > 0;
   };
 
   const loadData = async () => {

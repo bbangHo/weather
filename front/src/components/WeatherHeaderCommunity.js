@@ -29,18 +29,16 @@ const WeatherHeaderCommunity = ({accessToken, refreshing}) => {
   };
 
   const isCloudyOrRainyCondition = data => {
-    if (!data || !data.weatherPerHourList) return false;
+    if (
+      !data ||
+      !data.weatherPerHourList ||
+      data.weatherPerHourList.length === 0
+    ) {
+      return false;
+    }
 
-    const currentHour = new Date().getHours();
-    return data.weatherPerHourList.some(item => {
-      const hour = new Date(item.hour).getHours();
-      return (
-        hour <= currentHour &&
-        hour >= 6 &&
-        hour < 18 &&
-        (item.skyType === 'CLOUDY' || item.rain > 0)
-      );
-    });
+    const firstItem = data.weatherPerHourList[0];
+    return firstItem.skyType === 'CLOUDY' || firstItem.rain > 0;
   };
 
   const loadData = async () => {

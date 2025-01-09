@@ -1,12 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import {
-  View,
-  StyleSheet,
-  Dimensions,
-  ActivityIndicator,
-  Text,
-} from 'react-native';
-import Svg, {Path, Circle, Text as SvgText, Rect} from 'react-native-svg';
+import {View, StyleSheet, Dimensions, ActivityIndicator} from 'react-native';
+import Svg, {Path, Circle, Text as SvgText, TSpan} from 'react-native-svg';
 
 const {width, height} = Dimensions.get('window');
 const aspectRatio = height / width;
@@ -25,6 +19,8 @@ const WeatherGraph = ({
   const [maxTmp, setMaxTmp] = useState(0);
   const [minTmp, setMinTmp] = useState(0);
 
+  const leftMargin = 40;
+
   const loadWeatherData = () => {
     if (
       weatherData &&
@@ -32,8 +28,6 @@ const WeatherGraph = ({
       weatherData.temperature
     ) {
       const {maxTmp, minTmp} = weatherData.temperature;
-      console.log('Fetched graph data:', weatherData.temperature);
-
       const tempData = weatherData.weatherPerHourList
         .slice(0, 12)
         .map(item => ({
@@ -64,9 +58,10 @@ const WeatherGraph = ({
   }, [refreshing]);
 
   const getX = index => {
-    if (!temperatureData.length) return 20;
-    const interval = (graphWidth - 40) / (temperatureData.length - 1);
-    return 20 + interval * index;
+    if (!temperatureData.length) return leftMargin;
+    const interval =
+      (graphWidth - leftMargin - 20) / (temperatureData.length - 1);
+    return leftMargin + interval * index;
   };
 
   const getY = temperature => {
@@ -100,29 +95,59 @@ const WeatherGraph = ({
   }
 
   return (
-    <View
-      style={[
-        styles.container,
-        aspectRatio < 2.09999 && {
-          paddingTop: 20,
-          paddingBottom: -10,
-        },
-      ]}>
+    <View style={styles.container}>
       <Svg height={graphHeight} width={graphWidth}>
-        <Rect
-          x="10"
-          y="20"
-          width={graphWidth - 20}
-          height={graphHeight - 40}
-          fill="#fff"
-          rx="10"
+        <Path
+          d={`M ${leftMargin} 20 V ${graphHeight - 20}`}
+          stroke="#E0E0E0"
+          strokeWidth="1"
         />
+
+        <Path
+          d={`M ${leftMargin} ${getY(maxTmp)} H ${graphWidth - 20}`}
+          stroke="#E0E0E0"
+          strokeWidth="1"
+          strokeDasharray="4, 2"
+        />
+        <SvgText
+          x={leftMargin - 10}
+          y={getY(maxTmp) - 15}
+          fill="#333"
+          fontSize="9"
+          textAnchor="middle">
+          <TSpan x={leftMargin - 20} dy="1em">
+            최고
+          </TSpan>
+          <TSpan x={leftMargin - 26} dy="1em">
+            ( {maxTmp}°)
+          </TSpan>
+        </SvgText>
+
+        <Path
+          d={`M ${leftMargin} ${getY(minTmp)} H ${graphWidth - 20}`}
+          stroke="#E0E0E0"
+          strokeWidth="1"
+          strokeDasharray="4, 2"
+        />
+        <SvgText
+          x={leftMargin - 10}
+          y={getY(minTmp) - 15}
+          fill="#333"
+          fontSize="9"
+          textAnchor="middle">
+          <TSpan x={leftMargin - 20} dy="1em">
+            최저
+          </TSpan>
+          <TSpan x={leftMargin - 26} dy="1em">
+            ( {minTmp}°)
+          </TSpan>
+        </SvgText>
 
         {pathData && (
           <Path
             d={`${pathData} L ${getX(temperatureData.length - 1)} ${
               graphHeight - 20
-            } L 20 ${graphHeight - 20} Z`}
+            } L ${leftMargin} ${graphHeight - 20} Z`}
             fill="rgba(63, 125, 253, 0.3)"
           />
         )}
