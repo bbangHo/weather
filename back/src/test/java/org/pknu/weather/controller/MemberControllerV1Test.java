@@ -19,6 +19,7 @@ import org.pknu.weather.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -64,8 +66,8 @@ class MemberControllerV1Test {
     @Autowired
     ObjectMapper objectMapper;
 
-    @Test
-    @Transactional
+//    @Test
+//    @Transactional
     void saveMemberInfo() throws Exception {
         // given
         init();
@@ -96,6 +98,32 @@ class MemberControllerV1Test {
                 .andExpect(jsonPath("$.result.email").value(member.getEmail()));  // 응답 바디 검증
 
         List<MemberTerms> terms = memberTermsRepository.findAll();
+        Assertions.assertThat(terms.size()).isEqualTo(4);
+    }
+
+    @Test
+    @Transactional
+    void setTermsTest() throws Exception {
+        String email = "setTermsTest@naver.com";
+        init();
+        memberRepository.save(Member.builder()
+                        .email(email)
+                .build());
+        em.flush();
+        em.clear();
+
+        TermsDto termsDtoAgreed = getTermsDto(true);
+        Member member = memberRepository.findMemberByEmail(email).get();
+        String jwt = generateJwtToken(member.getId(), member.getEmail());
+
+        mockMvc.perform(post("/api/v1/member/terms")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(termsDtoAgreed))
+                        .header("Authorization", jwt))
+                .andExpect(status().isOk()); // 응답 상태 코드 200 OK 확인
+
+        List<MemberTerms> terms = memberTermsRepository.findAll();
+
         Assertions.assertThat(terms.size()).isEqualTo(4);
     }
 

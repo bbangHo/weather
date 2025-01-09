@@ -62,7 +62,7 @@ public class MemberService {
     }
 
     @Transactional
-    public MemberResponse.MemberResponseDTO checkNicknameAndSave(String email, MemberJoinDTO memberJoinDTO, TermsDto agreed) {
+    public MemberResponse.MemberResponseDTO checkNicknameAndSave(String email, MemberJoinDTO memberJoinDTO) {
 
         Member member = memberRepository.findMemberByEmail(email)
                 .orElseThrow(() -> new GeneralException(ErrorStatus._MEMBER_NOT_FOUND));
@@ -75,14 +75,22 @@ public class MemberService {
         }
 
         member.setMemberInfo(memberJoinDTO);
-
-        List<Terms> termsList = termsRepository.findAll();
-        List<MemberTerms> memberTermsList = TermsConverter.toMemberTermsList(member, agreed, termsList);
-        memberTermsRepository.saveAll(memberTermsList);
-
         Member savedMember = checkNicknameAndSave(member);
 
         return toMemberResponseDTO(savedMember);
+    }
+
+    /**
+     * 회원가입 시 사용자 약관 동의를 저장하는 로직
+     * @param email 사용자의 email
+     * @param termsDto 각 약관의 동의 여부
+     */
+    @Transactional
+    public void setTermsAgree(String email, TermsDto termsDto) {
+        Member member = memberRepository.safeFindByEmail(email);
+        List<Terms> termsList = termsRepository.findAll();
+        List<MemberTerms> memberTermsList = TermsConverter.toMemberTermsList(member, termsDto, termsList);
+        memberTermsRepository.saveAll(memberTermsList);
     }
 
     @Transactional
