@@ -33,7 +33,7 @@ public class TokenCheckFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
 
-         log.info("Token Check Filter............................");
+         log.debug("Token Check Filter............................");
 
         try{
             validateAccessToken(request);
