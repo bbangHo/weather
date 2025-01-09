@@ -67,7 +67,7 @@ const KakaoShareButton = ({accessToken}) => {
     try {
       const response = await KakaoShareLink.sendFeed({
         content: {
-          title: `${weatherEmoji} ${city} ${street} 날씨를 확인하세요!`,
+          title: `${weatherEmoji} ${city} ${street} 날씨입니다!`,
           description: `현재 ${currentTmp}°C   (↑)${maxTmp}° (↓)${minTmp}°\n${rainComment} ${weatherEmoji}`,
           imageUrl: 'https:이미지 추가할 경우.png',
           link: {
