@@ -99,7 +99,7 @@ const WeatherGraph = ({
       <Svg height={graphHeight} width={graphWidth}>
         <Path
           d={`M ${leftMargin} 20 V ${graphHeight - 20}`}
-          stroke="#E0E0E0"
+          stroke="#fff"
           strokeWidth="1"
         />
 
