@@ -29,6 +29,7 @@ const MyScreen = ({
   setAccessToken,
   setIsDeleted,
   navigation,
+  setIsProfileCompleted,
 }) => {
   const [nickname, setNickname] = useState('');
   const [email, setEmail] = useState('');
@@ -122,6 +123,8 @@ const MyScreen = ({
               Alert.alert('로그아웃', '메인 화면으로 이동합니다.');
               setAccessToken(null);
               setIsLoggedIn(false);
+              setIsNewMember(false);
+              setIsProfileCompleted(false);
 
               await AsyncStorage.removeItem('accessToken');
               await AsyncStorage.removeItem('refreshToken');
@@ -142,6 +145,9 @@ const MyScreen = ({
       return;
     }
 
+    console.log('Starting account deletion process...');
+    console.log('Current accessToken:', accessToken);
+
     try {
       const loginMethod = await AsyncStorage.getItem('loginMethod');
       console.log('Current login method:', loginMethod);
@@ -156,6 +162,10 @@ const MyScreen = ({
           });
 
           authenticationCode = appleCredential.authorizationCode;
+          console.log(
+            'Received Apple authentication code:',
+            authenticationCode,
+          );
 
           if (!authenticationCode) {
             Alert.alert(
@@ -183,12 +193,21 @@ const MyScreen = ({
             text: '네',
             onPress: async () => {
               try {
+                console.log('Sending delete request with:', {
+                  accessToken,
+                  loginMethod,
+                  authenticationCode,
+                });
+
                 await deleteMember(
                   accessToken,
                   loginMethod,
                   authenticationCode,
                 );
+                console.log('Account deletion successful.');
                 Alert.alert('탈퇴 완료', '회원 탈퇴가 완료되었습니다.');
+                await AsyncStorage.setItem('isProfileCompleted', 'false');
+                setIsProfileCompleted(false);
 
                 await AsyncStorage.multiRemove([
                   'accessToken',
@@ -197,13 +216,22 @@ const MyScreen = ({
                   'appleUserId',
                 ]);
 
+                console.log('Local data cleared.');
+
                 setIsDeleted(true);
               } catch (error) {
                 console.error('Failed to delete member:', error);
-                Alert.alert(
-                  '회원 탈퇴 실패',
-                  '회원 탈퇴에 실패했습니다. 다시 시도해주세요.',
-                );
+                if (error.code === 'MEMBER_404_1') {
+                  Alert.alert(
+                    '회원 탈퇴 실패',
+                    '사용자를 찾을 수 없습니다. 이미 탈퇴된 계정일 수 있습니다.',
+                  );
+                } else {
+                  Alert.alert(
+                    '회원 탈퇴 실패',
+                    '회원 탈퇴에 실패했습니다. 다시 시도해주세요.',
+                  );
+                }
               }
             },
           },

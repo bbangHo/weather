@@ -502,7 +502,6 @@ export const registerProfile = async (
   sensitivity,
   profileImage,
   accessToken,
-  agreements,
 ) => {
   const formData = new FormData();
 
@@ -516,17 +515,6 @@ export const registerProfile = async (
       name: profileImage.name || 'profile.jpg',
     });
   }
-
-  formData.append('isServiceTermsAgreed', agreements.isServiceTermsAgreed);
-  formData.append('isPrivacyPolicyAgreed', agreements.isPrivacyPolicyAgreed);
-  formData.append(
-    'isLocationServiceTermsAgreed',
-    agreements.isLocationServiceTermsAgreed,
-  );
-  formData.append(
-    'isPushNotificationAgreed',
-    agreements.isPushNotificationAgreed,
-  );
 
   formData._parts.forEach(part => {
     console.log(`FormData key: ${part[0]}, value: ${JSON.stringify(part[1])}`);
@@ -619,47 +607,6 @@ export const submitAddress = async (accessToken, province, city, street) => {
   }
 };
 
-/*
-export const deleteMember = async (
-  accessToken,
-  loginMethod,
-  authenticationCode = null,
-) => {
-  const url = `${BASE_URL}/api/v1/member`;
-
-  console.log('Attempting to delete member with API:', url);
-  console.log('Authorization header:', `Bearer ${accessToken}`);
-  console.log('Login method:', loginMethod);
-
-  try {
-    const options = {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`,
-      },
-    };
-
-    if (loginMethod === 'apple' && authenticationCode) {
-      options.body = JSON.stringify({authenticationCode});
-    }
-
-    const response = await fetch(url, options);
-
-    if (!response.ok) {
-      const errorResponse = await response.json();
-      console.error('Failed to delete member:', errorResponse);
-      throw new Error('Failed to delete member');
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Error Deleting member:', error);
-    throw error;
-  }
-};
-*/
-
 export const deleteMember = async (
   accessToken,
   loginMethod,
@@ -718,6 +665,44 @@ export const deleteMember = async (
     return await response.json();
   } catch (error) {
     console.error('Error Deleting member:', error);
+    throw error;
+  }
+};
+
+export const registerTermsAgreement = async (accessToken, agreements) => {
+  const payload = {
+    isServiceTermsAgreed: agreements.isServiceTermsAgreed,
+    isPrivacyPolicyAgreed: agreements.isPrivacyPolicyAgreed,
+    isLocationServiceTermsAgreed: agreements.isLocationServiceTermsAgreed,
+    isPushNotificationAgreed: agreements.isPushNotificationAgreed,
+  };
+
+  console.log('Payload:', JSON.stringify(payload, null, 2));
+
+  try {
+    const response = await fetch(`${BASE_URL}/api/v1/member/terms`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    console.log('Full Response:', response);
+
+    const responseData = await response.json();
+
+    console.log('Parsed Response Data:', responseData);
+
+    if (!response.ok) {
+      console.error('Server Error Details:', responseData);
+      throw new Error(responseData.message || '약관 동의 실패');
+    }
+
+    return responseData;
+  } catch (error) {
+    console.error('Error registering terms agreement:', error);
     throw error;
   }
 };

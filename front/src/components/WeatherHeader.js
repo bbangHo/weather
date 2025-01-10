@@ -23,7 +23,8 @@ const WeatherHeader = ({
   const [userLocation, setUserLocation] = useState({city: '', street: ''});
   const [weatherTags, setWeatherTags] = useState([]);
   const [isToggled, setIsToggled] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loadingLocation, setLoadingLocation] = useState(true);
+  const [loadingTags, setLoadingTags] = useState(true);
   const [backgroundColors, setBackgroundColors] = useState([
     '#4e9cf5',
     '#498bf5',
@@ -49,16 +50,27 @@ const WeatherHeader = ({
     return firstItem.skyType === 'CLOUDY' || firstItem.rain > 0;
   };
 
-  const loadData = async () => {
+  const loadLocationData = async () => {
     try {
-      setLoading(true);
+      setLoadingLocation(true);
       const location = await fetchUserLocation(accessToken);
-      const tags = await fetchWeatherTags(accessToken);
 
       setUserLocation({
         city: location?.city || '',
         street: location?.street || '',
       });
+    } catch (error) {
+      console.error('Error fetching location data:', error.message);
+    } finally {
+      setLoadingLocation(false);
+    }
+  };
+
+  const loadTagData = async () => {
+    try {
+      setLoadingTags(true);
+      const tags = await fetchWeatherTags(accessToken);
+
       setWeatherTags(Array.isArray(tags) ? tags : []);
 
       const storedState = await AsyncStorage.getItem('switchState');
@@ -68,19 +80,22 @@ const WeatherHeader = ({
         onToggleChange(parsedState);
       }
     } catch (error) {
-      console.error('Error fetching data:', error.message);
+      console.error('Error fetching tag data:', error.message);
     } finally {
-      setLoading(false);
+      setLoadingTags(false);
     }
   };
 
   useEffect(() => {
-    loadData();
+    loadLocationData();
+    loadTagData();
   }, [accessToken]);
 
   useEffect(() => {
     if (refreshing) {
-      loadData();
+      console.log('Refreshing WeatherHeader data...');
+      loadLocationData();
+      loadTagData();
     }
   }, [refreshing, accessToken, onToggleChange]);
 
@@ -126,7 +141,7 @@ const WeatherHeader = ({
         case 'CLOUDY':
           return require('../../assets/images/icon_weather_partlycloudyNight.png');
         default:
-          return require('../../assets/images/icon_default.png');
+          return require('../../assets/images/icon_weather_clearNight.png');
       }
     } else {
       switch (currentSkyType) {
@@ -137,12 +152,12 @@ const WeatherHeader = ({
         case 'CLOUDY':
           return require('../../assets/images/icon_weather_cloudy.png');
         default:
-          return require('../../assets/images/icon_default.png');
+          return require('../../assets/images/icon_weather_clear.png');
       }
     }
   };
 
-  if (loading) {
+  if (loadingLocation) {
     return (
       <LinearGradient
         colors={backgroundColors}
@@ -206,8 +221,8 @@ const WeatherHeader = ({
             </View>
           ))
         ) : (
-          <View style={styles.tag}>
-            <Text style={styles.tagText}>
+          <View style={styles.tagNone}>
+            <Text style={styles.tagTextNone}>
               게시글을 작성해서 태그를 공유해 주세요!
             </Text>
           </View>
@@ -294,7 +309,21 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     maxWidth: width * 0.4,
   },
+  tagNone: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 20,
+    paddingVertical: 3,
+    paddingHorizontal: 12,
+    marginRight: 8,
+    marginBottom: 5,
+  },
   tagText: {
+    color: '#fff',
+    fontSize: width * 0.031,
+    paddingBottom: Platform.OS === 'ios' ? 0 : 3,
+    overflow: 'hidden',
+  },
+  tagTextNone: {
     color: '#fff',
     fontSize: width * 0.031,
     paddingBottom: Platform.OS === 'ios' ? 0 : 3,

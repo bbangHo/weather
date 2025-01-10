@@ -16,14 +16,21 @@ import {launchImageLibrary} from 'react-native-image-picker';
 import Geolocation from 'react-native-geolocation-service';
 import {check, PERMISSIONS, request, RESULTS} from 'react-native-permissions';
 import {registerProfile, sendLocationToBackend} from '../api/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const {width, height} = Dimensions.get('window');
 
-const RegisterProfileScreen = ({route, setIsNewMember, setIsLoggedIn}) => {
+const RegisterProfileScreen = ({
+  route,
+  setIsNewMember,
+  setIsLoggedIn,
+  navigation,
+}) => {
   const [nickname, setNickname] = useState('');
   const [profileImage, setProfileImage] = useState(null);
   const [selectedType, setSelectedType] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [isProfileCompleted, setIsProfileCompleted] = useState(false);
 
   const {accessToken, agreements} = route.params || {};
 
@@ -91,15 +98,18 @@ const RegisterProfileScreen = ({route, setIsNewMember, setIsLoggedIn}) => {
         sensitivityMap[selectedType],
         profileImage,
         accessToken,
-        {
-          isServiceTermsAgreed: agreements.service,
-          isPrivacyPolicyAgreed: agreements.personalInfo,
-          isLocationServiceTermsAgreed: agreements.location,
-          isPushNotificationAgreed: agreements.pushNotification,
-        },
       );
 
       console.log('registered new member info:', result);
+
+      await AsyncStorage.setItem('isProfileCompleted', 'true');
+      console.log('AsyncStorage: isProfileCompleted set to true');
+
+      setIsProfileCompleted(true);
+      console.log('State: isProfileCompleted updated to true');
+
+      setIsNewMember(false);
+      setIsLoggedIn(true);
 
       const permissionGranted = await requestLocationPermission();
       if (permissionGranted) {

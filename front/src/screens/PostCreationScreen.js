@@ -85,6 +85,11 @@ const PostCreationScreen = ({navigation, accessToken, route}) => {
   };
 
   const handleSubmit = async () => {
+    if (!temperature || !weather || !humidity || !wind || !airQuality) {
+      Alert.alert('태그 선택', '아직 선택하지 않은 태그가 있어요.');
+      return;
+    }
+
     const postData = {
       content: description,
       temperatureTagCode: temperature,
