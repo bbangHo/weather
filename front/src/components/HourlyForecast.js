@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useMemo} from 'react';
 import {
   ScrollView,
   Text,
@@ -18,6 +18,10 @@ const aspectRatio = height / width;
 const HourlyForecast = ({weatherData, showText, refreshing}) => {
   const [hourlyData, setHourlyData] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const marginTop = useMemo(() => {
+    return aspectRatio < 2.1 ? -width * 0.01 : -width * 0.01;
+  }, []);
 
   const loadData = () => {
     if (
@@ -90,10 +94,7 @@ const HourlyForecast = ({weatherData, showText, refreshing}) => {
     <ScrollView
       horizontal
       contentContainerStyle={styles.scrollContent}
-      style={[
-        styles.container,
-        aspectRatio === 2.09999 && {marginTop: -width * 0.13},
-      ]}>
+      style={[styles.container, {marginTop}]}>
       {(loading ? placeholderData : hourlyData || []).map((item, i) => (
         <View key={i} style={styles.shadowContainer}>
           <Card
@@ -145,7 +146,6 @@ const HourlyForecast = ({weatherData, showText, refreshing}) => {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: Math.abs(aspectRatio) < 2.1 ? -width * 0.13 : -width * 0.01,
     paddingRight: 10,
     marginRight: 10,
   },
