@@ -22,6 +22,8 @@ const AuthStack = ({
   setAccessToken,
   setIsNewMember,
   setIsDeleted,
+  setIsProfileCompleted,
+  isProfileCompleted,
 }) => (
   <Stack.Navigator screenOptions={{headerShown: false}}>
     <Stack.Screen name="LoginScreen">
@@ -32,6 +34,8 @@ const AuthStack = ({
           setAccessToken={setAccessToken}
           setIsNewMember={setIsNewMember}
           setIsDeleted={setIsDeleted}
+          setIsProfileCompleted={setIsProfileCompleted}
+          isProfileCompleted={isProfileCompleted}
         />
       )}
     </Stack.Screen>
@@ -75,6 +79,7 @@ const MyStack = ({
   setIsLoggedIn,
   setAccessToken,
   setIsDeleted,
+  setIsProfileCompleted,
 }) => (
   <Stack.Navigator screenOptions={{headerShown: false}}>
     <Stack.Screen name="MyScreen">
@@ -87,6 +92,7 @@ const MyStack = ({
           setIsLoggedIn={setIsLoggedIn}
           setAccessToken={setAccessToken}
           setIsDeleted={setIsDeleted}
+          setIsProfileCompleted={setIsProfileCompleted}
         />
       )}
     </Stack.Screen>
@@ -104,13 +110,23 @@ const App = () => {
   const [isNewMember, setIsNewMember] = useState(false);
   const [locationId, setLocationId] = useState(null);
   const [isDeleted, setIsDeleted] = useState(false);
+  const [isProfileCompleted, setIsProfileCompleted] = useState(true);
 
   useEffect(() => {
     const checkLoginStatus = async () => {
       const storedAccessToken = await AsyncStorage.getItem('accessToken');
+      const profileCompleted = await AsyncStorage.getItem('isProfileCompleted');
+
       if (storedAccessToken) {
         setAccessToken(storedAccessToken);
         setIsLoggedIn(true);
+
+        if (profileCompleted === 'true') {
+          setIsProfileCompleted(true);
+        } else {
+          setIsProfileCompleted(false);
+          setIsLoggedIn(false);
+        }
       }
       setIsAutoLoggingIn(false);
     };
@@ -120,15 +136,15 @@ const App = () => {
 
   useEffect(() => {
     console.log(
-      `현재 상태: isLoggedIn=${isLoggedIn}, isNewMember=${isNewMember}, isDeleted=${isDeleted}`,
+      `현재 상태: isLoggedIn=${isLoggedIn}, isNewMember=${isNewMember}, isDeleted=${isDeleted}, isProfileCompleted=${isProfileCompleted}`,
     );
-  }, [isLoggedIn, isNewMember, isDeleted]);
+  }, [isLoggedIn, isNewMember, isDeleted, isProfileCompleted]);
 
   if (isAutoLoggingIn) {
     return <View style={styles.autoLoginBackground} />;
   }
 
-  if (isDeleted) {
+  if (isDeleted || !isLoggedIn || !isProfileCompleted) {
     return (
       <NavigationContainer>
         <AuthStack
@@ -136,6 +152,8 @@ const App = () => {
           setAccessToken={setAccessToken}
           setIsNewMember={setIsNewMember}
           setIsDeleted={setIsDeleted}
+          setIsProfileCompleted={setIsProfileCompleted}
+          isProfileCompleted={isProfileCompleted}
         />
       </NavigationContainer>
     );
@@ -159,6 +177,7 @@ const App = () => {
                     accessToken={accessToken}
                     setIsNewMember={setIsNewMember}
                     setIsLoggedIn={setIsLoggedIn}
+                    setIsProfileCompleted={setIsProfileCompleted}
                   />
                 )}
               </Stack.Screen>
@@ -242,6 +261,7 @@ const App = () => {
                     setIsLoggedIn={setIsLoggedIn}
                     setAccessToken={setAccessToken}
                     setIsDeleted={setIsDeleted}
+                    setIsProfileCompleted={setIsProfileCompleted}
                   />
                 )}
               </Tab.Screen>
@@ -253,6 +273,7 @@ const App = () => {
             setAccessToken={setAccessToken}
             setIsNewMember={setIsNewMember}
             setIsDeleted={setIsDeleted}
+            setIsProfileCompleted={setIsProfileCompleted}
           />
         )}
       </NavigationContainer>

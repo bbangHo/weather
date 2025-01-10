@@ -101,6 +101,7 @@ const HomeScreen = ({accessToken, navigation}) => {
         accessToken={accessToken}
         weatherData={weatherData}
         onToggleChange={setShowText}
+        refreshing={refreshing}
       />
 
       {weatherData ? (

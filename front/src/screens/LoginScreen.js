@@ -32,6 +32,8 @@ const LoginScreen = ({
   setAccessToken,
   setIsNewMember,
   navigation,
+  setIsProfileCompleted,
+  isProfileCompleted,
 }) => {
   const [token, setToken] = useState('');
 
@@ -88,8 +90,14 @@ const LoginScreen = ({
           if (isNewMember) {
             navigation.navigate('TermsAgreementScreen', {accessToken});
             setIsNewMember(true);
+            setIsProfileCompleted(false);
           } else {
-            setIsLoggedIn(true);
+            if (!isProfileCompleted) {
+              navigation.navigate('TermsAgreementScreen', {accessToken});
+            } else {
+              setIsLoggedIn(true);
+              navigation.navigate('Home', {accessToken});
+            }
           }
 
           await AsyncStorage.setItem('accessToken', accessToken);
@@ -144,8 +152,14 @@ const LoginScreen = ({
         if (isNewMember) {
           navigation.navigate('TermsAgreementScreen', {accessToken});
           setIsNewMember(true);
+          setIsProfileCompleted(false);
         } else {
-          setIsLoggedIn(true);
+          if (!isProfileCompleted) {
+            navigation.navigate('TermsAgreementScreen', {accessToken});
+          } else {
+            setIsLoggedIn(true);
+            navigation.navigate('Home', {accessToken});
+          }
         }
 
         await AsyncStorage.setItem('accessToken', accessToken);

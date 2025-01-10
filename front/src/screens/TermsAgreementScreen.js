@@ -9,6 +9,7 @@ import {
   Linking,
 } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
+import {registerTermsAgreement} from '../api/api';
 
 const {width, height} = Dimensions.get('window');
 
@@ -58,7 +59,7 @@ const TermsAgreementScreen = ({navigation, route}) => {
     }));
   };
 
-  const handleComplete = () => {
+  const handleComplete = async () => {
     if (
       !agreements.service ||
       !agreements.location ||
@@ -68,10 +69,26 @@ const TermsAgreementScreen = ({navigation, route}) => {
       return;
     }
 
-    navigation.navigate('RegisterProfileScreen', {
-      accessToken,
-      agreements,
-    });
+    try {
+      const response = await registerTermsAgreement(accessToken, {
+        isServiceTermsAgreed: agreements.service,
+        isPrivacyPolicyAgreed: agreements.personalInfo,
+        isLocationServiceTermsAgreed: agreements.location,
+        isPushNotificationAgreed: agreements.pushNotification,
+      });
+
+      console.log('약관 동의 완료:', response);
+
+      navigation.navigate('RegisterProfileScreen', {
+        accessToken,
+      });
+    } catch (error) {
+      console.error('약관 동의 실패:', error);
+      Alert.alert(
+        '약관 동의 실패',
+        error.message || '약관 동의 중 오류가 발생했습니다.',
+      );
+    }
   };
 
   const openTermsPage = key => {
