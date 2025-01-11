@@ -55,6 +55,8 @@ const AuthStack = ({
           {...props}
           setIsNewMember={setIsNewMember}
           setIsLoggedIn={setIsLoggedIn}
+          setIsDeleted={setIsDeleted}
+          setIsProfileCompleted={setIsProfileCompleted}
         />
       )}
     </Stack.Screen>
@@ -140,6 +142,17 @@ const App = () => {
     );
   }, [isLoggedIn, isNewMember, isDeleted, isProfileCompleted]);
 
+  useEffect(() => {
+    if (!isNewMember && isLoggedIn && isProfileCompleted) {
+      console.log('Navigating to HomeStack as isNewMember is false');
+    }
+
+    (async () => {
+      await AsyncStorage.removeItem('isProfileCompleted');
+      console.log('isProfileCompleted has been removed from AsyncStorage');
+    })();
+  }, [isNewMember, isLoggedIn, isDeleted, isProfileCompleted]);
+
   if (isAutoLoggingIn) {
     return <View style={styles.autoLoginBackground} />;
   }
@@ -178,6 +191,7 @@ const App = () => {
                     setIsNewMember={setIsNewMember}
                     setIsLoggedIn={setIsLoggedIn}
                     setIsProfileCompleted={setIsProfileCompleted}
+                    setIsDeleted={setIsDeleted}
                   />
                 )}
               </Stack.Screen>

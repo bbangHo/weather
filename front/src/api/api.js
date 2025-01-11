@@ -677,8 +677,6 @@ export const registerTermsAgreement = async (accessToken, agreements) => {
     isPushNotificationAgreed: agreements.isPushNotificationAgreed,
   };
 
-  console.log('Payload:', JSON.stringify(payload, null, 2));
-
   try {
     const response = await fetch(`${BASE_URL}/api/v1/member/terms`, {
       method: 'POST',
@@ -689,11 +687,7 @@ export const registerTermsAgreement = async (accessToken, agreements) => {
       body: JSON.stringify(payload),
     });
 
-    console.log('Full Response:', response);
-
     const responseData = await response.json();
-
-    console.log('Parsed Response Data:', responseData);
 
     if (!response.ok) {
       console.error('Server Error Details:', responseData);
