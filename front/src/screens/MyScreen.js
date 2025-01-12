@@ -63,15 +63,15 @@ const MyScreen = ({
       const memberInfo = await fetchMemberInfo(accessToken);
       console.log('Fetched member info:', memberInfo);
       if (
-        memberInfo.profileImage &&
-        memberInfo.profileImage.startsWith('http')
+        memberInfo.result.profileImage &&
+        memberInfo.result.profileImage.startsWith('http')
       ) {
-        setProfileImage({uri: memberInfo.profileImage});
+        setProfileImage({uri: memberInfo.result.profileImage});
       } else {
         setProfileImage(profilePlaceholder);
       }
-      setNickname(memberInfo.nickname || '닉네임');
-      setEmail(memberInfo.email || 'example@email.com');
+      setNickname(memberInfo.result.nickname || '닉네임');
+      setEmail(memberInfo.result.email || 'example@email.com');
       setLoading(false);
     } catch (error) {
       console.error('회원 정보 불러오는 중 오류 발생:', error);
@@ -178,7 +178,7 @@ const MyScreen = ({
           console.error('Apple authentication error:', error);
           Alert.alert(
             'Apple 로그인 실패',
-            '회원 탈퇴를 원하시면 로그인이 필요합니다.',
+            '회원 탈퇴를 위해서는 로그인이 필요합니다.',
           );
           return;
         }

@@ -486,8 +486,10 @@ export const fetchMemberInfo = async accessToken => {
     });
 
     const result = await response.json();
+    console.log('Fetch memeber info api:', result);
+
     if (result.isSuccess) {
-      return result.result;
+      return result;
     } else {
       throw new Error(result.message);
     }

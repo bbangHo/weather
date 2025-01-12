@@ -12,6 +12,7 @@ import LoginScreen from './src/screens/LoginScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import TermsViewScreen from './src/screens/TermsViewScreen';
 import {StatusBar, Image, Platform, View, StyleSheet} from 'react-native';
+import {refreshAccessToken, fetchMemberInfo} from './src/api/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Tab = createBottomTabNavigator();
@@ -116,21 +117,71 @@ const App = () => {
 
   useEffect(() => {
     const checkLoginStatus = async () => {
-      const storedAccessToken = await AsyncStorage.getItem('accessToken');
-      const profileCompleted = await AsyncStorage.getItem('isProfileCompleted');
+      try {
+        const storedAccessToken = await AsyncStorage.getItem('accessToken');
+        const refreshToken = await AsyncStorage.getItem('refreshToken');
+        const loginMethod = await AsyncStorage.getItem('loginMethod');
 
-      if (storedAccessToken) {
-        setAccessToken(storedAccessToken);
-        setIsLoggedIn(true);
+        console.log('Retrieved accessToken:', storedAccessToken);
+        console.log('Retrieved refreshToken:', refreshToken);
+        console.log('Login method:', loginMethod);
 
-        if (profileCompleted === 'true') {
-          setIsProfileCompleted(true);
-        } else {
-          setIsProfileCompleted(false);
-          setIsLoggedIn(false);
+        if (storedAccessToken) {
+          try {
+            const memberInfoResponse = await fetchMemberInfo(storedAccessToken);
+            console.log('회원 정보 응답:', memberInfoResponse);
+
+            if (memberInfoResponse.isSuccess) {
+              const memberData = memberInfoResponse;
+              console.log('회원 정보:', memberData);
+
+              setAccessToken(storedAccessToken);
+              setIsLoggedIn(true);
+            } else {
+              console.error(
+                'Failed to fetch member info:',
+                memberInfoResponse.message,
+              );
+              setIsLoggedIn(false);
+            }
+          } catch (error) {
+            console.error('Error fetching member info:', error.message);
+            setIsLoggedIn(false);
+          }
         }
+
+        if (!storedAccessToken && refreshToken) {
+          try {
+            const newAccessToken = await refreshAccessToken(refreshToken);
+            const memberInfoResponse = await fetchMemberInfo(newAccessToken);
+
+            if (memberInfoResponse.isSuccess) {
+              const memberData = memberInfoResponse.result;
+              console.log('Access token 갱신 및 회원 정보:', memberData);
+
+              setAccessToken(newAccessToken);
+              setIsLoggedIn(true);
+              await AsyncStorage.setItem('accessToken', newAccessToken);
+            } else {
+              console.error(
+                'Failed to fetch member info with new token:',
+                memberInfoResponse.message,
+              );
+              setIsLoggedIn(false);
+            }
+          } catch (error) {
+            console.error('Token refresh failed:', error.message);
+            await AsyncStorage.removeItem('accessToken');
+            await AsyncStorage.removeItem('refreshToken');
+            setIsLoggedIn(false);
+          }
+        }
+      } catch (error) {
+        console.error('자동 로그인 처리 중 오류 발생:', error.message);
+        setIsLoggedIn(false);
+      } finally {
+        setIsAutoLoggingIn(false);
       }
-      setIsAutoLoggingIn(false);
     };
 
     checkLoginStatus();

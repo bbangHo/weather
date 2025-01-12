@@ -46,10 +46,10 @@ const PostCreationScreen = ({navigation, accessToken, route}) => {
     const loadMemberInfo = async () => {
       try {
         const memberInfo = await fetchMemberInfo(accessToken);
-        setNickname(memberInfo.nickname || '사용자');
+        setNickname(memberInfo.result.nickname || '사용자');
         setProfileImage(
-          memberInfo.profileImage?.startsWith('http')
-            ? {uri: memberInfo.profileImage}
+          memberInfo.result.profileImage?.startsWith('http')
+            ? {uri: memberInfo.result.profileImage}
             : require('../../assets/images/profile.png'),
         );
       } catch (error) {

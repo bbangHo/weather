@@ -23,6 +23,7 @@ import {
   sendAccessTokenToBackend,
   sendLocationToBackend,
   refreshAccessToken,
+  fetchMemberInfo,
 } from '../api/api';
 
 const {width, height} = Dimensions.get('window');
@@ -31,6 +32,7 @@ const LoginScreen = ({
   setIsLoggedIn,
   setAccessToken,
   setIsNewMember,
+  setIsDeleted,
   navigation,
   setIsProfileCompleted,
   isProfileCompleted,
@@ -77,7 +79,7 @@ const LoginScreen = ({
         if (response.isSuccess) {
           const accessToken = response.result.accessToken;
           const refreshToken = response.result.refreshToken;
-          const isNewMember = response.result.isNewMember === 'true';
+          const isNewMember = response.result.isNewMember;
 
           console.log('Apple Login Success:', {accessToken, isNewMember});
 
@@ -86,17 +88,35 @@ const LoginScreen = ({
 
           await saveLoginMethod('apple');
 
+          let memberInfoSuccess = false;
+          try {
+            const memberInfoResponse = await fetchMemberInfo(accessToken);
+            if (memberInfoResponse.isSuccess) {
+              memberInfoSuccess = true;
+              console.log('회원 정보:', memberInfoResponse.result);
+            } else {
+              console.error(
+                'Failed to fetch member info:',
+                memberInfoResponse.message,
+              );
+            }
+          } catch (error) {
+            console.error('Error fetching member info:', error.message);
+          }
+
           setAccessToken(accessToken);
-          if (isNewMember) {
+
+          if (isNewMember && !memberInfoSuccess) {
             navigation.navigate('TermsAgreementScreen', {accessToken});
-            setIsNewMember(true);
             setIsProfileCompleted(false);
           } else {
-            if (!isProfileCompleted) {
+            if (!isProfileCompleted && !memberInfoSuccess) {
               navigation.navigate('TermsAgreementScreen', {accessToken});
             } else {
               setIsLoggedIn(true);
-              navigation.navigate('Home', {accessToken});
+              setIsProfileCompleted(true);
+              setIsNewMember(false);
+              setIsDeleted(false);
             }
           }
 
@@ -144,21 +164,42 @@ const LoginScreen = ({
       if (response.isSuccess) {
         const accessToken = response.result.accessToken;
         const refreshToken = response.result.refreshToken;
-        const isNewMember = response.result.isNewMember === 'true';
+        const isNewMember = response.result.isNewMember;
+
+        console.log('Kakao Login Success:', {accessToken, isNewMember});
 
         await saveLoginMethod('kakao');
 
+        let memberInfoSuccess = false;
+        try {
+          const memberInfoResponse = await fetchMemberInfo(accessToken);
+          if (memberInfoResponse.isSuccess) {
+            memberInfoSuccess = true;
+            console.log('회원 정보:', memberInfoResponse.result);
+          } else {
+            console.error(
+              'Failed to fetch member info:',
+              memberInfoResponse.message,
+            );
+          }
+        } catch (error) {
+          console.error('Error fetching member info:', error.message);
+        }
+
         setAccessToken(accessToken);
-        if (isNewMember) {
+
+        if (isNewMember && !memberInfoSuccess) {
           navigation.navigate('TermsAgreementScreen', {accessToken});
           setIsNewMember(true);
           setIsProfileCompleted(false);
         } else {
-          if (!isProfileCompleted) {
+          if (!isProfileCompleted && !memberInfoSuccess) {
             navigation.navigate('TermsAgreementScreen', {accessToken});
           } else {
             setIsLoggedIn(true);
-            navigation.navigate('Home', {accessToken});
+            setIsProfileCompleted(true);
+            setIsNewMember(false);
+            setIsDeleted(false);
           }
         }
 

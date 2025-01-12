@@ -75,11 +75,6 @@ const RegisterProfileScreen = ({
       return;
     }
 
-    if (!profileImage) {
-      Alert.alert('프로필 이미지 설정', '프로필 이미지를 선택해주세요.');
-      return;
-    }
-
     if (!selectedType) {
       Alert.alert('유형 선택', '날씨 체감 유형을 선택해주세요.');
       return;
@@ -133,6 +128,7 @@ const RegisterProfileScreen = ({
     } catch (error) {
       console.error('프로필 저장 오류:', error);
       Alert.alert('프로필 저장 실패', error.message);
+    } finally {
       setLoading(false);
     }
   };
