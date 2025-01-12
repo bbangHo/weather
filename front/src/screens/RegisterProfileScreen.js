@@ -24,13 +24,14 @@ const RegisterProfileScreen = ({
   route,
   setIsNewMember,
   setIsLoggedIn,
+  setIsDeleted,
   navigation,
+  setIsProfileCompleted,
 }) => {
   const [nickname, setNickname] = useState('');
   const [profileImage, setProfileImage] = useState(null);
   const [selectedType, setSelectedType] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [isProfileCompleted, setIsProfileCompleted] = useState(false);
 
   const {accessToken, agreements} = route.params || {};
 
@@ -102,14 +103,9 @@ const RegisterProfileScreen = ({
 
       console.log('registered new member info:', result);
 
-      await AsyncStorage.setItem('isProfileCompleted', 'true');
-      console.log('AsyncStorage: isProfileCompleted set to true');
-
-      setIsProfileCompleted(true);
-      console.log('State: isProfileCompleted updated to true');
-
       setIsNewMember(false);
       setIsLoggedIn(true);
+      setIsDeleted(false);
 
       const permissionGranted = await requestLocationPermission();
       if (permissionGranted) {
@@ -181,6 +177,21 @@ const RegisterProfileScreen = ({
           setIsNewMember(prevState => !prevState);
           setIsNewMember(false);
           console.log('isNewMember 변경됨: false');
+          await AsyncStorage.setItem('isProfileCompleted', 'true');
+          const storedProfileCompleted = await AsyncStorage.getItem(
+            'isProfileCompleted',
+          );
+          console.log('Stored isProfileCompleted:', storedProfileCompleted);
+
+          setIsProfileCompleted(true);
+          console.log('State: isProfileCompleted updated to true');
+
+          if (storedProfileCompleted === 'true') {
+            await AsyncStorage.removeItem('isProfileCompleted');
+            console.log(
+              'isProfileCompleted has been removed after being stored.',
+            );
+          }
         } catch (error) {
           console.error('위치 등록 실패:', error);
           Alert.alert(
