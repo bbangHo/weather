@@ -1,6 +1,7 @@
 package org.pknu.weather.config;
 
 import lombok.RequiredArgsConstructor;
+import org.pknu.weather.filter.InitFilter;
 import org.pknu.weather.filter.RefreshTokenFilter;
 import org.pknu.weather.filter.GenerateTokenFilter;
 import org.pknu.weather.filter.TokenCheckFilter;
@@ -15,6 +16,16 @@ public class FilterConfig {
     private final GenerateTokenFilter generateTokenFilter;
     private final TokenCheckFilter tokencheckFilter;
     private final RefreshTokenFilter refreshTokenFilter;
+    private final InitFilter initFilter;
+
+    @Bean
+    public FilterRegistrationBean<InitFilter> initFilterRegister() {
+        FilterRegistrationBean<InitFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(initFilter);
+        registrationBean.addUrlPatterns("/");
+        registrationBean.setOrder(0);
+        return registrationBean;
+    }
 
     @Bean
     public FilterRegistrationBean<RefreshTokenFilter> refreshTokenFilterRegister() {
