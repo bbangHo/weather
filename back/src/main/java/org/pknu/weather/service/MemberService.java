@@ -69,7 +69,8 @@ public class MemberService {
 
         MultipartFile profileImg = memberJoinDTO.getProfileImg();
 
-        if (!profileImg.isEmpty() && profileImg.getContentType().startsWith("image")) {
+
+        if (isProfileImgValid(profileImg)) {
             uploadProfileImageToS3(memberJoinDTO, profileImg);
             removeExProfileImage(member);
         }
@@ -78,6 +79,12 @@ public class MemberService {
         Member savedMember = checkNicknameAndSave(member);
 
         return toMemberResponseDTO(savedMember);
+    }
+
+    private boolean isProfileImgValid(MultipartFile profileImg) {
+        return profileImg != null
+                && !profileImg.isEmpty()
+                && profileImg.getContentType().startsWith("image");
     }
 
     /**

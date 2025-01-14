@@ -35,12 +35,12 @@ public class TokenCheckFilter extends OncePerRequestFilter {
 
          log.debug("Token Check Filter............................");
 
-        try{
+        try {
             validateAccessToken(request);
 
             filterChain.doFilter(request,response);
 
-        }catch (TokenException TokenException){
+        } catch (TokenException TokenException){
             TokenException.sendResponseError(response);
         }
     }
