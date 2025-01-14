@@ -29,14 +29,14 @@ const ProfileScreen = ({accessToken, navigation, route}) => {
       try {
         const memberInfo = await fetchMemberInfo(accessToken);
         if (
-          memberInfo.profileImage &&
-          memberInfo.profileImage.startsWith('http')
+          memberInfo.result.profileImage &&
+          memberInfo.result.profileImage.startsWith('http')
         ) {
-          setProfileImage({uri: memberInfo.profileImage});
+          setProfileImage({uri: memberInfo.result.profileImage});
         }
-        setNickname(memberInfo.nickname || '닉네임');
-        setEmail(memberInfo.email || 'example@email.com');
-        setSelectedType(memberInfo.sensitivity.toLowerCase());
+        setNickname(memberInfo.result.nickname || '닉네임');
+        setEmail(memberInfo.result.email || 'example@email.com');
+        setSelectedType(memberInfo.result.sensitivity.toLowerCase());
         setLoading(false);
       } catch (error) {
         console.error('Error fetching profile data:', error);
