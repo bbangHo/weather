@@ -1,4 +1,4 @@
-const BASE_URL = 'http://13.125.128.147:8080';
+const BASE_URL = 'https://weather-community.shop';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const sendAccessTokenToBackend = async (accessToken, type) => {
