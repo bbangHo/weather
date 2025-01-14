@@ -22,7 +22,7 @@ public class FilterConfig {
     public FilterRegistrationBean<InitFilter> initFilterRegister() {
         FilterRegistrationBean<InitFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(initFilter);
-        registrationBean.addUrlPatterns("/");
+        registrationBean.addUrlPatterns("/health-check");
         registrationBean.setOrder(0);
         return registrationBean;
     }
@@ -50,6 +50,7 @@ public class FilterConfig {
     public FilterRegistrationBean<TokenCheckFilter> tokenCheckFilterRegister() {
         FilterRegistrationBean<TokenCheckFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(tokencheckFilter);
+        registrationBean.addUrlPatterns("/api/*", "/actuator/*");
         registrationBean.setOrder(3);
         return registrationBean;
     }
