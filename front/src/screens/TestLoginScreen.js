@@ -56,7 +56,7 @@ const TestLoginScreen = ({setAccessToken, setIsLoggedIn, setIsNewMember}) => {
         onChangeText={setTestToken}
         autoCapitalize="none"
         multiline={false}
-        placeholderTextColor="#333"
+        placeholderTextColor="#888"
         returnKeyType="done"
         onSubmitEditing={() => Keyboard.dismiss()}
       />
