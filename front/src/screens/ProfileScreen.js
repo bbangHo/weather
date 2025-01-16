@@ -221,8 +221,8 @@ const styles = StyleSheet.create({
     /*backgroundColor: '#3f51b5',*/
     backgroundColor: '#2f5af4',
     borderRadius: 20,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
+    paddingVertical: Platform.OS === 'ios' ? 4 : 4,
+    paddingHorizontal: Platform.OS === 'ios' ? 8 : 10,
   },
   plusIcon: {
     color: '#fff',
