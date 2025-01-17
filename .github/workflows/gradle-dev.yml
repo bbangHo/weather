@@ -1,7 +1,11 @@
 name: Deploy to CLOUDTYPE
 on:
-  push:
+#  push:
+#    branches:
+#      - dev
+  pull_request:
     branches:
+      - ci/**
       - dev
 
 jobs:
@@ -36,9 +40,6 @@ jobs:
             options:
               ports: "8080"
               healthz: /helath-check
-              predeploy: |
-                mkdir -p /customLog
-                chmod 777 /customLog
               env: 
                 - name: MARIA_DB_URL
                   value: ${{ secrets.DB_URL }}
@@ -71,6 +72,7 @@ jobs:
                 - name: APPLE_KEY
                   value: ${{ secrets.APPLE_KEY }}
               buildenv: []
+              start: mkdir -p ./customLog && chmod 777 ./customLog
             context:
               git:
                 url: git@github.com:${{ github.repository }}.git
