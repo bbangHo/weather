@@ -25,6 +25,9 @@ import {
 
 const {width, height} = Dimensions.get('window');
 
+const aspectRatio = height / width;
+const isIpad = aspectRatio < 1.78;
+
 const WeatherHeader = ({
   accessToken,
   weatherData,
@@ -365,7 +368,11 @@ const WeatherHeader = ({
 const styles = StyleSheet.create({
   headerContainer: {
     width: width,
-    height: Platform.OS === 'ios' ? height * 0.23 : height * 0.2,
+    height: isIpad
+      ? height * 0.28
+      : Platform.OS === 'ios'
+      ? height * 0.23
+      : height * 0.2,
     paddingVertical: 20,
     paddingHorizontal: 20,
     paddingLeft: width * 0.07,

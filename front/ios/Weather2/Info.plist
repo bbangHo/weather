@@ -54,11 +54,11 @@
 		</dict>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>카메라 접근 권한이 필요합니다.</string>
+	<string>프로필 사진을 촬영하여 설정할 수 있도록 카메라 접근이 필요합니다.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>앱 사용 중 위치 접근이 필요합니다.</string>
+	<string>사용자의 현재 위치를 기반으로 실시간 날씨 정보를 정확하게 제공하기 위해 위치 접근이 필요합니다. 예를 들어, 현재 기온, 강수량 및 지역별 기상 상태를 업데이트하는 데 사용됩니다.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>사진 라이브러리 접근 권한이 필요합니다.</string>
+	<string>사용자가 기기 내 사진을 선택하여 프로필 사진을 업로드하거나 변경할 수 있도록 사진 라이브러리 접근이 필요합니다.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>

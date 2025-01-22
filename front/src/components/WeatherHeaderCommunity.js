@@ -12,6 +12,9 @@ import {fetchUserLocation, fetchWeatherData} from '../api/api';
 
 const {width, height} = Dimensions.get('window');
 
+const aspectRatio = height / width;
+const isIpad = aspectRatio < 1.78;
+
 const WeatherHeaderCommunity = ({accessToken, refreshing}) => {
   const [userLocation, setUserLocation] = useState({city: '', street: ''});
   const [weatherData, setWeatherData] = useState(null);
@@ -165,7 +168,11 @@ const WeatherHeaderCommunity = ({accessToken, refreshing}) => {
 const styles = StyleSheet.create({
   headerContainer: {
     width: width,
-    height: Platform.OS === 'ios' ? height * 0.15 : height * 0.13,
+    height: isIpad
+      ? height * 0.17
+      : Platform.OS === 'ios'
+      ? height * 0.15
+      : height * 0.13,
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
     paddingLeft: width * 0.07,
