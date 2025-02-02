@@ -150,7 +150,7 @@ const WeatherHeader = ({
             setRefresh(true);
           } catch (error) {
             console.error('Error sending location to backend:', error.message);
-            Alert.alert('위치 전송 실패', '위치 정보 등록에 실패하였습니다.');
+            Alert.alert('위치 전송 실패', '나중에 다시 시도해 주세요.');
           } finally {
             setLoadingLocation(false);
           }
