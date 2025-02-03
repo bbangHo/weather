@@ -5,15 +5,18 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.pknu.weather.common.TestDataCreator;
+import org.pknu.weather.common.TestUtil;
 import org.pknu.weather.config.TestConfig;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.Post;
+import org.pknu.weather.domain.common.PostType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @DataJpaTest
@@ -50,7 +53,7 @@ class PostCustomRepositoryTest {
         em.clear();
 
         // when
-        List<Post> latestPostList = postRepository.getLatestPostList(seoulLocation);
+        List<Post> latestPostList = postRepository.findAllWithinDistance(1L, 5L, seoulLocation, PostType.WEATHER);
 
         // then
         Assertions.assertThat(latestPostList.get(0).getCreatedAt()).isAfter(latestPostList.get(1).getCreatedAt());
@@ -58,6 +61,31 @@ class PostCustomRepositoryTest {
         Assertions.assertThat(latestPostList.get(2).getCreatedAt()).isAfter(latestPostList.get(3).getCreatedAt());
         Assertions.assertThat(latestPostList.get(3).getCreatedAt()).isAfter(latestPostList.get(4).getCreatedAt());
         Assertions.assertThat(latestPostList.size()).isEqualTo(5);
+
+    }
+
+    @Test
+    @Transactional
+    void 게시글이_생성된_시간이_24시간이_초과했으면_조회되지_않습니다() {
+        // given
+        Location location = locationRepository.save(TestDataCreator.getSeoulLocation());
+        Member member = memberRepository.save(TestDataCreator.getMember());
+        Post post = TestDataCreator.getPost(member);
+        em.detach(post);
+
+        TestUtil.setField(post,
+                "createdAt",
+                LocalDateTime.now().minusHours(24));
+
+        em.merge(post);
+        em.flush();
+        em.clear();
+
+        // when
+        List<Post> postList = postRepository.findAllWithinDistance(1L, 1L, location, PostType.WEATHER);
+
+        // then
+        Assertions.assertThat(postList.size()).isEqualTo(0);
 
     }
 }

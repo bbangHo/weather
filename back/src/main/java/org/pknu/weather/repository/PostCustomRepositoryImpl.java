@@ -13,6 +13,7 @@ import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Post;
 import org.pknu.weather.domain.common.PostType;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     /**
-     * post 무한 스크롤,  이내의 거리에 있는 사용자가 작성한 post만 보여줌 정렬은 최신순
+     * post 무한 스크롤, 이내의 거리에 있는 사용자가 작성한 post만 보여줌 정렬은 최신순이며 24시간 이내의 게시글만 가져옴
      *
      * @param lastPostId     마지막 post id
      * @param size           가져올 post의 개수
@@ -35,23 +36,23 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
      * @param postType
      * @return size + 1 개의 Post
      */
-    // TODO: tag 도 함께 페치 조인하여 n + 1 문제를 해결해야함(적용하니까 쿼리 결과가 0개 날라와서 일단 주석처리)
     public List<Post> findAllWithinDistance(Long lastPostId, Long size, Location locationEntity, PostType postType) {
         BoundingBox box = BoundingBox.calculateBoundingBox(locationEntity);
+        LocalDateTime yesterday = LocalDateTime.now().minusDays(1);
 
         return jpaQueryFactory.selectFrom(post)
                 .join(post.location, location).fetchJoin()
                 .join(post.member, member).fetchJoin()
-//                .join(post.tag, tag)
                 .where(
                         location.latitude.between(box.getLeftLat(), box.getRightLat()),
                         location.longitude.between(box.getLeftLon(), box.getRightLon()),
                         goeLastPostId(lastPostId),
-                        post.postType.eq(postType),
-                        post.content.isNotEmpty()
+//                        post.postType.eq(postType),
+                        post.content.isNotEmpty(),
+                        post.createdAt.after(yesterday)
                 )
                 .orderBy(
-                        post.id.desc()
+                        post.createdAt.desc()
                 )
                 .limit(size + 1)
                 .fetch();
@@ -85,15 +86,5 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
         }
 
         return postList;
-    }
-
-    @Override
-    public List<Post> getLatestPostList(Location location) {
-        return jpaQueryFactory
-                .select(post)
-                .from(post)
-                .orderBy(post.createdAt.desc())
-                .limit(5)
-                .fetch();
     }
 }
