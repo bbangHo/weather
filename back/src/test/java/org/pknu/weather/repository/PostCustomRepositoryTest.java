@@ -39,9 +39,9 @@ class PostCustomRepositoryTest {
     @DisplayName("최신순으로 게시글을 가져오는 메서드 테스트")
     void getLatestPostListTest() {
         // given
-        Location seoulLocation = locationRepository.save(TestDataCreator.getSeoulLocation());
+        Location location = locationRepository.save(TestDataCreator.getBusanLocation());
+        Member member = memberRepository.save(TestDataCreator.getBusanMember());
 
-        Member member = memberRepository.save(TestDataCreator.getMember());
         postRepository.save(TestDataCreator.getPost(member));
         postRepository.save(TestDataCreator.getPost(member));
         postRepository.save(TestDataCreator.getPost(member));
@@ -53,7 +53,7 @@ class PostCustomRepositoryTest {
         em.clear();
 
         // when
-        List<Post> latestPostList = postRepository.findAllWithinDistance(1L, 5L, seoulLocation, PostType.WEATHER);
+        List<Post> latestPostList = postRepository.findAllWithinDistance(1L, 4L, location, PostType.WEATHER);
 
         // then
         Assertions.assertThat(latestPostList.get(0).getCreatedAt()).isAfter(latestPostList.get(1).getCreatedAt());
@@ -61,7 +61,6 @@ class PostCustomRepositoryTest {
         Assertions.assertThat(latestPostList.get(2).getCreatedAt()).isAfter(latestPostList.get(3).getCreatedAt());
         Assertions.assertThat(latestPostList.get(3).getCreatedAt()).isAfter(latestPostList.get(4).getCreatedAt());
         Assertions.assertThat(latestPostList.size()).isEqualTo(5);
-
     }
 
     @Test
@@ -69,11 +68,11 @@ class PostCustomRepositoryTest {
     void 게시글이_생성된_시간이_24시간이_초과했으면_조회되지_않습니다() {
         // given
         Location location = locationRepository.save(TestDataCreator.getSeoulLocation());
-        Member member = memberRepository.save(TestDataCreator.getMember());
+        Member member = memberRepository.save(TestDataCreator.getBusanMember());
         Post post = TestDataCreator.getPost(member);
         em.detach(post);
 
-        TestUtil.setField(post,
+        TestUtil.entitySetFiled(post,
                 "createdAt",
                 LocalDateTime.now().minusHours(24));
 
@@ -86,7 +85,30 @@ class PostCustomRepositoryTest {
 
         // then
         Assertions.assertThat(postList.size()).isEqualTo(0);
+    }
 
+    @Test
+    @Transactional
+    void 게시글이_24시간_이내에_생성되었다면_조회됩니다() {
+        // given
+        Location location = locationRepository.save(TestDataCreator.getBusanLocation());
+        Member member = memberRepository.save(TestDataCreator.getBusanMember());
+        Post post = TestDataCreator.getPost(member);
+        em.detach(post);
+
+        TestUtil.entitySetFiled(post,
+                "createdAt",
+                LocalDateTime.now().minusHours(23));
+
+        em.merge(post);
+        em.flush();
+        em.clear();
+
+        // when
+        List<Post> postList = postRepository.findAllWithinDistance(1L, 1L, location, PostType.WEATHER);
+
+        // then
+        Assertions.assertThat(postList.size()).isEqualTo(1);
     }
 }
 

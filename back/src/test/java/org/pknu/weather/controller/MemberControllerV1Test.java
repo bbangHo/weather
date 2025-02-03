@@ -78,7 +78,7 @@ class MemberControllerV1Test {
 
         MockMultipartFile profileImgFile = getProfileImage();
         TermsDto termsDtoAgreed = getTermsDto(true);
-        Member member = memberRepository.findMemberByEmail(TestDataCreator.getMember().getEmail()).get();
+        Member member = memberRepository.findMemberByEmail(TestDataCreator.getBusanMember().getEmail()).get();
         MemberJoinDTO memberJoinDTO = getMemberJoinDTO(member);
         String jwt = generateJwtToken(member.getId(), member.getEmail());
 
@@ -185,7 +185,7 @@ class MemberControllerV1Test {
                 .termsVersion(1)
                 .build());
 
-        memberRepository.save(TestDataCreator.getMember());
+        memberRepository.save(TestDataCreator.getBusanMember());
     }
 
     private String generateJwtToken(Long id, String email) {
