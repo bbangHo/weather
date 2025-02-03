@@ -20,7 +20,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: 빌드
+      - name: 권한
         run: chmod +x back/gradlew
 
       - name: 환경변수 주입
@@ -44,6 +44,10 @@ jobs:
           apple.key.id: ${{ secrets.APPLE_KEY_ID }}
           apple.key.content: ${{ secrets.APPLE_KEY }}
           spring.profiles.active: ${{ secrets.PROFILE_TYPE }}
+
+      - name: Build
+        working-directory: back
+        run: ./gradlew build -x test -i
 
       - name: 도커 이미지 build
         run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/neighborhood_weather_community_app ./back

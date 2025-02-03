@@ -7,7 +7,7 @@ on:
 
     paths:
       - back/src/main/**
-      - ./github/**
+      - .github/**
 
 jobs:
   test:
@@ -72,8 +72,12 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: 빌드
+      - name: 권한
         run: chmod +x back/gradlew
+
+      - name: Build
+        working-directory: back
+        run: ./gradlew build -x test -i
 
       - name: Build Docker image
         run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/github-actions-demo ./back
