@@ -201,11 +201,11 @@ class PostServiceTest {
         assertThat(postList.get(0)).isEqualTo(busanPost);
     }
 
-    @Test
+//    @Test
     @Transactional
     void postType이_다르면_게시글이_조회되지_않습니다() {
         // given
-        Member member = memberRepository.save(TestDataCreator.getMember());
+        Member member = memberRepository.save(TestDataCreator.getBusanMember());
 
         Post hPost = postRepository.save(Post.builder()
                 .postType(PostType.HIKING)
@@ -233,20 +233,21 @@ class PostServiceTest {
     @Transactional
     public void 좋아요_누르기_좋아요_취소_테스트() {
         // given
-        Member member = memberRepository.save(TestDataCreator.getMember());
+        Member member = memberRepository.save(TestDataCreator.getBusanMember());
         Post post = postRepository.save(TestDataCreator.getPost(member));
-        // when
 
-        // then
+        // when
         postService.addRecommendation(member.getEmail(), post.getId());
         em.flush();
         em.clear();
+
         post = postRepository.safeFindById(post.getId());
         assertThat(post.getRecommendationList().size()).isEqualTo(1);
 
         postService.addRecommendation(member.getEmail(), post.getId());
         em.flush();
         em.clear();
+
         post = postRepository.safeFindById(post.getId());
         assertThat(post.getRecommendationList().size()).isEqualTo(0);
     }

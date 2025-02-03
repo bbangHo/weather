@@ -12,7 +12,7 @@ public class TestDataCreator {
     private static int locationIdx = 1;
     private static int memberIdx = 1;
 
-    public static Member getMember() {
+    public static Member getBusanMember() {
         return Member.builder()
                 .location(getBusanLocation())
                 .email("test@naver.com")

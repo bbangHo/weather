@@ -9,6 +9,7 @@ import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.tag.EnumTag;
 import org.pknu.weather.dto.TagQueryResult;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,14 +37,16 @@ public class TagCustomRepositoryImpl implements TagCustomRepository {
 
     private TagQueryResult getTagTuple(Location locationEntity, EnumPath<? extends EnumTag> pTag) {
         BoundingBox box = BoundingBox.calculateBoundingBox(locationEntity);
+        LocalDateTime threeHoursAgo = LocalDateTime.now().minusHours(3);
 
         Tuple tuple = jpaQueryFactory
                 .select(pTag.count(), pTag)
                 .from(tag)
-                .join(tag.location, location)
+                .join(tag.location, location).fetchJoin()
                 .where(
                         location.latitude.between(box.getLeftLat(), box.getRightLat()),
-                        location.longitude.between(box.getLeftLon(), box.getRightLon())
+                        location.longitude.between(box.getLeftLon(), box.getRightLon()),
+                        tag.createdAt.after(threeHoursAgo)
                 )
                 .groupBy(pTag)
                 .orderBy(pTag.count().desc())

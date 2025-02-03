@@ -10,6 +10,4 @@ public interface PostCustomRepository {
     List<Post> findAllWithinDistance(Long lastPostId, Long size, Location location, PostType postType);
 
     List<Post> getPopularPostList(Location location);
-
-    List<Post> getLatestPostList(Location location);
 }
