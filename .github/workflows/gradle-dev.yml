@@ -6,6 +6,7 @@ on:
       - dev
     paths:
       - back/**
+      - .github/**
 
 jobs:
   deploy:
