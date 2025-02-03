@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.Post;
+import org.pknu.weather.domain.common.PostType;
 import org.pknu.weather.dto.PostResponse;
 import org.pknu.weather.dto.converter.PostResponseConverter;
 import org.pknu.weather.repository.MemberRepository;
@@ -31,7 +32,7 @@ public class PostQueryService {
 
     public List<PostResponse.Post> getLatestPostList(String email) {
         Member member = memberRepository.safeFindByEmail(email);
-        List<Post> popularPostList = postRepository.getLatestPostList(member.getLocation());
-        return PostResponseConverter.toPopularPostList(member, popularPostList);
+        List<Post> popularPostList = postRepository.findAllWithinDistance(1L, 5L, member.getLocation(), PostType.WEATHER);
+        return PostResponseConverter.toLatestPostList(member, popularPostList);
     }
 }

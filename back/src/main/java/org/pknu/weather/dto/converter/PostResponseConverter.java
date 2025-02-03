@@ -1,7 +1,5 @@
 package org.pknu.weather.dto.converter;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.pknu.weather.common.formatter.DateTimeFormatter;
 import org.pknu.weather.common.utils.RecommendationUtils;
 import org.pknu.weather.domain.Location;
@@ -9,6 +7,9 @@ import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.Post;
 import org.pknu.weather.domain.Recommendation;
 import org.pknu.weather.dto.PostResponse;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PostResponseConverter {
 
@@ -28,8 +29,8 @@ public class PostResponseConverter {
                 .build();
     }
 
-    public static List<PostResponse.Post> toPopularPostList(Member member, List<Post> popularPostList) {
-        return popularPostList.stream()
+    public static List<PostResponse.Post> toLatestPostList(Member member, List<Post> latestPostList) {
+        return latestPostList.stream()
                 .map(PostResponseConverter::toPost)
                 .toList();
     }
