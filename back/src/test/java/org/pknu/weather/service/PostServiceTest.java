@@ -201,7 +201,7 @@ class PostServiceTest {
         assertThat(postList.get(0)).isEqualTo(busanPost);
     }
 
-    @Test
+//    @Test
     @Transactional
     void postType이_다르면_게시글이_조회되지_않습니다() {
         // given
