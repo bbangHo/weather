@@ -38,7 +38,7 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
      */
     public List<Post> findAllWithinDistance(Long lastPostId, Long size, Location locationEntity, PostType postType) {
         BoundingBox box = BoundingBox.calculateBoundingBox(locationEntity);
-        LocalDateTime yesterday = LocalDateTime.now().minusDays(1);
+        LocalDateTime yesterday = LocalDateTime.now().minusHours(24);
 
         return jpaQueryFactory.selectFrom(post)
                 .join(post.location, location).fetchJoin()
