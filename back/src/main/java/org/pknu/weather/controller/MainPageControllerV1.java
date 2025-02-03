@@ -44,8 +44,8 @@ public class MainPageControllerV1 {
             @RequestHeader("Authorization") String authorization) {
 
         String email = TokenConverter.getEmailByToken(authorization);
-        List<PostResponse.Post> popularPosts = mainPageService.getLatestPostList(email);
-        return ApiResponse.onSuccess(popularPosts);
+        List<PostResponse.Post> latestPostList = mainPageService.getLatestPostList(email);
+        return ApiResponse.onSuccess(latestPostList);
     }
 
     @GetMapping(value = "/extraWeatherInfo")
