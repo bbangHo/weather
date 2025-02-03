@@ -2,8 +2,12 @@ name: test Pipeline
 
 on:
   pull_request:
+    branch:
+      - dev
+
     paths:
-      - back/**
+      - back/src/main/**
+      - ./github/**
 
 jobs:
   test:
@@ -28,23 +32,24 @@ jobs:
       - name: Set yml value
         uses: microsoft/variable-substitution@v1
         with:
-          files: "**/src/test/resources/application.yml"
+          files: "**/src/test/resources/application.yml, **/src/main/resources/application.yml"
         env:
-          spring.datasource.url: ${{ env.SPRING_DATASOURCE_URL }}
-          spring.datasource.username: ${{ env.SPRING_DATASOURCE_USERNAME }}
-          spring.datasource.password: ${{ env.SPRING_DATASOURCE_PASSWORD }}
+          spring.datasource.url: ${{ secrets.DB_URL }}
+          spring.datasource.username: ${{ secrets.DB_USERNAME }}
+          spring.datasource.password: ${{ secrets.DB_PASSWORD }}
           api.weather.service-key: ${{ secrets.SHORT_TERM_FORECAST_API_KEY }}
           spring.jwt.key: ${{ secrets.JWT_KEY }}
           spring.sigs.key: ${{ secrets.CONSUMER_KEY }}
           spring.sigs.secret: ${{ secrets.CONSUMER_SECRET }}
-          cloud.aws.credentials.access-key: ${{secrets.S3_ACCESS_KEY}}
-          cloud.aws.credentials.secret-key: ${{secrets.S3_SECRET_KEY}}
+          cloud.aws.credentials.access-key: ${{ secrets.S3_ACCESS_KEY }}
+          cloud.aws.credentials.secret-key: ${{ secrets.S3_SECRET_KEY }}
           spring.weather.key: ${{ secrets.METEOROLOGICAL_ADMIN_KEY }}
-          spring.kakao.admin_key: $ {{secrets.KAKAO_SERVICE_ADMIN_KEY}}
+          spring.kakao.admin_key: ${{ secrets.KAKAO_SERVICE_ADMIN_KEY }}
           apple.client-id: ${{ secrets.CLIENT_ID }}
           apple.team-id: ${{ secrets.TEAM_ID }}
           apple.key.id: ${{ secrets.APPLE_KEY_ID }}
           apple.key.content: ${{ secrets.APPLE_KEY }}
+          spring.profiles.active: ${{ secrets.PROFILE_TYPE }}
 
       - name: Grant execute permission for gradlew
         run: chmod +x back/gradlew
@@ -52,3 +57,32 @@ jobs:
       - name: Build with Gradle Wrapper
         working-directory: back
         run: ./gradlew test -i
+
+  build-and-push:
+    runs-on: ubuntu-latest
+    needs: test
+    if: ${{ needs.test.result == 'success' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: 빌드
+        run: chmod +x back/gradlew
+
+      - name: Build Docker image
+        run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/github-actions-demo ./back
+
+      - name: Docker login
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+
+      - name: Docker Hub push
+        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/github-actions-demo
