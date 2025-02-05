@@ -10,17 +10,18 @@ on:
 
 jobs:
   deploy:
-    if: github.event_name == 'push'
     runs-on: self-hosted
+    needs: build-and-push
 
     steps:
       - name: 최신 Docker 이미지를 풀
-        run: sudo docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/github-actions-demo
+        run: sudo docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/github-actions-demo:latest
 
       - name: 기존의 Docker 컨테이너를 중지 (if any)
         run: |
-          if [ "$(sudo docker ps -q)" ]; then
-            sudo docker stop $(sudo docker ps -q)
+          if [ "$(sudo docker ps -q --filter 'name=neighborhood_weather_community_app')" ]; then
+            sudo docker stop neighborhood_weather_community_app
+            sudo docker rm neighborhood_weather_community_app
           fi
 
       - name: 기존의 Docker 컨테이너를 제거 (if any)
