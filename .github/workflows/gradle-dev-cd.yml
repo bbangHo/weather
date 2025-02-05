@@ -18,15 +18,15 @@ jobs:
 
       - name: 기존의 Docker 컨테이너를 중지 (if any)
         run: |
-          if [ "$(sudo docker ps -q --filter 'name=neighborhood_weather_community_app')" ]; then
-            sudo docker stop neighborhood_weather_community_app
-            sudo docker rm neighborhood_weather_community_app
+          if sudo docker inspect neighborhood_weather_community_app >/dev/null 2>&1; then
+            sudo docker stop neighborhood_weather_community_app || true
+            sudo docker rm neighborhood_weather_community_app || true
           fi
 
       - name: 기존의 Docker 컨테이너를 제거 (if any)
         run: |
           if [ "$(sudo docker ps -a -q)" ]; then
-            sudo docker rm $(sudo docker ps -a -q)
+            sudo docker rm $(sudo docker ps -a -q) || true
           fi
 
       - name: 새로운 Docker 컨테이너를 실행
