@@ -1,4 +1,4 @@
-name: test Pipeline
+name: CI Pipeline
 
 on:
   pull_request:
@@ -7,7 +7,6 @@ on:
 
     paths:
       - back/src/main/**
-      - .github/**
 
 jobs:
   test:
