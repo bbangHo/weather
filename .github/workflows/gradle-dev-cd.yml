@@ -10,7 +10,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: self-hosted
+    runs-on: dev-self-hosted
 
     steps:
       - name: 최신 Docker 이미지를 풀
@@ -18,9 +18,9 @@ jobs:
 
       - name: 기존의 Docker 컨테이너를 중지 (if any)
         run: |
-          if sudo docker inspect neighborhood_weather_community_app >/dev/null 2>&1; then
-            sudo docker stop neighborhood_weather_community_app || true
-            sudo docker rm neighborhood_weather_community_app || true
+          if sudo docker inspect dev_weather_community_app >/dev/null 2>&1; then
+            sudo docker stop dev_weather_community_app || true
+            sudo docker rm dev_weather_community_app || true
           fi
 
       - name: 기존의 Docker 컨테이너를 제거 (if any)
@@ -31,7 +31,7 @@ jobs:
 
       - name: 새로운 Docker 컨테이너를 실행
         run: |
-          sudo docker run --name neighborhood_weather_community_app \
+          sudo docker run --name dev_weather_community_app \
           -e TZ=Asia/Seoul \
           -v /etc/localtime:/etc/localtime:ro \
           -v /etc/timezone:/etc/timezone:ro \

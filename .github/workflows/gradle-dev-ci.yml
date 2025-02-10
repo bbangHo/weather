@@ -21,21 +21,15 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Set up environment variables
-        run: |
-          echo "SPRING_DATASOURCE_URL=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE" >> $GITHUB_ENV
-          echo "SPRING_DATASOURCE_USERNAME=sa" >> $GITHUB_ENV
-          echo "SPRING_DATASOURCE_PASSWORD=" >> $GITHUB_ENV
-
       # 환경변수 주입
       - name: Set yml value
         uses: microsoft/variable-substitution@v1
         with:
-          files: "**/src/test/resources/application.yml, **/src/main/resources/application.yml"
+          files: "**/src/test/resources/application.yml"
         env:
-          spring.datasource.url: ${{ secrets.DB_URL }}
-          spring.datasource.username: ${{ secrets.DB_USERNAME }}
-          spring.datasource.password: ${{ secrets.DB_PASSWORD }}
+          spring.datasource.url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+          spring.datasource.username: sa
+          spring.datasource.password:
           api.weather.service-key: ${{ secrets.SHORT_TERM_FORECAST_API_KEY }}
           spring.jwt.key: ${{ secrets.JWT_KEY }}
           spring.sigs.key: ${{ secrets.CONSUMER_KEY }}
@@ -48,7 +42,6 @@ jobs:
           apple.team-id: ${{ secrets.TEAM_ID }}
           apple.key.id: ${{ secrets.APPLE_KEY_ID }}
           apple.key.content: ${{ secrets.APPLE_KEY }}
-          spring.profiles.active: ${{ secrets.PROFILE_TYPE }}
 
       - name: Grant execute permission for gradlew
         run: chmod +x back/gradlew
@@ -58,7 +51,7 @@ jobs:
         run: ./gradlew test -i
 
   build-and-push:
-    runs-on: ubuntu-latest
+    runs-on: dev-self-hosted
     needs: test
     if: ${{ needs.test.result == 'success' }}
 
@@ -95,7 +88,6 @@ jobs:
           apple.team-id: ${{ secrets.TEAM_ID }}
           apple.key.id: ${{ secrets.APPLE_KEY_ID }}
           apple.key.content: ${{ secrets.APPLE_KEY }}
-          spring.profiles.active: ${{ secrets.PROFILE_TYPE }}
 
       - name: Build
         working-directory: back
