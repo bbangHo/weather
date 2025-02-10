@@ -1,11 +1,11 @@
 name: CI/CD Pipeline
 
 on:
-  push:
+#  push:
+  pull_request:
     branches:
       - main
-    paths:
-      - back/**
+      - release
 
 jobs:
   backend-docker-build-and-push:
@@ -43,7 +43,7 @@ jobs:
           apple.team-id: ${{ secrets.TEAM_ID }}
           apple.key.id: ${{ secrets.APPLE_KEY_ID }}
           apple.key.content: ${{ secrets.APPLE_KEY }}
-          spring.profiles.active: ${{ secrets.PROFILE_TYPE }}
+          spring.profiles.active: prod
 
       - name: Build
         working-directory: back
@@ -87,13 +87,13 @@ jobs:
           -e TZ=Asia/Seoul \
           -v /etc/localtime:/etc/localtime:ro \
           -v /etc/timezone:/etc/timezone:ro \
-          --rm -d -p 8080:8080 \
+          -d -p 8080:8080 \
           ${{ secrets.DOCKER_HUB_USERNAME }}/neighborhood_weather_community_app
 
       - name: 헬스 체크 수행
         run: |
           echo "Performing health check..."
-          sleep 10  # 컨테이너가 완전히 시작될 때까지 대기
+          sleep 30  # 컨테이너가 완전히 시작될 때까지 대기
           if curl -f http://localhost:8080/actuator/health; then
             echo "Health check passed. Deployment successful."
           else
