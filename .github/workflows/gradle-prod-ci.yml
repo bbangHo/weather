@@ -43,7 +43,6 @@ jobs:
           apple.team-id: ${{ secrets.TEAM_ID }}
           apple.key.id: ${{ secrets.APPLE_KEY_ID }}
           apple.key.content: ${{ secrets.APPLE_KEY }}
-          spring.profiles.active: prod
 
       - name: Build
         working-directory: back
@@ -62,7 +61,7 @@ jobs:
         run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/neighborhood_weather_community_app
 
   backend-docker-pull-and-run:
-    runs-on: self-hosted
+    runs-on: prod-self-hosted
     needs: backend-docker-build-and-push
     if: ${{ needs.backend-docker-build-and-push.result == 'success' }}
 
@@ -93,8 +92,8 @@ jobs:
       - name: 헬스 체크 수행
         run: |
           echo "Performing health check..."
-          sleep 30  # 컨테이너가 완전히 시작될 때까지 대기
-          if curl -f http://localhost:8080/actuator/health; then
+          sleep 60  # 컨테이너가 완전히 시작될 때까지 대기
+          if curl -f http://localhost:8080/health-check; then
             echo "Health check passed. Deployment successful."
           else
             echo "Health check failed. Rolling back to previous version..."
