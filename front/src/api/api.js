@@ -1,4 +1,8 @@
-const BASE_URL = 'https://weather-community.shop';
+/* 개발 서버 */
+/* const BASE_URL = 'https://weather-community.shop'; */
+/* 운영 서버 */
+const BASE_URL = 'https://weather-community.store';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const sendAccessTokenToBackend = async (accessToken, type) => {
@@ -327,6 +331,7 @@ export const toggleLikePost = async (accessToken, postId) => {
     }
 
     const data = await response.json();
+    console.log('toggleLikePost 좋아요 응답:', data);
     return data;
   } catch (error) {
     console.error('Error liking post:', error);
