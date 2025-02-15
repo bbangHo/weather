@@ -39,6 +39,7 @@ const PostScroll = ({accessToken, refreshPosts, onRefreshComplete}) => {
 
   const loadPosts = async () => {
     try {
+      setLoading(true);
       const fetchedPosts = await fetchPosts(
         accessToken,
         postType,
@@ -47,16 +48,7 @@ const PostScroll = ({accessToken, refreshPosts, onRefreshComplete}) => {
         100000000,
       );
       console.log('Fetched scroll posts:', fetchedPosts);
-
-      setPosts(
-        fetchedPosts.map(post => ({
-          ...post,
-          postInfo: {
-            ...post.postInfo,
-            likeClickable: post.postInfo.likeCount > 0,
-          },
-        })),
-      );
+      setPosts(fetchedPosts);
     } catch (error) {
       console.error('Error loading posts:', error.message);
       Alert.alert(
@@ -69,29 +61,28 @@ const PostScroll = ({accessToken, refreshPosts, onRefreshComplete}) => {
   };
 
   const handleLikePress = async postId => {
-    try {
-      const response = await toggleLikePost(accessToken, postId);
+    /*
+    setPosts(prevPosts =>
+      prevPosts.map(post =>
+        post.postInfo.postId === postId
+          ? {
+              ...post,
+              postInfo: {
+                ...post.postInfo,
+                likeClickable: !post.postInfo.likeClickable,
+                likeCount: post.postInfo.likeClickable
+                  ? Math.max(post.postInfo.likeCount - 1, 0)
+                  : post.postInfo.likeCount + 1,
+              },
+            }
+          : post,
+      ),
+    );
+    */
 
-      if (response.isSuccess) {
-        setPosts(prevPosts =>
-          prevPosts.map(post =>
-            post.postInfo.postId === postId
-              ? {
-                  ...post,
-                  postInfo: {
-                    ...post.postInfo,
-                    likeClickable: !post.postInfo.likeClickable,
-                    likeCount: post.postInfo.likeClickable
-                      ? Math.max(post.postInfo.likeCount - 1, 0)
-                      : post.postInfo.likeCount + 1,
-                  },
-                }
-              : post,
-          ),
-        );
-      } else {
-        Alert.alert('Error', '좋아요를 할 수 없습니다. 다시 시도해주세요.');
-      }
+    try {
+      await toggleLikePost(accessToken, postId);
+      loadPosts();
     } catch (error) {
       console.error('Failed to like/unlike post:', error.message);
       Alert.alert(
@@ -142,15 +133,15 @@ const PostScroll = ({accessToken, refreshPosts, onRefreshComplete}) => {
             <Image
               source={
                 item.postInfo.likeClickable
-                  ? require('../../assets/images/icon_heart2.png')
-                  : require('../../assets/images/icon_heart0.png')
+                  ? require('../../assets/images/icon_heart0.png')
+                  : require('../../assets/images/icon_heart2.png')
               }
               style={[
                 styles.likeIcon,
                 {
                   tintColor: item.postInfo.likeClickable
-                    ? '#da4133'
-                    : '#d3d3d3',
+                    ? '#d3d3d3'
+                    : '#da4133',
                 },
               ]}
             />
@@ -178,7 +169,9 @@ const PostScroll = ({accessToken, refreshPosts, onRefreshComplete}) => {
           </View>
         ) : (
           <View style={styles.emptyStateContainer}>
-            <Text style={styles.emptyStateText}>불러올 게시글이 없습니다.</Text>
+            <Text style={styles.emptyStateText}>
+              아직 작성된 게시글이 없습니다.
+            </Text>
           </View>
         )
       }

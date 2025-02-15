@@ -32,8 +32,28 @@ const HomeScreen = ({accessToken, navigation}) => {
   const fetchWeather = async () => {
     try {
       const data = await fetchWeatherData(accessToken);
-      setWeatherData(data.result);
-      updateButtonBackgroundColor(data.result?.weatherPerHourList || []);
+
+      if (data?.result?.weatherPerHourList) {
+        const uniqueWeatherList = [];
+        const seenHours = new Set();
+
+        for (const item of data.result.weatherPerHourList) {
+          const itemHour = new Date(item.hour).getHours();
+          if (!seenHours.has(itemHour)) {
+            uniqueWeatherList.push(item);
+            seenHours.add(itemHour);
+          }
+        }
+
+        setWeatherData({
+          ...data.result,
+          weatherPerHourList: uniqueWeatherList,
+        });
+
+        updateButtonBackgroundColor(uniqueWeatherList);
+      } else {
+        setWeatherData(data.result);
+      }
     } catch (error) {
       console.error('Error fetching weather data:', error);
     }
