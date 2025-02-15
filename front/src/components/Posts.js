@@ -26,8 +26,31 @@ const Posts = ({accessToken, refreshing}) => {
     const loadPosts = async () => {
       try {
         const posts = await fetchPopularPosts(accessToken);
-        setNewPosts(posts);
-        console.log('Fetched popular posts:', posts);
+
+        if (posts.length === 0) {
+          setNewPosts([
+            {
+              memberInfo: {
+                city: 'city',
+                memberName: '알림 메시지',
+                profileImageUrl: null,
+                sensitivity: 'NONE',
+                street: '',
+              },
+              postInfo: {
+                postId: 'placeholder',
+                content:
+                  '아직 작성된 글이 없습니다.\n우리 동네 날씨를 가장 먼저 알려주세요!',
+                createdAt: '방금 전',
+                likeClickable: false,
+                likeCount: 1,
+              },
+            },
+          ]);
+        } else {
+          setNewPosts(posts);
+          console.log('Fetched popular posts:', posts);
+        }
       } catch (error) {
         console.error('Error fetching popular posts:', error.message);
       } finally {
@@ -39,6 +62,8 @@ const Posts = ({accessToken, refreshing}) => {
   }, [accessToken, refreshing]);
 
   const handleLikePress = async postId => {
+    if (postId === 'placeholder') return;
+
     try {
       const response = await toggleLikePost(accessToken, postId);
       console.log('Like/unlike response:', response);
@@ -114,7 +139,8 @@ const Posts = ({accessToken, refreshing}) => {
           </View>
           <TouchableOpacity
             style={styles.likeContainer}
-            onPress={() => handleLikePress(item.postInfo.postId)}>
+            onPress={() => handleLikePress(item.postInfo.postId)}
+            disabled={item.postInfo.postId === 'placeholder'}>
             <Image
               source={
                 !item.postInfo.likeClickable

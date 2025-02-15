@@ -103,6 +103,11 @@ const WeatherHeader = ({
 
   useEffect(() => {
     const updateLocation = async () => {
+      if (!accessToken) {
+        console.log('Access Token이 필요합니다.');
+        return;
+      }
+
       const requestAndCheckPermission = async () => {
         const hasPermission = await requestLocationPermission();
 
