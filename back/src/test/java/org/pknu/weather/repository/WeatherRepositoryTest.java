@@ -65,7 +65,7 @@ class WeatherRepositoryTest {
     @Transactional
     void 특정_지역의_날씨_갱신_시각이_지나_업데이트_되었다면_true() {
         // given
-        LocalDateTime baseTime = DateTimeFormatter.getBaseTimeCloseToNow();
+        LocalDateTime baseTime = DateTimeFormatter.getBaseLocalDateTime();
 
         Weather weather = Weather.builder()
                 .basetime(baseTime)
@@ -103,7 +103,7 @@ class WeatherRepositoryTest {
     @Transactional
     void 특정_지역의_날씨가_등록되어_있다면_true() {
         // give
-        LocalDateTime baseTime = DateTimeFormatter.getBaseTimeCloseToNow();
+        LocalDateTime baseTime = DateTimeFormatter.getBaseLocalDateTime();
 
         Weather weather = Weather.builder()
                 .basetime(baseTime)
