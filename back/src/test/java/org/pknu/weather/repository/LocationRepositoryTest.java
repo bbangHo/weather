@@ -44,7 +44,7 @@ class LocationRepositoryTest {
             Weather weather = Weather.builder()
                     .basetime(LocalDateTime.now())
                     .presentationTime(
-                            DateTimeFormatter.formattedDateTime2LocalDateTime(DateTimeFormatter.getFormattedDate(),
+                            DateTimeFormatter.formattedDateTime2LocalDateTime(DateTimeFormatter.getFormattedLocalDate(),
                                     DateTimeFormatter.getFormattedTimeByOneHour(LocalTime.of(i, 0))))
                     .temperature(14)
                     .humidity(50)
@@ -56,7 +56,7 @@ class LocationRepositoryTest {
                     .basetime(now)
                     .presentationTime(
                             DateTimeFormatter.formattedDateTime2LocalDateTime(
-                                    DateTimeFormatter.getFormattedDate(
+                                    DateTimeFormatter.getFormattedLocalDate(
                                             LocalDate.of(now.getYear(), now.getMonth(), now.getDayOfMonth() - 1)),
                                     DateTimeFormatter.getFormattedTimeByOneHour(LocalTime.of(i, 0))))
                     .temperature(14)

@@ -62,8 +62,8 @@ public class WeatherService {
         float lat = location.getLatitude().floatValue();
 
         PointDTO pointDTO = GeometryUtils.coordinateToPoint(lon, lat);
-        String date = DateTimeFormatter.getFormattedDate();
-        String time = DateTimeFormatter.getFormattedTimeByThreeHour();
+        String date = DateTimeFormatter.getFormattedBaseDate();
+        String time = DateTimeFormatter.getFormattedBaseTime();
 
         WeatherParams weatherParams = WeatherParamsFactory.create(weatherServiceKey, date, time, pointDTO);
 

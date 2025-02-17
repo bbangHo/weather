@@ -1,6 +1,5 @@
 package org.pknu.weather.feignClient.utils;
 
-import java.lang.reflect.Method;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
@@ -17,6 +16,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -24,7 +24,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 import static org.pknu.weather.common.converter.CoordinateConverter.transformWGS84ToUTMK;
-import static org.pknu.weather.common.formatter.DateTimeFormatter.getFormattedDate;
+import static org.pknu.weather.common.formatter.DateTimeFormatter.getFormattedLocalDate;
 
 @Slf4j
 @Component
@@ -143,7 +143,7 @@ public class ExtraWeatherApiUtils {
         if (locationCode  == null)
             throw new GeneralException(ErrorStatus._LOCATION_NOT_FOUND);
 
-        String date = getFormattedDate() + LocalTime.now().getHour();
+        String date = getFormattedLocalDate() + LocalTime.now().getHour();
 
         UVResponseDTO result = uvClient.getUVInfo(weatherKey, locationCode, date, DATATYPE);
 
