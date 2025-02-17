@@ -54,7 +54,12 @@ public final class DateTimeFormatter {
      * @return yyyyMMdd 형태의 날짜 스트링
      */
     public static String getFormattedBaseDate() {
-        LocalDate currentDate = LocalDate.now();
+        LocalDate currentDate = getBaseLocalDateTime().toLocalDate();
+        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd");
+        return currentDate.format(formatter);
+    }
+
+    public static String getFormattedBaseDate(LocalDate currentDate) {
         java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd");
         return currentDate.format(formatter);
     }
