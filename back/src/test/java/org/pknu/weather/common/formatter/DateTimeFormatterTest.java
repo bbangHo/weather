@@ -25,11 +25,11 @@ class DateTimeFormatterTest {
     @MethodSource("provideTestDates")
     void 날짜가_변경되는_시점에서도_baseTime을_정상적으로_반환하는지_테스트(LocalDateTime localDateTime) {
         // given
-        String baseDate = DateTimeFormatter.getFormattedLocalDate(localDateTime.toLocalDate());
+        String baseDate = DateTimeFormatter.getFormattedBaseDate(localDateTime.toLocalDate());
         String baseTime = DateTimeFormatter.getFormattedBaseTime(localDateTime);
 
         // when
-        String baseDateResult = DateTimeFormatter.getFormattedLocalDate(localDateTime.toLocalDate());
+        String baseDateResult = DateTimeFormatter.getFormattedBaseDate(localDateTime.toLocalDate());
         String baseTimeResult = DateTimeFormatter.getFormattedBaseTime(localDateTime);
 
         // then
