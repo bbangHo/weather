@@ -1,12 +1,6 @@
 package org.pknu.weather.common.utils;
 
 
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.io.ParseException;
-import org.locationtech.jts.io.WKTReader;
 import org.pknu.weather.feignClient.dto.PointDTO;
 
 public final class GeometryUtils {
@@ -24,8 +18,7 @@ public final class GeometryUtils {
     private static final int WGS84_SRID = 4326; // 기준점 Y좌표
 
     /**
-     * 위경도를 격자(nx, ny) 좌표로 변환을 해주는 메소드
-     * 위경도 -> 격자
+     * 위경도를 격자(nx, ny) 좌표로 변환을 해주는 메소드 위경도 -> 격자
      *
      * @param lon 경도(degree)
      * @param lat 위도(degree)
@@ -48,27 +41,24 @@ public final class GeometryUtils {
     }
 
     /**
-     *
-     * @param latitude 위도 (-90 ~ 90)
+     * @param latitude  위도 (-90 ~ 90)
      * @param longitude 경도
      * @return org.locationtech.jts.geom.Point
      */
-    public static Point getPoint(double latitude, double longitude) {
-        GeometryFactory gf = new GeometryFactory();
-        Point point = gf.createPoint(new Coordinate(longitude, latitude));
-        point.setSRID(WGS84_SRID);
-        return point;
-    }
+//    public static Point getPoint(double latitude, double longitude) {
+//        GeometryFactory gf = new GeometryFactory();
+//        Point point = gf.createPoint(new Coordinate(longitude, latitude));
+//        point.setSRID(WGS84_SRID);
+//        return point;
+//    }
+//    private static Geometry createPoint(double latitude, double longitude) throws ParseException {
+//        return new WKTReader().read("POINT(" + longitude + " " + latitude + ")");
+//    }
 
-    private static Geometry createPoint(double latitude, double longitude) throws ParseException {
-        return new WKTReader().read("POINT(" + longitude + " " + latitude + ")");
-    }
-
-    public static Geometry getMBR(Geometry startGeometry, double distance) {
-        distance /= 111;        // 3km 입력시 111로 나눠야함. buffer의 distance는 단위가 '도' 이기 때문이다.
-        return startGeometry.buffer(distance);
-    }
-
+//    public static Geometry getMBR(Geometry startGeometry, double distance) {
+//        distance /= 111;        // 3km 입력시 111로 나눠야함. buffer의 distance는 단위가 '도' 이기 때문이다.
+//        return startGeometry.buffer(distance);
+//    }
     public static double[] getSouthwestCoordinate(double latitude, double longitude, double distance) {
         return calculate(latitude, longitude, distance, 225.0);
     }
@@ -78,7 +68,7 @@ public final class GeometryUtils {
     }
 
     private static double[] calculate(Double baseLatitude, Double baseLongitude, Double distance,
-                                     Double bearing) {
+                                      Double bearing) {
         Double radianLatitude = toRadian(baseLatitude);
         Double radianLongitude = toRadian(baseLongitude);
         Double radianAngle = toRadian(bearing);
@@ -145,8 +135,12 @@ public final class GeometryUtils {
             ra = re * sf / Math.pow(ra, sn);
             theta = lon * DEGRAD - olon;
 
-            if (theta > PI) theta -= 2.0 * PI;
-            if (theta < -PI) theta += 2.0 * PI;
+            if (theta > PI) {
+                theta -= 2.0 * PI;
+            }
+            if (theta < -PI) {
+                theta += 2.0 * PI;
+            }
 
             theta *= sn;
             x = ra * Math.sin(theta) + XO;
@@ -158,7 +152,9 @@ public final class GeometryUtils {
             double yn = ro - y + YO;
 
             ra = Math.sqrt(xn * xn + yn * yn);
-            if (sn < 0.0) ra = -ra;
+            if (sn < 0.0) {
+                ra = -ra;
+            }
             lat = Math.pow((re * sf / ra), (1.0 / sn));
             lat = 2.0 * Math.atan(lat) - PI * 0.5;
 
@@ -167,7 +163,9 @@ public final class GeometryUtils {
             } else {
                 if (Math.abs(yn) <= 0.0) {
                     theta = PI * 0.5;
-                    if (xn < 0.0) theta = -theta;
+                    if (xn < 0.0) {
+                        theta = -theta;
+                    }
                 } else {
                     theta = Math.atan2(xn, yn);
                 }

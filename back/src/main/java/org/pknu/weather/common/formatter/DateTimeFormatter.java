@@ -8,6 +8,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public final class DateTimeFormatter {
+    static java.time.format.DateTimeFormatter yyyyMMdd = java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd");
+    static java.time.format.DateTimeFormatter hhmm = java.time.format.DateTimeFormatter.ofPattern("HHmm");
+    static java.time.format.DateTimeFormatter yyyyMMddHHmm = java.time.format.DateTimeFormatter.ofPattern("yyyyMMddHHmm");
 
     /**
      * post의 생성 시각과 현재와의 차이를 String으로 반환합니다.
@@ -30,6 +33,19 @@ public final class DateTimeFormatter {
     }
 
     /**
+     * 현재 LocalDate를 yyyymmdd 로 변환한다.
+     *
+     * @return string yyyyMMdd
+     */
+    public static String getFormattedLocalDate() {
+        return getFormattedLocalDate(LocalDate.now());
+    }
+
+    public static String getFormattedLocalDate(LocalDate currentDate) {
+        return currentDate.format(yyyyMMdd);
+    }
+
+    /**
      * basetime(0200, 0500, 0800, 1100, 1400, 1700, 2000, 2300)에 해당하는 LocalDate 값을 yyyyMMdd 형태로 반환합니다.
      * basedate을 계산할 때 사용한다.
      *
@@ -38,14 +54,11 @@ public final class DateTimeFormatter {
      * @return yyyyMMdd 형태의 날짜 스트링
      */
     public static String getFormattedBaseDate() {
-        LocalDate currentDate = LocalDate.now();
-        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd");
-        return currentDate.format(formatter);
+        return getFormattedBaseDate(getBaseLocalDateTime().toLocalDate());
     }
 
     public static String getFormattedBaseDate(LocalDate currentDate) {
-        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd");
-        return currentDate.format(formatter);
+        return currentDate.format(yyyyMMdd);
     }
 
     /**
@@ -55,15 +68,12 @@ public final class DateTimeFormatter {
      * @return HHmm, String 형태의 formatted time
      */
     public static String getFormattedBaseTime() {
-        LocalDateTime currentLocalDateTime = getBaseLocalDateTime();
-        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("HHmm");
-        return currentLocalDateTime.format(formatter);
+        return getFormattedBaseTime(getBaseLocalDateTime());
     }
 
     public static String getFormattedBaseTime(LocalDateTime localDateTime) {
         LocalDateTime currentLocalDateTime = getBaseLocalDateTime(localDateTime);
-        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("HHmm");
-        return currentLocalDateTime.format(formatter);
+        return currentLocalDateTime.format(hhmm);
     }
 
     /**
@@ -72,9 +82,7 @@ public final class DateTimeFormatter {
      * @return HHmm, String 형태의 formatted time
      */
     public static String getFormattedTimeByOneHour() {
-        LocalTime currentTime = LocalTime.now().withMinute(0);
-        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("HHmm");
-        return currentTime.format(formatter);
+        return getFormattedTimeByOneHour(LocalTime.now());
     }
 
     /**
@@ -84,21 +92,18 @@ public final class DateTimeFormatter {
      */
     public static String getFormattedTimeByOneHour(LocalTime now) {
         LocalTime currentTime = now.withMinute(0);
-        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("HHmm");
-        return currentTime.format(formatter);
+        return currentTime.format(hhmm);
     }
 
     /**
-     * yyyyMMDD HHmm 을 LocalDateTime으로 변경
+     * yyyyMMdd HHmm 을 LocalDateTime으로 변경
      *
-     * @param date
-     * @param time
-     * @return
+     * @param date yyyyMMdd
+     * @param time HHmm
+     * @return LocalDateTime
      */
     public static LocalDateTime formattedDateTime2LocalDateTime(String date, String time) {
-        String dateTime = date + time;
-        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("yyyyMMddHHmm");
-        return LocalDateTime.parse(dateTime, formatter);
+        return LocalDateTime.parse(date + time, yyyyMMddHHmm);
     }
 
     /**
@@ -107,8 +112,7 @@ public final class DateTimeFormatter {
      * @return LocalDateTime
      */
     public static LocalDateTime getBaseLocalDateTime() {
-        LocalDateTime currentLocalDateTime = LocalDateTime.now();
-        return findLocalDateTimeCloseToNow(currentLocalDateTime);
+        return findLocalDateTimeCloseToNow(LocalDateTime.now());
     }
 
     public static LocalDateTime getBaseLocalDateTime(LocalDateTime currentLocalDateTime) {

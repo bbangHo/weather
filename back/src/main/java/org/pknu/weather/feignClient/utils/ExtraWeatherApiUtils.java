@@ -24,7 +24,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 import static org.pknu.weather.common.converter.CoordinateConverter.transformWGS84ToUTMK;
-import static org.pknu.weather.common.formatter.DateTimeFormatter.getFormattedBaseDate;
+import static org.pknu.weather.common.formatter.DateTimeFormatter.getFormattedLocalDate;
 
 @Slf4j
 @Component
@@ -143,7 +143,7 @@ public class ExtraWeatherApiUtils {
         if (locationCode  == null)
             throw new GeneralException(ErrorStatus._LOCATION_NOT_FOUND);
 
-        String date = getFormattedBaseDate() + LocalTime.now().getHour();
+        String date = getFormattedLocalDate() + LocalTime.now().getHour();
 
         UVResponseDTO result = uvClient.getUVInfo(weatherKey, locationCode, date, DATATYPE);
 
