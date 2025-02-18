@@ -1,0 +1,83 @@
+spring:
+  sql:
+    init:
+      mode: never
+  datasource:
+    url: ${DB_PROD_URL}
+    username: ${DB_PROD_USERNAME}
+    password: ${DB_PROD_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        use_sql_comments: true
+        default_batch_fetch_size: 500
+    hibernate:
+      ddl-auto: update
+    open-in-view: false   # osiv 설정
+  jwt:
+    key: ${JWT_KEY}
+  sigs:
+    key: ${CONSUMER_KEY}
+    secret: ${CONSUMER_SECRET}
+  weather:
+    key: ${METEOROLOGICAL_ADMIN_KEY}
+  kakao:
+    admin_key: ${KAKAO_SERVICE_ADMIN_KEY}
+  servlet:
+    multipart:
+      enabled: true
+      location: /uploadImg
+      max-request-size: 30MB
+      max-file-size: 10MB
+
+logging:
+  level:
+    root: info
+log:
+  config:
+    path: /customLog
+    filename: custom
+
+api:
+  weather:
+    service-key: ${SHORT_TERM_FORECAST_API_KEY}
+    data-type: JSON
+
+management:
+  health:
+    db:
+      enabled: false
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+cloud:
+  aws:
+    credentials:
+      access-key: ${S3_ACCESS_KEY}
+      secret-key: ${S3_SECRET_KEY}
+    s3:
+      bucket: weather-pknu-bucket
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+
+server:
+  tomcat:
+    mbeanregistry:
+      enabled: true
+
+apple:
+  public-key-url: https://appleid.apple.com
+  client-id: ${CLIENT_ID}
+  team-id: ${TEAM_ID}
+  key:
+    id: ${APPLE_KEY_ID}
+    content: ${APPLE_KEY}
