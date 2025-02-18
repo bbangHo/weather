@@ -1,25 +1,82 @@
 spring:
+  cache:
+    type: simple
   sql:
     init:
       mode: never
   datasource:
-    url: jdbc:mysql://localhost/weather
-    username: root
-    password: 1234
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+    hikari:
+      connection-timeout: 3000
+      maximum-pool-size: 5
+      max-lifetime: 30000
   jpa:
     properties:
       hibernate:
-        ddl-auto: update #운영 환경에서는 사용하지 않기!!!
-        dialect: org.hibernate.dialect.MySQL8Dialect
-        show_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
         format_sql: true
         use_sql_comments: true
         default_batch_fetch_size: 500
+    hibernate:
+      ddl-auto: create
+    open-in-view: false   # osiv 설정
+  jwt:
+    key: ${JWT_KEY}
+  sigs:
+    key: ${CONSUMER_KEY}
+    secret: ${CONSUMER_SECRET}
+  weather:
+    key: ${METEOROLOGICAL_ADMIN_KEY}
+  kakao:
+    admin_key: ${KAKAO_SERVICE_ADMIN_KEY}
+  profiles:
+    active: default
+  servlet:
+    multipart:
+      enabled: true
+      location: /uploadImg
+      max-request-size: 30MB
+      max-file-size: 10MB
 logging:
   level:
-    root: off
+    root: debug
+    org.springframework.cache: DEBUG
 api:
   weather:
-    service_key: '%2BTr3T2Oz8rE41Pb37Hj%2BdJIBtR7WSkr73xNNd%2FS9YCyBagavmwIlWFjV0ZgBWwTpHL0mp01fgJiHAn7PzbTU0Q%3D%3D'
-    data_type: JSON
+    service-key: ${SHORT_TERM_FORECAST_API_KEY}
+    data-type: JSON
+
+management:
+  health:
+    db:
+      enabled: false
+  endpoint:
+    health:
+      show-details: always
+cloud:
+  aws:
+    credentials:
+      access-key: ${S3_ACCESS_KEY}
+      secret-key: ${S3_SECRET_KEY}
+    s3:
+      bucket: weather-pknu-bucket
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+server:
+  tomcat:
+    mbeanregistry:
+      enabled: true
+apple:
+  public-key-url: https://appleid.apple.com
+  client-id: ${CLIENT_ID}
+  team-id: ${TEAM_ID}
+  key:
+    id: ${APPLE_KEY_ID}
+    content: ${APPLE_KEY}
+
+integration-logging: false
