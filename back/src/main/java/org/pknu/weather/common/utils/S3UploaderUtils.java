@@ -21,6 +21,9 @@ public class S3UploaderUtils {
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;
 
+    @Value("${cloud.aws.cdn.cloud-front}")
+    public String cloudFront;
+
     public String upload(String filePath) throws RuntimeException {
 
         File targetFile = new File(filePath);
@@ -37,7 +40,7 @@ public class S3UploaderUtils {
         amazonS3Client.putObject(new PutObjectRequest(bucket, fileName, uploadFile)
                 .withCannedAcl(CannedAccessControlList.PublicRead));
 
-        return amazonS3Client.getUrl(bucket, fileName).toString();
+        return cloudFront + fileName;
     }
 
     private void removeOriginalFile(File targetFile) {
