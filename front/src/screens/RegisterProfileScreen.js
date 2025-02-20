@@ -144,6 +144,14 @@ const RegisterProfileScreen = ({
       } else {
         const granted = await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+          {
+            title: '위치 권한 요청',
+            message:
+              '앱에서 사용자의 현재 위치를 기반으로 실시간 날씨 정보를 정확하게 제공하기 위해 위치 정보 권한이 필요합니다.',
+            buttonNeutral: '나중에',
+            buttonNegative: '취소',
+            buttonPositive: '허용',
+          },
         );
         return granted === PermissionsAndroid.RESULTS.GRANTED;
       }
