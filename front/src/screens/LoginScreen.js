@@ -9,7 +9,7 @@ import {
   Dimensions,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import {login} from '@react-native-seoul/kakao-login';
+import {login, getProfile} from '@react-native-seoul/kakao-login';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import appleAuth, {
   AppleButton,
@@ -149,6 +149,13 @@ const LoginScreen = ({
       console.log('Starting Kakao login...');
       const token = await login();
       console.log('Kakao login successful, token:', token.accessToken);
+
+      try {
+        const profile = await getProfile();
+        console.log('카카오 사용자 정보:', profile);
+      } catch (error) {
+        console.error('카카오 사용자 정보 가져오기 실패:', error);
+      }
 
       const response = await sendAccessTokenToBackend(
         token.accessToken,
