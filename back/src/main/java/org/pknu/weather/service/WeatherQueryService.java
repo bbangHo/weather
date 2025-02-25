@@ -34,7 +34,7 @@ public class WeatherQueryService {
      * @param location
      * @return true = 갱신되었음(3시간 안지남), false = 갱신되지 않았음(3시간 지남)
      */
-    @Cacheable(value = "locationCache", key = "#location.id", sync = true)
+    @Cacheable(value = "locationUpdateStore", key = "#location.id", sync = true)
     public boolean weatherHasBeenUpdated(Location location) {
         return weatherRepository.weatherHasBeenUpdated(location);
     }
@@ -45,6 +45,7 @@ public class WeatherQueryService {
      * @param location
      * @return true = 존재함, false = 존재 하지 않음
      */
+    @Cacheable(value = "locationCreatedStore", key = "#location.id", sync = true)
     public boolean weatherHasBeenCreated(Location location) {
         return weatherRepository.weatherHasBeenCreated(location);
     }
