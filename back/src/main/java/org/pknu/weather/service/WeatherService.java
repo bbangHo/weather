@@ -1,5 +1,12 @@
 package org.pknu.weather.service;
 
+import static org.pknu.weather.dto.converter.LocationConverter.toLocationDTO;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
@@ -27,14 +34,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-
-import static org.pknu.weather.dto.converter.LocationConverter.toLocationDTO;
 
 @Service
 @RequiredArgsConstructor
@@ -84,7 +83,7 @@ public class WeatherService {
      * @return
      */
     public List<Weather> getWeathers(Location location) {
-        return weatherRepository.findAllWithLocation(location, LocalDateTime.now().plusHours(24)).stream()
+        return weatherRepository.findAllWithLocation(location.getId(), LocalDateTime.now().plusHours(24)).stream()
                 .sorted(Comparator.comparing(Weather::getPresentationTime))
                 .toList();
     }
@@ -106,7 +105,8 @@ public class WeatherService {
 
     /**
      * 날씨 정보를 저장합니다. 비동기적으로 동작합니다.
-     * @param loc member.getLocation()
+     *
+     * @param loc      member.getLocation()
      * @param forecast 공공데이터 API에서 받아온 단기날씨예보 값 list
      */
     @Async("threadPoolTaskExecutor")

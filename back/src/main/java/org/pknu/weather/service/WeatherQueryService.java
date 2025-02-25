@@ -1,5 +1,6 @@
 package org.pknu.weather.service;
 
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.domain.Location;
@@ -9,17 +10,23 @@ import org.pknu.weather.dto.WeatherResponse;
 import org.pknu.weather.dto.converter.WeatherResponseConverter;
 import org.pknu.weather.repository.MemberRepository;
 import org.pknu.weather.repository.WeatherRepository;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@EnableCaching
 @Slf4j
 @Transactional(readOnly = true)
 public class WeatherQueryService {
     private final MemberRepository memberRepository;
     private final WeatherRepository weatherRepository;
+    private final CacheManager cm;
+    private final String LOCATION_UPDATE_STORE = "locationUpdateStore";
+    private final String LOCATION_CREATE_STORE = "locationCreatedStore";
 
     public WeatherResponse.SimpleRainInformation getSimpleRainInfo(String email) {
         Member member = memberRepository.safeFindByEmail(email);
@@ -34,10 +41,21 @@ public class WeatherQueryService {
      * @param location
      * @return true = 갱신되었음(3시간 안지남), false = 갱신되지 않았음(3시간 지남)
      */
-    @Cacheable(value = "locationUpdateStore", key = "#location.id", sync = true)
     public boolean weatherHasBeenUpdated(Location location) {
-        return weatherRepository.weatherHasBeenUpdated(location);
+        Cache cache = cm.getCache(LOCATION_UPDATE_STORE);
+        if (cacheExist(cache, location.getId())) {
+            cache.put(location.getId(), true);
+            return true;
+        }
+
+        boolean value = weatherRepository.weatherHasBeenUpdated(location);
+        if (!value) {
+            cache.put(location.getId(), true);
+        }
+
+        return value;
     }
+
 
     /**
      * 해당 지역의 날씨 데이터가 존재하는지 확인하는 메서드
@@ -45,9 +63,26 @@ public class WeatherQueryService {
      * @param location
      * @return true = 존재함, false = 존재 하지 않음
      */
-    @Cacheable(value = "locationCreatedStore", key = "#location.id", sync = true)
     public boolean weatherHasBeenCreated(Location location) {
-        return weatherRepository.weatherHasBeenCreated(location);
+        Cache cache = cm.getCache(LOCATION_CREATE_STORE);
+        if (cacheExist(cache, location.getId())) {
+            cache.put(location.getId(), true);
+            return true;
+        }
+
+        boolean value = weatherRepository.weatherHasBeenCreated(location);
+        if (!value) {
+            cache.put(location.getId(), true);
+        }
+
+        return value;
     }
 
+    private boolean cacheExist(Cache cache, Long locationId) {
+        return cache != null &&
+                Optional.ofNullable(cache.get(locationId))
+                        .map(Cache.ValueWrapper::get)
+                        .map(Boolean.class::cast)
+                        .orElse(false);
+    }
 }
