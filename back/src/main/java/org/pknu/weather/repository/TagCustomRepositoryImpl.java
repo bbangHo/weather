@@ -1,20 +1,21 @@
 package org.pknu.weather.repository;
 
+import static org.pknu.weather.domain.QLocation.location;
+import static org.pknu.weather.domain.QTag.tag;
+
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.EnumPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.pknu.weather.apiPayload.code.status.ErrorStatus;
 import org.pknu.weather.common.BoundingBox;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.tag.EnumTag;
 import org.pknu.weather.dto.TagQueryResult;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.pknu.weather.domain.QLocation.location;
-import static org.pknu.weather.domain.QTag.tag;
+import org.pknu.weather.exception.GeneralException;
 
 @RequiredArgsConstructor
 public class TagCustomRepositoryImpl implements TagCustomRepository {
@@ -52,7 +53,10 @@ public class TagCustomRepositoryImpl implements TagCustomRepository {
                 .orderBy(pTag.count().desc())
                 .fetchFirst();
 
-        assert tuple != null;
+        if (tuple == null) {
+            throw new GeneralException(ErrorStatus._TAG_NOT_FOUND);
+        }
+
         return TagQueryResult.builder()
                 .tag(tuple.get(pTag))
                 .count(tuple.get(pTag.count()))
