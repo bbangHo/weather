@@ -82,8 +82,8 @@ android {
         applicationId "com.weather2"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 7
-        versionName "1.0.7"
+        versionCode 10
+        versionName "1.0.10"
         manifestPlaceholders = [kakaoAppKey: "53650279ac97bd9bde779eba3f9f2499"]
     }
     signingConfigs {

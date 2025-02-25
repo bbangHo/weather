@@ -11,12 +11,10 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
-        #        show_sql: true
-        #        format_sql: true
         use_sql_comments: true
         default_batch_fetch_size: 500
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     open-in-view: false   # osiv 설정
   jwt:
     key: ${JWT_KEY}
@@ -28,7 +26,7 @@ spring:
   kakao:
     admin_key: ${KAKAO_SERVICE_ADMIN_KEY}
   profiles:
-    active: ${PROFILE_TYPE} # dev: 개발서버 / prod: 운영서버
+    active: default
   servlet:
     multipart:
       enabled: true
@@ -91,3 +89,5 @@ apple:
   key:
     id: ${APPLE_KEY_ID}
     content: ${APPLE_KEY}
+
+integration-logging: false

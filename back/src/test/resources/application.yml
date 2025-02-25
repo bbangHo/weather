@@ -78,3 +78,5 @@ apple:
   key:
     id: ${APPLE_KEY_ID}
     content: ${APPLE_KEY}
+
+integration-logging: false
