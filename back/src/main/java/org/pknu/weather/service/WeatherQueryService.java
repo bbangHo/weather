@@ -26,7 +26,7 @@ public class WeatherQueryService {
     private final WeatherRepository weatherRepository;
     private final CacheManager cm;
     private final String LOCATION_UPDATE_STORE = "locationUpdateStore";
-    private final String LOCATION_CREATE_STORE = "locationCreatedStore";
+    private final String LOCATION_CREATE_STORE = "locationCreateStore";
 
     public WeatherResponse.SimpleRainInformation getSimpleRainInfo(String email) {
         Member member = memberRepository.safeFindByEmail(email);
