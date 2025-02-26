@@ -1,0 +1,42 @@
+name: CD Pipeline
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - back/**
+      - .github/**
+
+jobs:
+  deploy:
+    runs-on: dev-self-hosted
+
+    steps:
+      - name: 최신 Docker 이미지를 풀
+        run: sudo docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/github-actions-demo:latest
+
+      - name: 기존의 Docker 컨테이너를 중지 (if any)
+        run: |
+          if sudo docker inspect dev_weather_community_app >/dev/null 2>&1; then
+            sudo docker stop dev_weather_community_app || true
+            sudo docker rm dev_weather_community_app || true
+          fi
+
+      - name: 기존의 Docker 컨테이너를 제거 (if any)
+        run: |
+          if [ "$(sudo docker ps -a -q)" ]; then
+            sudo docker rm $(sudo docker ps -a -q) || true
+          fi
+
+      - name: 새로운 Docker 컨테이너를 실행
+        run: |
+          sudo docker run --name dev_weather_community_app \
+          -e TZ=Asia/Seoul \
+          -v /etc/localtime:/etc/localtime:ro \
+          -v /etc/timezone:/etc/timezone:ro \
+          --rm -d -p 8080:8080 \
+          ${{ secrets.DOCKER_HUB_USERNAME }}/github-actions-demo
+
+      - name: 사용하지 않는 Docker 이미지를 정리
+        run: sudo docker system prune -f --volumes
