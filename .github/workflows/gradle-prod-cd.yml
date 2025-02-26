@@ -4,9 +4,10 @@ on:
   push:
     branches:
       - main
-      - release   # 임시
+
     paths:
       - back/**
+      - .github/**
 
 jobs:
   backend-docker-pull-and-run:
