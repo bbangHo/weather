@@ -35,10 +35,9 @@ jobs:
           spring.jwt.key: ${{ secrets.JWT_KEY }}
           spring.sigs.key: ${{ secrets.CONSUMER_KEY }}
           spring.sigs.secret: ${{ secrets.CONSUMER_SECRET }}
-          cloud.aws.credentials.access-key: ${{ secrets.S3_ACCESS_KEY }}
-          cloud.aws.credentials.secret-key: ${{ secrets.S3_SECRET_KEY }}
-          cloud.aws.s3.bucket: ${{ secrets.S3_BUCKET_PROD }}
-          cloud.aws.cdn.cloud-front: ${{ secrets.CLOUD_FRONT_PROD }}
+          cloud.aws.credentials.access-key: ${{ secrets.PROD_S3_ACCESS_KEY }}
+          cloud.aws.credentials.secret-key: ${{ secrets.PROD_S3_SECRET_KEY }}
+          cloud.aws.s3.bucket: ${{ secrets.PROD_S3_BUCKET_NAME }}
           spring.weather.key: ${{ secrets.METEOROLOGICAL_ADMIN_KEY }}
           spring.kakao.admin_key: ${{ secrets.KAKAO_SERVICE_ADMIN_KEY }}
           apple.client-id: ${{ secrets.CLIENT_ID }}
@@ -82,10 +81,9 @@ jobs:
           spring.jwt.key: ${{ secrets.JWT_KEY }}
           spring.sigs.key: ${{ secrets.CONSUMER_KEY }}
           spring.sigs.secret: ${{ secrets.CONSUMER_SECRET }}
-          cloud.aws.credentials.access-key: ${{ secrets.S3_ACCESS_KEY_PROD }}
-          cloud.aws.credentials.secret-key: ${{ secrets.S3_SECRET_KEY_PROD }}
-          cloud.aws.s3.bucket: ${{ secrets.S3_BUCKET_PROD }}
-          cloud.aws.cdn.cloud-front: ${{ secrets.CLOUD_FRONT_PROD }}
+          cloud.aws.credentials.access-key: ${{ secrets.PROD_S3_ACCESS_KEY }}
+          cloud.aws.credentials.secret-key: ${{ secrets.PROD_S3_SECRET_KEY }}
+          cloud.aws.s3.bucket: ${{ secrets.PROD_S3_BUCKET_NAME }}
           spring.weather.key: ${{ secrets.METEOROLOGICAL_ADMIN_KEY }}
           spring.kakao.admin_key: ${{ secrets.KAKAO_SERVICE_ADMIN_KEY }}
           apple.client-id: ${{ secrets.CLIENT_ID }}
