@@ -17,8 +17,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     }
 
     // true = location이 있다.
-    default Boolean hasRegisteredLocation(String email) {
-        Member member = safeFindByEmail(email);
+    default Boolean hasRegisteredLocation(Member member) {
         return member.getLocation() != null;
     }
 
