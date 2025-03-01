@@ -134,16 +134,6 @@ const LoginScreen = ({
     }
   };
 
-  const saveTokens = async (accessToken, refreshToken) => {
-    try {
-      await AsyncStorage.setItem('accessToken', accessToken);
-      await AsyncStorage.setItem('refreshToken', refreshToken);
-      console.log('Tokens saved:', {accessToken, refreshToken});
-    } catch (error) {
-      console.error('Error saving tokens:', error);
-    }
-  };
-
   const handleKakaoLogin = async () => {
     try {
       console.log('Starting Kakao login...');
@@ -225,37 +215,72 @@ const LoginScreen = ({
         return;
       }
 
-      const refreshToken = await AsyncStorage.getItem('refreshToken');
-      if (refreshToken) {
-        try {
-          const newAccessToken = await refreshAccessToken();
-          setAccessToken(newAccessToken);
-          setIsLoggedIn(true);
-        } catch (error) {
-          console.error('Failed to refresh token:', error.message);
+      const storedRefreshToken = await AsyncStorage.getItem('refreshToken');
+      if (!storedRefreshToken) {
+        console.log('No refresh token found, login required.');
+        return;
+      }
+
+      try {
+        console.log('Refreshing access token...');
+        let retryCount = 0;
+        let response;
+
+        while (retryCount < 3) {
+          response = await refreshAccessToken(storedRefreshToken);
+          if (response.isSuccess) break;
+          retryCount++;
+          console.warn(`Retrying token refresh... Attempt ${retryCount}`);
+          await new Promise(resolve => setTimeout(resolve, 2000));
         }
+
+        if (response.isSuccess) {
+          const newAccessToken = response.result.accessToken;
+          const newRefreshToken = response.result.refreshToken;
+
+          setAccessToken(newAccessToken);
+
+          if (newRefreshToken && newRefreshToken !== storedRefreshToken) {
+            console.log('New refresh token detected, updating storage.');
+            await AsyncStorage.setItem('refreshToken', newRefreshToken);
+          }
+
+          await AsyncStorage.setItem('accessToken', newAccessToken);
+          setIsLoggedIn(true);
+        } else {
+          console.log('Failed to refresh tokens after retries, logging out.');
+
+          await AsyncStorage.removeItem('accessToken');
+          await AsyncStorage.removeItem('refreshToken');
+          setIsLoggedIn(false);
+        }
+      } catch (error) {
+        console.error('Failed to refresh token:', error.message);
+
+        if (
+          error.message.includes('Network Error') ||
+          error.message.includes('timeout')
+        ) {
+          console.warn('Network error detected, will retry later.');
+          setTimeout(() => {
+            checkStoredTokens();
+          }, 5 * 60 * 1000);
+          return;
+        }
+
+        await AsyncStorage.removeItem('accessToken');
+        await AsyncStorage.removeItem('refreshToken');
+        setIsLoggedIn(false);
       }
     };
 
     checkStoredTokens();
 
-    const interval = setInterval(async () => {
-      const refreshToken = await AsyncStorage.getItem('refreshToken');
-      if (refreshToken) {
-        try {
-          const newAccessToken = await refreshAccessToken();
-          console.log('Refreshed access token:', newAccessToken);
-          setAccessToken(newAccessToken);
-        } catch (error) {
-          console.error('Failed to refresh token:', error.message);
-          await AsyncStorage.removeItem('accessToken');
-          await AsyncStorage.removeItem('refreshToken');
-          setIsLoggedIn(false);
-        }
-      }
-    }, 15 * 60 * 1000);
+    const interval = setInterval(checkStoredTokens, 15 * 60 * 1000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+    };
   }, []);
 
   return (
