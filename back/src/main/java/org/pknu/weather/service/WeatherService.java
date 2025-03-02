@@ -19,6 +19,7 @@ import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.Weather;
 import org.pknu.weather.dto.WeatherApiResponse;
 import org.pknu.weather.dto.WeatherResponse;
+import org.pknu.weather.dto.WeatherResponse.ExtraWeatherInfo;
 import org.pknu.weather.exception.GeneralException;
 import org.pknu.weather.feignClient.WeatherFeignClient;
 import org.pknu.weather.feignClient.dto.PointDTO;
@@ -155,37 +156,45 @@ public class WeatherService {
         Member member = memberRepository.findMemberByEmail(email)
                 .orElseThrow(() -> new GeneralException(ErrorStatus._MEMBER_NOT_FOUND));
 
-        Location location;
-
-        if (locationId != null) {
-            location = locationRepository.safeFindById(locationId);
-        } else {
-            location = member.getLocation();
-        }
+        Location location = getLocation(member, locationId);
 
         Optional<ExtraWeather> searchedExtraWeather = extraWeatherRepository.findByLocationId(location.getId());
 
         if (searchedExtraWeather.isEmpty()) {
-            WeatherResponse.ExtraWeatherInfo extraWeatherInfo = extraWeatherApiUtils.getExtraWeatherInfo(
-                    toLocationDTO(location));
-
-            saveExtraWeatherInfo(location, extraWeatherInfo);
-
-            return extraWeatherInfo;
+            return getNewExtraWeatherInfo(location);
         }
 
         ExtraWeather extraWeather = searchedExtraWeather.get();
 
         if (extraWeather.getBasetime().isBefore(LocalDateTime.now().minusHours(3))) {
+            return getUpdatedExtraWeatherInfo(location, extraWeather);
+        }
 
-            WeatherResponse.ExtraWeatherInfo extraWeatherInfo = extraWeatherApiUtils.getExtraWeatherInfo(
-                    toLocationDTO(location), extraWeather.getBasetime());
-            extraWeather.updateExtraWeather(extraWeatherInfo);
+        return transferToExtraWeatherInfo(extraWeather);
+    }
 
-            return extraWeatherInfo;
+    private ExtraWeatherInfo getUpdatedExtraWeatherInfo(Location location, ExtraWeather extraWeather) {
+        ExtraWeatherInfo extraWeatherInfo = extraWeatherApiUtils.getExtraWeatherInfo(
+                toLocationDTO(location), extraWeather.getBasetime());
+        extraWeather.updateExtraWeather(extraWeatherInfo);
 
+        return extraWeatherInfo;
+    }
+
+    private ExtraWeatherInfo getNewExtraWeatherInfo(Location location) {
+        ExtraWeatherInfo extraWeatherInfo = extraWeatherApiUtils.getExtraWeatherInfo(
+                toLocationDTO(location));
+
+        saveExtraWeatherInfo(location, extraWeatherInfo);
+        return extraWeatherInfo;
+    }
+
+    private Location getLocation(Member member, Long locationId) {
+
+        if (locationId != null) {
+            return locationRepository.safeFindById(locationId);
         } else {
-            return transferToExtraWeatherInfo(extraWeather);
+            return member.getLocation();
         }
     }
 
