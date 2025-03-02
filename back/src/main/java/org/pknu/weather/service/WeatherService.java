@@ -35,6 +35,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import static org.pknu.weather.dto.converter.ExtraWeatherConverter.toExtraWeather;
+import static org.pknu.weather.dto.converter.ExtraWeatherConverter.toExtraWeatherInfo;
 
 @Service
 @RequiredArgsConstructor
@@ -158,22 +160,19 @@ public class WeatherService {
 
         Location location = getLocation(member, locationId);
 
-        Optional<ExtraWeather> searchedExtraWeather = extraWeatherRepository.findByLocationId(location.getId());
-
-        if (searchedExtraWeather.isEmpty()) {
-            return getNewExtraWeatherInfo(location);
-        }
-
-        ExtraWeather extraWeather = searchedExtraWeather.get();
-
-        if (extraWeather.getBasetime().isBefore(LocalDateTime.now().minusHours(3))) {
-            return getUpdatedExtraWeatherInfo(location, extraWeather);
-        }
-
-        return transferToExtraWeatherInfo(extraWeather);
+        return extraWeatherRepository.findByLocationId(location.getId())
+                .map(extraWeather -> processExistingExtraWeather(location, extraWeather))
+                .orElseGet(() -> fetchAndSaveExtraWeather(location));
     }
 
-    private ExtraWeatherInfo getUpdatedExtraWeatherInfo(Location location, ExtraWeather extraWeather) {
+    private WeatherResponse.ExtraWeatherInfo processExistingExtraWeather(Location location, ExtraWeather extraWeather) {
+        if (extraWeather.getBasetime().isBefore(LocalDateTime.now().minusHours(3))) {
+            return updateAndReturnExtraWeatherInfo(location, extraWeather);
+        }
+        return mapToExtraWeatherInfo(extraWeather);
+    }
+
+    private ExtraWeatherInfo updateAndReturnExtraWeatherInfo(Location location, ExtraWeather extraWeather) {
         ExtraWeatherInfo extraWeatherInfo = extraWeatherApiUtils.getExtraWeatherInfo(
                 toLocationDTO(location), extraWeather.getBasetime());
         extraWeather.updateExtraWeather(extraWeatherInfo);
@@ -181,7 +180,7 @@ public class WeatherService {
         return extraWeatherInfo;
     }
 
-    private ExtraWeatherInfo getNewExtraWeatherInfo(Location location) {
+    private ExtraWeatherInfo fetchAndSaveExtraWeather(Location location) {
         ExtraWeatherInfo extraWeatherInfo = extraWeatherApiUtils.getExtraWeatherInfo(
                 toLocationDTO(location));
 
@@ -190,48 +189,16 @@ public class WeatherService {
     }
 
     private Location getLocation(Member member, Long locationId) {
-
-        if (locationId != null) {
-            return locationRepository.safeFindById(locationId);
-        } else {
-            return member.getLocation();
-        }
+        return Optional.ofNullable(locationId)
+                .map(locationRepository::safeFindById)
+                .orElse(member.getLocation());
     }
 
-    private WeatherResponse.ExtraWeatherInfo transferToExtraWeatherInfo(ExtraWeather extraWeather) {
-        return WeatherResponse.ExtraWeatherInfo.builder()
-                .baseTime(extraWeather.getBasetime())
-                .uvGrade(extraWeather.getUv())
-                .uvGradePlus3(extraWeather.getUvPlus3())
-                .uvGradePlus6(extraWeather.getUvPlus6())
-                .uvGradePlus9(extraWeather.getUvPlus9())
-                .uvGradePlus12(extraWeather.getUvPlus12())
-                .uvGradePlus15(extraWeather.getUvPlus15())
-                .uvGradePlus18(extraWeather.getUvPlus18())
-                .uvGradePlus21(extraWeather.getUvPlus21())
-                .o3Grade(extraWeather.getO3())
-                .pm10Grade(extraWeather.getPm10())
-                .pm25Grade(extraWeather.getPm25())
-                .build();
+    private WeatherResponse.ExtraWeatherInfo mapToExtraWeatherInfo(ExtraWeather extraWeather) {
+        return toExtraWeatherInfo(extraWeather);
     }
 
-    private void saveExtraWeatherInfo(Location location, WeatherResponse.ExtraWeatherInfo extraWeatherInfo) {
-        ExtraWeather result = ExtraWeather.builder()
-                .location(location)
-                .basetime(extraWeatherInfo.getBaseTime())
-                .uv(extraWeatherInfo.getUvGrade())
-                .uvPlus3(extraWeatherInfo.getUvGradePlus3())
-                .uvPlus6(extraWeatherInfo.getUvGradePlus6())
-                .uvPlus9(extraWeatherInfo.getUvGradePlus9())
-                .uvPlus12(extraWeatherInfo.getUvGradePlus12())
-                .uvPlus15(extraWeatherInfo.getUvGradePlus15())
-                .uvPlus18(extraWeatherInfo.getUvGradePlus18())
-                .uvPlus21(extraWeatherInfo.getUvGradePlus21())
-                .o3(extraWeatherInfo.getO3Grade())
-                .pm10(extraWeatherInfo.getPm10Grade())
-                .pm25(extraWeatherInfo.getPm25Grade())
-                .build();
-
-        extraWeatherRepository.save(result);
+    private void saveExtraWeatherInfo(Location location, ExtraWeatherInfo extraWeatherInfo) {
+        extraWeatherRepository.save(toExtraWeather(location, extraWeatherInfo));
     }
 }
