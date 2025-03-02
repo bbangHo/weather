@@ -1,5 +1,6 @@
 package org.pknu.weather.common.utils;
 
+import org.pknu.weather.domain.common.RainType;
 import org.pknu.weather.domain.common.Sensitivity;
 import org.pknu.weather.domain.tag.*;
 
@@ -15,14 +16,35 @@ public class TagUtils {
     private static final int LITTLE_COLD = 13;
     private static final int COLD = 8;
 
-    public static RainTag rain2Text(Float rain) {
+    public static RainTag rainType2Text(Float rain, Float snowCover, RainType rainType) {
+        switch (rainType) {
+            case RAIN -> { return rain2Text(rain); }
+            case RAIN_AND_SNOW -> { return rainAndSnow2Text(rain); }
+            case SNOW -> { return snow2Text(snowCover);}
+            case SHOWER -> { return RainTag.SHOWER; }
+            default -> { return RainTag.NOTHING; }
+        }
+    }
+
+    private static RainTag snow2Text(Float snowCover) {
+        if(snowCover == 0.0) { return RainTag.NOTHING; }
+        else if(snowCover <= 1.0) { return RainTag.LIGHT_SNOW; }
+        else if(snowCover <= 3.0) { return RainTag.MODERATE_SNOW; }
+        else { return RainTag.HEAVY_SNOW; }
+    }
+
+    private static RainTag rainAndSnow2Text(Float rain) {
         if(rain == 0.0) return RainTag.NOTHING;
-        else if(rain <= 1.0) return RainTag.ALMOST_NOTHING;
-        else if(rain <= 3.0) return RainTag.VERY_WEAK;
-        else if(rain <= 6.0) return RainTag.WEAK;
-        else if(rain <= 10.0) return RainTag.AVERAGE;
-        else if(rain <= 20.0) return RainTag.STRONG;
-        else return RainTag.VERY_STRONG;
+        else if(rain <= 3.0) return RainTag.LIGHT_RAIN_AND_SNOW;
+        else if(rain <= 15.0) return RainTag.MODERATE_RAIN_AND_SNOW;
+        else return RainTag.EXTREME_RAIN_AND_SNOW;
+    }
+
+    private static RainTag rain2Text(Float rain) {
+        if(rain == 0.0) return RainTag.NOTHING;
+        else if(rain <= 3.0) return RainTag.LIGHT_RAIN;
+        else if(rain <= 15.0) return RainTag.MODERATE_RAIN;
+        else return RainTag.EXTREME_RAIN;
     }
 
     public static TemperatureTag tmp2Text(Integer tmp, Sensitivity sensitivity) {

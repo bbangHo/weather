@@ -122,7 +122,7 @@ public class Weather extends BaseEntity {
             case "1":
                 return RainType.RAIN;
             case "2":
-                return RainType.RAINANDSNOW;
+                return RainType.RAIN_AND_SNOW;
             case "3":
                 return RainType.SNOW;
             case "4":
