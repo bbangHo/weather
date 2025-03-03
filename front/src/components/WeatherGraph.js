@@ -65,9 +65,23 @@ const WeatherGraph = ({
   };
 
   const getY = temperature => {
-    if (maxTmp === minTmp) return graphHeight / 2;
-    const scale = (graphHeight - 40) / (maxTmp - minTmp);
-    return graphHeight - (temperature - minTmp) * scale - 20;
+    let adjustedMax = maxTmp;
+    let adjustedMin = minTmp;
+
+    if (minTmp <= 5) {
+      adjustedMax = maxTmp + 8;
+      adjustedMin = minTmp - 3;
+    } else if (minTmp >= 20) {
+      adjustedMax = maxTmp + 3;
+      adjustedMin = minTmp - 8;
+    } else {
+      adjustedMax = maxTmp + 4;
+      adjustedMin = minTmp - 6;
+    }
+
+    if (adjustedMax === adjustedMin) return graphHeight / 2;
+    const scale = (graphHeight - 40) / (adjustedMax - adjustedMin);
+    return graphHeight - (temperature - adjustedMin) * scale - 20;
   };
 
   const pathData =
@@ -118,9 +132,6 @@ const WeatherGraph = ({
           <TSpan x={leftMargin - 20} dy="1em">
             최고
           </TSpan>
-          <TSpan x={leftMargin - 26} dy="1em">
-            ( {maxTmp}°)
-          </TSpan>
         </SvgText>
 
         <Path
@@ -137,9 +148,6 @@ const WeatherGraph = ({
           textAnchor="middle">
           <TSpan x={leftMargin - 20} dy="1em">
             최저
-          </TSpan>
-          <TSpan x={leftMargin - 26} dy="1em">
-            ( {minTmp}°)
           </TSpan>
         </SvgText>
 

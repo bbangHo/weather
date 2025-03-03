@@ -1,23 +1,33 @@
 package org.pknu.weather.domain.tag;
 
-import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
 import org.pknu.weather.exception.GeneralException;
 
+import java.util.Arrays;
+
 @Getter
 @RequiredArgsConstructor
 
 public enum RainTag implements EnumTag {
-    NOTHING("", "안옴", 1),
-    ALMOST_NOTHING("거의", "안옴", 2),
-    VERY_WEAK("매우", "약함", 3),
-    WEAK("", "약함", 4),
-    AVERAGE("", "보통", 5),
-    STRONG("", "강함", 6),
-    LITTLE_STRONG("조금", "강함", 7),
-    VERY_STRONG("매우", "강함", 8);
+    NOTHING("", "강수 없음", 1),
+    LIGHT_RAIN("", "약한 비", 2),
+    MODERATE_RAIN("", "보통 비", 3),
+    HEAVY_RAIN("", "강한 비", 4),
+    EXTREME_RAIN("", "매우 강한 비", 5),
+
+    LIGHT_RAIN_AND_SNOW("", "약한 눈/비", 6),
+    MODERATE_RAIN_AND_SNOW("", "보통 눈/비", 7),
+    HEAVY_RAIN_AND_SNOW("", "강한 눈/비", 8),
+    EXTREME_RAIN_AND_SNOW("매우", "강한 눈/비", 9),
+
+    LIGHT_SNOW("", "약한 눈", 10),
+    MODERATE_SNOW("", "보통 눈", 11),
+    HEAVY_SNOW("", "강한 눈", 12),
+    
+    SHOWER("", "소나기", 20),
+    ;
 
     private final String adverb;
     private final String text;
