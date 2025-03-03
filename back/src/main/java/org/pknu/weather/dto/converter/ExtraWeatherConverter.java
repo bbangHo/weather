@@ -19,7 +19,9 @@ public class ExtraWeatherConverter {
                 .uvGradePlus21(extraWeather.getUvPlus21())
                 .o3Grade(extraWeather.getO3())
                 .pm10Grade(extraWeather.getPm10())
+                .pm10Value(extraWeather.getPm10value())
                 .pm25Grade(extraWeather.getPm25())
+                .pm25Value(extraWeather.getPm25value())
                 .build();
     }
 
@@ -37,7 +39,9 @@ public class ExtraWeatherConverter {
                 .uvPlus21(extraWeatherInfo.getUvGradePlus21())
                 .o3(extraWeatherInfo.getO3Grade())
                 .pm10(extraWeatherInfo.getPm10Grade())
+                .pm10value(extraWeatherInfo.getPm10Value())
                 .pm25(extraWeatherInfo.getPm25Grade())
+                .pm25value(extraWeatherInfo.getPm25Value())
                 .build();
     }
 }

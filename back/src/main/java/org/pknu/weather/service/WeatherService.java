@@ -169,7 +169,7 @@ public class WeatherService {
         if (extraWeather.getBasetime().isBefore(LocalDateTime.now().minusHours(3))) {
             return updateAndReturnExtraWeatherInfo(location, extraWeather);
         }
-        return mapToExtraWeatherInfo(extraWeather);
+        return toExtraWeatherInfo(extraWeather);
     }
 
     private ExtraWeatherInfo updateAndReturnExtraWeatherInfo(Location location, ExtraWeather extraWeather) {
@@ -192,10 +192,6 @@ public class WeatherService {
         return Optional.ofNullable(locationId)
                 .map(locationRepository::safeFindById)
                 .orElse(member.getLocation());
-    }
-
-    private WeatherResponse.ExtraWeatherInfo mapToExtraWeatherInfo(ExtraWeather extraWeather) {
-        return toExtraWeatherInfo(extraWeather);
     }
 
     private void saveExtraWeatherInfo(Location location, ExtraWeatherInfo extraWeatherInfo) {
