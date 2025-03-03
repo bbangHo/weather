@@ -92,6 +92,7 @@ jobs:
           apple.team-id: ${{ secrets.TEAM_ID }}
           apple.key.id: ${{ secrets.APPLE_KEY_ID }}
           apple.key.content: ${{ secrets.APPLE_KEY }}
+          integration-logging: true
 
       - name: Build
         working-directory: back
