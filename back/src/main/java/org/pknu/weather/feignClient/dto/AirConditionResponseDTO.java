@@ -56,8 +56,8 @@ public class AirConditionResponseDTO {
         private Integer pm10Grade;
         private Integer pm25Grade;
         private Integer coGrade;
-        private Integer pm10Value;
-        private Integer pm25Value;
+        private String pm10Value;
+        private String pm25Value;
 
 
 
