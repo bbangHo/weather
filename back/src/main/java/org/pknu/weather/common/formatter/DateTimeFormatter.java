@@ -124,7 +124,7 @@ public final class DateTimeFormatter {
 
         LocalDateTime closestPastTime = predefinedTimes.get(0);
         for (LocalDateTime time : predefinedTimes) {
-            if (time.isBefore(currentLocalDateTime)) {
+            if (time.isBefore(currentLocalDateTime) || time.isEqual(currentLocalDateTime)) {
                 closestPastTime = time;
             } else {
                 break;
