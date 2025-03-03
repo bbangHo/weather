@@ -1,5 +1,12 @@
 package org.pknu.weather.service;
 
+import static org.pknu.weather.dto.converter.LocationConverter.toLocationDTO;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
@@ -12,6 +19,7 @@ import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.Weather;
 import org.pknu.weather.dto.WeatherApiResponse;
 import org.pknu.weather.dto.WeatherResponse;
+import org.pknu.weather.dto.WeatherResponse.ExtraWeatherInfo;
 import org.pknu.weather.exception.GeneralException;
 import org.pknu.weather.feignClient.WeatherFeignClient;
 import org.pknu.weather.feignClient.dto.PointDTO;
@@ -27,14 +35,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-
-import static org.pknu.weather.dto.converter.LocationConverter.toLocationDTO;
+import static org.pknu.weather.dto.converter.ExtraWeatherConverter.toExtraWeather;
+import static org.pknu.weather.dto.converter.ExtraWeatherConverter.toExtraWeatherInfo;
 
 @Service
 @RequiredArgsConstructor
@@ -84,7 +86,7 @@ public class WeatherService {
      * @return
      */
     public List<Weather> getWeathers(Location location) {
-        return weatherRepository.findAllWithLocation(location, LocalDateTime.now().plusHours(24)).stream()
+        return weatherRepository.findAllWithLocation(location.getId(), LocalDateTime.now().plusHours(24)).stream()
                 .sorted(Comparator.comparing(Weather::getPresentationTime))
                 .toList();
     }
@@ -106,7 +108,8 @@ public class WeatherService {
 
     /**
      * 날씨 정보를 저장합니다. 비동기적으로 동작합니다.
-     * @param loc member.getLocation()
+     *
+     * @param loc      member.getLocation()
      * @param forecast 공공데이터 API에서 받아온 단기날씨예보 값 list
      */
     @Async("threadPoolTaskExecutor")
@@ -155,74 +158,45 @@ public class WeatherService {
         Member member = memberRepository.findMemberByEmail(email)
                 .orElseThrow(() -> new GeneralException(ErrorStatus._MEMBER_NOT_FOUND));
 
-        Location location;
+        Location location = getLocation(member, locationId);
 
-        if (locationId != null) {
-            location = locationRepository.safeFindById(locationId);
-        } else {
-            location = member.getLocation();
-        }
+        return extraWeatherRepository.findByLocationId(location.getId())
+                .map(extraWeather -> processExistingExtraWeather(location, extraWeather))
+                .orElseGet(() -> fetchAndSaveExtraWeather(location));
+    }
 
-        Optional<ExtraWeather> searchedExtraWeather = extraWeatherRepository.findByLocationId(location.getId());
-
-        if (searchedExtraWeather.isEmpty()) {
-            WeatherResponse.ExtraWeatherInfo extraWeatherInfo = extraWeatherApiUtils.getExtraWeatherInfo(
-                    toLocationDTO(location));
-
-            saveExtraWeatherInfo(location, extraWeatherInfo);
-
-            return extraWeatherInfo;
-        }
-
-        ExtraWeather extraWeather = searchedExtraWeather.get();
-
+    private WeatherResponse.ExtraWeatherInfo processExistingExtraWeather(Location location, ExtraWeather extraWeather) {
         if (extraWeather.getBasetime().isBefore(LocalDateTime.now().minusHours(3))) {
-
-            WeatherResponse.ExtraWeatherInfo extraWeatherInfo = extraWeatherApiUtils.getExtraWeatherInfo(
-                    toLocationDTO(location), extraWeather.getBasetime());
-            extraWeather.updateExtraWeather(extraWeatherInfo);
-
-            return extraWeatherInfo;
-
-        } else {
-            return transferToExtraWeatherInfo(extraWeather);
+            return updateAndReturnExtraWeatherInfo(location, extraWeather);
         }
+        return toExtraWeatherInfo(extraWeather);
     }
 
-    private WeatherResponse.ExtraWeatherInfo transferToExtraWeatherInfo(ExtraWeather extraWeather) {
-        return WeatherResponse.ExtraWeatherInfo.builder()
-                .baseTime(extraWeather.getBasetime())
-                .uvGrade(extraWeather.getUv())
-                .uvGradePlus3(extraWeather.getUvPlus3())
-                .uvGradePlus6(extraWeather.getUvPlus6())
-                .uvGradePlus9(extraWeather.getUvPlus9())
-                .uvGradePlus12(extraWeather.getUvPlus12())
-                .uvGradePlus15(extraWeather.getUvPlus15())
-                .uvGradePlus18(extraWeather.getUvPlus18())
-                .uvGradePlus21(extraWeather.getUvPlus21())
-                .o3Grade(extraWeather.getO3())
-                .pm10Grade(extraWeather.getPm10())
-                .pm25Grade(extraWeather.getPm25())
-                .build();
+    private ExtraWeatherInfo updateAndReturnExtraWeatherInfo(Location location, ExtraWeather extraWeather) {
+        ExtraWeatherInfo extraWeatherInfo = extraWeatherApiUtils.getExtraWeatherInfo(
+                toLocationDTO(location), extraWeather.getBasetime());
+        extraWeather.updateExtraWeather(extraWeatherInfo);
+        log.debug("기타 날씨 정보 업데이트 완료");
+        return extraWeatherInfo;
     }
 
-    private void saveExtraWeatherInfo(Location location, WeatherResponse.ExtraWeatherInfo extraWeatherInfo) {
-        ExtraWeather result = ExtraWeather.builder()
-                .location(location)
-                .basetime(extraWeatherInfo.getBaseTime())
-                .uv(extraWeatherInfo.getUvGrade())
-                .uvPlus3(extraWeatherInfo.getUvGradePlus3())
-                .uvPlus6(extraWeatherInfo.getUvGradePlus6())
-                .uvPlus9(extraWeatherInfo.getUvGradePlus9())
-                .uvPlus12(extraWeatherInfo.getUvGradePlus12())
-                .uvPlus15(extraWeatherInfo.getUvGradePlus15())
-                .uvPlus18(extraWeatherInfo.getUvGradePlus18())
-                .uvPlus21(extraWeatherInfo.getUvGradePlus21())
-                .o3(extraWeatherInfo.getO3Grade())
-                .pm10(extraWeatherInfo.getPm10Grade())
-                .pm25(extraWeatherInfo.getPm25Grade())
-                .build();
+    private ExtraWeatherInfo fetchAndSaveExtraWeather(Location location) {
+        ExtraWeatherInfo extraWeatherInfo = extraWeatherApiUtils.getExtraWeatherInfo(
+                toLocationDTO(location));
 
-        extraWeatherRepository.save(result);
+        saveExtraWeatherInfo(location, extraWeatherInfo);
+        log.debug("기타 날씨 정보 저장 완료");
+        return extraWeatherInfo;
+    }
+
+    private Location getLocation(Member member, Long locationId) {
+        return Optional.ofNullable(locationId)
+                .map(locationRepository::safeFindById)
+                .orElse(member.getLocation());
+    }
+
+    private void saveExtraWeatherInfo(Location location, ExtraWeatherInfo extraWeatherInfo) {
+        extraWeatherRepository.save(toExtraWeather(location, extraWeatherInfo));
+        log.debug("기타 날씨 정보 저장 완료");
     }
 }
