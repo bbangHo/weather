@@ -176,7 +176,7 @@ public class WeatherService {
         ExtraWeatherInfo extraWeatherInfo = extraWeatherApiUtils.getExtraWeatherInfo(
                 toLocationDTO(location), extraWeather.getBasetime());
         extraWeather.updateExtraWeather(extraWeatherInfo);
-
+        log.debug("기타 날씨 정보 업데이트 완료");
         return extraWeatherInfo;
     }
 
@@ -185,6 +185,7 @@ public class WeatherService {
                 toLocationDTO(location));
 
         saveExtraWeatherInfo(location, extraWeatherInfo);
+        log.debug("기타 날씨 정보 저장 완료");
         return extraWeatherInfo;
     }
 
@@ -196,5 +197,6 @@ public class WeatherService {
 
     private void saveExtraWeatherInfo(Location location, ExtraWeatherInfo extraWeatherInfo) {
         extraWeatherRepository.save(toExtraWeather(location, extraWeatherInfo));
+        log.debug("기타 날씨 정보 저장 완료");
     }
 }
