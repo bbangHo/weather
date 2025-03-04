@@ -52,7 +52,7 @@ public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
     @Override
     public boolean weatherHasBeenUpdated(Location location) {
         LocalDateTime now = LocalDateTime.now()
-                .withMinute(0)
+                .withMinute(15)
                 .withSecond(0)
                 .withNano(0);
 
@@ -79,7 +79,10 @@ public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
      */
     @Override
     public boolean weatherHasBeenCreated(Location location) {
-        LocalDateTime now = LocalDateTime.now().withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime now = LocalDateTime.now()
+                .withMinute(15)
+                .withSecond(0)
+                .withNano(0);
 
         Weather w = jpaQueryFactory
                 .select(weather)

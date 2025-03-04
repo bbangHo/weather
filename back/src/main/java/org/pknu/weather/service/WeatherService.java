@@ -42,7 +42,6 @@ import static org.pknu.weather.dto.converter.ExtraWeatherConverter.toExtraWeathe
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Transactional(readOnly = true)
 public class WeatherService {
     private final WeatherFeignClient weatherFeignClient;
     private final WeatherRepository weatherRepository;
@@ -88,6 +87,7 @@ public class WeatherService {
      * @param location
      * @return
      */
+    @Transactional(readOnly = true)
     public List<Weather> getWeathers(Location location) {
         return weatherRepository.findAllWithLocation(location.getId(), LocalDateTime.now().plusHours(24)).stream()
                 .sorted(Comparator.comparing(Weather::getPresentationTime))
@@ -99,7 +99,6 @@ public class WeatherService {
      *
      * @return 위도와 경도에 해당하는 Location의 Weather list를 반환
      */
-    // TODO: 비동기 처리
     @Transactional
     public List<Weather> saveWeathers(Location location) {
         List<Weather> values = getVillageShortTermForecast(location);

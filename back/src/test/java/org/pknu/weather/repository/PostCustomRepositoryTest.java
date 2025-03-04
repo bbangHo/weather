@@ -6,7 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.pknu.weather.common.TestDataCreator;
 import org.pknu.weather.common.TestUtil;
-import org.pknu.weather.config.TestConfig;
+import org.pknu.weather.config.DataJpaTestConfig;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.Post;
@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @DataJpaTest
-@Import(TestConfig.class)
+@Import(DataJpaTestConfig.class)
 class PostCustomRepositoryTest {
     @Autowired
     PostRepository postRepository;
