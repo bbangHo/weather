@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   rainText: {
-    fontSize: 13,
+    fontSize: 12,
     color: '#555',
     textAlign: 'center',
     marginTop: 5,
