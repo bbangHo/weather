@@ -51,10 +51,6 @@ const PostScroll = ({accessToken, refreshPosts, onRefreshComplete}) => {
       setPosts(fetchedPosts);
     } catch (error) {
       console.error('Error loading posts:', error.message);
-      Alert.alert(
-        'Error',
-        '게시글을 불러오는 중 문제가 발생했습니다. 다시 시도해주세요.',
-      );
     } finally {
       setLoading(false);
     }
