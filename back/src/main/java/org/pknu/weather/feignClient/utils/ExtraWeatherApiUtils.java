@@ -1,16 +1,19 @@
 package org.pknu.weather.feignClient.utils;
 
+import java.lang.reflect.InvocationTargetException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
 import org.pknu.weather.dto.LocationDTO;
 import org.pknu.weather.dto.WeatherResponse;
+import org.pknu.weather.dto.WeatherResponse.ExtraWeatherInfo;
 import org.pknu.weather.exception.GeneralException;
 import org.pknu.weather.feignClient.AirConditionClient;
 import org.pknu.weather.feignClient.UVClient;
 import org.pknu.weather.feignClient.dto.AirConditionResponseDTO;
 import org.pknu.weather.feignClient.dto.AirObservatoryResponseDTO;
 import org.pknu.weather.feignClient.dto.UVResponseDTO;
+import org.pknu.weather.feignClient.dto.UVResponseDTO.Item;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -43,116 +46,78 @@ public class ExtraWeatherApiUtils {
 
     public WeatherResponse.ExtraWeatherInfo getExtraWeatherInfo(LocationDTO locationDTO){
 
-
         UVResponseDTO.Item uvResult = getUV(locationDTO);
         transferUvGrade(uvResult);
 
-        AirConditionResponseDTO result = getAirConditionInfo(locationDTO);
-        AirConditionResponseDTO.Item airConditionInfo = result.getResponse().getBody().getItems().get(0);
+        AirConditionResponseDTO.Item airConditionInfo = getAirConditionInfo(locationDTO);
 
-
-        return WeatherResponse.ExtraWeatherInfo.builder()
-                .baseTime(convertToLocalDateTime(uvResult.getDate()))
-                .o3Grade(airConditionInfo.getO3Grade())
-                .pm10Grade(airConditionInfo.getPm10Grade1h())
-                .pm25Grade(airConditionInfo.getPm25Grade1h())
-                .uvGrade(uvResult.getH0())
-                .uvGradePlus3(uvResult.getH3())
-                .uvGradePlus6(uvResult.getH6())
-                .uvGradePlus9(uvResult.getH9())
-                .uvGradePlus12(uvResult.getH12())
-                .uvGradePlus15(uvResult.getH15())
-                .uvGradePlus18(uvResult.getH18())
-                .uvGradePlus21(uvResult.getH21())
-                .build();
-    }
-
-    public void transferUvGrade(UVResponseDTO.Item uvResult) {
-
-        int[] fieldNumbers = {0, 3, 6, 9, 12, 15, 18, 21};
-
-        try {
-            for (int fieldNumber : fieldNumbers) {
-                String getterMethodName = "getH" + fieldNumber;
-                Method getterMethod = uvResult.getClass().getMethod(getterMethodName);
-
-                Integer currentValue = (Integer) getterMethod.invoke(uvResult);
-
-                int newValue;
-                if (currentValue != null && currentValue < 3) {
-                    newValue = 1;
-                } else if (currentValue != null && currentValue < 6) {
-                    newValue = 2;
-                } else if (currentValue != null && currentValue < 9) {
-                    newValue = 3;
-                } else {
-                    newValue = 4;
-                }
-
-                String setterMethodName = "setH" + fieldNumber;
-                Method setterMethod = uvResult.getClass().getMethod(setterMethodName, Integer.class);
-
-                setterMethod.invoke(uvResult, newValue);
-            }
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
+        return getExtraWeatherInformation(uvResult, airConditionInfo);
     }
 
     public WeatherResponse.ExtraWeatherInfo getExtraWeatherInfo(LocationDTO locationDTO, LocalDateTime baseTime){
 
         UVResponseDTO.Item uvResult = getUV(locationDTO);
+        transferUvGrade(uvResult);
 
         if (baseTime.toLocalDate().isBefore(LocalDate.now())){
-            AirConditionResponseDTO result = getAirConditionInfo(locationDTO);
-            AirConditionResponseDTO.Item airConditionInfo = result.getResponse().getBody().getItems().get(0);
+            AirConditionResponseDTO.Item airConditionInfo = getAirConditionInfo(locationDTO);
 
-            return WeatherResponse.ExtraWeatherInfo.builder()
-                    .baseTime(convertToLocalDateTime(uvResult.getDate()))
-                    .o3Grade(airConditionInfo.getO3Grade())
-                    .pm10Grade(airConditionInfo.getPm10Grade())
-                    .pm25Grade(airConditionInfo.getPm25Grade())
-                    .uvGrade(uvResult.getH0())
-                    .uvGradePlus3(uvResult.getH3())
-                    .uvGradePlus6(uvResult.getH6())
-                    .uvGradePlus9(uvResult.getH9())
-                    .uvGradePlus12(uvResult.getH12())
-                    .uvGradePlus15(uvResult.getH15())
-                    .uvGradePlus18(uvResult.getH18())
-                    .uvGradePlus21(uvResult.getH21())
-                    .build();
+            return getExtraWeatherInformation(uvResult, airConditionInfo);
         }
 
-        return WeatherResponse.ExtraWeatherInfo.builder()
-                .baseTime(convertToLocalDateTime(uvResult.getDate()))
-                .uvGrade(uvResult.getH0())
-                .uvGradePlus3(uvResult.getH3())
-                .uvGradePlus6(uvResult.getH6())
-                .uvGradePlus9(uvResult.getH9())
-                .uvGradePlus12(uvResult.getH12())
-                .uvGradePlus15(uvResult.getH15())
-                .uvGradePlus18(uvResult.getH18())
-                .uvGradePlus21(uvResult.getH21())
-                .build();
+        return updateUvInformation(uvResult);
     }
 
     private UVResponseDTO.Item getUV(LocationDTO locationDTO){
 
         Long locationCode = getLocation(locationDTO);
-
-        if (locationCode  == null)
-            throw new GeneralException(ErrorStatus._LOCATION_NOT_FOUND);
-
-        String date = getFormattedLocalDate() + LocalTime.now().getHour();
-
+        String date = getRequestDate();
         UVResponseDTO result = uvClient.getUVInfo(weatherKey, locationCode, date, DATATYPE);
 
-        int resultCode = result.getResponse().getHeader().getResultCode();
-
-        if(resultCode != 0)
-            throw new GeneralException(ErrorStatus._API_SERVER_ERROR);
+        validateUvResult(result);
 
         return result.getResponse().getBody().getItems().getItem().get(0);
+    }
+
+    public void transferUvGrade(UVResponseDTO.Item uvResult) {
+        int[] uvHours = {0, 3, 6, 9, 12, 15, 18, 21};
+
+        for (int uvHour : uvHours) {
+            try {
+                updateUvGrade(uvResult, uvHour);
+            } catch (NoSuchMethodException e) {
+                log.error("메서드를 찾을 수 없습니다 H{}: {}", uvHour, e.getMessage());
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                log.error("해당 메서드에 문제가 발생했습니다. H{}: {}", uvHour, e.getMessage());
+            }
+        }
+    }
+
+    private void updateUvGrade(UVResponseDTO.Item uvResult, int uvHour)
+            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+
+        Method getterMethod = uvResult.getClass().getMethod("getH" + uvHour);
+        Integer currentValue = (Integer) getterMethod.invoke(uvResult);
+
+        if (currentValue != null) {
+            Integer newValue = calculateUvGrade(currentValue);
+
+            Method setterMethod = uvResult.getClass().getMethod("setH" + uvHour, Integer.class);
+            setterMethod.invoke(uvResult, newValue);
+        }
+    }
+
+    private int calculateUvGrade(Integer value) {
+        return Math.min(value / 3 + 1, 4);
+    }
+
+    private void validateUvResult(UVResponseDTO result) {
+        if (result.getResponse().getHeader().getResultCode() != 0)
+            throw new GeneralException(ErrorStatus._API_SERVER_ERROR);
+    }
+
+    private String getRequestDate() {
+        return getFormattedLocalDate() + LocalTime.now().getHour();
     }
 
     private Long getLocation(LocationDTO locationDTO){
@@ -166,6 +131,9 @@ public class ExtraWeatherApiUtils {
         if (locationCode == null) {
             locationCode = getLocationCode(locationDTO.getProvince());
         }
+
+        if (locationCode == null)
+            throw new GeneralException(ErrorStatus._LOCATION_NOT_FOUND);
 
         return locationCode;
     }
@@ -222,7 +190,7 @@ public class ExtraWeatherApiUtils {
         return LocalDateTime.parse(Long.toString(input), DateTimeFormatter.ofPattern("yyyyMMddHH"));
     }
 
-    private AirConditionResponseDTO getAirConditionInfo(LocationDTO locationDTO){
+    private AirConditionResponseDTO.Item getAirConditionInfo(LocationDTO locationDTO){
 
         String stationName = getAirConditionObservatory(locationDTO);
         AirConditionResponseDTO result = airConditionClient.getAirConditionInfo(weatherKey, DATATYPE, stationName, DATATERM, 1.5);
@@ -230,9 +198,10 @@ public class ExtraWeatherApiUtils {
         int resultCode = result.getResponse().getHeader().getResultCode();
 
         if(resultCode == 0)
-            return result;
+            return result.getResponse().getBody().getItems().get(0);
         else
             throw new GeneralException(ErrorStatus._API_SERVER_ERROR);
+
     }
 
 
@@ -242,6 +211,47 @@ public class ExtraWeatherApiUtils {
         AirObservatoryResponseDTO result = airConditionClient.getObservatoryInfo(weatherKey, DATATYPE, transformedCoor.get("X"),transformedCoor.get("Y"), 1.2);
 
         return result.getResponse().getBody().getItems().get(0).getStationName();
+    }
+
+    private ExtraWeatherInfo getExtraWeatherInformation(Item uvResult, AirConditionResponseDTO.Item airConditionInfo) {
+        return ExtraWeatherInfo.builder()
+                .baseTime(convertToLocalDateTime(uvResult.getDate()))
+                .o3Grade(airConditionInfo.getO3Grade())
+                .pm10Grade(airConditionInfo.getPm10Grade())
+                .pm10Value(checkNumberFormat(airConditionInfo.getPm10Value()))
+                .pm25Grade(airConditionInfo.getPm25Grade())
+                .pm25Value(checkNumberFormat(airConditionInfo.getPm25Value()))
+                .uvGrade(uvResult.getH0())
+                .uvGradePlus3(uvResult.getH3())
+                .uvGradePlus6(uvResult.getH6())
+                .uvGradePlus9(uvResult.getH9())
+                .uvGradePlus12(uvResult.getH12())
+                .uvGradePlus15(uvResult.getH15())
+                .uvGradePlus18(uvResult.getH18())
+                .uvGradePlus21(uvResult.getH21())
+                .build();
+    }
+
+    private ExtraWeatherInfo updateUvInformation(Item uvResult) {
+        return ExtraWeatherInfo.builder()
+                .baseTime(convertToLocalDateTime(uvResult.getDate()))
+                .uvGrade(uvResult.getH0())
+                .uvGradePlus3(uvResult.getH3())
+                .uvGradePlus6(uvResult.getH6())
+                .uvGradePlus9(uvResult.getH9())
+                .uvGradePlus12(uvResult.getH12())
+                .uvGradePlus15(uvResult.getH15())
+                .uvGradePlus18(uvResult.getH18())
+                .uvGradePlus21(uvResult.getH21())
+                .build();
+    }
+
+    private Integer checkNumberFormat(String value) {
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException ex) {
+            return null;
+        }
     }
 
 }
