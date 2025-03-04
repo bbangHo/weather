@@ -3,7 +3,7 @@ package org.pknu.weather.repository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.pknu.weather.config.TestConfig;
+import org.pknu.weather.config.DataJpaTestConfig;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.Post;
@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @DataJpaTest
-@Import(TestConfig.class)
+@Import(DataJpaTestConfig.class)
 class PostRepositoryTest {
 
     @Autowired

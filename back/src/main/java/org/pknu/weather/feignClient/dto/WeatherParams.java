@@ -1,15 +1,14 @@
 package org.pknu.weather.feignClient.dto;
 
 
-import lombok.*;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import lombok.Builder;
+import lombok.Getter;
 
 @Getter
 public class WeatherParams {
     private String serviceKey;
 
-    @Builder.Default
-    private String dataType = "JSON";
+    private String dataType;
 
     private Integer pageNo;
 
@@ -26,6 +25,7 @@ public class WeatherParams {
     @Builder
     private WeatherParams(String serviceKey, Integer pageNo, Integer numOfRows, String base_date, String base_time, Integer nx, Integer ny) {
         this.serviceKey = serviceKey;
+        this.dataType = "JSON";
         this.pageNo = pageNo;
         this.numOfRows = numOfRows;
         this.base_date = base_date;
