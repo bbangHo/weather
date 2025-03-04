@@ -55,10 +55,10 @@ const LoginScreen = ({
 
       if (!authorizationCode) {
         console.error('Error: authenticationCode is missing!');
-        Alert.alert(
+        /* Alert.alert(
           '애플 로그인 실패',
           'authenticationCode를 가져올 수 없습니다.',
-        );
+        ); */
         return;
       }
 
@@ -123,14 +123,14 @@ const LoginScreen = ({
           );
         }
       } else {
-        Alert.alert('애플 로그인 실패', '사용자가 인증되지 않았습니다.');
+        /* Alert.alert('애플 로그인 실패', '사용자가 인증되지 않았습니다.'); */
       }
     } catch (error) {
       console.error('Apple Login Error:', error.message);
-      Alert.alert(
+      /* Alert.alert(
         '애플 로그인 실패',
         error.message || '알 수 없는 오류가 발생했습니다.',
-      );
+      ); */
     }
   };
 
