@@ -2,11 +2,11 @@ package org.pknu.weather.service;
 
 import static org.pknu.weather.dto.converter.LocationConverter.toLocationDTO;
 
+import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
@@ -30,6 +30,7 @@ import org.pknu.weather.repository.ExtraWeatherRepository;
 import org.pknu.weather.repository.LocationRepository;
 import org.pknu.weather.repository.MemberRepository;
 import org.pknu.weather.repository.WeatherRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -49,6 +50,8 @@ public class WeatherService {
     private final MemberRepository memberRepository;
     private final ExtraWeatherApiUtils extraWeatherApiUtils;
     private final LocationRepository locationRepository;
+    @Autowired
+    private EntityManager em;
 
     @Value("${api.weather.service-key}")
     private String weatherServiceKey;
@@ -155,7 +158,7 @@ public class WeatherService {
     @Transactional
     public WeatherResponse.ExtraWeatherInfo extraWeatherInfo(String email, Long locationId) {
 
-        Member member = memberRepository.findMemberByEmail(email)
+        Member member = memberRepository.findMemberWithLocationByEmail(email)
                 .orElseThrow(() -> new GeneralException(ErrorStatus._MEMBER_NOT_FOUND));
 
         Location location = getLocation(member, locationId);
@@ -190,9 +193,10 @@ public class WeatherService {
     }
 
     private Location getLocation(Member member, Long locationId) {
-        return Optional.ofNullable(locationId)
-                .map(locationRepository::safeFindById)
-                .orElse(member.getLocation());
+        if (locationId != null) {
+            return locationRepository.safeFindById(locationId);
+        }
+        return member.getLocation();
     }
 
     private void saveExtraWeatherInfo(Location location, ExtraWeatherInfo extraWeatherInfo) {
