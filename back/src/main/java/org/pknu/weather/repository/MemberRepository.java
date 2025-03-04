@@ -28,6 +28,10 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Member findByEmail(String email);
 
     @EntityGraph(attributePaths = {"location"})
+    Optional<Member> findMemberWithLocationByEmail(@Param("email") String email);
+
+
+    @EntityGraph(attributePaths = {"location"})
     default Member safeFindByEmail(String email) {
         Member member = findByEmail(email);
 

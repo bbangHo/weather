@@ -201,6 +201,7 @@ public class ExtraWeatherApiUtils {
             return result.getResponse().getBody().getItems().get(0);
         else
             throw new GeneralException(ErrorStatus._API_SERVER_ERROR);
+
     }
 
 
