@@ -21,8 +21,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     }
 
     // true = location이 있다.
-    default Boolean hasRegisteredLocation(String email) {
-        Member member = safeFindByEmail(email);
+    default Boolean hasRegisteredLocation(Member member) {
         return member.getLocation() != null;
     }
 
@@ -32,6 +31,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @EntityGraph(attributePaths = {"location"})
     Optional<Member> findByEmail(String email);
+
+    Optional<Member> findMemberWithLocationByEmail(@Param("email") String email);
 
     default Member safeFindByEmail(String email) {
         return findByEmail(email)

@@ -20,6 +20,7 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // tag
     _TAG_NOT_FOUND_FROM_CODE(HttpStatus.FORBIDDEN, "TAG_404_1", "요청하신 code로 태그를 찾을 수 없습니다."),
+    _TAG_NOT_FOUND(HttpStatus.FORBIDDEN, "TAG_404_2", "해당 지역의 태그가 존재하지 않습니다."),
 
     //Token
     ACCESS_TOKEN_NOT_ACCEPTED(HttpStatus.UNAUTHORIZED, "Jwt_401_1", "Access Token이 존재하지 않습니다."),
@@ -45,7 +46,7 @@ public enum ErrorStatus implements BaseErrorCode {
     // location
     _LOCATION_NOT_FOUND(HttpStatus.NOT_FOUND, "LOCATION_404_1", "존재하지 않는 지역입니다. 범위에 해당하는 위도와 경도 값을 입력하세요 "),
     _PROVINCE_NOT_FOUND(HttpStatus.BAD_REQUEST, "LOCATION_400_2", "도(광역시)의 정보가 필요합니다."),
-    _MALFORMED_ADDRESS_INFORMATION(HttpStatus.BAD_REQUEST,"LOCATION_400_3", "주소의 일부 정보가 누락되었습니다."),
+    _MALFORMED_ADDRESS_INFORMATION(HttpStatus.BAD_REQUEST, "LOCATION_400_3", "주소의 일부 정보가 누락되었습니다."),
 
     // member
     _MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER_404_1", "사용자를 찾을 수 없습니다."),

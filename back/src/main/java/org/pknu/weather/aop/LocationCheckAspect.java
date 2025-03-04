@@ -1,5 +1,7 @@
 package org.pknu.weather.aop;
 
+import java.net.InetAddress;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -8,12 +10,10 @@ import org.pknu.weather.apiPayload.ApiResponse;
 import org.pknu.weather.apiPayload.code.status.SuccessStatus;
 import org.pknu.weather.common.GlobalParams;
 import org.pknu.weather.common.converter.TokenConverter;
-import org.pknu.weather.service.MemberQueryService;
+import org.pknu.weather.domain.Member;
+import org.pknu.weather.repository.MemberRepository;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-
-import java.net.InetAddress;
-import java.util.Map;
 
 
 @Order(0)
@@ -21,21 +21,21 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class LocationCheckAspect {
-    private final MemberQueryService memberQueryService;
+    private final MemberRepository memberRepository;
 
     /**
      * 사용자가 지역을 등록했는지 확인하는 공통 로직
      *
      * @param authorization JWT 입니다.
-     *
      * @return
      * @throws Throwable
      */
     @Around("org.pknu.weather.aop.Pointcuts.doCheckLocationPointcut() && args(authorization,..)")
     public Object locationCheck(ProceedingJoinPoint pjp, String authorization) throws Throwable {
         String email = TokenConverter.getEmailByToken(authorization);
+        Member member = memberRepository.safeFindByEmail(email);
 
-        if (!memberQueryService.hasRegisteredLocation(email)) {
+        if (member.getLocation() == null) {
             String address = "http://" + InetAddress.getLocalHost().getHostAddress();
             Map<String, String> result = Map.of("url", address + GlobalParams.LOCATION_REDIRECT_URL);
             return ApiResponse.of(SuccessStatus._REDIRECT, SuccessStatus._REDIRECT.getMessage(), result);

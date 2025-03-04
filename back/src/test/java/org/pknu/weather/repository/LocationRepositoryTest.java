@@ -1,7 +1,14 @@
 package org.pknu.weather.repository;
 
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import jakarta.transaction.Transactional;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,14 +20,6 @@ import org.pknu.weather.domain.Weather;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @Import(DataJpaTestConfig.class)
@@ -82,7 +81,8 @@ class LocationRepositoryTest {
         Location location = locationRepository.findAll().get(0);
 
         // when
-        List<Weather> weathers = weatherRepository.findAllWithLocation(location, LocalDateTime.now().plusHours(24));
+        List<Weather> weathers = weatherRepository.findAllWithLocation(location.getId(),
+                LocalDateTime.now().plusHours(24));
 
         // then
         for (Weather weather : weathers) {

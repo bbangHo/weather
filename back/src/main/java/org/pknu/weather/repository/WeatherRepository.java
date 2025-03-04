@@ -10,8 +10,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface WeatherRepository extends JpaRepository<Weather, Long>, WeatherCustomRepository {
-    @Query("select w from Weather w join fetch w.location where w.location = :location and w.presentationTime >= now() and w.presentationTime < :end")
-    List<Weather> findAllWithLocation(@Param("location") Location location, @Param("end") LocalDateTime end);
+    @Query("select w "
+            + "from Weather w "
+            + "join fetch w.location "
+            + "where w.location.id = :locationId "
+            + "and w.presentationTime >= now() "
+            + "and w.presentationTime < :end"
+    )
+    List<Weather> findAllWithLocation(@Param("locationId") Long locationId, @Param("end") LocalDateTime end);
 
     @Modifying
     @Query("delete from Weather w where w.presentationTime < now()")

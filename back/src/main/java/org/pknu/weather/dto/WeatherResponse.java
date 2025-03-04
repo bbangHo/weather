@@ -76,7 +76,9 @@ public class WeatherResponse {
         LocalDateTime baseTime;
         Integer o3Grade;
         Integer pm10Grade;
+        Integer pm10Value;
         Integer pm25Grade;
+        Integer pm25Value;
         Integer uvGrade;
         Integer uvGradePlus3;
         Integer uvGradePlus6;

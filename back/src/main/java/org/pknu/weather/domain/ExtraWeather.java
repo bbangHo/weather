@@ -7,6 +7,10 @@ import org.pknu.weather.dto.WeatherResponse;
 
 import java.time.LocalDateTime;
 
+/**
+ *  pm10: 미세먼지(10)
+ *  pm25: 초미세먼지(2.5)
+ */
 @Entity
 @Getter
 @Builder
@@ -36,6 +40,8 @@ public class ExtraWeather extends BaseEntity {
     private Integer o3;
     private Integer pm10;
     private Integer pm25;
+    private Integer pm10value;
+    private Integer pm25value;
 
     public void updateExtraWeather (WeatherResponse.ExtraWeatherInfo extraWeatherInfo){
         this.basetime = extraWeatherInfo.getBaseTime();
@@ -71,5 +77,12 @@ public class ExtraWeather extends BaseEntity {
 
         if (extraWeatherInfo.getPm25Grade() != null)
             this.pm25 = extraWeatherInfo.getPm25Grade();
+
+        if (extraWeatherInfo.getPm10Value() != null)
+            this.pm10 = extraWeatherInfo.getPm10Value();
+
+        if (extraWeatherInfo.getPm25Value() != null)
+            this.pm25 = extraWeatherInfo.getPm25Value();
+
     }
 }
