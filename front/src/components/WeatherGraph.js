@@ -8,6 +8,7 @@ const aspectRatio = height / width;
 const graphWidth = aspectRatio < 2.09999 ? width * 0.95 : width * 0.95;
 
 const graphHeight = 160;
+const graphTopMargin = 20;
 
 const WeatherGraph = ({
   accessToken,
@@ -27,18 +28,26 @@ const WeatherGraph = ({
       weatherData.weatherPerHourList?.length > 0 &&
       weatherData.temperature
     ) {
-      const {maxTmp, minTmp} = weatherData.temperature;
       const tempData = weatherData.weatherPerHourList
-        .slice(0, 12)
+        .slice(0, 13)
         .map(item => ({
           hour: item.hour || '',
           tmp: item.tmp ?? 0,
         }));
 
-      setMaxTmp(maxTmp ?? 0);
-      setMinTmp(minTmp ?? 0);
+      if (tempData.length > 0) {
+        const newMaxTmp = Math.max(...tempData.map(item => item.tmp));
+        const newMinTmp = Math.min(...tempData.map(item => item.tmp));
+
+        setMaxTmp(newMaxTmp);
+        setMinTmp(newMinTmp);
+      } else {
+        setMaxTmp(0);
+        setMinTmp(0);
+      }
+
       setTemperatureData(tempData);
-    } else if (weatherData) {
+    } else {
       setTemperatureData([]);
     }
 
@@ -118,7 +127,7 @@ const WeatherGraph = ({
         />
 
         <Path
-          d={`M ${leftMargin} ${getY(maxTmp)} H ${graphWidth - 20}`}
+          d={`M ${leftMargin} ${graphTopMargin} H ${graphWidth - 20}`}
           stroke="#E0E0E0"
           strokeWidth="1"
           strokeDasharray="4, 2"
@@ -132,22 +141,22 @@ const WeatherGraph = ({
           <TSpan x={leftMargin - 20} dy="1em">
             최고
           </TSpan>
+          <TSpan x={leftMargin - 26} dy="1em">
+            ( {maxTmp}°)
+          </TSpan>
         </SvgText>
 
-        <Path
-          d={`M ${leftMargin} ${getY(minTmp)} H ${graphWidth - 20}`}
-          stroke="#E0E0E0"
-          strokeWidth="1"
-          strokeDasharray="4, 2"
-        />
         <SvgText
           x={leftMargin - 10}
-          y={getY(minTmp) - 15}
+          y={getY(minTmp) - 5}
           fill="#333"
           fontSize="9"
           textAnchor="middle">
           <TSpan x={leftMargin - 20} dy="1em">
             최저
+          </TSpan>
+          <TSpan x={leftMargin - 26} dy="1em">
+            ( {minTmp}°)
           </TSpan>
         </SvgText>
 
