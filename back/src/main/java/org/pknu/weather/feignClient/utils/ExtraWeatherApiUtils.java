@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.pknu.weather.common.converter.CoordinateConverter.transformWGS84ToUTMK;
 import static org.pknu.weather.common.formatter.DateTimeFormatter.getFormattedLocalDate;
@@ -120,7 +121,8 @@ public class ExtraWeatherApiUtils {
         return getFormattedLocalDate() + LocalTime.now().getHour();
     }
 
-    private Long getLocation(LocationDTO locationDTO){
+    @Transactional(readOnly = true)
+    public Long getLocation(LocationDTO locationDTO){
 
         Long locationCode = getLocationCode(locationDTO.getProvince(), locationDTO.getCity(), locationDTO.getStreet());
 
