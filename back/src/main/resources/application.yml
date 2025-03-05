@@ -55,6 +55,8 @@ log:
 
 api:
   weather:
+    forecast-url: http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0
+    forecast-value: /getVilageFcst
     service-key: ${SHORT_TERM_FORECAST_API_KEY}
     data-type: JSON
 
