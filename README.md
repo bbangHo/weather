@@ -1,5 +1,6 @@
-> 안드로이드 다운로드
-> IOS 다운로드
+> [Android 다운로드](https://play.google.com/store/apps/details?id=com.weather2&hl=ko)
+
+> [IOS 다운로드](https://apps.apple.com/kr/app/%EB%82%A0%EC%94%A8%ED%86%A1%ED%86%A1/id6738004972)
 
 
 # 날씨 톡톡이란?
@@ -32,12 +33,11 @@
 |---|---|---|---|---|
 
 
-# stacks
+# stacks (수정중)
 
 ## front
 
 ## backend
-- 아키텍쳐 구조 이미지(변동사항 수정해서)
 <div> 
   <img src="https://img.shields.io/badge/java-007396?style=for-the-badge&logo=java&logoColor=white"> 
   <img src="https://img.shields.io/badge/springboot-6DB33F?style=for-the-badge&logo=spring&logoColor=white"> 
