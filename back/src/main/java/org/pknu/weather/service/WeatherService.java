@@ -1,13 +1,5 @@
 package org.pknu.weather.service;
 
-import static org.pknu.weather.dto.converter.ExtraWeatherConverter.toExtraWeather;
-import static org.pknu.weather.dto.converter.ExtraWeatherConverter.toExtraWeatherInfo;
-import static org.pknu.weather.dto.converter.LocationConverter.toLocationDTO;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
@@ -28,6 +20,15 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
+import static org.pknu.weather.dto.converter.ExtraWeatherConverter.toExtraWeather;
+import static org.pknu.weather.dto.converter.ExtraWeatherConverter.toExtraWeatherInfo;
+import static org.pknu.weather.dto.converter.LocationConverter.toLocationDTO;
 
 @Service
 @RequiredArgsConstructor
@@ -84,12 +85,12 @@ public class WeatherService {
     /**
      * 단기 날씨 예보 API가 3시간 마다 갱신되기 때문에, 날씨 데이터 갱신을 위한 메서드
      *
-     * @param location API를 호출한 사용자의 Location 엔티티
+     * @param locationId API를 호출한 사용자의 Location id
      * @return 해당 위치의 날씨 데이터 List
      */
     @Async("threadPoolTaskExecutor")
-    public void updateWeathersAsync(Location location) {
-        weatherWriteService.updateWeathersAsync(location);
+    public void updateWeathersAsync(Long locationId) {
+        weatherWriteService.updateWeathersAsync(locationId);
     }
 
     /**

@@ -1,9 +1,5 @@
 package org.pknu.weather.service;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.domain.Location;
@@ -11,10 +7,13 @@ import org.pknu.weather.domain.Weather;
 import org.pknu.weather.feignClient.utils.WeatherFeignClientUtils;
 import org.pknu.weather.repository.LocationRepository;
 import org.pknu.weather.repository.WeatherRepository;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -30,8 +29,7 @@ public class WeatherWriteService {
      * @param loc      member.getLocation()
      * @param forecast 공공데이터 API에서 받아온 단기날씨예보 값 list
      */
-    @Async("threadPoolTaskExecutor")
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public void saveWeathersAsync(Location loc, List<Weather> forecast) {
         Location location = locationRepository.safeFindById(loc.getId());
 
@@ -45,16 +43,15 @@ public class WeatherWriteService {
     /**
      * 단기 날씨 예보 API가 3시간 마다 갱신되기 때문에, 날씨 데이터 갱신을 위한 메서드
      *
-     * @param loc API를 호출한 사용자의 Location 엔티티
+     * @param locationId API를 호출한 사용자의 Location id
      * @return 해당 위치의 날씨 데이터 List
      */
-    @Async("threadPoolTaskExecutor")
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void updateWeathersAsync(Location loc) {
-        Location location = locationRepository.safeFindById(loc.getId());
+    @Transactional
+    public void updateWeathersAsync(Long locationId) {
+        Location location = locationRepository.safeFindById(locationId);
         Map<LocalDateTime, Weather> oldWeatherMap = weatherRepository.findAllByLocationAfterNow(location);
 
-        List<Weather> newWeathers = weatherFeignClientUtils.getVillageShortTermForecast(location).stream()
+        List<Weather> weatherList = weatherFeignClientUtils.getVillageShortTermForecast(location).stream()
                 .peek(newWeather -> {
                     LocalDateTime presentationTime = newWeather.getPresentationTime();
                     if (oldWeatherMap.containsKey(presentationTime)) {
