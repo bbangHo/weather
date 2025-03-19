@@ -1,21 +1,19 @@
 package org.pknu.weather.domain.tag;
 
+import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
 import org.pknu.weather.exception.GeneralException;
 
-import java.util.Arrays;
-
 @Getter
 @RequiredArgsConstructor
 public enum HumidityTag implements EnumTag {
     DRY("", "건조함", 1),
-    COMMON_HUMID("", "보통", 2),
+    COMMON_HUMID("", "쾌적함", 2),
     LITTLE_HUMID("약간", "습함", 3),
     HUMID("", "습함", 4),
-    VERY_HUMID("매우", "습함", 5)
-    ;
+    VERY_HUMID("매우", "습함", 5);
 
     private final String adverb;
     private final String text;

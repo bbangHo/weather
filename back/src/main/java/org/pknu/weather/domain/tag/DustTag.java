@@ -1,21 +1,18 @@
 package org.pknu.weather.domain.tag;
 
+import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
 import org.pknu.weather.exception.GeneralException;
 
-import java.util.Arrays;
-
 @Getter
 @RequiredArgsConstructor
 public enum DustTag implements EnumTag {
-    VERY_GOOD("매우", "좋음", 1),
-    GOOD("", "좋음", 2),
-    NORMAL("", "보통", 3),
-    LITTLE_BAD("약간", "나쁨", 4),
-    VERY_BAD("매우", "나쁨", 5)
-    ;
+    GOOD("", "좋음", 1),
+    NORMAL("", "보통", 2),
+    LITTLE_BAD("", "나쁨", 3),
+    VERY_BAD("매우", "나쁨", 4);
 
     private final String adverb;
     private final String text;
