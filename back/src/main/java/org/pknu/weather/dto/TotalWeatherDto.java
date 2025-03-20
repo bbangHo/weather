@@ -1,16 +1,15 @@
 package org.pknu.weather.dto;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.pknu.weather.domain.ExtraWeather;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Weather;
 import org.pknu.weather.domain.common.RainType;
 import org.pknu.weather.domain.common.SkyType;
+import org.pknu.weather.dto.WeatherResponse.ExtraWeatherInfo;
 
 @Getter
 public class TotalWeatherDto {
@@ -36,7 +35,7 @@ public class TotalWeatherDto {
         extraWeatherDto = new ExtraWeatherDto();
     }
 
-    public TotalWeatherDto(Weather weather, Optional<ExtraWeather> extraWeatherOptional) {
+    public TotalWeatherDto(Weather weather, ExtraWeatherInfo extraWeatherInfo) {
         baseTime = weather.getBasetime();
         weatherDto = WeatherDto.builder()
                 .location(weather.getLocation())
@@ -51,21 +50,20 @@ public class TotalWeatherDto {
                 .skyType(weather.getSkyType())
                 .presentationTime(weather.getPresentationTime())
                 .build();
-        ExtraWeather extraWeather = extraWeatherOptional.orElse(null);
         extraWeatherDto = ExtraWeatherDto.builder()
-                .uv(extraWeather.getUv())
-                .uvPlus3(extraWeather.getUvPlus3())
-                .uvPlus6(extraWeather.getUvPlus6())
-                .uvPlus9(extraWeather.getUvPlus9())
-                .uvPlus12(extraWeather.getUvPlus12())
-                .uvPlus15(extraWeather.getUvPlus15())
-                .uvPlus18(extraWeather.getUvPlus18())
-                .uvPlus21(extraWeather.getUvPlus21())
-                .o3(extraWeather.getO3())
-                .pm10(extraWeather.getPm10())
-                .pm25(extraWeather.getPm25())
-                .pm10value(extraWeather.getPm10value())
-                .pm25value(extraWeather.getPm25value())
+                .uv(extraWeatherInfo.getUvGrade())
+                .uvPlus3(extraWeatherInfo.getUvGradePlus3())
+                .uvPlus6(extraWeatherInfo.getUvGradePlus6())
+                .uvPlus9(extraWeatherInfo.getUvGradePlus9())
+                .uvPlus12(extraWeatherInfo.getUvGradePlus12())
+                .uvPlus15(extraWeatherInfo.getUvGradePlus15())
+                .uvPlus18(extraWeatherInfo.getUvGradePlus18())
+                .uvPlus21(extraWeatherInfo.getUvGradePlus21())
+                .o3(extraWeatherInfo.getO3Grade())
+                .pm10(extraWeatherInfo.getPm10Grade())
+                .pm25(extraWeatherInfo.getPm25Grade())
+                .pm10value(extraWeatherInfo.getPm10Value())
+                .pm25value(extraWeatherInfo.getPm25Value())
                 .build();
     }
 
