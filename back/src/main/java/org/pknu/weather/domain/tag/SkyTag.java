@@ -4,7 +4,7 @@ import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
-import org.pknu.weather.domain.Weather;
+import org.pknu.weather.dto.TotalWeatherDto;
 import org.pknu.weather.exception.GeneralException;
 
 @Getter
@@ -32,7 +32,7 @@ public enum SkyTag implements EnumTag {
     }
 
     @Override
-    public EnumTag weatherValueToTag(Weather weather) {
+    public EnumTag weatherValueToTag(TotalWeatherDto totalWeatherDto) {
         return CLEAR;
     }
 }

@@ -4,7 +4,9 @@ import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
-import org.pknu.weather.domain.Weather;
+import org.pknu.weather.domain.common.RainType;
+import org.pknu.weather.dto.TotalWeatherDto;
+import org.pknu.weather.dto.TotalWeatherDto.WeatherDto;
 import org.pknu.weather.exception.GeneralException;
 
 @Getter
@@ -47,7 +49,67 @@ public enum RainTag implements EnumTag {
     }
 
     @Override
-    public EnumTag weatherValueToTag(Weather weather) {
-        return NOTHING;
+    public EnumTag weatherValueToTag(TotalWeatherDto totalWeatherDto) {
+        return rainTypeToRainTag(totalWeatherDto.getWeatherDto());
+    }
+
+    private static RainTag rainTypeToRainTag(WeatherDto weatherDto) {
+        Float rain = weatherDto.getRain();
+        Float snowCover = weatherDto.getSnowCover();
+        RainType rainType = weatherDto.getRainType();
+
+        switch (rainType) {
+            case RAIN -> {
+                return rainToRainTag(rain);
+            }
+            case RAIN_AND_SNOW -> {
+                return rainAndSnowToRainTag(rain);
+            }
+            case SNOW -> {
+                return snowTORainTag(snowCover);
+            }
+            case SHOWER -> {
+                return RainTag.SHOWER;
+            }
+            default -> {
+                return RainTag.NOTHING;
+            }
+        }
+    }
+
+    private static RainTag snowTORainTag(Float snowCover) {
+        if (snowCover == 0.0) {
+            return RainTag.NOTHING;
+        } else if (snowCover <= 1.0) {
+            return RainTag.LIGHT_SNOW;
+        } else if (snowCover <= 3.0) {
+            return RainTag.MODERATE_SNOW;
+        } else {
+            return RainTag.HEAVY_SNOW;
+        }
+    }
+
+    private static RainTag rainAndSnowToRainTag(Float rain) {
+        if (rain == 0.0) {
+            return RainTag.NOTHING;
+        } else if (rain <= 3.0) {
+            return RainTag.LIGHT_RAIN_AND_SNOW;
+        } else if (rain <= 15.0) {
+            return RainTag.MODERATE_RAIN_AND_SNOW;
+        } else {
+            return RainTag.EXTREME_RAIN_AND_SNOW;
+        }
+    }
+
+    private static RainTag rainToRainTag(Float rain) {
+        if (rain == 0.0) {
+            return RainTag.NOTHING;
+        } else if (rain <= 3.0) {
+            return RainTag.LIGHT_RAIN;
+        } else if (rain <= 15.0) {
+            return RainTag.MODERATE_RAIN;
+        } else {
+            return RainTag.EXTREME_RAIN;
+        }
     }
 }

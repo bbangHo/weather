@@ -4,8 +4,8 @@ import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
-import org.pknu.weather.domain.ExtraWeather;
-import org.pknu.weather.domain.Weather;
+import org.pknu.weather.dto.TotalWeatherDto;
+import org.pknu.weather.dto.TotalWeatherDto.ExtraWeatherDto;
 import org.pknu.weather.exception.GeneralException;
 
 @Getter
@@ -34,13 +34,18 @@ public enum DustTag implements EnumTag {
     }
 
     @Override
-    public EnumTag weatherValueToTag(Weather weather) {
-        return null;
+    public String toText() {
+        return "미세먼지" + EnumTag.super.toText();
     }
 
-    public static DustTag pmValueToDustTag(ExtraWeather extraWeather) {
-        Integer pm10Value = extraWeather.getPm10value();
-        Integer pm25Value = extraWeather.getPm25value();
+    @Override
+    public EnumTag weatherValueToTag(TotalWeatherDto totalWeatherDto) {
+        return pmValueToDustTag(totalWeatherDto.getExtraWeatherDto());
+    }
+
+    private DustTag pmValueToDustTag(ExtraWeatherDto extraWeatherDto) {
+        Integer pm10Value = extraWeatherDto.getPm10value();
+        Integer pm25Value = extraWeatherDto.getPm25value();
 
         DustTag pm10;
         DustTag pm25;

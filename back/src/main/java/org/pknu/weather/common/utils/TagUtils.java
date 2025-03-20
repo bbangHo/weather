@@ -2,7 +2,6 @@ package org.pknu.weather.common.utils;
 
 import java.util.List;
 import org.pknu.weather.domain.Weather;
-import org.pknu.weather.domain.common.RainType;
 import org.pknu.weather.domain.common.Sensitivity;
 import org.pknu.weather.domain.tag.DustTag;
 import org.pknu.weather.domain.tag.EnumTag;
@@ -11,6 +10,7 @@ import org.pknu.weather.domain.tag.RainTag;
 import org.pknu.weather.domain.tag.SkyTag;
 import org.pknu.weather.domain.tag.TemperatureTag;
 import org.pknu.weather.domain.tag.WindTag;
+import org.pknu.weather.dto.TotalWeatherDto;
 
 public class TagUtils {
 
@@ -22,66 +22,10 @@ public class TagUtils {
     private static final int LITTLE_COLD = 13;
     private static final int COLD = 8;
 
-    public static RainTag rainType2RainTag(Weather weather) {
-        Float rain = weather.getRain();
-        Float snowCover = weather.getSnowCover();
-        RainType rainType = weather.getRainType();
-
-        switch (rainType) {
-            case RAIN -> {
-                return rain2RainTag(rain);
-            }
-            case RAIN_AND_SNOW -> {
-                return rainAndSnow2RainTag(rain);
-            }
-            case SNOW -> {
-                return snow2RainTag(snowCover);
-            }
-            case SHOWER -> {
-                return RainTag.SHOWER;
-            }
-            default -> {
-                return RainTag.NOTHING;
-            }
-        }
+    public static EnumTag rainType2RainTag(Weather weather) {
+        RainTag rainTag = RainTag.NOTHING;
+        return rainTag.weatherValueToTag(new TotalWeatherDto(weather));
     }
-
-    private static RainTag snow2RainTag(Float snowCover) {
-        if (snowCover == 0.0) {
-            return RainTag.NOTHING;
-        } else if (snowCover <= 1.0) {
-            return RainTag.LIGHT_SNOW;
-        } else if (snowCover <= 3.0) {
-            return RainTag.MODERATE_SNOW;
-        } else {
-            return RainTag.HEAVY_SNOW;
-        }
-    }
-
-    private static RainTag rainAndSnow2RainTag(Float rain) {
-        if (rain == 0.0) {
-            return RainTag.NOTHING;
-        } else if (rain <= 3.0) {
-            return RainTag.LIGHT_RAIN_AND_SNOW;
-        } else if (rain <= 15.0) {
-            return RainTag.MODERATE_RAIN_AND_SNOW;
-        } else {
-            return RainTag.EXTREME_RAIN_AND_SNOW;
-        }
-    }
-
-    private static RainTag rain2RainTag(Float rain) {
-        if (rain == 0.0) {
-            return RainTag.NOTHING;
-        } else if (rain <= 3.0) {
-            return RainTag.LIGHT_RAIN;
-        } else if (rain <= 15.0) {
-            return RainTag.MODERATE_RAIN;
-        } else {
-            return RainTag.EXTREME_RAIN;
-        }
-    }
-
 
     public static TemperatureTag tmp2TemperatureTag(Integer tmp, Sensitivity sensitivity) {
         int adjustment = 0;
@@ -136,55 +80,10 @@ public class TagUtils {
         assert temperatureTag != null;
         assert humidityTag != null;
 
-        String temperature = tag2Text(temperatureTag);
-        String humidity = tag2Text(humidityTag);
+        String temperature = temperatureTag.toText();
+        String humidity = humidityTag.toText();
 
         return humidity + ", " + temperature;
-    }
-
-    public static String tag2Text(EnumTag tag) {
-        if (isTemperatureTag(tag)) {
-            return temperatureTag2Text(tag);
-        } else if (isWindTag(tag)) {
-            return windTag2Text(tag);
-        } else if (isHumidityTag(tag)) {
-            return humidityTag2Text(tag);
-        } else if (isSkyTag(tag)) {
-            return skyTag2Text(tag);
-        } else {
-            return dustTag2Text(tag);
-        }
-    }
-
-    private static String skyTag2Text(EnumTag skyTag) {
-        assert skyTag instanceof SkyTag;
-        return skyTag.toText();
-    }
-
-    private static String dustTag2Text(EnumTag dustTag) {
-        assert dustTag instanceof DustTag;
-        return "미세먼지 " + dustTag.toText();
-    }
-
-    private static String humidityTag2Text(EnumTag humidityTag) {
-        assert humidityTag instanceof HumidityTag;
-        return humidityTag.toText();
-    }
-
-    private static String temperatureTag2Text(EnumTag temperatureTag) {
-        assert temperatureTag instanceof TemperatureTag;
-        return temperatureTag.toText();
-    }
-
-    private static String windTag2Text(EnumTag windTag) {
-        assert windTag instanceof WindTag;
-        String wind = "바람 ";
-        Integer code = windTag.getCode();
-        return switch (code) {
-            case 1 -> wind + windTag.findByCode(code).getText();
-            case 3 -> wind + windTag.findByCode(code).getText();
-            default -> wind + windTag.findByCode(code).getText();
-        };
     }
 
     public static boolean isTempTagOrHumdiTag(EnumTag tag) {
@@ -192,22 +91,22 @@ public class TagUtils {
     }
 
     public static boolean isTemperatureTag(EnumTag tag) {
-        return tag.getClass() == TemperatureTag.class;
+        return tag instanceof TemperatureTag;
     }
 
     public static boolean isHumidityTag(EnumTag tag) {
-        return tag.getClass() == HumidityTag.class;
+        return tag instanceof HumidityTag;
     }
 
     public static boolean isSkyTag(EnumTag tag) {
-        return tag.getClass() == SkyTag.class;
+        return tag instanceof SkyTag;
     }
 
     public static boolean isDustTag(EnumTag tag) {
-        return tag.getClass() == DustTag.class;
+        return tag instanceof DustTag;
     }
 
     public static boolean isWindTag(EnumTag tag) {
-        return tag.getClass() == WindTag.class;
+        return tag instanceof WindTag;
     }
 }

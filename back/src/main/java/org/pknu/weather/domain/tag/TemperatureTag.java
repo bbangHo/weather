@@ -4,7 +4,7 @@ import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
-import org.pknu.weather.domain.Weather;
+import org.pknu.weather.dto.TotalWeatherDto;
 import org.pknu.weather.exception.GeneralException;
 
 @Getter
@@ -39,8 +39,7 @@ public enum TemperatureTag implements EnumTag {
     }
 
     @Override
-    public EnumTag weatherValueToTag(Weather weather) {
-        return VERY_COLD;
+    public EnumTag weatherValueToTag(TotalWeatherDto totalWeatherDto) {
+        return null;
     }
-
 }
