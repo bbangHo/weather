@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.pknu.weather.domain.ExtraWeather;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Weather;
@@ -73,7 +72,6 @@ public class TotalWeatherDto {
     @Builder
     @Getter
     @AllArgsConstructor
-    @RequiredArgsConstructor
     @NoArgsConstructor
     public static class WeatherDto {
         private Location location;
