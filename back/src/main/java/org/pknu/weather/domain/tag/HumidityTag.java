@@ -4,6 +4,7 @@ import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
+import org.pknu.weather.domain.Weather;
 import org.pknu.weather.exception.GeneralException;
 
 @Getter
@@ -32,5 +33,19 @@ public enum HumidityTag implements EnumTag {
         return name();
     }
 
-
+    @Override
+    public EnumTag weatherValueToTag(Weather weather) {
+        Integer humidity = weather.getHumidity();
+        if (humidity < 30) {
+            return HumidityTag.DRY;
+        } else if (humidity < 37) {
+            return HumidityTag.COMMON_HUMID;
+        } else if (humidity < 44) {
+            return HumidityTag.LITTLE_HUMID;
+        } else if (humidity < 52) {
+            return HumidityTag.HUMID;
+        } else {
+            return HumidityTag.VERY_HUMID;
+        }
+    }
 }

@@ -1,11 +1,11 @@
 package org.pknu.weather.domain.tag;
 
+import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
+import org.pknu.weather.domain.Weather;
 import org.pknu.weather.exception.GeneralException;
-
-import java.util.Arrays;
 
 @Getter
 @RequiredArgsConstructor
@@ -25,7 +25,7 @@ public enum RainTag implements EnumTag {
     LIGHT_SNOW("", "약한 눈", 10),
     MODERATE_SNOW("", "보통 눈", 11),
     HEAVY_SNOW("", "강한 눈", 12),
-    
+
     SHOWER("", "소나기", 20),
     ;
 
@@ -44,5 +44,10 @@ public enum RainTag implements EnumTag {
     @Override
     public String getKey() {
         return name();
+    }
+
+    @Override
+    public EnumTag weatherValueToTag(Weather weather) {
+        return NOTHING;
     }
 }

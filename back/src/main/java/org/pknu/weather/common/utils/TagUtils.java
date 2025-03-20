@@ -1,8 +1,6 @@
 package org.pknu.weather.common.utils;
 
 import java.util.List;
-import java.util.Optional;
-import org.pknu.weather.domain.ExtraWeather;
 import org.pknu.weather.domain.Weather;
 import org.pknu.weather.domain.common.RainType;
 import org.pknu.weather.domain.common.Sensitivity;
@@ -23,20 +21,6 @@ public class TagUtils {
     private static final int COOL = 17;
     private static final int LITTLE_COLD = 13;
     private static final int COLD = 8;
-
-    public static Boolean tagSelectedOrNot(EnumTag tag, Weather weather, Optional<ExtraWeather> extraWeatherOptional) {
-        if (tag instanceof WindTag) {
-            return tag == windSpeed2WindTag(weather.getWindSpeed());
-        } else if (tag instanceof HumidityTag) {
-            return tag == humidity2HumidityTag(weather.getHumidity());
-        } else if (tag instanceof SkyTag) {
-            return tag == SkyTag.CLEAR;
-        } else if (tag instanceof DustTag) {
-            return extraWeatherOptional.map(extraWeather -> tag == pmValues2DustTag(extraWeather))
-                    .orElseGet(() -> tag == DustTag.GOOD);
-        }
-        return false;
-    }
 
     public static RainTag rainType2RainTag(Weather weather) {
         Float rain = weather.getRain();
@@ -98,64 +82,6 @@ public class TagUtils {
         }
     }
 
-    public static DustTag pmValues2DustTag(ExtraWeather extraWeather) {
-        Integer pm10Value = extraWeather.getPm10value();
-        Integer pm25value = extraWeather.getPm25value();
-
-        DustTag pm10;
-        DustTag pm25;
-
-        if (pm10Value <= 30) {
-            pm10 = DustTag.GOOD;
-        } else if (pm10Value <= 50) {
-            pm10 = DustTag.NORMAL;
-        } else if (pm10Value <= 150) {
-            pm10 = DustTag.LITTLE_BAD;
-        } else {
-            pm10 = DustTag.VERY_BAD;
-        }
-
-        if (pm25value <= 30) {
-            pm25 = DustTag.GOOD;
-        } else if (pm25value <= 50) {
-            pm25 = DustTag.NORMAL;
-        } else if (pm25value <= 150) {
-            pm25 = DustTag.LITTLE_BAD;
-        } else {
-            pm25 = DustTag.VERY_BAD;
-        }
-        if (pm10.getCode() > pm25.getCode()) {
-            return pm10;
-        } else {
-            return pm25;
-        }
-    }
-
-    public static WindTag windSpeed2WindTag(Double windSpeed) {
-        if (windSpeed < 1.5) {
-            return WindTag.NONE;
-        } else if (windSpeed < 8.0) {
-            return WindTag.NORMAL_WINDY;
-        } else if (windSpeed < 10.8) {
-            return WindTag.WEAK_WINDY;
-        } else {
-            return WindTag.VERY_WINDY;
-        }
-    }
-
-    public static HumidityTag humidity2HumidityTag(Integer humidity) {
-        if (humidity < 30) {
-            return HumidityTag.DRY;
-        } else if (humidity < 37) {
-            return HumidityTag.COMMON_HUMID;
-        } else if (humidity < 44) {
-            return HumidityTag.LITTLE_HUMID;
-        } else if (humidity < 52) {
-            return HumidityTag.HUMID;
-        } else {
-            return HumidityTag.VERY_HUMID;
-        }
-    }
 
     public static TemperatureTag tmp2TemperatureTag(Integer tmp, Sensitivity sensitivity) {
         int adjustment = 0;

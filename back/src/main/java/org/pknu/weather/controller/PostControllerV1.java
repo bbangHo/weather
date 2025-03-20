@@ -1,19 +1,14 @@
 package org.pknu.weather.controller;
 
 import jakarta.validation.Valid;
-import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.pknu.weather.apiPayload.ApiResponse;
 import org.pknu.weather.common.converter.TokenConverter;
 import org.pknu.weather.dto.PostRequest;
-import org.pknu.weather.dto.TagSelectedOrNotDto;
 import org.pknu.weather.dto.converter.PostRequestConverter;
 import org.pknu.weather.service.PostService;
-import org.pknu.weather.service.TagQueryService;
 import org.pknu.weather.validation.annotation.IsPositive;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -26,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 public class PostControllerV1 {
     private final PostService postService;
-    private final TagQueryService tagQueryService;
 
     @PostMapping("/post")
     public ApiResponse<Object> createWeatherPost(@RequestHeader("Authorization") String authorization,
@@ -51,13 +45,5 @@ public class PostControllerV1 {
         String email = TokenConverter.getEmailByToken(authorization);
         boolean result = postService.addRecommendation(email, postId);
         return ApiResponse.of(result);
-    }
-
-    @GetMapping("/post/tags")
-    public ApiResponse<Map<String, List<TagSelectedOrNotDto>>> getSelectedOrNotTagList(
-            @RequestHeader("Authorization") String authorization) {
-        String email = TokenConverter.getEmailByToken(authorization);
-        Map<String, List<TagSelectedOrNotDto>> selectedOrNotTags = tagQueryService.getSelectedOrNotTags(email);
-        return ApiResponse.onSuccess(selectedOrNotTags);
     }
 }
