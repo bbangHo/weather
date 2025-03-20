@@ -34,11 +34,6 @@ public enum DustTag implements EnumTag {
     }
 
     @Override
-    public String toText() {
-        return "미세먼지" + EnumTag.super.toText();
-    }
-
-    @Override
     public EnumTag weatherValueToTag(TotalWeatherDto totalWeatherDto) {
         return pmValueToDustTag(totalWeatherDto.getExtraWeatherDto());
     }

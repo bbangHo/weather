@@ -56,6 +56,8 @@ public class TagQueryService {
             EnumTag tag = tagQueryResultList.get(i).getTag();
             if (TagUtils.isTempTagOrHumdiTag(tag)) {
                 tempAndHumidList.add(tag);
+            } else if (TagUtils.isDustTag(tag)) {
+                result.add("미세먼지 " + tag.toText());
             } else {
                 result.add(tag.toText());
             }
