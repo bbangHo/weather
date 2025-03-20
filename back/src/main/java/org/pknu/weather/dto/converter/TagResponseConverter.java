@@ -1,11 +1,9 @@
 package org.pknu.weather.dto.converter;
 
-import java.util.Optional;
-import org.pknu.weather.domain.ExtraWeather;
-import org.pknu.weather.domain.Weather;
 import org.pknu.weather.domain.tag.EnumTag;
 import org.pknu.weather.dto.TagDto;
 import org.pknu.weather.dto.TagSelectedOrNotDto;
+import org.pknu.weather.dto.TotalWeatherDto;
 
 public class TagResponseConverter {
 
@@ -15,11 +13,10 @@ public class TagResponseConverter {
                 .build();
     }
 
-    public static TagSelectedOrNotDto toTagSelectedOrNotDto(EnumTag enumTag, Weather weather,
-                                                            Optional<ExtraWeather> extraWeatherOptional) {
+    public static TagSelectedOrNotDto toTagSelectedOrNotDto(EnumTag tag, TotalWeatherDto totalWeatherDto) {
         return TagSelectedOrNotDto.builder()
-                .enumTag(enumTag)
-                .selected(enumTag.tagSelectedCheck(enumTag, weather, extraWeatherOptional))
+                .enumTag(tag)
+                .selected(tag.tagSelectedCheck(tag, totalWeatherDto))
                 .build();
     }
 

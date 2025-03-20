@@ -44,7 +44,7 @@ public class WeatherResponseConverter {
     }
 
     public static WeatherResponse.WeatherPerHour toWeatherPerHour(Weather weather, Member member) {
-        RainTag rainTag = TagUtils.rainType2RainTag(weather);
+        RainTag rainTag = (RainTag) TagUtils.rainType2RainTag(weather);
         TemperatureTag temperatureTag = TagUtils.tmp2TemperatureTag(weather.getTemperature(), member.getSensitivity());
 
         return WeatherResponse.WeatherPerHour.builder()

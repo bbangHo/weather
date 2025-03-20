@@ -25,11 +25,11 @@ public class EnumTagMapper {
     }
 
     public void put(Class<? extends EnumTag> e) {
-        List<EnumTag> enumTagValues = toEnumTagValues(e);
+        List<EnumTag> tagValues = toEnumTagValues(e);
 
-        for (EnumTag enumTagValue : enumTagValues) {
-            isDuplicateTagKeyName(enumTagValue.getKey());
-            map.put(enumTagValue.getKey(), enumTagValue);
+        for (EnumTag tagValue : tagValues) {
+            isDuplicateTagKeyName(tagValue.getKey());
+            map.put(tagValue.getKey(), tagValue);
         }
     }
 

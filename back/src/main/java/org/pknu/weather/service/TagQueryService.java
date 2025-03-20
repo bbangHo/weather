@@ -1,6 +1,7 @@
 package org.pknu.weather.service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ import org.pknu.weather.domain.tag.EnumTag;
 import org.pknu.weather.dto.TagDto;
 import org.pknu.weather.dto.TagQueryResult;
 import org.pknu.weather.dto.TagSelectedOrNotDto;
+import org.pknu.weather.dto.TotalWeatherDto;
 import org.pknu.weather.dto.converter.TagResponseConverter;
 import org.pknu.weather.repository.ExtraWeatherRepository;
 import org.pknu.weather.repository.MemberRepository;
@@ -55,7 +57,7 @@ public class TagQueryService {
             if (TagUtils.isTempTagOrHumdiTag(tag)) {
                 tempAndHumidList.add(tag);
             } else {
-                result.add(TagUtils.tag2Text(tag));
+                result.add(tag.toText());
             }
         }
 
@@ -74,18 +76,25 @@ public class TagQueryService {
         Location location = member.getLocation();
         Weather weather = weatherRepository.findByLocationClosePresentationTime(location);
         Optional<ExtraWeather> extraWeatherOptional = extraWeatherRepository.findByLocationId(location.getId());
+        TotalWeatherDto totalWeatherDto = new TotalWeatherDto(weather, extraWeatherOptional);
 
         Map<String, List<TagSelectedOrNotDto>> map = new HashMap<>();
 
         enumTagMapper.getAll().forEach((key, enumTag) -> {
-            TagSelectedOrNotDto tagSelectedOrNotDto = TagResponseConverter.toTagSelectedOrNotDto(enumTag, weather,
-                    extraWeatherOptional);
+            TagSelectedOrNotDto tagSelectedOrNotDto = TagResponseConverter.toTagSelectedOrNotDto(enumTag,
+                    totalWeatherDto);
 
-            if (!map.containsKey(key)) {
-                map.put(key, new ArrayList<>());
+            String tagName = enumTag.getTagName();
+
+            if (!map.containsKey(tagName)) {
+                map.put(tagName, new ArrayList<>());
             }
 
-            map.get(key).add(tagSelectedOrNotDto);
+            map.get(tagName).add(tagSelectedOrNotDto);
+        });
+
+        map.forEach((s, dtoList) -> {
+            dtoList.sort(Comparator.comparingInt(TagSelectedOrNotDto::getCode));
         });
 
         return map;
