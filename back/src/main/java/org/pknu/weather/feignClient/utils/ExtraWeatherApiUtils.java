@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.pknu.weather.common.converter.CoordinateConverter.transformWGS84ToUTMK;
 import static org.pknu.weather.common.formatter.DateTimeFormatter.getFormattedLocalDate;
@@ -120,7 +121,8 @@ public class ExtraWeatherApiUtils {
         return getFormattedLocalDate() + LocalTime.now().getHour();
     }
 
-    private Long getLocation(LocationDTO locationDTO){
+    @Transactional(readOnly = true)
+    public Long getLocation(LocationDTO locationDTO){
 
         Long locationCode = getLocationCode(locationDTO.getProvince(), locationDTO.getCity(), locationDTO.getStreet());
 
@@ -201,6 +203,7 @@ public class ExtraWeatherApiUtils {
             return result.getResponse().getBody().getItems().get(0);
         else
             throw new GeneralException(ErrorStatus._API_SERVER_ERROR);
+
     }
 
 
@@ -217,9 +220,9 @@ public class ExtraWeatherApiUtils {
                 .baseTime(convertToLocalDateTime(uvResult.getDate()))
                 .o3Grade(airConditionInfo.getO3Grade())
                 .pm10Grade(airConditionInfo.getPm10Grade())
-                .pm10Value(airConditionInfo.getPm10Value())
+                .pm10Value(checkNumberFormat(airConditionInfo.getPm10Value()))
                 .pm25Grade(airConditionInfo.getPm25Grade())
-                .pm25Value(airConditionInfo.getPm25Value())
+                .pm25Value(checkNumberFormat(airConditionInfo.getPm25Value()))
                 .uvGrade(uvResult.getH0())
                 .uvGradePlus3(uvResult.getH3())
                 .uvGradePlus6(uvResult.getH6())
@@ -243,6 +246,14 @@ public class ExtraWeatherApiUtils {
                 .uvGradePlus18(uvResult.getH18())
                 .uvGradePlus21(uvResult.getH21())
                 .build();
+    }
+
+    private Integer checkNumberFormat(String value) {
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException ex) {
+            return null;
+        }
     }
 
 }

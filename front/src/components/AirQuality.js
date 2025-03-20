@@ -11,6 +11,8 @@ const AirQuality = ({accessToken, refreshing}) => {
     pm10Grade: 0,
     uvGrade: 0,
     o3Grade: 0,
+    pm10Value: null,
+    pm25Value: null,
   });
   const [loading, setLoading] = useState(true);
 
@@ -64,7 +66,7 @@ const AirQuality = ({accessToken, refreshing}) => {
     const loadExtraWeatherInfo = async () => {
       try {
         const data = await fetchExtraWeatherInfo(accessToken);
-        console.log('fetched extra weather info:', data);
+        console.log('Fetched extra weather info:', data);
         setExtraWeatherInfo(data);
       } catch (error) {
         console.error('Error fetching extra weather info:', error);
@@ -81,24 +83,33 @@ const AirQuality = ({accessToken, refreshing}) => {
   return (
     <View style={styles.container}>
       <View style={styles.row}>
-        {['pm10Grade', 'pm25Grade'].map((key, index) => (
-          <View style={styles.shadowContainer} key={index}>
-            <LinearGradient
-              colors={getGradientColors(extraWeatherInfo[key])}
-              style={styles.box}>
-              <Text style={styles.title}>
-                {key === 'pm25Grade' ? '초미세먼지' : '미세먼지'}
-              </Text>
-              <Text
-                style={[
-                  styles.value,
-                  {color: getTextColor(extraWeatherInfo[key])},
-                ]}>
-                {getGradeText(extraWeatherInfo[key])}
-              </Text>
-            </LinearGradient>
-          </View>
-        ))}
+        {['pm10Grade', 'pm25Grade'].map((key, index) => {
+          const gradeText = getGradeText(extraWeatherInfo[key]);
+          const valueKey = key === 'pm25Grade' ? 'pm25Value' : 'pm10Value';
+          const value = extraWeatherInfo[valueKey];
+
+          return (
+            <View style={styles.shadowContainer} key={index}>
+              <LinearGradient
+                colors={getGradientColors(extraWeatherInfo[key])}
+                style={styles.box}>
+                <Text style={styles.title}>
+                  {key === 'pm25Grade' ? '초미세먼지' : '미세먼지'}
+                </Text>
+                <Text
+                  style={[
+                    styles.value,
+                    {color: getTextColor(extraWeatherInfo[key])},
+                  ]}>
+                  {gradeText}
+                </Text>
+                {gradeText !== '정보 없음' && value !== null && (
+                  <Text style={styles.valueText}>{value} µg/m³</Text>
+                )}
+              </LinearGradient>
+            </View>
+          );
+        })}
       </View>
       <View style={styles.row}>
         {['uvGrade', 'o3Grade'].map((key, index) => (
@@ -155,11 +166,16 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 13,
     color: '#333',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   value: {
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  valueText: {
+    fontSize: 11,
+    color: '#555',
+    marginTop: 1,
   },
 });
 

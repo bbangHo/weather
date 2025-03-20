@@ -1,17 +1,19 @@
 package org.pknu.weather.repository;
 
+import static org.pknu.weather.domain.QWeather.weather;
+
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.pknu.weather.common.formatter.DateTimeFormatter;
 import org.pknu.weather.common.utils.QueryUtils;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Weather;
 import org.pknu.weather.dto.WeatherQueryResult;
-
-import java.time.LocalDateTime;
-
-import static org.pknu.weather.domain.QWeather.weather;
 
 @RequiredArgsConstructor
 public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
@@ -43,8 +45,7 @@ public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
     }
 
     /**
-     * 해당 지역의 날씨가 갱신되었는지 확인하는 메서드
-     * ex. baseTime: 14:00, now: 14:00~16:59 true baseTime: 14:00, now: 17:00~      false
+     * 해당 지역의 날씨가 갱신되었는지 확인하는 메서드 ex. baseTime: 14:00, now: 14:00~16:59 true baseTime: 14:00, now: 17:00~      false
      *
      * @param location
      * @return true = 갱신되었음(3시간 안지남), false = 갱신되지 않았음(3시간 지남)
@@ -52,7 +53,7 @@ public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
     @Override
     public boolean weatherHasBeenUpdated(Location location) {
         LocalDateTime now = LocalDateTime.now()
-                .withMinute(0)
+                .withMinute(15)
                 .withSecond(0)
                 .withNano(0);
 
@@ -79,7 +80,10 @@ public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
      */
     @Override
     public boolean weatherHasBeenCreated(Location location) {
-        LocalDateTime now = LocalDateTime.now().withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime now = LocalDateTime.now()
+                .withMinute(15)
+                .withSecond(0)
+                .withNano(0);
 
         Weather w = jpaQueryFactory
                 .select(weather)
@@ -104,5 +108,27 @@ public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
                         weather.presentationTime.eq(now)
                 )
                 .fetchOne();
+    }
+
+    /**
+     * 특정 지역의 날씨 예보중 현재 시각 이후의 예보들을 가져온다.
+     *
+     * @param locationEntity
+     */
+    @Override
+    public Map<LocalDateTime, Weather> findAllByLocationAfterNow(Location locationEntity) {
+        LocalDateTime now = LocalDateTime.now();
+
+        List<Weather> weatherList = jpaQueryFactory
+                .select(weather)
+                .from(weather)
+                .where(
+                        weather.location.id.eq(locationEntity.getId()),
+                        weather.presentationTime.after(now)
+                )
+                .fetch();
+
+        return weatherList.stream()
+                .collect((Collectors.toMap(w -> w.getPresentationTime(), w -> w)));
     }
 }

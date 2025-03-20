@@ -3,7 +3,7 @@ package org.pknu.weather.repository;
 import org.junit.jupiter.api.Test;
 import org.pknu.weather.common.TestDataCreator;
 import org.pknu.weather.common.formatter.DateTimeFormatter;
-import org.pknu.weather.config.TestConfig;
+import org.pknu.weather.config.DataJpaTestConfig;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Weather;
 import org.pknu.weather.dto.WeatherQueryResult;
@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 @DataJpaTest
-@Import(TestConfig.class)
+@Import(DataJpaTestConfig.class)
 class WeatherRepositoryTest {
     @Autowired
     WeatherRepository weatherRepository;
