@@ -35,17 +35,53 @@ public enum HumidityTag implements EnumTag {
 
     @Override
     public EnumTag weatherValueToTag(TotalWeatherDto totalWeatherDto) {
+        Integer temperature = totalWeatherDto.getWeatherDto().getTemperature();
         Integer humidity = totalWeatherDto.getWeatherDto().getHumidity();
-        if (humidity < 30) {
-            return HumidityTag.DRY;
-        } else if (humidity < 37) {
-            return HumidityTag.PLEASANT;
-        } else if (humidity < 44) {
-            return HumidityTag.LITTLE_HUMID;
-        } else if (humidity < 52) {
-            return HumidityTag.HUMID;
+
+        if (temperature <= 15) {
+            if (humidity <= 50) {
+                return DRY;
+            } else if (humidity <= 70) {
+                return PLEASANT;
+            } else if (humidity <= 90) {
+                return LITTLE_HUMID;
+            } else {
+                return HUMID;
+            }
+        } else if (temperature <= 20) {
+            if (humidity <= 40) {
+                return DRY;
+            } else if (humidity <= 60) {
+                return PLEASANT;
+            } else if (humidity <= 80) {
+                return LITTLE_HUMID;
+            } else {
+                return HUMID;
+            }
+        } else if (temperature <= 23) {
+            if (humidity <= 30) {
+                return DRY;
+            } else if (humidity <= 50) {
+                return PLEASANT;
+            } else if (humidity <= 70) {
+                return LITTLE_HUMID;
+            } else if (humidity <= 90) {
+                return HUMID;
+            } else {
+                return VERY_HUMID;
+            }
         } else {
-            return HumidityTag.VERY_HUMID;
+            if (humidity <= 20) {
+                return DRY;
+            } else if (humidity <= 40) {
+                return PLEASANT;
+            } else if (humidity <= 60) {
+                return LITTLE_HUMID;
+            } else if (humidity <= 80) {
+                return HUMID;
+            } else {
+                return VERY_HUMID;
+            }
         }
     }
 }
