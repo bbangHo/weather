@@ -79,10 +79,10 @@ public class ExtraWeather extends BaseEntity {
             this.pm25 = extraWeatherInfo.getPm25Grade();
 
         if (extraWeatherInfo.getPm10Value() != null)
-            this.pm10 = extraWeatherInfo.getPm10Value();
+            this.pm10value = extraWeatherInfo.getPm10Value();
 
         if (extraWeatherInfo.getPm25Value() != null)
-            this.pm25 = extraWeatherInfo.getPm25Value();
+            this.pm25value = extraWeatherInfo.getPm25Value();
 
     }
 }
