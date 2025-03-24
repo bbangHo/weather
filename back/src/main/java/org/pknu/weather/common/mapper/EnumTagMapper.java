@@ -1,13 +1,10 @@
 package org.pknu.weather.common.mapper;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import org.pknu.weather.domain.tag.EnumTag;
 import org.pknu.weather.dto.TagDto;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class EnumTagMapper {
     private final Map<String, EnumTag> map = new HashMap<>();
@@ -19,17 +16,17 @@ public class EnumTagMapper {
     }
 
     private void isDuplicateTagKeyName(String tagKeyName) {
-        if (map.containsKey(tagKeyName)) {
+        if(map.containsKey(tagKeyName)) {
             throw new IllegalArgumentException("EnumTag의 Key가 중복입니다.: " + tagKeyName);
         }
     }
 
     public void put(Class<? extends EnumTag> e) {
-        List<EnumTag> tagValues = toEnumTagValues(e);
+        List<EnumTag> enumTagValues = toEnumTagValues(e);
 
-        for (EnumTag tagValue : tagValues) {
-            isDuplicateTagKeyName(tagValue.getKey());
-            map.put(tagValue.getKey(), tagValue);
+        for (EnumTag enumTagValue : enumTagValues) {
+            isDuplicateTagKeyName(enumTagValue.getKey());
+            map.put(enumTagValue.getKey(), enumTagValue);
         }
     }
 
@@ -37,11 +34,7 @@ public class EnumTagMapper {
         return map.get(key);
     }
 
-    public Map<String, EnumTag> getAll() {
-        return map;
-    }
-
-    public Map<String, List<TagDto>> getAllDto() {
+    public Map<String, List<TagDto>> getAll() {
         Map<String, List<TagDto>> list = new HashMap<>();
 
         map.values().forEach(tag -> {
