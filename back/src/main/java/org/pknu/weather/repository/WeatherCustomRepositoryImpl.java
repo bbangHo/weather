@@ -129,6 +129,8 @@ public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
                 .fetch();
 
         return weatherList.stream()
-                .collect((Collectors.toMap(w -> w.getPresentationTime(), w -> w)));
+                .collect((Collectors.toMap(Weather::getPresentationTime,
+                        weather -> weather,
+                        (existing, replacement) -> existing)));
     }
 }
