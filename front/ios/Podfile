@@ -45,6 +45,11 @@ end
 target 'Weather2' do
   config = use_native_modules!
 
+  pod 'FirebaseCore', :modular_headers => true
+  pod 'FirebaseMessaging', :modular_headers => true
+  pod 'FirebaseInstallations', :modular_headers => true
+  pod 'GoogleUtilities', :modular_headers => true
+
   pod 'KakaoSDKCommon', '2.22.0'
   pod 'KakaoSDKAuth', '2.22.0'
   pod 'KakaoSDKUser', '2.22.0'

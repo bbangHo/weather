@@ -272,7 +272,9 @@ const MyScreen = ({
 
       <View style={styles.separator} />
       <View style={styles.menuSection}>
-        <TouchableOpacity style={styles.menuItem}>
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => navigation.navigate('NotificationSettingScreen')}>
           <Text style={styles.menuText}>알림 설정</Text>
           <Text style={styles.menuArrow}>{'>'}</Text>
         </TouchableOpacity>

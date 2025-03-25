@@ -9,6 +9,11 @@ import {
   Linking,
 } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
+import {
+  requestUserPermission,
+  getFcmToken,
+  onMessageListener,
+} from '../firebase/pushNotification';
 import {registerTermsAgreement} from '../api/api';
 
 const {width, height} = Dimensions.get('window');
@@ -78,6 +83,11 @@ const TermsAgreementScreen = ({navigation, route}) => {
       });
 
       console.log('약관 동의 완료:', response);
+
+      await requestUserPermission();
+      const token = await getFcmToken();
+      console.log('FCM 토큰:', token);
+      onMessageListener();
 
       navigation.navigate('RegisterProfileScreen', {
         accessToken,

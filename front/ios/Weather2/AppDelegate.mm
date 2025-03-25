@@ -3,6 +3,9 @@
 #import <React/RCTBundleURLProvider.h>
 #import <RNKakaoLogins.h>
 
+#import <Firebase.h>
+#import <FirebaseMessaging/FirebaseMessaging.h>
+
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)app
@@ -15,14 +18,22 @@
  return NO;
 }
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions 
 {
+  [FIRApp configure];
+  [application registerForRemoteNotifications];
+  
   self.moduleName = @"Weather2";
   // You can add your custom initial props in the dictionary below.
   // They will be passed down to the ViewController used by React Native.
   self.initialProps = @{};
 
   return [super application:application didFinishLaunchingWithOptions:launchOptions];
+}
+
+- (void)application:(UIApplication *)application
+ didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+ [FIRMessaging messaging].APNSToken = deviceToken;
 }
 
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
