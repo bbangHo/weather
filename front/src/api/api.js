@@ -141,7 +141,7 @@ export const sendLocationToBackend = async (
   try {
     const postData = {latitude, longitude};
 
-    console.log('Sending location data:', postData);
+    // console.log('Sending location data:', postData);
 
     const response = await fetch(`${BASE_URL}/api/v1/location/coor`, {
       method: 'POST',
@@ -504,7 +504,7 @@ export const fetchMemberInfo = async accessToken => {
     });
 
     const result = await response.json();
-    console.log('Fetch memeber info api:', result);
+    // console.log('Fetch memeber info api:', result);
 
     if (result.isSuccess) {
       return result;

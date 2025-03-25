@@ -1,5 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {View, StyleSheet, Dimensions, ActivityIndicator} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Dimensions,
+  ActivityIndicator,
+  Text,
+} from 'react-native';
 import Svg, {Path, Circle, Text as SvgText, TSpan} from 'react-native-svg';
 
 const {width, height} = Dimensions.get('window');
@@ -113,6 +119,14 @@ const WeatherGraph = ({
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#999999" />
+      </View>
+    );
+  }
+
+  if (!temperatureData || temperatureData.length <= 1) {
+    return (
+      <View style={styles.emptyContainer}>
+        <Text style={styles.emptyText}></Text>
       </View>
     );
   }

@@ -12,10 +12,17 @@ import PostCreationScreen from './src/screens/PostCreationScreen';
 import TestLoginScreen from './src/screens/TestLoginScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
+import NotificationSettingScreen from './src/screens/NotificationSettingScreen';
 import TermsViewScreen from './src/screens/TermsViewScreen';
 import {StatusBar, Image, Platform, View, StyleSheet} from 'react-native';
 import {refreshAccessToken, fetchMemberInfo} from './src/api/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  requestUserPermission,
+  getFcmToken,
+  onMessageListener,
+} from './src/firebase/pushNotification';
+import {useFcmTokenSync} from './src/firebase/pushNotification';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -114,11 +121,16 @@ const MyStack = ({
     <Stack.Screen name="ProfileScreen">
       {props => <ProfileScreen {...props} accessToken={accessToken} />}
     </Stack.Screen>
+    <Stack.Screen
+      name="NotificationSettingScreen"
+      component={NotificationSettingScreen}
+    />
     <Stack.Screen name="TermsViewScreen" component={TermsViewScreen} />
   </Stack.Navigator>
 );
 
 const App = () => {
+  useFcmTokenSync();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAutoLoggingIn, setIsAutoLoggingIn] = useState(true);
   const [accessToken, setAccessToken] = useState(null);
@@ -145,7 +157,7 @@ const App = () => {
 
             if (memberInfoResponse.isSuccess) {
               const memberData = memberInfoResponse;
-              console.log('회원 정보:', memberData);
+              // console.log('회원 정보:', memberData);
 
               setAccessToken(storedAccessToken);
               setIsLoggedIn(true);
@@ -197,6 +209,23 @@ const App = () => {
     };
 
     checkLoginStatus();
+  }, []);
+
+  useEffect(() => {
+    const initPushNotification = async () => {
+      await requestUserPermission();
+      const fcmToken = await getFcmToken();
+
+      if (fcmToken) {
+        console.log('토큰 정상 수신 완료');
+      } else {
+        console.log('토큰을 받아오지 못함');
+      }
+
+      onMessageListener();
+    };
+
+    // initPushNotification();
   }, []);
 
   useEffect(() => {
