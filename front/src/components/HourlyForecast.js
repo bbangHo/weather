@@ -29,7 +29,7 @@ const HourlyForecast = ({weatherData, showText, refreshing}) => {
       weatherData.weatherPerHourList.length > 0
     ) {
       setHourlyData(weatherData.weatherPerHourList);
-      console.log('Hourly Weather data:', JSON.stringify(weatherData, null, 2));
+      // console.log('Hourly Weather data:', JSON.stringify(weatherData, null, 2));
     } else {
       setHourlyData([]);
     }
