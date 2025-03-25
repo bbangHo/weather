@@ -87,7 +87,7 @@ const LoginScreen = ({
             const memberInfoResponse = await fetchMemberInfo(accessToken);
             if (memberInfoResponse.isSuccess) {
               memberInfoSuccess = true;
-              console.log('회원 정보:', memberInfoResponse.result);
+              // console.log('회원 정보:', memberInfoResponse.result);
             } else {
               console.error(
                 'Failed to fetch member info:',
@@ -166,7 +166,7 @@ const LoginScreen = ({
           const memberInfoResponse = await fetchMemberInfo(accessToken);
           if (memberInfoResponse.isSuccess) {
             memberInfoSuccess = true;
-            console.log('회원 정보:', memberInfoResponse.result);
+            // console.log('회원 정보:', memberInfoResponse.result);
           } else {
             console.error(
               'Failed to fetch member info:',
