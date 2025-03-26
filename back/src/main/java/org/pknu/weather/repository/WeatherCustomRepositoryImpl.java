@@ -15,6 +15,7 @@ import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Weather;
 import org.pknu.weather.dto.WeatherQueryResult;
 
+
 @RequiredArgsConstructor
 public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
 
@@ -68,8 +69,7 @@ public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
                 )
                 .fetchFirst();
 
-        assert weatherBaseTime != null;
-        return weatherBaseTime.isEqual(baseTime);
+        return weatherBaseTime != null && weatherBaseTime.isEqual(baseTime);
     }
 
     /**
