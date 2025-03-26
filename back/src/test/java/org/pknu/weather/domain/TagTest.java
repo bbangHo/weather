@@ -1,28 +1,27 @@
 package org.pknu.weather.domain;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
+import org.junit.jupiter.api.Test;
 import org.pknu.weather.common.mapper.EnumTagMapper;
 import org.pknu.weather.domain.tag.EnumTag;
-import org.pknu.weather.dto.TotalWeatherDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-public class EnumTagTest {
-    @Autowired
-    EnumTagMapper enumTagMapper;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @org.junit.jupiter.api.Test
+@SpringBootTest
+public class TagTest {
+    @Autowired EnumTagMapper enumTagMapper;
+
+    @Test
     void enumTag_name_중복_검사_테스트() {
         // then
         assertThrows(IllegalArgumentException.class, () -> {
-            enumTagMapper.put(Test.class);
+            enumTagMapper.put(TestEnum.class);
         });
     }
 }
 
-enum Test implements EnumTag {
+enum TestEnum implements EnumTag {
     COMMON;
 
     @Override
@@ -42,11 +41,6 @@ enum Test implements EnumTag {
 
     @Override
     public Integer getCode() {
-        return null;
-    }
-
-    @Override
-    public EnumTag weatherValueToTag(TotalWeatherDto totalWeatherDto) {
         return null;
     }
 }

@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -57,6 +56,7 @@ public class WeatherWriteService {
                     if (oldWeatherMap.containsKey(presentationTime)) {
                         Weather oldWeather = oldWeatherMap.get(presentationTime);
                         oldWeather.updateWeather(newWeather);
+
                     } else {
                         newWeather.addLocation(location);
                         weatherRepository.save(newWeather);
