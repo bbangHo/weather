@@ -7,7 +7,6 @@ on:
 
     paths:
       - back/**
-      - .github/**
 
 jobs:
   test:
