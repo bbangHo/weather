@@ -1,10 +1,9 @@
 package org.pknu.weather.aop.util;
 
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
-
-import java.util.List;
 
 @Slf4j
 public class LoggingUtils {
@@ -17,7 +16,7 @@ public class LoggingUtils {
     /**
      * 포인트컷 대상 메서드가 수행되기 전에 호출합니다. 포인트컷 대상 메서드가 시작되었음을 로깅합니다.
      *
-     * @param pjp ProceedingJoinPoint
+     * @param pjp  ProceedingJoinPoint
      * @param args 필요하다면 파라미터도 넘길 수 있다.
      */
     public static void logBefore(ProceedingJoinPoint pjp, List<String> args) {
@@ -39,7 +38,7 @@ public class LoggingUtils {
     /**
      * 포인트컷 대상 메서드가 수행된 이후에 호출합니다. 포인트컷 대상 메서드가 종료되었음을 로깅합니다.
      *
-     * @param pjp ProceedingJoinPoint
+     * @param pjp                 ProceedingJoinPoint
      * @param methodExecutionTime ExecutionTimerUtils.start() 의 return 값
      */
     public static void logAfterWithExecutionTime(ProceedingJoinPoint pjp, long methodExecutionTime) {
@@ -79,6 +78,7 @@ public class LoggingUtils {
 
     /**
      * AOP 도중 에러가 발생하였을 때 호출합니다. 에러가 발생했음을 로깅합니다.
+     *
      * @param pjp
      * @param ex
      */
@@ -95,7 +95,7 @@ public class LoggingUtils {
         sb.append(DEPTH_PREFIX.repeat(currentDepth)).append(ERROR_PREFIX);
         depth.remove();
 
-        log.info("[{}] {}{}.{} [Exception!] ex=", traceId, sb, className, methodName, ex);
+        log.info("[{}] {}{}.{}", traceId, sb, className, methodName);
     }
 
     private static int setCurrentDepthMinus() {
