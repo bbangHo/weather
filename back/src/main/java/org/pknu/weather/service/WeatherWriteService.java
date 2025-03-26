@@ -1,9 +1,5 @@
 package org.pknu.weather.service;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.domain.Location;
@@ -14,6 +10,10 @@ import org.pknu.weather.repository.WeatherRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -56,6 +56,7 @@ public class WeatherWriteService {
                     if (oldWeatherMap.containsKey(presentationTime)) {
                         Weather oldWeather = oldWeatherMap.get(presentationTime);
                         oldWeather.updateWeather(newWeather);
+
                     } else {
                         newWeather.addLocation(location);
                         weatherRepository.save(newWeather);
