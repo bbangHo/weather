@@ -9,13 +9,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.pknu.weather.apiPayload.code.status.ErrorStatus;
 import org.pknu.weather.common.formatter.DateTimeFormatter;
 import org.pknu.weather.common.utils.QueryUtils;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Weather;
 import org.pknu.weather.dto.WeatherQueryResult;
-import org.pknu.weather.exception.GeneralException;
 
 @RequiredArgsConstructor
 public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
@@ -70,11 +68,7 @@ public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
                 )
                 .fetchFirst();
 
-        if (weatherBaseTime == null) {
-            new GeneralException(ErrorStatus._WEATHER_DATA_NOT_FOUND_IN_THE_LOCATION);
-        }
-
-        return weatherBaseTime.isEqual(baseTime);
+        return weatherBaseTime != null && weatherBaseTime.isEqual(baseTime);
     }
 
     /**
