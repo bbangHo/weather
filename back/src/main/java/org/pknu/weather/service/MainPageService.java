@@ -1,6 +1,5 @@
 package org.pknu.weather.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +39,6 @@ public class MainPageService {
      * @param email
      * @return
      */
-    @Transactional
     public WeatherResponse.MainPageWeatherData getWeatherInfo(String email, Long locationId) {
         Member member = memberRepository.safeFindByEmail(email);
 
@@ -51,11 +49,9 @@ public class MainPageService {
             location = member.getLocation();
         }
 
-        List<Weather> weatherList = new ArrayList<>();
-
         // 해당 지역에 날씨 예보가 있는지 없는지 체크
         if (!weatherQueryService.weatherHasBeenCreated(location)) {
-            weatherList = weatherFeignClientUtils.getVillageShortTermForecast(location);
+            List<Weather> weatherList = weatherFeignClientUtils.getVillageShortTermForecast(location);
             weatherService.saveWeathersAsync(location.getId(), weatherList);
             return WeatherResponseConverter.toMainPageWeatherData(weatherList, member);
         }
@@ -65,8 +61,7 @@ public class MainPageService {
             weatherService.updateWeathersAsync(location.getId());
         }
 
-        weatherList = weatherList.isEmpty() ? weatherService.getWeathers(location) : weatherList;
-
+        List<Weather> weatherList = weatherService.getWeathers(location);
         return WeatherResponseConverter.toMainPageWeatherData(weatherList, member);
     }
 

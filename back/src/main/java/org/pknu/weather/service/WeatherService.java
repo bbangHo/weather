@@ -99,17 +99,17 @@ public class WeatherService {
         Location location = locationRepository.safeFindById(locationId);
         Map<LocalDateTime, Weather> oldWeatherMap = weatherRepository.findAllByLocationAfterNow(location);
 
-        weatherFeignClientUtils.getVillageShortTermForecast(location)
-                .forEach(newWeather -> {
+        List<Weather> weatherList = weatherFeignClientUtils.getVillageShortTermForecast(location).stream()
+                .peek(newWeather -> {
                     LocalDateTime presentationTime = newWeather.getPresentationTime();
                     if (oldWeatherMap.containsKey(presentationTime)) {
                         Weather oldWeather = oldWeatherMap.get(presentationTime);
                         oldWeather.updateWeather(newWeather);
-                    } else {
-                        newWeather.addLocation(location);
-                        weatherRepository.save(newWeather);
                     }
-                });
+                    newWeather.addLocation(location);
+                }).toList();
+
+        weatherRepository.saveAll(weatherList);
     }
 
     /**
