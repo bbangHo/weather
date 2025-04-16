@@ -6,15 +6,15 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ExpEvent {
-    CREATE_POST(10L),   // 게시글 작성
-    ATTENDANCE(1L),     // 출석체크
-    STREAK_7_DAYS(15L), // 7연속 출석체크
-    RECOMMEND(1L),     // 좋아요 클릭
-    RECOMMENDED(3L),  // 좋아요 받음
-    SHARE_KAKAO(5L),    // 카카오로 날씨 공유
-    INACTIVE_7_DAYS(-5L),   // 7일 미출석
-    INACTIVE_30_DAYS(-25L)  // 30일 미출석
-    ;
+    CREATE_POST("게시글 작성", 10L),
+    ATTENDANCE("출석 체크", 1L),
+    STREAK_7_DAYS("7일 연속 출석 체크", 15L),
+    RECOMMEND("좋아요 클릭", 1L),
+    RECOMMENDED("좋아요 받음", 3L),
+    SHARE_KAKAO("카카오톡 날씨 공유", 5L),
+    INACTIVE_7_DAYS("7일 미출석", -5L),
+    INACTIVE_30_DAYS("30일 미출석", -25L);
 
+    private final String rewardName;
     private final Long rewardExpAmount;
 }

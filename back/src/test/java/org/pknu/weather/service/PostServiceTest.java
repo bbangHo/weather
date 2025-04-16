@@ -14,6 +14,7 @@ import org.pknu.weather.common.TestDataCreator;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.Post;
+import org.pknu.weather.domain.Recommendation;
 import org.pknu.weather.domain.Weather;
 import org.pknu.weather.domain.common.PostType;
 import org.pknu.weather.domain.tag.DustTag;
@@ -53,6 +54,9 @@ class PostServiceTest {
 
     @Autowired
     WeatherRepository weatherRepository;
+
+    @Autowired
+    RecommendationService recommendationService;
 
     @Autowired
     EntityManager em;
@@ -245,21 +249,23 @@ class PostServiceTest {
         Post post = postRepository.save(TestDataCreator.getPost(member1));
 
         // when
-        postService.addRecommendation(member1.getEmail(), post.getId());
-        postService.addRecommendation(member2.getEmail(), post.getId());
+        recommendationService.addRecommendation(member1.getEmail(), post.getId());
+        recommendationService.addRecommendation(member2.getEmail(), post.getId());
         em.flush();
         em.clear();
 
         post = postRepository.safeFindById(post.getId());
         assertThat(post.getRecommendationList().size()).isEqualTo(2);
 
-        postService.addRecommendation(member1.getEmail(), post.getId());
+        recommendationService.addRecommendation(member1.getEmail(), post.getId());
         em.flush();
         em.clear();
 
         post = postRepository.safeFindById(post.getId());
-        assertThat(post.getRecommendationList().size()).isEqualTo(1);
+        assertThat(
+                post.getRecommendationList().stream()
+                        .filter(Recommendation::isNotDeleted)
+                        .count())
+                .isEqualTo(1L);
     }
-
-
 }
