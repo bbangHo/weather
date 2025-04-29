@@ -2,8 +2,8 @@ package org.pknu.weather.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
+
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.persistence.EntityManager;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -16,41 +16,33 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.pknu.weather.config.QueryDslConfig;
-import org.pknu.weather.config.TestClockConfig;
+import org.pknu.weather.config.DataJpaTestConfig;
 import org.pknu.weather.domain.Alarm;
 import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.common.SummaryAlarmTime;
 import org.pknu.weather.dto.AlarmMemberDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 
+@Import(DataJpaTestConfig.class)
 @DataJpaTest
-@Import({QueryDslConfig.class, TestClockConfig.class})
 class MemberCustomRepositoryImplTest {
-
-    @Autowired
-    private MemberRepository memberRepository;
-
-    @Autowired
-    private AlarmRepository alarmRepository;
 
     @Autowired
     private JPAQueryFactory jpaQueryFactory;
 
     @Autowired
-    private EntityManager em;
+    private TestEntityManager testEntityManager;
 
     @ParameterizedTest
     @MethodSource("provideMatchedSummaryAlarmTimes")
     void 시간대에_맞는_알람만_조회된다(LocalTime fixedTime, Set<SummaryAlarmTime> expectedAlarmTimes) {
+
         // Given
         Clock clock = createFixedClock(fixedTime);
         saveMemberAndAlarm("test@example.com", "test-fcm-token", expectedAlarmTimes);
-
-        em.flush();
-        em.clear();
 
         MemberCustomRepositoryImpl repository = createRepository(clock);
 
@@ -71,9 +63,6 @@ class MemberCustomRepositoryImplTest {
         Clock clock = createFixedClock(fixedTime);
         saveMemberAndAlarm("mismatch@example.com", "mismatch-fcm-token", alarmSummaryTimes);
 
-        em.flush();
-        em.clear();
-
         MemberCustomRepositoryImpl repository = createRepository(clock);
 
         // When
@@ -92,9 +81,6 @@ class MemberCustomRepositoryImplTest {
         saveMemberAndAlarm("user1@example.com", "fcm-token-1", Collections.singleton(SummaryAlarmTime.MORNING));
         saveMemberAndAlarm("user2@example.com", "fcm-token-2", Set.of(SummaryAlarmTime.MORNING,SummaryAlarmTime.AFTERNOON));
         saveMemberAndAlarm("user3@example.com", "fcm-token-3", Collections.singleton(SummaryAlarmTime.MORNING));
-
-        em.flush();
-        em.clear();
 
         MemberCustomRepositoryImpl repository = createRepository(clock);
 
@@ -125,8 +111,9 @@ class MemberCustomRepositoryImplTest {
                 .summaryAlarmTimes(alarmTime)
                 .build();
 
-        memberRepository.save(member);
-        alarmRepository.save(alarm);
+        testEntityManager.persistAndFlush(member);
+        testEntityManager.persistAndFlush(alarm);
+
     }
 
     private MemberCustomRepositoryImpl createRepository(Clock clock) {
