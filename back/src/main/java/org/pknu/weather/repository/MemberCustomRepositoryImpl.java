@@ -15,25 +15,8 @@ import org.pknu.weather.dto.AlarmMemberDTO;
 public class MemberCustomRepositoryImpl implements MemberCustomRepository {
 
     private final JPAQueryFactory queryFactory;
-    private final Clock clock;
 
-
-    public List<AlarmMemberDTO> findMembersAndAlarmsByAlarmType() {
-        return findMembersAndAlarmsByAlarmTime(getCurrentAlarmTime());
-    }
-
-    private SummaryAlarmTime getCurrentAlarmTime() {
-        LocalTime now = LocalTime.now(clock);
-        if (now.isBefore(LocalTime.of(10, 0))) {
-            return SummaryAlarmTime.MORNING;
-        } else if (now.isBefore(LocalTime.of(15, 0))) {
-            return SummaryAlarmTime.AFTERNOON;
-        } else {
-            return SummaryAlarmTime.EVENING;
-        }
-    }
-
-    private List<AlarmMemberDTO> findMembersAndAlarmsByAlarmTime(SummaryAlarmTime time) {
+    public List<AlarmMemberDTO> findMembersAndAlarmsByAlarmTime(SummaryAlarmTime time) {
         QAlarm alarm = QAlarm.alarm;
         QMember member = QMember.member;
 

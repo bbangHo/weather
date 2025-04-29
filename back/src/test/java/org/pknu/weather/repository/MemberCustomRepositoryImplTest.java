@@ -4,10 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import java.time.Clock;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -31,23 +27,21 @@ import org.springframework.context.annotation.Import;
 class MemberCustomRepositoryImplTest {
 
     @Autowired
-    private JPAQueryFactory jpaQueryFactory;
+    private TestEntityManager testEntityManager;
 
     @Autowired
-    private TestEntityManager testEntityManager;
+    private MemberRepository memberRepository;
 
     @ParameterizedTest
     @MethodSource("provideMatchedSummaryAlarmTimes")
-    void 시간대에_맞는_알람만_조회된다(LocalTime fixedTime, Set<SummaryAlarmTime> expectedAlarmTimes) {
+    void 시간대에_맞는_알람만_조회된다(SummaryAlarmTime expectedAlarmTime, Set<SummaryAlarmTime> memberAlarmTimes) {
 
         // Given
-        Clock clock = createFixedClock(fixedTime);
-        saveMemberAndAlarm("test@example.com", "test-fcm-token", expectedAlarmTimes);
+        saveMemberAndAlarm("test@example.com", "test-fcm-token", memberAlarmTimes);
 
-        MemberCustomRepositoryImpl repository = createRepository(clock);
 
         // When
-        List<AlarmMemberDTO> result = repository.findMembersAndAlarmsByAlarmType();
+        List<AlarmMemberDTO> result = memberRepository.findMembersAndAlarmsByAlarmTime(expectedAlarmTime);
 
         // Then
         assertThat(result)
@@ -58,15 +52,12 @@ class MemberCustomRepositoryImplTest {
 
     @ParameterizedTest
     @MethodSource("provideMismatchedSummaryAlarmTimes")
-    void 시간대가_다르면_알람이_조회되지_않는다(LocalTime fixedTime, Set<SummaryAlarmTime> alarmSummaryTimes) {
+    void 시간대가_다르면_알람이_조회되지_않는다(SummaryAlarmTime expectedAlarmTime, Set<SummaryAlarmTime> memberAlarmTimes) {
         // Given
-        Clock clock = createFixedClock(fixedTime);
-        saveMemberAndAlarm("mismatch@example.com", "mismatch-fcm-token", alarmSummaryTimes);
-
-        MemberCustomRepositoryImpl repository = createRepository(clock);
+        saveMemberAndAlarm("mismatch@example.com", "mismatch-fcm-token", memberAlarmTimes);
 
         // When
-        List<AlarmMemberDTO> result = repository.findMembersAndAlarmsByAlarmType();
+        List<AlarmMemberDTO> result = memberRepository.findMembersAndAlarmsByAlarmTime(expectedAlarmTime);
 
         // Then
         assertThat(result).isEmpty();
@@ -76,16 +67,13 @@ class MemberCustomRepositoryImplTest {
     void 같은_시간대에_여러명의_알람이_조회된다() {
 
         // Given
-        Clock clock = createFixedClock(LocalTime.of(7, 0));
-
         saveMemberAndAlarm("user1@example.com", "fcm-token-1", Collections.singleton(SummaryAlarmTime.MORNING));
         saveMemberAndAlarm("user2@example.com", "fcm-token-2", Set.of(SummaryAlarmTime.MORNING,SummaryAlarmTime.AFTERNOON));
         saveMemberAndAlarm("user3@example.com", "fcm-token-3", Collections.singleton(SummaryAlarmTime.MORNING));
 
-        MemberCustomRepositoryImpl repository = createRepository(clock);
 
         // When
-        List<AlarmMemberDTO> result = repository.findMembersAndAlarmsByAlarmType();
+        List<AlarmMemberDTO> result = memberRepository.findMembersAndAlarmsByAlarmTime(SummaryAlarmTime.MORNING);
 
         // Then
         assertThat(result)
@@ -116,32 +104,19 @@ class MemberCustomRepositoryImplTest {
 
     }
 
-    private MemberCustomRepositoryImpl createRepository(Clock clock) {
-        return new MemberCustomRepositoryImpl(jpaQueryFactory, clock);
-    }
-
-    private Clock createFixedClock(LocalTime time) {
-        return Clock.fixed(
-                time.atDate(LocalDate.now())
-                        .atZone(ZoneId.systemDefault())
-                        .toInstant(),
-                ZoneId.systemDefault()
-        );
-    }
-
     static Stream<Arguments> provideMatchedSummaryAlarmTimes() {
         return Stream.of(
-                arguments(LocalTime.of(7, 0), Set.of(SummaryAlarmTime.MORNING,SummaryAlarmTime.AFTERNOON)),
-                arguments(LocalTime.of(12, 0), Set.of(SummaryAlarmTime.AFTERNOON)),
-                arguments(LocalTime.of(18, 0), Set.of(SummaryAlarmTime.EVENING,SummaryAlarmTime.AFTERNOON))
+                arguments(SummaryAlarmTime.MORNING, Set.of(SummaryAlarmTime.MORNING,SummaryAlarmTime.AFTERNOON)),
+                arguments(SummaryAlarmTime.AFTERNOON, Set.of(SummaryAlarmTime.AFTERNOON)),
+                arguments(SummaryAlarmTime.EVENING, Set.of(SummaryAlarmTime.EVENING,SummaryAlarmTime.AFTERNOON))
         );
     }
 
     static Stream<Arguments> provideMismatchedSummaryAlarmTimes() {
         return Stream.of(
-                arguments(LocalTime.of(7, 0), Set.of(SummaryAlarmTime.AFTERNOON,SummaryAlarmTime.EVENING)),
-                arguments(LocalTime.of(12, 0),Set.of(SummaryAlarmTime.EVENING,SummaryAlarmTime.MORNING)),
-                arguments(LocalTime.of(18, 0),Set.of(SummaryAlarmTime.MORNING))
+                arguments(SummaryAlarmTime.MORNING, Set.of(SummaryAlarmTime.AFTERNOON,SummaryAlarmTime.EVENING)),
+                arguments(SummaryAlarmTime.AFTERNOON,Set.of(SummaryAlarmTime.EVENING,SummaryAlarmTime.MORNING)),
+                arguments(SummaryAlarmTime.EVENING,Set.of(SummaryAlarmTime.MORNING))
         );
     }
 }

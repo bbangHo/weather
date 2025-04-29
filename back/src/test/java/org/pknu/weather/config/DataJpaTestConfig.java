@@ -19,8 +19,4 @@ public class DataJpaTestConfig {
     public JPAQueryFactory jpaQueryFactory() {
         return new JPAQueryFactory(entityManager);
     }
-    @Bean
-    public Clock clock() {
-        return Clock.systemDefaultZone();
-    }
 }
