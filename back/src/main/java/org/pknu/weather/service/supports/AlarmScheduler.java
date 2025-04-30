@@ -1,0 +1,19 @@
+package org.pknu.weather.service.supports;
+
+import lombok.RequiredArgsConstructor;
+import org.pknu.weather.service.AlarmService;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+@Component
+@RequiredArgsConstructor
+public class AlarmScheduler {
+
+    private final AlarmService alarmService;
+
+    // 날씨 요약 알림 전송
+    @Scheduled(cron = "0 0 7,12,18 * * *")
+    public void runWeatherSummaryAlarm() {
+        alarmService.trigger(AlarmType.WEATHER_SUMMARY);
+    }
+}
