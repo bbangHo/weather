@@ -23,7 +23,7 @@ import org.pknu.weather.domain.QWeather;
 import org.pknu.weather.domain.Weather;
 import org.pknu.weather.domain.common.RainType;
 import org.pknu.weather.dto.WeatherQueryResult;
-import org.pknu.weather.test.alarm.dto.WeatherSummaryDTO;
+import org.pknu.weather.dto.WeatherSummaryDTO;
 
 
 @RequiredArgsConstructor

@@ -7,7 +7,7 @@ import java.util.Set;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Weather;
 import org.pknu.weather.dto.WeatherQueryResult;
-import org.pknu.weather.test.alarm.dto.WeatherSummaryDTO;
+import org.pknu.weather.dto.WeatherSummaryDTO;
 
 public interface WeatherCustomRepository {
     boolean weatherHasBeenUpdated(Location location);
