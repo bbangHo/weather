@@ -1,7 +1,8 @@
-package org.pknu.weather.service.supports;
+package org.pknu.weather.service.handler;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.pknu.weather.service.supports.AlarmType;
 import org.springframework.stereotype.Component;
 
 @Component
