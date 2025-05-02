@@ -149,4 +149,23 @@ public class WeatherService {
         extraWeatherRepository.save(toExtraWeather(location, extraWeatherInfo));
         log.debug("기타 날씨 정보 저장 완료");
     }
+
+    /**
+     * temp
+     */
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void saveWeathers(Location location, List<Weather> forecast) {
+        weatherWriteService.saveWeathersAsync(location, forecast);
+    }
+
+    /**
+     * 단기 날씨 예보 API가 3시간 마다 갱신되 기 때문에, 날씨 데이터 갱신을 위한 메서드
+     *
+     * @param locationId API를 호출한 사용자의 Location id
+     * @return 해당 위치의 날씨 데이터 List
+     */
+    public void updateWeathers(Long locationId) {
+        weatherWriteService.updateWeathersAsync(locationId);
+    }
 }
