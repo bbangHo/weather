@@ -10,6 +10,8 @@ public class WeatherAlarmMessageBuilder {
     private Integer pm10;
     private String maxUvTime;
     private Integer maxUvValue;
+    private static final String STRING_FORMAT = "%-24s";
+
 
 
     public WeatherAlarmMessageBuilder withRainStatus(String rainStatus) {
@@ -47,22 +49,22 @@ public class WeatherAlarmMessageBuilder {
 
     private void appendTemperature(List<String> messageParts) {
         if (maxTemp != null && minTemp != null)
-            messageParts.add("🌡️ " + String.format("%-24s", "기온: " + minTemp + "°C / " + maxTemp + "°C"));
+            messageParts.add("🌡️ " + String.format(STRING_FORMAT, "기온: " + minTemp + "°C / " + maxTemp + "°C"));
     }
 
     private void appendRainStatus(List<String> messageParts) {
         if (rainStatus != null)
-            messageParts.add("☔️ " + String.format("%-24s", "강수 상태: " + rainStatus));
+            messageParts.add("☔️ " + String.format(STRING_FORMAT, "강수 상태: " + rainStatus));
     }
 
     private void appendDustLevel(List<String> messageParts) {
         if (pm10 != null)
-            messageParts.add("🌫️ " + String.format("%-24s", "미세먼지: " + getDustLevel(pm10)));
+            messageParts.add("🌫️ " + String.format(STRING_FORMAT, "미세먼지: " + getDustLevel(pm10)));
     }
 
     private void appendUvLevel(List<String> messageParts) {
         if (maxUvTime != null && maxUvValue != null)
-            messageParts.add("🌞 " + String.format("%-24s", "자외선: " + getUvLevel(maxUvValue) + " - " + maxUvTime + "시"));
+            messageParts.add("🌞 " + String.format(STRING_FORMAT, "자외선: " + getUvLevel(maxUvValue) + " - " + maxUvTime + "시"));
     }
 
     private String formatMessage(List<String> messageParts) {
