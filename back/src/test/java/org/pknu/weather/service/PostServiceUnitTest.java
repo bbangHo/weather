@@ -21,6 +21,7 @@ import org.pknu.weather.domain.Post;
 import org.pknu.weather.domain.Recommendation;
 import org.pknu.weather.domain.common.PostType;
 import org.pknu.weather.domain.exp.ExpEvent;
+import org.pknu.weather.event.ExpRewardEvent;
 import org.pknu.weather.repository.MemberRepository;
 import org.pknu.weather.repository.PostRepository;
 import org.pknu.weather.repository.RecommendationRepository;
@@ -84,7 +85,7 @@ class PostServiceUnitTest {
                 receiver.addExp(event.getRewardExpAmount());
             }
             return null;
-        }).when(expRewardService).rewardExp(anyString(), any(ExpEvent.class));
+        }).when(expRewardService).rewardExp(new ExpRewardEvent(anyString(), any(ExpEvent.class)));
 
         // when
         recommendationService.addRecommendation(sender.getEmail(), post.getId());
@@ -146,8 +147,8 @@ class PostServiceUnitTest {
 
         // then
         // 경험치 지급 메서드가 호출되지 않았는지 확인
-        verify(expRewardService, times(1)).rewardExp(eq(sender.getEmail()), eq(ExpEvent.RECOMMEND));
-        verify(expRewardService, times(1)).rewardExp(eq(receiver.getEmail()), eq(ExpEvent.RECOMMENDED));
+        verify(expRewardService, times(1)).rewardExp(eq(new ExpRewardEvent(sender.getEmail(), ExpEvent.RECOMMEND)));
+        verify(expRewardService, times(1)).rewardExp(eq(new ExpRewardEvent(receiver.getEmail(), ExpEvent.RECOMMENDED)));
     }
 
     @Test
@@ -171,6 +172,6 @@ class PostServiceUnitTest {
 
         // then
         // 경험치 지급 메서드가 호출되지 않았는지 확인
-        verify(expRewardService, times(0)).rewardExp(eq(receiver.getEmail()), eq(ExpEvent.RECOMMENDED));
+        verify(expRewardService, times(0)).rewardExp(eq(new ExpRewardEvent(receiver.getEmail(), ExpEvent.RECOMMENDED)));
     }
 }

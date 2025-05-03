@@ -6,11 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.Post;
 import org.pknu.weather.domain.Recommendation;
-import org.pknu.weather.domain.exp.ExpEvent;
 import org.pknu.weather.dto.converter.RecommendationConverter;
+import org.pknu.weather.event.RecommendEvent;
+import org.pknu.weather.event.RecommendedEvent;
 import org.pknu.weather.repository.MemberRepository;
 import org.pknu.weather.repository.PostRepository;
 import org.pknu.weather.repository.RecommendationRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +23,7 @@ public class RecommendationService {
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
     private final RecommendationRepository recommendationRepository;
-    private final ExpRewardService expRewardService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public boolean addRecommendation(String senderEmail, Long postId) {
@@ -72,7 +74,7 @@ public class RecommendationService {
     }
 
     private void rewardRecommendation(Member sender, Post post) {
-        expRewardService.rewardExp(sender.getEmail(), ExpEvent.RECOMMEND);
-        expRewardService.rewardExp(post.getMember().getEmail(), ExpEvent.RECOMMENDED);
+        eventPublisher.publishEvent(new RecommendEvent(sender.getEmail()));
+        eventPublisher.publishEvent(new RecommendedEvent(post.getMember().getEmail()));
     }
 }
