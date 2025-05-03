@@ -9,15 +9,13 @@ import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.Post;
 import org.pknu.weather.domain.Tag;
 import org.pknu.weather.domain.common.PostType;
-import org.pknu.weather.domain.exp.ExpEvent;
 import org.pknu.weather.dto.PostRequest;
 import org.pknu.weather.dto.converter.PostConverter;
 import org.pknu.weather.dto.converter.TagConverter;
-import org.pknu.weather.event.ExpRewardEvent;
+import org.pknu.weather.event.PostCreatedEvent;
 import org.pknu.weather.repository.LocationRepository;
 import org.pknu.weather.repository.MemberRepository;
 import org.pknu.weather.repository.PostRepository;
-import org.pknu.weather.repository.RecommendationRepository;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class PostService {
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
-    private final RecommendationRepository recommendationRepository;
     private final LocationRepository locationRepository;
     private final EnumTagMapper enumTagMapper;
     private final ApplicationEventPublisher eventPublisher;
@@ -66,9 +63,7 @@ public class PostService {
 
         post.addTag(tag);
         postRepository.save(post);
-
-        // TODO: 이벤트 방식으로 변경
-        eventPublisher.publishEvent(new ExpRewardEvent(member.getEmail(), ExpEvent.CREATE_POST));
+        eventPublisher.publishEvent(new PostCreatedEvent(member.getEmail()));
 
         return true;
     }
