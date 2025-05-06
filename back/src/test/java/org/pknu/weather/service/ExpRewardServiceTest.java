@@ -17,10 +17,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.pknu.weather.common.TestDataCreator;
 import org.pknu.weather.domain.Member;
-import org.pknu.weather.domain.exp.CreatePostExpRewardLimitPolicy;
 import org.pknu.weather.domain.exp.ExpEvent;
-import org.pknu.weather.domain.exp.ExpRewardLimitPolicy;
 import org.pknu.weather.domain.exp.Level;
+import org.pknu.weather.domain.exp.policy.CreatePostExpRewardLimitPolicy;
+import org.pknu.weather.domain.exp.policy.ExpRewardLimitPolicy;
 import org.pknu.weather.repository.MemberRepository;
 
 @ExtendWith(MockitoExtension.class)

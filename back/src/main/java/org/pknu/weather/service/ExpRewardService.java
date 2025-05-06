@@ -6,7 +6,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.exp.ExpEvent;
-import org.pknu.weather.domain.exp.ExpRewardLimitPolicy;
+import org.pknu.weather.domain.exp.policy.ExpRewardLimitPolicy;
 import org.pknu.weather.repository.MemberRepository;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;

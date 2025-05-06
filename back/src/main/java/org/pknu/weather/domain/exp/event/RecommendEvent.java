@@ -1,4 +1,4 @@
-package org.pknu.weather.event;
+package org.pknu.weather.domain.exp.event;
 
 import lombok.Getter;
 

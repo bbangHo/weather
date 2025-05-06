@@ -1,4 +1,4 @@
-package org.pknu.weather.domain.exp;
+package org.pknu.weather.domain.exp.policy;
 
 import lombok.RequiredArgsConstructor;
 import org.pknu.weather.repository.RecommendationRepository;
