@@ -1,7 +1,6 @@
 package org.pknu.weather.service;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.times;
@@ -21,9 +20,13 @@ import org.pknu.weather.domain.Post;
 import org.pknu.weather.domain.Recommendation;
 import org.pknu.weather.domain.common.PostType;
 import org.pknu.weather.domain.exp.ExpEvent;
+import org.pknu.weather.event.AbstractExpEvent;
+import org.pknu.weather.event.RecommendEvent;
+import org.pknu.weather.event.RecommendedEvent;
 import org.pknu.weather.repository.MemberRepository;
 import org.pknu.weather.repository.PostRepository;
 import org.pknu.weather.repository.RecommendationRepository;
+import org.springframework.context.ApplicationEventPublisher;
 
 @ExtendWith(MockitoExtension.class)
 class PostServiceUnitTest {
@@ -39,6 +42,9 @@ class PostServiceUnitTest {
 
     @Mock
     ExpRewardService expRewardService;
+
+    @Mock
+    ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
     RecommendationService recommendationService;
@@ -75,16 +81,15 @@ class PostServiceUnitTest {
 
         // rewardExp() 호출 시 직접 경험치 증가시키는 로직을 스텁
         doAnswer(invocation -> {
-            String email = invocation.getArgument(0);
-            ExpEvent event = invocation.getArgument(1);
+            AbstractExpEvent abstractExpEvent = invocation.getArgument(0);
 
-            if (email.equals(sender.getEmail())) {
-                sender.addExp(event.getRewardExpAmount());
-            } else if (email.equals(receiver.getEmail())) {
-                receiver.addExp(event.getRewardExpAmount());
+            if (abstractExpEvent instanceof RecommendEvent) {
+                sender.addExp(ExpEvent.RECOMMEND.getRewardExpAmount());
+            } else if (abstractExpEvent instanceof RecommendedEvent) {
+                receiver.addExp(ExpEvent.RECOMMENDED.getRewardExpAmount());
             }
             return null;
-        }).when(expRewardService).rewardExp(anyString(), any(ExpEvent.class));
+        }).when(eventPublisher).publishEvent(any(AbstractExpEvent.class));
 
         // when
         recommendationService.addRecommendation(sender.getEmail(), post.getId());
@@ -146,8 +151,8 @@ class PostServiceUnitTest {
 
         // then
         // 경험치 지급 메서드가 호출되지 않았는지 확인
-        verify(expRewardService, times(1)).rewardExp(eq(sender.getEmail()), eq(ExpEvent.RECOMMEND));
-        verify(expRewardService, times(1)).rewardExp(eq(receiver.getEmail()), eq(ExpEvent.RECOMMENDED));
+        verify(eventPublisher, times(1)).publishEvent(any(RecommendedEvent.class));
+        verify(eventPublisher, times(1)).publishEvent(any(RecommendEvent.class));
     }
 
     @Test
