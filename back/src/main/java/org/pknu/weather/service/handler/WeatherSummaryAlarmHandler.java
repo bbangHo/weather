@@ -1,6 +1,7 @@
 package org.pknu.weather.service.handler;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -61,11 +62,11 @@ public class WeatherSummaryAlarmHandler implements AlarmHandler {
                 .map(ExtraWeatherConverter::toExtraWeatherSummaryDTO)
                 .collect(Collectors.toList());
 
-        Map<Long, List<AlarmMemberDTO>> membersByLocation = groupMembersByLocation(members);
+        Map<Long, List<AlarmMemberDTO>> groupedMembersByLocation = groupMembersByLocation(members);
         Map<Long, WeatherSummaryDTO> weatherMap = toMap(weatherSummaries, WeatherSummaryDTO::getLocationId);
         Map<Long, ExtraWeatherSummaryDTO> extraMap = toMap(extraWeatherSummaries, ExtraWeatherSummaryDTO::getLocationId);
 
-        return membersByLocation.entrySet().stream()
+        return groupedMembersByLocation.entrySet().stream()
                 .flatMap(entry -> sendAlarmsForLocation(entry.getKey(), entry.getValue(), weatherMap, extraMap).stream())
                 .collect(Collectors.toList());
     }
@@ -82,7 +83,8 @@ public class WeatherSummaryAlarmHandler implements AlarmHandler {
                 .collect(Collectors.toList());
     }
 
-    private boolean sendSingleAlarm(Long locationId, AlarmMemberDTO member, WeatherSummaryDTO weather, ExtraWeatherSummaryDTO extra) {
+    boolean sendSingleAlarm(Long locationId, AlarmMemberDTO member, WeatherSummaryDTO weather,
+                            ExtraWeatherSummaryDTO extra) {
         try {
             NotificationMessage message = weatherSummaryMessageMaker.createAlarmMessage(
                     new WeatherSummaryAlarmInfo(weather, extra, member)
@@ -91,7 +93,7 @@ public class WeatherSummaryAlarmHandler implements AlarmHandler {
             sender.send(message);
             return true;
 
-        } catch (IllegalStateException | IllegalArgumentException e) {
+        } catch (RuntimeException e) {
             log.warn("[알림 실패] locationId={}, memberId={}, reason={}", locationId, member.getId(), e.getMessage(), e);
             return false;
         }
@@ -116,6 +118,10 @@ public class WeatherSummaryAlarmHandler implements AlarmHandler {
     }
 
     private <T> Map<Long, T> toMap(List<T> list, Function<T, Long> keyMapper) {
+        if (list == null) {
+            return Collections.emptyMap();
+        }
+
         return list.stream().collect(Collectors.toMap(keyMapper, Function.identity()));
     }
 
