@@ -64,9 +64,12 @@ class CommunityControllerV1Test {
         // then
         result
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.result.postList[0].memberInfo.memberName").value(member2.getNickname()))
-                .andExpect(jsonPath("$.result.postList[0].memberInfo.levelName").value(member2.getLevel().name()))
-                .andExpect(jsonPath("$.result.postList[1].memberInfo.memberName").value(member.getNickname()))
-                .andExpect(jsonPath("$.result.postList[1].memberInfo.levelName").value(member.getLevel().name()));
+                .andExpect(
+                        jsonPath("$.result.postList[0].memberInfo.memberName").value(post2.getMember().getNickname()))
+                .andExpect(jsonPath("$.result.postList[0].memberInfo.levelName").value(
+                        post2.getMember().getLevel().name()))
+                .andExpect(jsonPath("$.result.postList[1].memberInfo.memberName").value(post.getMember().getNickname()))
+                .andExpect(jsonPath("$.result.postList[1].memberInfo.levelName").value(
+                        post.getMember().getLevel().name()));
     }
 }

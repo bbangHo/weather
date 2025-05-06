@@ -65,12 +65,18 @@ public class TestDataCreator {
     }
 
     public static Post getPost(Member member) {
-        return Post.builder()
-                .location(member.getLocation())
-                .member(member)
-                .content("content")
-                .postType(PostType.WEATHER)
-                .build();
+        try {
+            Thread.sleep(1);
+            return Post.builder()
+                    .location(member.getLocation())
+                    .member(member)
+                    .content("content")
+                    .postType(PostType.WEATHER)
+                    .build();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt(); // 인터럽트 상태 복구
+            throw new RuntimeException(e); // 또는 로깅 후 처리
+        }
     }
 
     public static LocalDateTime getLocalDateTime() {
