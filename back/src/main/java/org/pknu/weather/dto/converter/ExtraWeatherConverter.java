@@ -83,6 +83,6 @@ public class ExtraWeatherConverter {
                 new UvData(extraWeather.getUvPlus21(), baseTime.plusHours(21))
         );
     }
-    record UvData(Integer value, LocalDateTime time) {}
+    public record UvData(Integer value, LocalDateTime time) {}
 
 }
