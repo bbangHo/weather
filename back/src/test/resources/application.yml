@@ -82,3 +82,7 @@ apple:
     content: ${APPLE_KEY}
 
 integration-logging: false
+
+fcm:
+  project-id: ${FCM_ID}
+  service-account: ${FCM_CREDENTIAL}
