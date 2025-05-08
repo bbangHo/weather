@@ -21,30 +21,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class FcmNotificationSender implements NotificationSender {
 
-    @Value("${fcm.service-account}")
-    private String serviceAccountKeyContent;
-
-    @Value("${fcm.project-id}")
-    private String projectId;
-
-    @PostConstruct
-    public void initialize() throws IOException {
-
-        FirebaseOptions options = FirebaseOptions.builder()
-                .setCredentials(GoogleCredentials.fromStream(new ByteArrayInputStream(serviceAccountKeyContent.getBytes())))
-                .setProjectId(projectId)
-                .build();
-
-        FirebaseApp.initializeApp(options);
-    }
-
     @Override
     public void send(NotificationMessage message) {
 
         if (!(message instanceof FcmMessage fcmMessage)) {
             log.warn("푸시 발송 실패: FcmSender는 FcmMessage만 지원. 입력 타입: {}",
                     message != null ? message.getClass().getName() : "null");
-            throw new IllegalArgumentException("FcmSender는 FcmMessage만을 지원합니다.");
+            throw new IllegalArgumentException("FcmSender는 FcmMessage만 지원합니다.");
         }
 
         try {
