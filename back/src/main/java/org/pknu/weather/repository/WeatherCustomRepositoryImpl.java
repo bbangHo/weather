@@ -25,7 +25,6 @@ import org.pknu.weather.domain.common.RainType;
 import org.pknu.weather.dto.WeatherQueryResult;
 import org.pknu.weather.dto.WeatherSummaryDTO;
 
-
 @RequiredArgsConstructor
 public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
 
