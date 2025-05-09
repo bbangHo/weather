@@ -11,6 +11,8 @@ import {
   Dimensions,
 } from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {Alert} from 'react-native';
 import WeatherHeader from '../components/WeatherHeader';
 import HourlyForecast from '../components/HourlyForecast';
 import AirQuality from '../components/AirQuality';
@@ -18,7 +20,7 @@ import WeatherGraph from '../components/WeatherGraph';
 import Posts from '../components/Posts';
 import KakaoShareButton from '../components/KakaoShareButton';
 import globalStyles from '../globalStyles';
-import {fetchWeatherData} from '../api/api';
+import {fetchWeatherData, checkInAttendance, fetchMemberInfo} from '../api/api';
 
 const {width, height} = Dimensions.get('window');
 
@@ -95,6 +97,49 @@ const HomeScreen = ({accessToken, navigation}) => {
     }
   };
 
+  // 출석 체크 로직
+  const checkAttendanceOncePerDay = async () => {
+    const today = getKstToday(); // 한국 시간 기준 오늘 날짜 사용
+
+    try {
+      const memberInfo = await fetchMemberInfo(accessToken);
+      console.log('Fetched member info:', memberInfo);
+
+      const email = memberInfo?.result?.email;
+      if (!email) {
+        console.warn('이메일 정보를 가져오지 못했습니다.');
+        return;
+      }
+
+      const attendanceKey = `lastAttendanceDate_${email}`;
+      const lastCheckInDate = await AsyncStorage.getItem(attendanceKey);
+
+      if (lastCheckInDate === today) {
+        console.log(`이미 ${email} 계정으로 출석 완료된 날짜입니다:`, today);
+        return;
+      }
+
+      const result = await checkInAttendance(accessToken);
+      if (result?.isSuccess) {
+        console.log('출석 체크 성공:', result);
+        await AsyncStorage.setItem(attendanceKey, today);
+        Alert.alert('출석 완료', '오늘도 출석했습니다!');
+      } else {
+        throw new Error(result?.message || '출석 실패');
+      }
+    } catch (error) {
+      console.error('출석 체크 실패:', error.message);
+      Alert.alert('출석 실패', error.message || '오류가 발생했습니다.');
+    }
+  };
+
+  const getKstToday = () => {
+    const now = new Date();
+    const offsetMs = 9 * 60 * 60 * 1000;
+    const kstNow = new Date(now.getTime() + offsetMs);
+    return kstNow.toISOString().split('T')[0];
+  };
+
   useEffect(() => {
     if (refresh) {
       console.log('Refresh HomeScreen');
@@ -102,6 +147,10 @@ const HomeScreen = ({accessToken, navigation}) => {
       setRefresh(false);
     }
   }, [refresh]);
+
+  useEffect(() => {
+    checkAttendanceOncePerDay();
+  }, []);
 
   const onRefresh = async () => {
     setRefreshing(true);

@@ -22,6 +22,15 @@ const Posts = ({accessToken, refreshing}) => {
   const [newPosts, setNewPosts] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const levelImages = {
+    LV1: require('../../assets/images/LV1.png'),
+    LV2: require('../../assets/images/LV2.png'),
+    LV3: require('../../assets/images/LV3.png'),
+    LV4: require('../../assets/images/LV4.png'),
+    LV5: require('../../assets/images/LV5.png'),
+    LV6: require('../../assets/images/LV6.png'),
+  };
+
   useEffect(() => {
     const loadPosts = async () => {
       try {
@@ -97,16 +106,27 @@ const Posts = ({accessToken, refreshing}) => {
     }
   };
 
-  const getUserIcon = sensitivity => {
+  const getSensitivityBadge = sensitivity => {
     switch (sensitivity) {
       case 'HOT':
-        return require('../../assets/images/icon_weather_clear.png');
-      case 'NONE':
-        return require('../../assets/images/icon_weather_partlycloudy.png');
+        return {
+          text: '더위를 잘 타는 유형',
+          backgroundColor: '#ffe5e5',
+          color: '#e74c3c',
+        };
       case 'COLD':
-        return require('../../assets/images/icon_weather_snow.png');
+        return {
+          text: '추위를 잘 타는 유형',
+          backgroundColor: '#e6f0ff',
+          color: '#3aa2e8',
+        };
+      case 'NONE':
       default:
-        return null;
+        return {
+          text: '평범한 유형',
+          backgroundColor: '#e8f9e3',
+          color: '#59bd83',
+        };
     }
   };
 
@@ -130,10 +150,33 @@ const Posts = ({accessToken, refreshing}) => {
           <View style={styles.userInfo}>
             <View style={styles.userRow}>
               <Text style={styles.username}>{item.memberInfo.memberName}</Text>
-              <Image
-                source={getUserIcon(item.memberInfo.sensitivity)}
-                style={styles.userIcon}
-              />
+              {item.memberInfo.levelName &&
+                levelImages[item.memberInfo.levelName] && (
+                  <Image
+                    source={levelImages[item.memberInfo.levelName]}
+                    style={styles.levelBadge}
+                    resizeMode="contain"
+                  />
+                )}
+
+              {item.postInfo.postId !== 'placeholder' &&
+                (() => {
+                  const badge = getSensitivityBadge(
+                    item.memberInfo.sensitivity,
+                  );
+                  return (
+                    <View
+                      style={[
+                        styles.sensitivityBadge,
+                        {backgroundColor: badge.backgroundColor},
+                      ]}>
+                      <Text
+                        style={[styles.sensitivityText, {color: badge.color}]}>
+                        {badge.text}
+                      </Text>
+                    </View>
+                  );
+                })()}
             </View>
             <Text style={styles.timeAgo}>{item.postInfo.createdAt}</Text>
           </View>
@@ -294,6 +337,21 @@ const styles = StyleSheet.create({
     color: '#3f51b5',
     fontSize: 16,
     textAlign: 'center',
+  },
+  sensitivityBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 12,
+    marginLeft: -2,
+  },
+  sensitivityText: {
+    fontSize: 11,
+    fontWeight: '500',
+  },
+  levelBadge: {
+    width: 36,
+    height: 16,
+    marginLeft: -7,
   },
 });
 

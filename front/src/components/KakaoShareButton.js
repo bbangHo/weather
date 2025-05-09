@@ -2,9 +2,12 @@ import React, {useState, useEffect} from 'react';
 import {View, StyleSheet, Alert, Dimensions, Platform} from 'react-native';
 import {Button} from 'react-native-elements';
 import LinearGradient from 'react-native-linear-gradient';
-import globalStyles from '../globalStyles';
 import KakaoShareLink from 'react-native-kakao-share-link';
-import {fetchWeatherData, fetchRainForecast} from '../api/api';
+import {
+  fetchWeatherData,
+  fetchRainForecast,
+  rewardKakaoShare,
+} from '../api/api';
 
 const {width} = Dimensions.get('window');
 
@@ -65,11 +68,12 @@ const KakaoShareButton = ({accessToken}) => {
     const weatherEmoji = getWeatherEmoji(currentSkyType);
 
     try {
+      // 공유 요청 먼저 실행
       const response = await KakaoShareLink.sendFeed({
         content: {
           title: `${weatherEmoji} ${city} ${street} 날씨입니다!`,
           description: `현재 ${currentTmp}°C   (↑)${maxTmp}° (↓)${minTmp}°\n${rainComment} ${weatherEmoji}`,
-          imageUrl: 'https:이미지 추가할 경우.png',
+          imageUrl: 'https://이미지 추가할 경우.png',
           link: {
             mobileWebUrl: 'https://링크 추가.com',
             webUrl: 'https://링크 추가.com',
@@ -85,12 +89,19 @@ const KakaoShareButton = ({accessToken}) => {
           },
         ],
       });
-      if (response.success) {
-        Alert.alert('성공', '카카오톡으로 공유되었습니다.');
+
+      // 공유 성공 여부와 관계없이 API 호출
+      const rewardResult = await rewardKakaoShare(accessToken);
+
+      if (rewardResult?.isSuccess) {
+      } else {
+        console.warn(
+          '카카오 공유 경험치 지급 실패:',
+          rewardResult?.message || '응답 없음',
+        );
       }
     } catch (error) {
-      Alert.alert('오류', '카카오톡 공유에 실패했습니다.');
-      console.error('카카오 공유 오류:', error);
+      console.error('공유 또는 경험치 API 호출 오류:', error?.message || error);
     }
   };
 
