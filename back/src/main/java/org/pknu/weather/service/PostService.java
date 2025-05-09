@@ -7,18 +7,16 @@ import org.pknu.weather.common.mapper.EnumTagMapper;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.Post;
-import org.pknu.weather.domain.Recommendation;
 import org.pknu.weather.domain.Tag;
 import org.pknu.weather.domain.common.PostType;
 import org.pknu.weather.dto.PostRequest;
 import org.pknu.weather.dto.converter.PostConverter;
-import org.pknu.weather.dto.converter.RecommendationConverter;
 import org.pknu.weather.dto.converter.TagConverter;
+import org.pknu.weather.event.PostCreatedEvent;
 import org.pknu.weather.repository.LocationRepository;
 import org.pknu.weather.repository.MemberRepository;
 import org.pknu.weather.repository.PostRepository;
-import org.pknu.weather.repository.RecommendationRepository;
-import org.pknu.weather.repository.WeatherRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,10 +26,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class PostService {
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
-    private final RecommendationRepository recommendationRepository;
     private final LocationRepository locationRepository;
-    private final WeatherRepository weatherRepository;
     private final EnumTagMapper enumTagMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional(readOnly = true)
     public List<Post> getPosts(Long memberId, Long lastPostId, Long size, String postType, Long locationId) {
@@ -66,6 +63,7 @@ public class PostService {
 
         post.addTag(tag);
         postRepository.save(post);
+        eventPublisher.publishEvent(new PostCreatedEvent(member.getEmail()));
 
         return true;
     }
@@ -107,30 +105,6 @@ public class PostService {
         Location location = locationRepository.safeFindById(params.getLocationId());
         Post post = PostConverter.toPost(member, params);
         postRepository.save(post);
-        return true;
-    }
-
-    /**
-     * 좋아요, 좋아요 취소를 수행합니다.
-     *
-     * @param email
-     * @param postId
-     * @return
-     */
-    @Transactional
-    public boolean addRecommendation(String email, Long postId) {
-        Member member = memberRepository.safeFindByEmail(email);
-        Boolean isRecommended = recommendationRepository.isRecommended(member.getId(), postId);
-
-        if (!isRecommended) {
-            recommendationRepository.deleteByMemberAndPostId(member, postId);
-            return true;
-        }
-
-        Post post = postRepository.safeFindById(postId);
-        Recommendation recommendation = RecommendationConverter.toRecommendation(member, post);
-
-        recommendationRepository.save(recommendation);
         return true;
     }
 }
