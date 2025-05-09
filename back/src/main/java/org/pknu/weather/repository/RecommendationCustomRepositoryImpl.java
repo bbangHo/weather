@@ -1,5 +1,7 @@
 package org.pknu.weather.repository;
 
+import static org.pknu.weather.domain.QRecommendation.recommendation;
+
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.pknu.weather.domain.Member;
@@ -7,7 +9,6 @@ import org.pknu.weather.domain.Recommendation;
 
 import java.time.LocalDateTime;
 
-import static org.pknu.weather.domain.QRecommendation.recommendation;
 
 @RequiredArgsConstructor
 public class RecommendationCustomRepositoryImpl implements RecommendationCustomRepository {

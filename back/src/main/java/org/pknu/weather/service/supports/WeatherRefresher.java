@@ -19,8 +19,10 @@ import org.pknu.weather.repository.LocationRepository;
 import org.pknu.weather.service.WeatherQueryService;
 import org.pknu.weather.service.WeatherService;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
+@Transactional
 @RequiredArgsConstructor
 public class WeatherRefresher {
 
@@ -29,7 +31,6 @@ public class WeatherRefresher {
     private final ExtraWeatherApiUtils extraWeatherApiUtils;
     private final WeatherQueryService weatherQueryService;
     private final WeatherService weatherService;
-    private final WeatherFeignClientUtils weatherFeignClientUtils;
 
     public void refresh(Set<Long> locationIds) {
         List<Location> locations = locationRepository.findByIdIn(locationIds);
@@ -41,11 +42,8 @@ public class WeatherRefresher {
 
     private void updateWeather(Location location) {
 
-        List<Weather> weatherList = new ArrayList<>();
-
         if (!weatherQueryService.weatherHasBeenCreated(location)) {
-            weatherList = weatherFeignClientUtils.getVillageShortTermForecast(location);
-            weatherService.saveWeathers(location, weatherList);
+            weatherService.saveWeathers(location);
         }
 
         if (!weatherQueryService.weatherHasBeenUpdated(location)) {
