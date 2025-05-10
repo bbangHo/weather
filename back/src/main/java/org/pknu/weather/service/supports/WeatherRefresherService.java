@@ -4,27 +4,24 @@ import static org.pknu.weather.dto.converter.ExtraWeatherConverter.toExtraWeathe
 import static org.pknu.weather.dto.converter.LocationConverter.toLocationDTO;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.pknu.weather.domain.ExtraWeather;
 import org.pknu.weather.domain.Location;
-import org.pknu.weather.domain.Weather;
 import org.pknu.weather.dto.WeatherResponse.ExtraWeatherInfo;
 import org.pknu.weather.feignClient.utils.ExtraWeatherApiUtils;
-import org.pknu.weather.feignClient.utils.WeatherFeignClientUtils;
 import org.pknu.weather.repository.ExtraWeatherRepository;
 import org.pknu.weather.repository.LocationRepository;
 import org.pknu.weather.service.WeatherQueryService;
 import org.pknu.weather.service.WeatherService;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Component
+@Service
 @Transactional
 @RequiredArgsConstructor
-public class WeatherRefresher {
+public class WeatherRefresherService {
 
     private final LocationRepository locationRepository;
     private final ExtraWeatherRepository extraWeatherRepository;

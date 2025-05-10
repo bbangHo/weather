@@ -23,7 +23,7 @@ import org.pknu.weather.service.dto.WeatherSummaryAlarmInfo;
 import org.pknu.weather.dto.WeatherSummaryDTO;
 import org.pknu.weather.service.supports.AlarmTimeUtil;
 import org.pknu.weather.service.supports.AlarmType;
-import org.pknu.weather.service.supports.WeatherRefresher;
+import org.pknu.weather.service.supports.WeatherRefresherService;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -36,7 +36,7 @@ public class WeatherSummaryAlarmHandler implements AlarmHandler {
     private final ExtraWeatherRepository extraWeatherRepository;
     private final AlarmMessageMaker weatherSummaryMessageMaker;
     private final NotificationSender sender;
-    private final WeatherRefresher weatherRefresher;
+    private final WeatherRefresherService weatherRefresherService;
 
     @Override
     public AlarmType getAlarmType() {
@@ -102,7 +102,7 @@ public class WeatherSummaryAlarmHandler implements AlarmHandler {
     private void retryFailedMembers(List<AlarmMemberDTO> failedMembers) {
         Set<Long> locationIds = extractLocationIds(failedMembers);
 
-        weatherRefresher.refresh(locationIds);
+        weatherRefresherService.refresh(locationIds);
 
         List<AlarmMemberDTO> retryFailures = dispatchAlarmsForMembers(failedMembers);
 

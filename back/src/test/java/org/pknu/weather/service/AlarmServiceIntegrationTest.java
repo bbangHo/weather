@@ -41,7 +41,7 @@ import org.pknu.weather.service.sender.FcmMessage;
 import org.pknu.weather.service.sender.NotificationMessage;
 import org.pknu.weather.service.sender.NotificationSender;
 import org.pknu.weather.service.supports.AlarmType;
-import org.pknu.weather.service.supports.WeatherRefresher;
+import org.pknu.weather.service.supports.WeatherRefresherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -77,7 +77,7 @@ class AlarmServiceIntegrationTest {
     private NotificationSender sender;
 
     @MockBean
-    private WeatherRefresher weatherRefresher;
+    private WeatherRefresherService weatherRefresherService;
 
     @Autowired
     private EntityManager entityManager;
@@ -177,7 +177,7 @@ class AlarmServiceIntegrationTest {
     void 날씨_요약_알람이_모든_멤버들에게_한번에_성공한다() {
 
         // Given
-        doNothing().when(weatherRefresher).refresh(anySet());
+        doNothing().when(weatherRefresherService).refresh(anySet());
 
         List<Long> memberIds = savedMembers.stream().map(Member::getId).toList();
         List<String> fcmTokens = savedAlarms.stream().map(Alarm::getFcmToken).toList();
@@ -200,7 +200,7 @@ class AlarmServiceIntegrationTest {
         }
 
         // 날씨 업데이트는 호출하지 않는다.
-        verifyNoInteractions(weatherRefresher);
+        verifyNoInteractions(weatherRefresherService);
     }
 
     private void checkFcmMessage(NotificationMessage notificationMessage, List<String> fcmTokens) {
@@ -240,7 +240,7 @@ class AlarmServiceIntegrationTest {
         alarmService.trigger(AlarmType.WEATHER_SUMMARY);
 
         // Then
-        verifyNoInteractions(weatherSummaryMessageMaker, sender, weatherRefresher);
+        verifyNoInteractions(weatherSummaryMessageMaker, sender, weatherRefresherService);
     }
 
     @Test
@@ -260,7 +260,7 @@ class AlarmServiceIntegrationTest {
         entityManager.clear();
 
         // 재시도를 위한 날씨 업데이트 실패
-        doNothing().when(weatherRefresher).refresh(eq(failedLocationIds));
+        doNothing().when(weatherRefresherService).refresh(eq(failedLocationIds));
 
         // When
         alarmService.trigger(AlarmType.WEATHER_SUMMARY);
@@ -275,7 +275,7 @@ class AlarmServiceIntegrationTest {
         Assertions.assertThat(findSentFcmTokens()).doesNotContain(failedFcmToken);
 
         // weatherRefresher 호출 검증 (재시도 시 1번 호출)
-        verify(weatherRefresher, times(1)).refresh(eq(failedLocationIds));
+        verify(weatherRefresherService, times(1)).refresh(eq(failedLocationIds));
  }
 
     private List<String> findSentFcmTokens() {
@@ -322,7 +322,7 @@ class AlarmServiceIntegrationTest {
                     }
                     return null;
                 }
-        ).when(weatherRefresher).refresh(eq(retryLocationIds));
+        ).when(weatherRefresherService).refresh(eq(retryLocationIds));
 
 
         // When
@@ -343,6 +343,6 @@ class AlarmServiceIntegrationTest {
         assertThat(findSentFcmTokens()).containsAll(expectedFcmTokens);
 
         // weatherRefresher 호출 검증 (재시도 시 1번 호출)
-        verify(weatherRefresher, times(1)).refresh(eq(retryLocationIds));
+        verify(weatherRefresherService, times(1)).refresh(eq(retryLocationIds));
     }
 }

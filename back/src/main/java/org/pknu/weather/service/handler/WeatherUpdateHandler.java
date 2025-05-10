@@ -8,10 +8,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.repository.MemberRepository;
 import org.pknu.weather.dto.AlarmMemberDTO;
-import org.pknu.weather.service.handler.AlarmHandler;
 import org.pknu.weather.service.supports.AlarmTimeUtil;
 import org.pknu.weather.service.supports.AlarmType;
-import org.pknu.weather.service.supports.WeatherRefresher;
+import org.pknu.weather.service.supports.WeatherRefresherService;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -20,7 +19,7 @@ import org.springframework.stereotype.Component;
 public class WeatherUpdateHandler implements AlarmHandler {
 
     private final MemberRepository memberRepository;
-    private final WeatherRefresher weatherRefresher;
+    private final WeatherRefresherService weatherRefresherService;
 
 
     @Override
@@ -37,7 +36,7 @@ public class WeatherUpdateHandler implements AlarmHandler {
                 .map(AlarmMemberDTO::getLocationId)
                 .collect(Collectors.toSet());
 
-        weatherRefresher.refresh(searchedLocation);
+        weatherRefresherService.refresh(searchedLocation);
     }
 
 

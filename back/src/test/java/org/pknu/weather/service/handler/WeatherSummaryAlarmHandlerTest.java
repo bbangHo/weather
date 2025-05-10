@@ -47,7 +47,7 @@ import org.pknu.weather.service.message.AlarmMessageMaker;
 import org.pknu.weather.service.sender.NotificationMessage;
 import org.pknu.weather.service.sender.NotificationSender;
 import org.pknu.weather.service.supports.AlarmTimeUtil;
-import org.pknu.weather.service.supports.WeatherRefresher;
+import org.pknu.weather.service.supports.WeatherRefresherService;
 
 @ExtendWith(MockitoExtension.class)
 class WeatherSummaryAlarmHandlerTest {
@@ -66,7 +66,7 @@ class WeatherSummaryAlarmHandlerTest {
     @Mock
     private NotificationSender sender;
     @Mock
-    private WeatherRefresher weatherRefresher;
+    private WeatherRefresherService weatherRefresherService;
 
     @Captor
     ArgumentCaptor<NotificationMessage> notificationMessageCaptor;
@@ -111,7 +111,7 @@ class WeatherSummaryAlarmHandlerTest {
             weatherSummaryAlarmHandler.handleRequest();
 
             // Then
-            verifyNoInteractions(weatherSummaryMessageMaker, sender, weatherRefresher);
+            verifyNoInteractions(weatherSummaryMessageMaker, sender, weatherRefresherService);
 
         }
 
@@ -184,7 +184,7 @@ class WeatherSummaryAlarmHandlerTest {
                     .doThrow(new IllegalStateException("member2 초기 발송 실패"))
                     .doThrow(new IllegalStateException("member2 재시도 발송 실패"))
                     .when(sender).send(any(NotificationMessage.class));
-            doNothing().when(weatherRefresher).refresh(retryLocationIds);
+            doNothing().when(weatherRefresherService).refresh(retryLocationIds);
 
             // When
             weatherSummaryAlarmHandler.handleRequest();
@@ -195,7 +195,7 @@ class WeatherSummaryAlarmHandlerTest {
             verify(extraWeatherRepository, times(2)).findExtraWeatherByLocations(anySet(), any(LocalDateTime.class));
             verify(weatherSummaryMessageMaker, times(3)).createAlarmMessage(any(WeatherSummaryAlarmInfo.class));
             verify(sender, times(3)).send(any(NotificationMessage.class));
-            verify(weatherRefresher, times(1)).refresh(retryLocationIds);
+            verify(weatherRefresherService, times(1)).refresh(retryLocationIds);
 
             // 각 멤버별 호출 횟수도 검증
             verify(weatherSummaryMessageMaker, times(1)).createAlarmMessage(argThat(info ->
@@ -267,7 +267,7 @@ class WeatherSummaryAlarmHandlerTest {
 
             doNothing().when(sender).send(eq(dummyMessage1));
 
-            doNothing().when(weatherRefresher).refresh(retryLocationIds);
+            doNothing().when(weatherRefresherService).refresh(retryLocationIds);
 
             // When
             weatherSummaryAlarmHandler.handleRequest();
@@ -308,7 +308,7 @@ class WeatherSummaryAlarmHandlerTest {
             verifyNoMoreInteractions(sender);
 
             // weatherRefresher 호출 검증
-            verify(weatherRefresher, times(1)).refresh(retryLocationIds);
+            verify(weatherRefresherService, times(1)).refresh(retryLocationIds);
 
         }
 
@@ -368,7 +368,7 @@ class WeatherSummaryAlarmHandlerTest {
 
             doNothing().when(sender).send(eq(dummyMessage));
 
-            doNothing().when(weatherRefresher).refresh(retryLocationIds);
+            doNothing().when(weatherRefresherService).refresh(retryLocationIds);
 
             // When
             weatherSummaryAlarmHandler.handleRequest();
@@ -405,7 +405,7 @@ class WeatherSummaryAlarmHandlerTest {
             verify(sender, times(2)).send(eq(dummyMessage));
             verifyNoMoreInteractions(sender);
 
-            verify(weatherRefresher, times(1)).refresh(retryLocationIds);
+            verify(weatherRefresherService, times(1)).refresh(retryLocationIds);
         }
 
         @Test
@@ -489,7 +489,7 @@ class WeatherSummaryAlarmHandlerTest {
                     .doThrow(new RuntimeException("Invalid token - member3 retry")) // member3 재시도 실패
                     .when(sender).send(any(NotificationMessage.class));
 
-            doNothing().when(weatherRefresher).refresh(retryLocationIds);
+            doNothing().when(weatherRefresherService).refresh(retryLocationIds);
 
             // When
             weatherSummaryAlarmHandler.handleRequest();
@@ -509,7 +509,7 @@ class WeatherSummaryAlarmHandlerTest {
             verify(sender, times(5)).send(any(NotificationMessage.class));
 
             // weatherRefresher 호출 검증
-            verify(weatherRefresher, times(1)).refresh(retryLocationIds);
+            verify(weatherRefresherService, times(1)).refresh(retryLocationIds);
         }
 
         private List<AlarmMemberDTO> createAlarmMembers() {
