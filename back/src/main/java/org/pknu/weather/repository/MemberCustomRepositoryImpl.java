@@ -1,12 +1,17 @@
 package org.pknu.weather.repository;
 
+import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.pknu.weather.domain.QAlarm;
+import org.pknu.weather.domain.QMember;
+import org.pknu.weather.domain.common.SummaryAlarmTime;
+import org.pknu.weather.dto.AlarmMemberDTO;
 
 import static org.pknu.weather.domain.QMember.member;
 
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
-import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.pknu.weather.domain.Member;
 
 @RequiredArgsConstructor
@@ -23,5 +28,25 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
                 )
                 .fetch();
     }
-}
 
+    public List<AlarmMemberDTO> findMembersAndAlarmsByAlarmTime(SummaryAlarmTime time) {
+        QAlarm alarm = QAlarm.alarm;
+        QMember member = QMember.member;
+
+        return jpaQueryFactory
+                .select(Projections.fields(AlarmMemberDTO.class,
+                        member.id,
+                        member.location.id.as("locationId"),
+                        alarm.fcmToken,
+                        alarm.agreeTempAlarm,
+                        alarm.agreePrecipAlarm,
+                        alarm.agreeDustAlarm,
+                        alarm.agreeUvAlarm,
+                        alarm.agreeLiveRainAlarm
+                ))
+                .from(alarm)
+                .join(alarm.member, member)
+                .where(alarm.summaryAlarmTimes.contains(time))
+                .fetch();
+    }
+}

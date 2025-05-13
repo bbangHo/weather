@@ -3,18 +3,27 @@ package org.pknu.weather.repository;
 import static org.pknu.weather.domain.QWeather.weather;
 
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberTemplate;
+import com.querydsl.core.types.dsl.StringExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.pknu.weather.common.formatter.DateTimeFormatter;
 import org.pknu.weather.common.utils.QueryUtils;
 import org.pknu.weather.domain.Location;
+import org.pknu.weather.domain.QLocation;
+import org.pknu.weather.domain.QWeather;
 import org.pknu.weather.domain.Weather;
+import org.pknu.weather.domain.common.RainType;
 import org.pknu.weather.dto.WeatherQueryResult;
-
+import org.pknu.weather.dto.WeatherSummaryDTO;
 
 @RequiredArgsConstructor
 public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
@@ -132,5 +141,48 @@ public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
                 .collect((Collectors.toMap(Weather::getPresentationTime,
                         weather -> weather,
                         (existing, replacement) -> existing)));
+    }
+
+    @Override
+    public List<WeatherSummaryDTO> findWeatherSummary(Set<Long> locationIds) {
+
+        QWeather weather = QWeather.weather;
+        QLocation location = QLocation.location;
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime endDateTime = now.toLocalDate().plusDays(1).atStartOfDay();
+
+        BooleanExpression isRainOrShower = weather.rainType.in(RainType.RAIN, RainType.SHOWER);
+        BooleanExpression isSnow = weather.rainType.eq(RainType.SNOW);
+        BooleanExpression isRainAndSnow = weather.rainType.eq(RainType.RAIN_AND_SNOW);
+        BooleanExpression isNotNone = weather.rainType.ne(RainType.NONE);
+
+        NumberTemplate<Integer> rainCount = Expressions.numberTemplate(Integer.class, "SUM(CASE WHEN {0} THEN 1 ELSE 0 END)", isRainOrShower);
+        NumberTemplate<Integer> snowCount = Expressions.numberTemplate(Integer.class, "SUM(CASE WHEN {0} THEN 1 ELSE 0 END)", isSnow);
+        NumberTemplate<Integer> rainAndSnowCount = Expressions.numberTemplate(Integer.class, "SUM(CASE WHEN {0} THEN 1 ELSE 0 END)", isRainAndSnow);
+        NumberTemplate<Integer> notNoneCount = Expressions.numberTemplate(Integer.class, "SUM(CASE WHEN {0} THEN 1 ELSE 0 END)", isNotNone);
+
+        StringExpression rainStatus = new CaseBuilder()
+                .when(rainAndSnowCount.gt(0)).then("RAIN_AND_SNOW")
+                .when(rainCount.gt(0).and(snowCount.eq(0))).then("RAIN")
+                .when(snowCount.gt(0).and(rainCount.eq(0))).then("SNOW")
+                .when(notNoneCount.eq(0)).then("NONE")
+                .otherwise("RAIN_AND_SNOW");
+
+        return jpaQueryFactory
+                .select(Projections.fields(
+                        WeatherSummaryDTO.class,
+                        location.id.as("locationId"),
+                        weather.temperature.max().as("maxTemp"),
+                        weather.temperature.min().as("minTemp"),
+                        rainStatus.as("rainStatus")
+                ))
+                .from(weather)
+                .join(weather.location, location)
+                .where(
+                        weather.presentationTime.between(now, endDateTime)
+                                .and(location.id.in(locationIds)))
+                .groupBy(location.id)
+                .fetch();
     }
 }
