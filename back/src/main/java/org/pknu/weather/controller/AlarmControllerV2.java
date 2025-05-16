@@ -7,6 +7,7 @@ import org.pknu.weather.common.converter.TokenConverter;
 import org.pknu.weather.dto.AlarmRequestDTO;
 import org.pknu.weather.service.AlarmService;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -26,6 +27,12 @@ public class AlarmControllerV2 {
                                                  @Valid @RequestBody AlarmRequestDTO alarmRequestDTO) {
         String email = TokenConverter.getEmailByToken(authorization);
         alarmService.saveAlarm(email, alarmRequestDTO);
+        return ApiResponse.onSuccess();
+    }
+
+    @PatchMapping("/alarm")
+    public ApiResponse<Object> patchAlarm(@Valid @RequestBody AlarmRequestDTO alarmRequestDTO) {
+        alarmService.modifyAlarm(alarmRequestDTO);
         return ApiResponse.onSuccess();
     }
 }

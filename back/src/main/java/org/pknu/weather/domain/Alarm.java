@@ -90,6 +90,38 @@ public class Alarm extends BaseEntity {
                 .build();
     }
 
+    public static Alarm modifyAlarm(
+            Alarm alarm,
+            AlarmRequestDTO alarmRequestDTO
+    ) {
+        validateParamForModify(alarm, alarmRequestDTO);
+
+        if (alarmRequestDTO.getAgreeTempAlarm() != null) {
+            alarm.agreeTempAlarm = alarmRequestDTO.getAgreeTempAlarm();
+        }
+
+        if (alarmRequestDTO.getAgreePrecipAlarm() != null) {
+            alarm.agreePrecipAlarm = alarmRequestDTO.getAgreePrecipAlarm();
+        }
+
+        if (alarmRequestDTO.getAgreeDustAlarm() != null) {
+            alarm.agreeDustAlarm = alarmRequestDTO.getAgreeDustAlarm();
+        }
+
+        if (alarmRequestDTO.getAgreeUvAlarm() != null) {
+            alarm.agreeUvAlarm = alarmRequestDTO.getAgreeUvAlarm();
+        }
+
+        if (alarmRequestDTO.getAgreeLiveRainAlarm() != null) {
+            alarm.agreeLiveRainAlarm = alarmRequestDTO.getAgreeLiveRainAlarm();
+        }
+
+        if (alarmRequestDTO.getSummaryAlarmTimes() != null) {
+            alarm.summaryAlarmTimes = new HashSet<>(alarmRequestDTO.getSummaryAlarmTimes());
+        }
+
+        return alarm;
+    }
 
     private static void validateParam(Member member, AlarmRequestDTO alarmRequestDTO) {
         if (member == null) {
@@ -105,4 +137,12 @@ public class Alarm extends BaseEntity {
         }
     }
 
+    private static void validateParamForModify(Alarm alarm, AlarmRequestDTO alarmRequestDTO) {
+        if (alarm == null) {
+            throw new IllegalArgumentException("수정할 기존 Alarm 객체는 필수입니다.");
+        }
+        if (alarmRequestDTO == null) {
+            throw new IllegalArgumentException("AlarmRequestDTO는 알람 수정에 필수 요소입니다.");
+        }
+    }
 }

@@ -81,6 +81,9 @@ public enum ErrorStatus implements BaseErrorCode {
     //database
     _DUPLICATED_ENTRY(HttpStatus.CONFLICT, "DATA_409_1", "중복된 데이터가 이미 존재합니다."),
 
+    //alarm
+    _FCMTOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "ALARM_404_1", "Fcm토큰을 찾을 수 없습니다.");
+
     private final HttpStatus httpStatus;
     private final String code;
     private final String message;

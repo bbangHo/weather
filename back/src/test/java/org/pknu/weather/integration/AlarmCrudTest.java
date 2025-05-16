@@ -1,5 +1,7 @@
 package org.pknu.weather.integration;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -13,12 +15,15 @@ import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.pknu.weather.apiPayload.code.status.ErrorStatus;
 import org.pknu.weather.common.TestUtil;
 import org.pknu.weather.controller.AlarmControllerV2;
 import org.pknu.weather.domain.Alarm;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.common.SummaryAlarmTime;
+import org.pknu.weather.dto.AlarmRequestDTO;
+import org.pknu.weather.exception.GeneralException;
 import org.pknu.weather.repository.AlarmRepository;
 import org.pknu.weather.repository.LocationRepository;
 import org.pknu.weather.repository.MemberRepository;
@@ -57,6 +62,11 @@ class AlarmCrudTest {
 
     @Autowired
     private EntityManager entityManager;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+
 
     private static final int DUMMY_DATA_SIZE = 3;
 
@@ -142,8 +152,6 @@ class AlarmCrudTest {
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("fcmToken", "FcmToken1");
 
-        ObjectMapper objectMapper = new ObjectMapper();
-
         mockMvc.perform(post("/api/v2/alarm")
                 .header("Authorization", authHeader)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -165,5 +173,51 @@ class AlarmCrudTest {
         entityManager.clear();
 
         return savedMember;
+    }
+
+
+    @Test
+    void 알람_수정이_성공한다() throws Exception {
+        Alarm initAlarm = savedAlarms.get(0);
+        Member member = initAlarm.getMember();
+        String initFcmToken = initAlarm.getFcmToken();
+
+        String authHeader = TestUtil.generateJwtToken(jwtUtil, member);
+
+        AlarmRequestDTO requestDto = AlarmRequestDTO.builder()
+                .fcmToken(initFcmToken)
+                .agreeDustAlarm(false)
+                .summaryAlarmTimes(Set.of(SummaryAlarmTime.MORNING))
+                .build();
+
+
+        // when & then
+        mockMvc.perform(patch("/api/v2/alarm")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", authHeader)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void 잘못된_FcmToken을_포함한_요청은_실패한다() throws Exception {
+        Member member = saveMember();
+
+        String authHeader = TestUtil.generateJwtToken(jwtUtil, member);
+
+
+        AlarmRequestDTO requestDto = new AlarmRequestDTO();
+        requestDto.setFcmToken("nonExist-token");
+
+        mockMvc.perform(patch("/api/v2/alarm")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", authHeader)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().is4xxClientError())
+                .andExpect(result -> {
+                    Exception resolvedException = result.getResolvedException();
+                    assertThat(resolvedException).isInstanceOf(GeneralException.class);
+                    assertThat(resolvedException).extracting("code").isEqualTo(ErrorStatus._FCMTOKEN_NOT_FOUND);
+                });
     }
 }
