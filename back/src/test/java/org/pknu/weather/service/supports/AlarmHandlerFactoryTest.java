@@ -1,7 +1,7 @@
 package org.pknu.weather.service.supports;
 
-import org.junit.jupiter.api.Test; // JUnit 5 사용
-import java.util.ArrayList; // 테스트 리스트 생성을 위해 사용
+import org.junit.jupiter.api.Test;
+import java.util.ArrayList;
 import java.util.List;
 import org.pknu.weather.domain.common.AlarmType;
 import org.pknu.weather.service.handler.AlarmHandler;

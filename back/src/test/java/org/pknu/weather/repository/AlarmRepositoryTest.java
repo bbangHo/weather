@@ -51,8 +51,8 @@ public class AlarmRepositoryTest {
                 .get()
                 .satisfies(testAlarm -> {
                     Assertions.assertThat(testAlarm.getId()).isEqualTo(savedAlarm.getId());
-                    Assertions.assertThat(testAlarm.getFcmToken()).isEqualTo("fcmToken"); // fcmToken 일치 확인
-                    Assertions.assertThat(testAlarm.getAgreeUvAlarm()).isTrue(); // 각 알람 동의 여부 확인
+                    Assertions.assertThat(testAlarm.getFcmToken()).isEqualTo("fcmToken");
+                    Assertions.assertThat(testAlarm.getAgreeUvAlarm()).isTrue();
                     Assertions.assertThat(testAlarm.getAgreeDustAlarm()).isTrue();
                     Assertions.assertThat(testAlarm.getAgreeTempAlarm()).isTrue();
                     Assertions.assertThat(testAlarm.getAgreePrecipAlarm()).isTrue();
@@ -67,7 +67,7 @@ public class AlarmRepositoryTest {
 
         Assertions.assertThat(foundAlarm.get().getSummaryAlarmTimes()).isNotNull()
                 .satisfies(foundSummaryAlarmTimes -> {
-                    Assertions.assertThat(foundAlarm.get().getSummaryAlarmTimes()).hasSize(summaryAlarmTimes.size()); // 컬렉션 크기 확인
+                    Assertions.assertThat(foundAlarm.get().getSummaryAlarmTimes()).hasSize(summaryAlarmTimes.size());
                     Assertions.assertThat(foundAlarm.get().getSummaryAlarmTimes()).containsExactlyInAnyOrderElementsOf(summaryAlarmTimes);
                 });
     }
@@ -88,8 +88,8 @@ public class AlarmRepositoryTest {
                 .get()
                 .satisfies(testAlarm -> {
                     Assertions.assertThat(testAlarm.getId()).isEqualTo(savedAlarm.getId());
-                    Assertions.assertThat(testAlarm.getFcmToken()).isEqualTo("fcmToken"); // fcmToken 일치 확인
-                    Assertions.assertThat(testAlarm.getAgreeUvAlarm()).isFalse(); // 각 알람 동의 여부 확인
+                    Assertions.assertThat(testAlarm.getFcmToken()).isEqualTo("fcmToken");
+                    Assertions.assertThat(testAlarm.getAgreeUvAlarm()).isFalse();
                     Assertions.assertThat(testAlarm.getAgreeDustAlarm()).isFalse();
                     Assertions.assertThat(testAlarm.getAgreeTempAlarm()).isFalse();
                     Assertions.assertThat(testAlarm.getAgreePrecipAlarm()).isFalse();
