@@ -23,10 +23,13 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.pknu.weather.common.TestUtil;
 import org.pknu.weather.controller.AlarmControllerV2;
 import org.pknu.weather.domain.Alarm;
@@ -58,6 +61,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.annotation.DirtiesContext.MethodMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -108,6 +112,7 @@ class AlarmSendTest {
 
     private static final int DUMMY_DATA_SIZE = 3;
 
+
     @Captor
     ArgumentCaptor<AlarmInfo> alarmInfoArgumentCaptor;
     @Captor
@@ -116,6 +121,24 @@ class AlarmSendTest {
     List<Location> savedLocations;
     List<Member> savedMembers;
     List<Alarm> savedAlarms;
+
+    private static MockedStatic<LocalDateTime> mockedLocalDateTimeStatic;
+
+    private static final LocalDateTime FIXED_CURRENT_DATETIME = LocalDateTime.of(2025, 5, 16, 13, 59, 18);
+
+
+    @BeforeEach
+    void beforeAll() {
+        mockedLocalDateTimeStatic = Mockito.mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS);
+        mockedLocalDateTimeStatic.when(LocalDateTime::now).thenReturn(FIXED_CURRENT_DATETIME);
+    }
+
+    @AfterEach
+    void afterEach() {
+        if (mockedLocalDateTimeStatic != null) {
+            mockedLocalDateTimeStatic.close();
+        }
+    }
 
 
     @BeforeEach
@@ -162,6 +185,8 @@ class AlarmSendTest {
 
         List<Weather> transientWeathers = new ArrayList<>();
         LocalDateTime now = LocalDateTime.now();
+        System.out.println("-------------------------");
+        System.out.println(now);
         for (Location managedLocation : savedLocations) {
             for (int j = 0; j < DUMMY_DATA_SIZE; j++) {
                 Weather weather = Weather.builder()
@@ -214,7 +239,6 @@ class AlarmSendTest {
         alarmService.trigger(AlarmType.WEATHER_SUMMARY);
 
         // Then
-        // 멤버들의 수(DUMMY_DATA_SIZE) 만큼 메시지 생성 시도
         verify(weatherSummaryMessageMaker,times(DUMMY_DATA_SIZE)).createAlarmMessage(alarmInfoArgumentCaptor.capture());
         for (AlarmInfo alarmInfo:alarmInfoArgumentCaptor.getAllValues()) {
             checkAlarmInfo(alarmInfo, memberIds, locationIds);

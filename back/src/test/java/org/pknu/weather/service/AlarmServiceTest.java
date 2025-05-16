@@ -22,13 +22,14 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.pknu.weather.apiPayload.code.BaseCode;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
 import org.pknu.weather.domain.Alarm;
+import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.common.SummaryAlarmTime;
 import org.pknu.weather.dto.AlarmRequestDTO;
 import org.pknu.weather.exception.GeneralException;
 import org.pknu.weather.repository.AlarmRepository;
+import org.pknu.weather.repository.MemberRepository;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("AlarmService 유닛 테스트")
@@ -39,6 +40,9 @@ class AlarmServiceTest {
 
     @Mock
     private AlarmRepository alarmRepository;
+
+    @Mock
+    private MemberRepository memberRepository;
 
     private MockedStatic<Alarm> mockedAlarmStatic;
 
@@ -52,14 +56,40 @@ class AlarmServiceTest {
         mockedAlarmStatic.close();
     }
 
-
     @Test
-    void 알람_수정이_성공한다() {
+    void 알람_저장이_성공한다() {
 
         mockedAlarmStatic.when(Alarm::builder).thenCallRealMethod();
 
+
+        Member member = Member.builder()
+                .email("test_email")
+                .build();
+
         // Given
-        AlarmRequestDTO requestDTO = AlarmRequestDTO.builder()
+        AlarmRequestDTO requestDTO = getAlarmRequestDTO();
+        Alarm expectedCreatedAlarm = getAlarm(member);
+
+        // Stubbing
+        when(memberRepository.safeFindByEmail(eq("test_email"))).thenReturn(member);
+        mockedAlarmStatic.when(() -> Alarm.createDefaultAlarm(eq(member), eq(requestDTO)))
+                .thenReturn(expectedCreatedAlarm);
+        when(alarmRepository.saveAndFlush(any(Alarm.class))).thenReturn(expectedCreatedAlarm);
+
+        // When
+        alarmService.saveAlarm("test_email", requestDTO);
+
+        // Then
+        verify(memberRepository).safeFindByEmail(eq("test_email"));
+        mockedAlarmStatic.verify(() -> Alarm.createDefaultAlarm(eq(member), eq(requestDTO)));
+        verify(alarmRepository).saveAndFlush(eq(expectedCreatedAlarm));
+        verify(alarmRepository, times(1)).saveAndFlush(any(Alarm.class));
+    }
+
+    private static Alarm getAlarm(Member member) {
+        return Alarm.builder()
+                .id(1L)
+                .member(member)
                 .fcmToken("valid_fcm_token")
                 .agreeTempAlarm(true)
                 .agreePrecipAlarm(false)
@@ -68,6 +98,32 @@ class AlarmServiceTest {
                 .agreeLiveRainAlarm(false)
                 .summaryAlarmTimes(new HashSet<>(Set.of(SummaryAlarmTime.MORNING, SummaryAlarmTime.EVENING)))
                 .build();
+    }
+
+    private static AlarmRequestDTO getAlarmRequestDTO() {
+        return AlarmRequestDTO.builder()
+                .fcmToken("valid_fcm_token")
+                .agreeTempAlarm(true)
+                .agreePrecipAlarm(false)
+                .agreeDustAlarm(true)
+                .agreeUvAlarm(true)
+                .agreeLiveRainAlarm(false)
+                .summaryAlarmTimes(new HashSet<>(Set.of(SummaryAlarmTime.MORNING, SummaryAlarmTime.EVENING)))
+                .build();
+    }
+
+
+    @Test
+    void 알람_수정이_성공한다() {
+
+        Member member = Member.builder()
+                .email("test_email")
+                .build();
+
+        mockedAlarmStatic.when(Alarm::builder).thenCallRealMethod();
+
+        // Given
+        AlarmRequestDTO requestDTO = getAlarmRequestDTO();
 
         Alarm foundAlarm = Alarm.builder()
                 .id(1L)
@@ -80,18 +136,8 @@ class AlarmServiceTest {
                 .summaryAlarmTimes(new HashSet<>(Set.of(SummaryAlarmTime.AFTERNOON)))
                 .build();
 
-        Alarm expectedModifiedAlarm = Alarm.builder()
-                .id(1L)
-                .fcmToken("valid_fcm_token")
-                .agreeTempAlarm(true)
-                .agreePrecipAlarm(false)
-                .agreeDustAlarm(true)
-                .agreeUvAlarm(true)
-                .agreeLiveRainAlarm(false)
-                .summaryAlarmTimes(new HashSet<>(Set.of(SummaryAlarmTime.MORNING, SummaryAlarmTime.EVENING)))
-                .build();
+        Alarm expectedModifiedAlarm = getAlarm(member);
 
-        // Mocking
         when(alarmRepository.findByFcmToken(requestDTO.getFcmToken())).thenReturn(Optional.of(foundAlarm));
         mockedAlarmStatic.when(() -> Alarm.modifyAlarm(eq(foundAlarm), eq(requestDTO))).thenReturn(expectedModifiedAlarm);
         when(alarmRepository.saveAndFlush(any(Alarm.class))).thenReturn(expectedModifiedAlarm);

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -197,6 +198,15 @@ class AlarmCrudTest {
                         .header("Authorization", authHeader)
                         .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isOk());
+
+        Optional<Alarm> updatedAlarmOptional = alarmRepository.findByFcmToken(initFcmToken);
+
+        assertThat(updatedAlarmOptional).isPresent();
+        Alarm updatedAlarm = updatedAlarmOptional.get();
+
+        assertThat(updatedAlarm.getAgreeDustAlarm()).isEqualTo(requestDto.getAgreeDustAlarm());
+        assertThat(updatedAlarm.getSummaryAlarmTimes()).isEqualTo(requestDto.getSummaryAlarmTimes());
+
     }
 
     @Test
