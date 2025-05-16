@@ -1,4 +1,4 @@
-package org.pknu.weather.service;
+package org.pknu.weather.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anySet;
@@ -8,10 +8,15 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,6 +27,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.pknu.weather.common.TestUtil;
+import org.pknu.weather.controller.AlarmControllerV2;
 import org.pknu.weather.domain.Alarm;
 import org.pknu.weather.domain.ExtraWeather;
 import org.pknu.weather.domain.Location;
@@ -34,6 +41,8 @@ import org.pknu.weather.repository.ExtraWeatherRepository;
 import org.pknu.weather.repository.LocationRepository;
 import org.pknu.weather.repository.MemberRepository;
 import org.pknu.weather.repository.WeatherRepository;
+import org.pknu.weather.security.util.JWTUtil;
+import org.pknu.weather.service.AlarmService;
 import org.pknu.weather.service.dto.AlarmInfo;
 import org.pknu.weather.service.dto.WeatherSummaryAlarmInfo;
 import org.pknu.weather.service.message.AlarmMessageMaker;
@@ -43,14 +52,29 @@ import org.pknu.weather.service.sender.NotificationSender;
 import org.pknu.weather.service.supports.AlarmType;
 import org.pknu.weather.service.supports.WeatherRefresherService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.MethodMode;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 @SpringBootTest
-class AlarmServiceIntegrationTest {
+@AutoConfigureMockMvc
+class AlarmSendTest {
+
+    @Autowired
+    MockMvc mockMvc;
+
+    @Autowired
+    JWTUtil jwtUtil;
+
+    @Autowired
+    AlarmControllerV2 alarmController;
 
     @Autowired
     private AlarmService alarmService;
@@ -108,12 +132,15 @@ class AlarmServiceIntegrationTest {
 
 
         List<Member> transientMembers = new ArrayList<>();
-        for (Location location : savedLocations) {
+
+        for (int i = 0; i < DUMMY_DATA_SIZE; i++) {
             Member member = Member.builder()
-                    .location(location)
+                    .email("email" + i)
+                    .location(savedLocations.get(i))
                     .build();
             transientMembers.add(member);
         }
+
         savedMembers = memberRepository.saveAll(transientMembers);
 
 
@@ -344,5 +371,41 @@ class AlarmServiceIntegrationTest {
 
         // weatherRefresher 호출 검증 (재시도 시 1번 호출)
         verify(weatherRefresherService, times(1)).refresh(eq(retryLocationIds));
+    }
+
+    @Test
+    @DirtiesContext(methodMode = MethodMode.BEFORE_METHOD)
+    public void fcm토큰의_중복될_때_예외가_발생한다() throws Exception {
+
+        Member member = saveMember();
+
+        String authHeader = TestUtil.generateJwtToken(jwtUtil, member);
+
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("fcmToken", "FcmToken1");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        mockMvc.perform(post("/api/v2/alarm")
+                .header("Authorization", authHeader)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestBody)))
+                .andExpect(status().isConflict())
+                .andDo(print());
+    }
+
+
+    public Member saveMember() {
+        Member member = Member.builder()
+                .email("email")
+                .nickname("nickname")
+                .build();
+
+        Member savedMember = memberRepository.save(member);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        return savedMember;
     }
 }

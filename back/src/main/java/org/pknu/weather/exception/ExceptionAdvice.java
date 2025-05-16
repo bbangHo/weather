@@ -1,7 +1,10 @@
 package org.pknu.weather.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -9,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.apiPayload.ApiResponse;
 import org.pknu.weather.apiPayload.code.ErrorReasonDTO;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -26,11 +30,14 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @Slf4j
 @RestControllerAdvice(annotations = {RestController.class})
 public class ExceptionAdvice extends ResponseEntityExceptionHandler {
+    private static final String SQLSTATE_DUPLICATE_KEY_1 = "23000";
+    private static final String SQLSTATE_DUPLICATE_KEY_2 = "23505";
+    private static final int MYSQL_ERROR_CODE_DUPLICATE_ENTRY = 1062;
 
     @ExceptionHandler
     public ResponseEntity<Object> validation(ConstraintViolationException e, WebRequest request) {
         String errorMessage = e.getConstraintViolations().stream()
-                .map(constraintViolation -> constraintViolation.getMessage())
+                .map(ConstraintViolation::getMessage)
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("ConstraintViolationException 추출 도중 에러 발생"));
 
@@ -63,10 +70,46 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(value = GeneralException.class)
-    public ResponseEntity onThrowException(GeneralException generalException, HttpServletRequest request) {
+    public ResponseEntity<?> onThrowException(GeneralException generalException, HttpServletRequest request) {
         ErrorReasonDTO errorReasonHttpStatus = generalException.getErrorReasonHttpStatus();
         return handleExceptionInternal(generalException, errorReasonHttpStatus, null, request);
     }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<?> handleDataIntegrityViolation(DataIntegrityViolationException dataIntegrityViolationException, HttpServletRequest request) {
+        log.error("Data Integrity Violation occurred during request {}", dataIntegrityViolationException.getMessage(), dataIntegrityViolationException);
+
+        Throwable rootCause = dataIntegrityViolationException.getRootCause();
+        GeneralException generalException = null;
+
+        if (rootCause instanceof SQLIntegrityConstraintViolationException sqlException && rootCause.getMessage() != null) {
+            generalException = getGeneralException(sqlException);
+        }
+
+        if (generalException != null)
+            return handleExceptionInternal(generalException, generalException.getErrorReasonHttpStatus(), null, request);
+        else {
+            WebRequest webRequest = new ServletWebRequest(request);
+
+            return handleExceptionInternalFalse(dataIntegrityViolationException, ErrorStatus._INTERNAL_SERVER_ERROR, HttpHeaders.EMPTY,
+                    ErrorStatus._INTERNAL_SERVER_ERROR.getHttpStatus(), webRequest, dataIntegrityViolationException.getMessage());
+        }
+    }
+
+    private static GeneralException getGeneralException(SQLIntegrityConstraintViolationException sqlException) {
+        String sqlState = sqlException.getSQLState();
+        int dbErrorCode = sqlException.getErrorCode();
+
+        GeneralException generalException = null;
+
+        if (SQLSTATE_DUPLICATE_KEY_1.equals(sqlState) || SQLSTATE_DUPLICATE_KEY_2.equals(sqlState) ||
+                dbErrorCode == MYSQL_ERROR_CODE_DUPLICATE_ENTRY) {
+            generalException = new GeneralException(ErrorStatus._DUPLICATED_ENTRY);
+        }
+
+        return generalException;
+    }
+
 
     private ResponseEntity<Object> handleExceptionInternal(Exception e, ErrorReasonDTO reason,
                                                            HttpHeaders headers, HttpServletRequest request) {

@@ -12,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import java.util.HashSet;
 import java.util.Set;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.pknu.weather.domain.common.SummaryAlarmTime;
+import org.pknu.weather.dto.AlarmRequestDTO;
 
 @Builder
 @Entity
@@ -37,7 +39,7 @@ public class Alarm extends BaseEntity {
     @JoinColumn(name = "member_id", unique = true)
     private Member member;
 
-    @Column
+    @Column(unique = true)
     private String fcmToken;
 
     @ColumnDefault("false")
@@ -60,4 +62,47 @@ public class Alarm extends BaseEntity {
     @CollectionTable(name = "alarm_summary_time", joinColumns = @JoinColumn(name = "alarm_id"))
     @Column(name = "summary_time")
     private Set<SummaryAlarmTime> summaryAlarmTimes;
+
+
+    /**
+     * summaryAlarmTimes는 인자로 값이 전달되면 해당 값을 사용하고, null이 전달되면 기본값(false 또는 빈 Set)을 사용합니다.
+     *
+     * @param member           알람과 연관될 Member 객체 (필수)
+     * @param alarmRequestDTO  알람 생성에 연관된 정보들을 담은 DTO(필수)
+     * @return 생성된 Alarm 객체
+     * @throws IllegalArgumentException member 또는 fcmToken이 null이거나 비어있는 경우
+     */
+    public static Alarm createDefaultAlarm(
+            Member member,
+            AlarmRequestDTO alarmRequestDTO
+    ) {
+        validateParam(member, alarmRequestDTO);
+
+        return Alarm.builder()
+                .member(member)
+                .fcmToken(alarmRequestDTO.getFcmToken().trim())
+                .agreeTempAlarm(alarmRequestDTO.getAgreeTempAlarm() != null ? alarmRequestDTO.getAgreeTempAlarm() : false)
+                .agreePrecipAlarm(alarmRequestDTO.getAgreePrecipAlarm() != null ? alarmRequestDTO.getAgreePrecipAlarm() : false)
+                .agreeDustAlarm(alarmRequestDTO.getAgreeDustAlarm() != null ? alarmRequestDTO.getAgreeDustAlarm() : false)
+                .agreeUvAlarm(alarmRequestDTO.getAgreeUvAlarm() != null ? alarmRequestDTO.getAgreeUvAlarm() : false)
+                .agreeLiveRainAlarm(alarmRequestDTO.getAgreeLiveRainAlarm() != null ? alarmRequestDTO.getAgreeLiveRainAlarm() : false)
+                .summaryAlarmTimes(alarmRequestDTO.getSummaryAlarmTimes())
+                .build();
+    }
+
+
+    private static void validateParam(Member member, AlarmRequestDTO alarmRequestDTO) {
+        if (member == null) {
+            throw new IllegalArgumentException("Member는 알람 생성에 필수 요소입니다.");
+        }
+
+        if (alarmRequestDTO == null) {
+            throw new IllegalArgumentException("AlarmRequestDTO는 알람 생성에 필수 요소입니다.");
+        }
+
+        if (alarmRequestDTO.getFcmToken() == null || alarmRequestDTO.getFcmToken().trim().isEmpty()) {
+            throw new IllegalArgumentException("fcmToken은 알람 생성에 필수 요소입니다.");
+        }
+    }
+
 }
