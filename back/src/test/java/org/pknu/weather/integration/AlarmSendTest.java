@@ -49,7 +49,7 @@ import org.pknu.weather.service.message.AlarmMessageMaker;
 import org.pknu.weather.service.sender.FcmMessage;
 import org.pknu.weather.service.sender.NotificationMessage;
 import org.pknu.weather.service.sender.NotificationSender;
-import org.pknu.weather.service.supports.AlarmType;
+import org.pknu.weather.domain.common.AlarmType;
 import org.pknu.weather.service.supports.WeatherRefresherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

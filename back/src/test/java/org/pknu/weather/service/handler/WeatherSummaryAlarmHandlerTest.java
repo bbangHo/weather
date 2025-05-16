@@ -560,7 +560,7 @@ class WeatherSummaryAlarmHandlerTest {
         private AlarmMemberDTO testMember;
 
         private WeatherSummaryDTO testWeather;
-        private ExtraWeatherSummaryDTO testExtraSummary; // sendSingleAlarm에 전달될 ExtraWeatherSummaryDTO 더미
+        private ExtraWeatherSummaryDTO testExtraSummary;
         private final Long testLocationId = 201L;
         String errorMessage = "메시지 생성 실패";
 

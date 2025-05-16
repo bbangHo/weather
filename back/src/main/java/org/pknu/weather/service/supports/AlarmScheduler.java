@@ -1,6 +1,7 @@
 package org.pknu.weather.service.supports;
 
 import lombok.RequiredArgsConstructor;
+import org.pknu.weather.domain.common.AlarmType;
 import org.pknu.weather.service.AlarmService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;

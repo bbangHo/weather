@@ -2,7 +2,7 @@ package org.pknu.weather.service.message;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.pknu.weather.service.supports.AlarmType;
+import org.pknu.weather.domain.common.AlarmType;
 import org.pknu.weather.service.dto.AlarmInfo;
 import org.pknu.weather.dto.AlarmMemberDTO;
 import org.pknu.weather.service.sender.FcmMessage;

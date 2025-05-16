@@ -31,7 +31,7 @@ import org.pknu.weather.exception.GeneralException;
 import org.pknu.weather.repository.AlarmRepository;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("AlarmService 유닛 테스트") // 테스트 이름 변경
+@DisplayName("AlarmService 유닛 테스트")
 class AlarmServiceTest {
 
     @InjectMocks
@@ -113,22 +113,19 @@ class AlarmServiceTest {
                 .fcmToken("non_existent_fcm_token")
                 .build();
 
-        // Mocking
         when(alarmRepository.findByFcmToken(requestDTO.getFcmToken())).thenReturn(Optional.empty());
 
         // When & Then
-        // AssertJ의 assertThatThrownBy를 사용하여 예외 발생 및 예외 내용을 검증합니다.
         assertThatThrownBy(() -> {
             alarmService.modifyAlarm(requestDTO);
         })
                 .isInstanceOf(GeneralException.class)
-                .extracting("code") // 방법 2 (권장): getCode() 메서드 참조로 추출
+                .extracting("code")
                 .isEqualTo(ErrorStatus._FCMTOKEN_NOT_FOUND);
 
 
-        // Mockito 검증 (동일)
         verify(alarmRepository).findByFcmToken(requestDTO.getFcmToken());
-        mockedAlarmStatic.verifyNoInteractions(); // 정적 메서드 호출 없음 검증
-        verify(alarmRepository, never()).saveAndFlush(any(Alarm.class)); // saveAndFlush 호출 없음 검증
+        mockedAlarmStatic.verifyNoInteractions();
+        verify(alarmRepository, never()).saveAndFlush(any(Alarm.class));
     }
 }

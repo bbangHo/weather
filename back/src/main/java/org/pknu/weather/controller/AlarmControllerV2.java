@@ -1,6 +1,7 @@
 package org.pknu.weather.controller;
 
 import jakarta.validation.Valid;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.pknu.weather.apiPayload.ApiResponse;
 import org.pknu.weather.common.converter.TokenConverter;
@@ -37,9 +38,9 @@ public class AlarmControllerV2 {
         return ApiResponse.onSuccess();
     }
 
-    @GetMapping("/testAlarm")
-    public ApiResponse<Object> testAlarm(@Valid @RequestBody AlarmRequestDTO alarmRequestDTO) {
-        alarmService.modifyAlarm(alarmRequestDTO);
+    @PostMapping("/testAlarm")
+    public ApiResponse<Object> testAlarm(@RequestBody Map<String, String> payload) {
+        alarmService.testAlarm(payload.get("fcmToken"));
         return ApiResponse.onSuccess();
     }
 }
