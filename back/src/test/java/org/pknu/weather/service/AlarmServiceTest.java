@@ -54,8 +54,7 @@ class AlarmServiceTest {
 
 
     @Test
-    @DisplayName("modifyAlarm 성공: 알람 정보를 정상적으로 수정하고 저장한다")
-    void modifyAlarm_Success() {
+    void 알람_수정이_성공한다() {
 
         mockedAlarmStatic.when(Alarm::builder).thenCallRealMethod();
 
@@ -108,8 +107,7 @@ class AlarmServiceTest {
     }
 
     @Test
-    @DisplayName("modifyAlarm 실패: 해당 fcmToken의 알람을 찾을 수 없을 때 GeneralException 발생")
-    void modifyAlarm_NotFound_ThrowsException() {
+    void  fcmToken_을_찾을_수_없을_때_GeneralException이_발생한다() {
         // Given
         AlarmRequestDTO requestDTO = AlarmRequestDTO.builder()
                 .fcmToken("non_existent_fcm_token")
