@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.pknu.weather.apiPayload.ApiResponse;
 import org.pknu.weather.common.converter.TokenConverter;
 import org.pknu.weather.dto.AlarmRequestDTO;
+import org.pknu.weather.dto.AlarmResponseDTO;
 import org.pknu.weather.service.AlarmService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,6 +37,13 @@ public class AlarmControllerV2 {
     public ApiResponse<Object> patchAlarm(@Valid @RequestBody AlarmRequestDTO alarmRequestDTO) {
         alarmService.modifyAlarm(alarmRequestDTO);
         return ApiResponse.onSuccess();
+    }
+
+    @GetMapping("/alarm")
+    public ApiResponse<Object> getAlarm(@RequestHeader("Authorization") String authorization) {
+        String email = TokenConverter.getEmailByToken(authorization);
+        AlarmResponseDTO foundAlarm = alarmService.getAlarm(email);
+        return ApiResponse.onSuccess(foundAlarm);
     }
 
     @PostMapping("/testAlarm")
