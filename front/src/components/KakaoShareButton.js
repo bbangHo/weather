@@ -73,7 +73,8 @@ const KakaoShareButton = ({accessToken}) => {
         content: {
           title: `${weatherEmoji} ${city} ${street} 날씨입니다!`,
           description: `현재 ${currentTmp}°C   (↑)${maxTmp}° (↓)${minTmp}°\n${rainComment} ${weatherEmoji}`,
-          imageUrl: 'https://이미지 추가할 경우.png',
+          // 업데이트 되었나 봄. 기본값으로 라이언 이미지 나옴 -> 상의 후 설정 필요
+          // imageUrl: 'https://이미지 추가할 경우.png',
           link: {
             mobileWebUrl: 'https://링크 추가.com',
             webUrl: 'https://링크 추가.com',

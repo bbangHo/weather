@@ -20,11 +20,17 @@ import WeatherGraph from '../components/WeatherGraph';
 import Posts from '../components/Posts';
 import KakaoShareButton from '../components/KakaoShareButton';
 import globalStyles from '../globalStyles';
+import {useCopilot, CopilotStep, walkthroughable} from 'react-native-copilot';
+import {InteractionManager} from 'react-native';
 import {fetchWeatherData, checkInAttendance, fetchMemberInfo} from '../api/api';
 
 const {width, height} = Dimensions.get('window');
+const CopilotView = walkthroughable(View);
+const TUTORIAL_COMPLETED_KEY = 'homeTutorialCompleted';
 
 const HomeScreen = ({accessToken, navigation}) => {
+  const {start} = useCopilot();
+
   const {refresh, setRefresh} = useRefresh();
   const [weatherData, setWeatherData] = useState(null);
   const [showText, setShowText] = useState(false);
@@ -140,6 +146,44 @@ const HomeScreen = ({accessToken, navigation}) => {
     return kstNow.toISOString().split('T')[0];
   };
 
+  // 튜토리얼 시작 조건 및 실행
+  useEffect(() => {
+    const tryStartTutorial = async () => {
+      const done = await AsyncStorage.getItem(TUTORIAL_COMPLETED_KEY);
+      if (!done && !hasStartedTutorial) {
+        setHasStartedTutorial(true); // 중복 방지
+        InteractionManager.runAfterInteractions(() => {
+          start();
+          AsyncStorage.setItem(TUTORIAL_COMPLETED_KEY, 'true');
+        });
+      }
+    };
+    tryStartTutorial();
+  }, [start]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchWeather(); // 날씨 데이터
+
+      const tryStartTutorial = async () => {
+        const done = await AsyncStorage.getItem(TUTORIAL_COMPLETED_KEY);
+        if (!done) {
+          InteractionManager.runAfterInteractions(() => {
+            start();
+            AsyncStorage.setItem(TUTORIAL_COMPLETED_KEY, 'true');
+          });
+        }
+      };
+
+      tryStartTutorial();
+    }, [start]),
+  );
+
+  // 테스트용 - 앱 재실행 시 튜토리얼 시작 (추후 제거)
+  useEffect(() => {
+    AsyncStorage.removeItem('homeTutorialCompleted');
+  }, []);
+
   useEffect(() => {
     if (refresh) {
       console.log('Refresh HomeScreen');
@@ -158,11 +202,13 @@ const HomeScreen = ({accessToken, navigation}) => {
     setRefreshing(false);
   };
 
+  /*
   useFocusEffect(
     useCallback(() => {
       fetchWeather();
     }, []),
   );
+  */
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -224,17 +270,21 @@ const HomeScreen = ({accessToken, navigation}) => {
         <View style={styles.emptyContainer} />
       )}
 
-      <TouchableOpacity
-        style={[
-          styles.floatingButton,
-          {backgroundColor: buttonBackgroundColor},
-        ]}
-        onPress={() => navigation.navigate('PostCreationScreen')}>
-        <Image
-          source={require('../../assets/images/icon_pencil.png')}
-          style={styles.buttonIcon}
-        />
-      </TouchableOpacity>
+      <CopilotStep text="게시글을 작성해 보세요!" order={0} name="write">
+        <CopilotView style={styles.floatingButtonWrapper}>
+          <TouchableOpacity
+            style={[
+              styles.floatingButton,
+              {backgroundColor: buttonBackgroundColor},
+            ]}
+            onPress={() => navigation.navigate('PostCreationScreen')}>
+            <Image
+              source={require('../../assets/images/icon_pencil.png')}
+              style={styles.buttonIcon}
+            />
+          </TouchableOpacity>
+        </CopilotView>
+      </CopilotStep>
     </View>
   );
 };
@@ -246,15 +296,19 @@ const styles = StyleSheet.create({
   emptyContainer: {
     flex: 1,
   },
-  floatingButton: {
+  floatingButtonWrapper: {
     position: 'absolute',
     bottom: width * 0.05,
     right: width * 0.05,
     width: width * 0.16,
     height: width * 0.16,
-    borderRadius: 999,
+    zIndex: 9999, // 👈 Copilot 위치 표시를 방해하지 않도록
+  },
+  floatingButton: {
+    flex: 1, // 👈 부모인 CopilotView에 맞게 채우기
     justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: 999,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.3,
@@ -269,3 +323,5 @@ const styles = StyleSheet.create({
 });
 
 export default HomeScreen;
+
+// 수정 시작
