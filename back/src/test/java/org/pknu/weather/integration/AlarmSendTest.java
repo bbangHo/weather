@@ -397,6 +397,8 @@ class AlarmSendTest {
         verify(weatherRefresherService, times(1)).refresh(eq(retryLocationIds));
     }
 
+
+
     @Test
     @DirtiesContext(methodMode = MethodMode.BEFORE_METHOD)
     public void fcm토큰의_중복될_때_예외가_발생한다() throws Exception {
@@ -427,9 +429,19 @@ class AlarmSendTest {
 
         Member savedMember = memberRepository.save(member);
 
+        Alarm alarm = Alarm.builder()
+                .member(member)
+                .fcmToken("FcmToken1")
+                .build();
+
+        alarmRepository.save(alarm);
+
         entityManager.flush();
         entityManager.clear();
 
         return savedMember;
     }
+
+
+
 }

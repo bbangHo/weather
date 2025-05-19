@@ -34,8 +34,10 @@ public class AlarmControllerV2 {
     }
 
     @PatchMapping("/alarm")
-    public ApiResponse<Object> patchAlarm(@Valid @RequestBody AlarmRequestDTO alarmRequestDTO) {
-        alarmService.modifyAlarm(alarmRequestDTO);
+    public ApiResponse<Object> patchAlarm(@RequestHeader("Authorization") String authorization,
+                                          @Valid @RequestBody AlarmRequestDTO alarmRequestDTO) {
+        String email = TokenConverter.getEmailByToken(authorization);
+        alarmService.modifyAlarm(email, alarmRequestDTO);
         return ApiResponse.onSuccess();
     }
 
@@ -47,8 +49,11 @@ public class AlarmControllerV2 {
     }
 
     @PostMapping("/testAlarm")
-    public ApiResponse<Object> testAlarm(@RequestBody Map<String, String> payload) {
-        alarmService.testAlarm(payload.get("fcmToken"));
+    public ApiResponse<Object> testAlarm(@RequestHeader("Authorization") String authorization,
+                                         @RequestBody Map<String, String> payload) {
+
+        String email = TokenConverter.getEmailByToken(authorization);
+        alarmService.testAlarm(email, payload.get("fcmToken"));
         return ApiResponse.onSuccess();
     }
 }
