@@ -15,8 +15,8 @@ class WeatherAlarmMessageBuilderTest {
 
         builder.withTemperature(25, 15)
                 .withRainStatus("맑음")
-                .withDust(2) // Assuming 2 maps to "보통" via getDustLevel
-                .withUV("12", 3); // Assuming 3 maps to "나쁨" via getUvLevel
+                .withDust(2)
+                .withUV("12", 3);
 
         // When
         String message = builder.build();
@@ -35,7 +35,7 @@ class WeatherAlarmMessageBuilderTest {
         // Given
         WeatherAlarmMessageBuilder builder = new WeatherAlarmMessageBuilder();
         builder.withTemperature(20, 10)
-                .withDust(2); // Assuming 2 maps to "보통"
+                .withDust(2);
 
         // When
         String message = builder.build();
@@ -52,7 +52,7 @@ class WeatherAlarmMessageBuilderTest {
         // Given
         WeatherAlarmMessageBuilder builder = new WeatherAlarmMessageBuilder();
         builder.withRainStatus("비")
-                .withUV("15", 3); // Assuming 3 maps to "나쁨"
+                .withUV("15", 3);
 
         // When
         String message = builder.build();
@@ -98,7 +98,7 @@ class WeatherAlarmMessageBuilderTest {
         WeatherAlarmMessageBuilder builder = new WeatherAlarmMessageBuilder();
         builder.withRainStatus("흐림")
                 .withTemperature(10, 5)
-                .withDust(1); // Assuming 1 maps to "좋음"
+                .withDust(1);
 
         // When
         String message = builder.build();

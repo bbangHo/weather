@@ -11,10 +11,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.pknu.weather.config.DataJpaTestConfig;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Weather;
@@ -35,20 +39,39 @@ class WeatherCustomRepositoryTest {
     @Autowired
     private TestEntityManager entityManager;
 
+    private static MockedStatic<LocalDateTime> mockedLocalDateTimeStatic;
+
+    private static final LocalDateTime FIXED_CURRENT_DATETIME = LocalDateTime.of(2025, 5, 16, 13, 59, 18);
+
+
+    @BeforeEach
+    void beforeAll() {
+        mockedLocalDateTimeStatic = Mockito.mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS);
+        mockedLocalDateTimeStatic.when(LocalDateTime::now).thenReturn(FIXED_CURRENT_DATETIME);
+    }
+
+    @AfterEach
+    void afterEach() {
+        if (mockedLocalDateTimeStatic != null) {
+            mockedLocalDateTimeStatic.close();
+        }
+    }
+
     @Test
     void 위치_목록이_비어_있을_때_빈_리스트_반환() {
         // Given
-        Set<Long> locationIds = new HashSet<>(); // 빈 위치 ID 집합
+        Set<Long> locationIds = new HashSet<>();
 
         // When
-        List<WeatherSummaryDTO> result = weatherRepository.findWeatherSummary(locationIds); // 리포지토리 메소드 호출
+        List<WeatherSummaryDTO> result = weatherRepository.findWeatherSummary(locationIds);
 
         // Then
-        assertThat(result).isEmpty(); // 결과 리스트가 비어 있는지 확인
+        assertThat(result).isEmpty();
     }
 
     @Test
     void 시간_범위_밖의_날씨_데이터는_결과에_영향을_주지_않도록_설정() {
+
         // Given
         LocalDateTime now = LocalDateTime.now();
         Location location = createAndPersistLocation();
@@ -60,7 +83,7 @@ class WeatherCustomRepositoryTest {
 
         createAndPersistWeather(location, yesterday, 17, RainType.RAIN);
         createAndPersistWeather(location, endOfYesterday, 10, RainType.RAIN);
-        createAndPersistWeather(location, startOfTomorrow, 10, RainType.NONE);
+        createAndPersistWeather(location, startOfTomorrow, 11, RainType.NONE);
         createAndPersistWeather(location, tomorrow, 15, RainType.SNOW);
 
         // When

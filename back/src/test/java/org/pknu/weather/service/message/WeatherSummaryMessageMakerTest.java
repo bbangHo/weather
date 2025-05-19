@@ -11,7 +11,7 @@ import org.pknu.weather.dto.WeatherSummaryDTO;
 import org.pknu.weather.service.dto.AlarmInfo;
 import org.pknu.weather.service.dto.WeatherSummaryAlarmInfo;
 import org.pknu.weather.service.sender.FcmMessage;
-import org.pknu.weather.service.supports.AlarmType;
+import org.pknu.weather.domain.common.AlarmType;
 
 class WeatherSummaryMessageMakerTest {
 

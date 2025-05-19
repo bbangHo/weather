@@ -76,7 +76,14 @@ public enum ErrorStatus implements BaseErrorCode {
     _POST_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "POST_404_2", "올바르지 않은 게시글 Type 입니다."),
 
     //feignClient
-    _API_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "API_500_1", "외부 API 서버에 문제가 발생했습니다.");
+    _API_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "API_500_1", "외부 API 서버에 문제가 발생했습니다."),
+
+    //database
+    _DUPLICATED_ENTRY(HttpStatus.CONFLICT, "DATA_409_1", "중복된 데이터가 이미 존재합니다."),
+
+    //alarm
+    _FCMTOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "ALARM_404_1", "Fcm토큰을 찾을 수 없습니다."),
+    _ALARM_NOT_FOUND(HttpStatus.NOT_FOUND, "ALARM_404_2", "알람을 찾을 수 없습니다.");
 
 
     private final HttpStatus httpStatus;

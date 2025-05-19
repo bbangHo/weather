@@ -9,14 +9,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.repository.MemberRepository;
 import org.pknu.weather.dto.AlarmMemberDTO;
 import org.pknu.weather.service.supports.AlarmTimeUtil;
-import org.pknu.weather.service.supports.AlarmType;
+import org.pknu.weather.domain.common.AlarmType;
 import org.pknu.weather.service.supports.WeatherRefresherService;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class WeatherUpdateHandler implements AlarmHandler {
+public class WeatherUpdateHandler implements NoArgsAlarmHandler {
 
     private final MemberRepository memberRepository;
     private final WeatherRefresherService weatherRefresherService;
