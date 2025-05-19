@@ -142,6 +142,7 @@ class AlarmCrudTest {
                 .andDo(print());
     }
 
+
     @Test
     @DirtiesContext(methodMode = MethodMode.BEFORE_METHOD)
     public void 알람_저장_시_fcm토큰의_중복될_때_예외가_발생한다() throws Exception {
@@ -169,6 +170,14 @@ class AlarmCrudTest {
                 .build();
 
         Member savedMember = memberRepository.save(member);
+
+        Alarm alarm = Alarm.builder()
+                .member(member)
+                .fcmToken("FcmToken1")
+                .build();
+
+        alarmRepository.save(alarm);
+
 
         entityManager.flush();
         entityManager.clear();
@@ -199,7 +208,7 @@ class AlarmCrudTest {
                         .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isOk());
 
-        Optional<Alarm> updatedAlarmOptional = alarmRepository.findByFcmToken(initFcmToken);
+        Optional<Alarm> updatedAlarmOptional = alarmRepository.findByFcmTokenAndMember(initFcmToken, member);
 
         assertThat(updatedAlarmOptional).isPresent();
         Alarm updatedAlarm = updatedAlarmOptional.get();

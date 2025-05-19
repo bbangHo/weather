@@ -3,6 +3,8 @@ package org.pknu.weather.service;
 
 import static org.pknu.weather.dto.converter.AlarmConverter.toAlarmResponseDto;
 
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
@@ -41,8 +43,9 @@ public class AlarmService {
         alarmRepository.saveAndFlush(createdAlarm);
     }
 
-    public void modifyAlarm(AlarmRequestDTO alarmRequestDTO) {
-        Alarm foundAlarm = alarmRepository.findByFcmToken(alarmRequestDTO.getFcmToken())
+    public void modifyAlarm(String email, AlarmRequestDTO alarmRequestDTO) {
+        Member member = memberRepository.safeFindByEmail(email);
+        Alarm foundAlarm = alarmRepository.findByFcmTokenAndMember(alarmRequestDTO.getFcmToken(),member)
                 .orElseThrow(() -> new GeneralException(ErrorStatus._FCMTOKEN_NOT_FOUND));
 
         Alarm modifiedAlarm = Alarm.modifyAlarm(foundAlarm, alarmRequestDTO);
@@ -57,8 +60,9 @@ public class AlarmService {
         return toAlarmResponseDto(foundAlarm);
     }
 
-    public void testAlarm(String fcmToken) {
-        ArgsAlarmHandler<String> handler = handlerFactory.getArgsAlarmHandler(AlarmType.TEST_WEATHER_SUMMARY, String.class);
-        handler.handleRequest(fcmToken);
+    public void testAlarm(String email, String fcmToken) {
+        Map<String, String> payload = Map.of("email", email, "fcmToken", fcmToken);
+        ArgsAlarmHandler<Map> handler = handlerFactory.getArgsAlarmHandler(AlarmType.TEST_WEATHER_SUMMARY, Map.class);
+        handler.handleRequest(payload);
     }
 }

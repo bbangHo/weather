@@ -18,6 +18,7 @@ import org.pknu.weather.dto.converter.ExtraWeatherConverter;
 import org.pknu.weather.exception.GeneralException;
 import org.pknu.weather.repository.AlarmRepository;
 import org.pknu.weather.repository.ExtraWeatherRepository;
+import org.pknu.weather.repository.MemberRepository;
 import org.pknu.weather.repository.WeatherRepository;
 import org.pknu.weather.service.dto.WeatherSummaryAlarmInfo;
 import org.pknu.weather.service.message.AlarmMessageMaker;
@@ -28,9 +29,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class TestWeatherSummaryAlarmHandler implements ArgsAlarmHandler<String>{
+public class TestWeatherSummaryAlarmHandler implements ArgsAlarmHandler<Map<String, String>>{
 
     private final WeatherRepository weatherRepository;
+    private final MemberRepository memberRepository;
     private final ExtraWeatherRepository extraWeatherRepository;
     private final AlarmMessageMaker weatherSummaryMessageMaker;
     private final NotificationSender sender;
@@ -44,8 +46,13 @@ public class TestWeatherSummaryAlarmHandler implements ArgsAlarmHandler<String>{
 
 
     @Override
-    public void handleRequest(String fcmToken) {
-        Alarm foundAlarm = alarmRepository.findByFcmToken(fcmToken).orElseThrow(() -> new GeneralException(
+    public void handleRequest(Map<String, String> payload) {
+        String fcmToken = payload.get("fcmToken");
+        Member member= memberRepository.findMemberByEmail(payload.get("email"))
+                .orElseThrow(() -> new GeneralException(ErrorStatus._MEMBER_NOT_FOUND));
+
+
+        Alarm foundAlarm = alarmRepository.findByFcmTokenAndMember(fcmToken,member).orElseThrow(() -> new GeneralException(
                 ErrorStatus._FCMTOKEN_NOT_FOUND));
         Member foundMember = foundAlarm.getMember();
         Set<Long> alarmLocations = Collections.singleton(foundMember.getLocation().getId());

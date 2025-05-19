@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface AlarmRepository extends JpaRepository<Alarm, Long> {
-    Optional<Alarm> findByFcmToken(String fcmToken);
+    Optional<Alarm> findByFcmTokenAndMember(String fcmToken, Member member);
 
     @EntityGraph(attributePaths = {"summaryAlarmTimes"})
     @Query("SELECT a FROM Alarm a WHERE a.member = :member")

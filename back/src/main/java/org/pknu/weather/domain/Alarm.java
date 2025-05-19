@@ -11,7 +11,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.util.HashSet;
 import java.util.Set;
 import lombok.AccessLevel;
@@ -28,6 +30,8 @@ import org.pknu.weather.dto.AlarmRequestDTO;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Table(name = "alarm", uniqueConstraints = {
+        @UniqueConstraint(name = "UK_alarm_member_fcmToken", columnNames = {"member_id", "fcm_token"})})
 public class Alarm extends BaseEntity {
 
     @Id
@@ -35,11 +39,10 @@ public class Alarm extends BaseEntity {
     @Column(name = "alarm_id")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", unique = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
     private Member member;
 
-    @Column(unique = true)
     private String fcmToken;
 
     @ColumnDefault("false")

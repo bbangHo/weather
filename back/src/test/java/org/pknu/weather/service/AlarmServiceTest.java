@@ -137,16 +137,16 @@ class AlarmServiceTest {
                 .build();
 
         Alarm expectedModifiedAlarm = getAlarm(member);
-
-        when(alarmRepository.findByFcmToken(requestDTO.getFcmToken())).thenReturn(Optional.of(foundAlarm));
+        when(memberRepository.safeFindByEmail(member.getEmail())).thenReturn(member);
+        when(alarmRepository.findByFcmTokenAndMember(requestDTO.getFcmToken(), member)).thenReturn(Optional.of(foundAlarm));
         mockedAlarmStatic.when(() -> Alarm.modifyAlarm(eq(foundAlarm), eq(requestDTO))).thenReturn(expectedModifiedAlarm);
         when(alarmRepository.saveAndFlush(any(Alarm.class))).thenReturn(expectedModifiedAlarm);
 
-        alarmService.modifyAlarm(requestDTO);
+        alarmService.modifyAlarm(member.getEmail(), requestDTO);
 
 
         // Then
-        verify(alarmRepository).findByFcmToken(requestDTO.getFcmToken());
+        verify(alarmRepository).findByFcmTokenAndMember(requestDTO.getFcmToken(), member);
         mockedAlarmStatic.verify(() -> Alarm.modifyAlarm(eq(foundAlarm), eq(requestDTO)));
         verify(alarmRepository).saveAndFlush(eq(expectedModifiedAlarm));
         verify(alarmRepository, times(1)).saveAndFlush(any(Alarm.class));
@@ -154,23 +154,29 @@ class AlarmServiceTest {
 
     @Test
     void  fcmToken_을_찾을_수_없을_때_GeneralException이_발생한다() {
+        Member member = Member.builder()
+                .email("test_email")
+                .build();
+
+
         // Given
         AlarmRequestDTO requestDTO = AlarmRequestDTO.builder()
                 .fcmToken("non_existent_fcm_token")
                 .build();
 
-        when(alarmRepository.findByFcmToken(requestDTO.getFcmToken())).thenReturn(Optional.empty());
+        when(memberRepository.safeFindByEmail(member.getEmail())).thenReturn(member);
+        when(alarmRepository.findByFcmTokenAndMember(requestDTO.getFcmToken(), member)).thenReturn(Optional.empty());
 
         // When & Then
         assertThatThrownBy(() -> {
-            alarmService.modifyAlarm(requestDTO);
+            alarmService.modifyAlarm(member.getEmail(),requestDTO);
         })
                 .isInstanceOf(GeneralException.class)
                 .extracting("code")
                 .isEqualTo(ErrorStatus._FCMTOKEN_NOT_FOUND);
 
 
-        verify(alarmRepository).findByFcmToken(requestDTO.getFcmToken());
+        verify(alarmRepository).findByFcmTokenAndMember(requestDTO.getFcmToken(), member);
         mockedAlarmStatic.verifyNoInteractions();
         verify(alarmRepository, never()).saveAndFlush(any(Alarm.class));
     }
