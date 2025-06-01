@@ -90,6 +90,11 @@ dependencies {
 
     //FCM
     implementation 'com.google.firebase:firebase-admin:9.4.3'
+
+    // Spring Data Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    testImplementation 'com.github.codemonstur:embedded-redis:1.4.3'
 }
 tasks.named('test') {
     useJUnitPlatform()

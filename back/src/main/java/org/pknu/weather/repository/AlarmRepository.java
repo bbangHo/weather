@@ -1,9 +1,11 @@
 package org.pknu.weather.repository;
 
 
+import java.util.List;
 import java.util.Optional;
 import org.pknu.weather.domain.Alarm;
 import org.pknu.weather.domain.Member;
+import org.pknu.weather.service.dto.LiveRainAlarmInfo;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,5 +17,11 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
     @EntityGraph(attributePaths = {"summaryAlarmTimes"})
     @Query("SELECT a FROM Alarm a WHERE a.member = :member")
     Optional<Alarm> findByMemberWithSummaryAlarmTimes(@Param("member") Member member);
+
+
+    @Query("SELECT a.fcmToken " +
+            "FROM Alarm a JOIN a.member m JOIN m.location l " +
+            "WHERE l.id = :locationId AND a.agreeLiveRainAlarm = true")
+    List<String> findLiveRainAlarmInfo(@Param("locationId") Long locationId);
 
 }

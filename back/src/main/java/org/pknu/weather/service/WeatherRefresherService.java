@@ -1,4 +1,4 @@
-package org.pknu.weather.service.supports;
+package org.pknu.weather.service;
 
 import static org.pknu.weather.dto.converter.ExtraWeatherConverter.toExtraWeather;
 import static org.pknu.weather.dto.converter.LocationConverter.toLocationDTO;
@@ -13,8 +13,6 @@ import org.pknu.weather.dto.WeatherResponse.ExtraWeatherInfo;
 import org.pknu.weather.feignClient.utils.ExtraWeatherApiUtils;
 import org.pknu.weather.repository.ExtraWeatherRepository;
 import org.pknu.weather.repository.LocationRepository;
-import org.pknu.weather.service.WeatherQueryService;
-import org.pknu.weather.service.WeatherService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

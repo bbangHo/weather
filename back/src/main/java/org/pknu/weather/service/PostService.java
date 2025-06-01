@@ -9,10 +9,12 @@ import org.pknu.weather.domain.Member;
 import org.pknu.weather.domain.Post;
 import org.pknu.weather.domain.Tag;
 import org.pknu.weather.domain.common.PostType;
+import org.pknu.weather.domain.tag.SkyTag;
 import org.pknu.weather.dto.PostRequest;
 import org.pknu.weather.dto.converter.PostConverter;
 import org.pknu.weather.dto.converter.TagConverter;
 import org.pknu.weather.event.PostCreatedEvent;
+import org.pknu.weather.event.alarm.LiveRainAlarmCreatedEvent;
 import org.pknu.weather.repository.LocationRepository;
 import org.pknu.weather.repository.MemberRepository;
 import org.pknu.weather.repository.PostRepository;
@@ -62,12 +64,14 @@ public class PostService {
         Post post = PostConverter.toPost(member, tag, createPost.getContent());
 
         post.addTag(tag);
-        postRepository.save(post);
+        Post savedPost = postRepository.save(post);
         eventPublisher.publishEvent(new PostCreatedEvent(member.getEmail()));
+
+        if(tag.getSkyTag().equals(SkyTag.RAIN))
+            eventPublisher.publishEvent(new LiveRainAlarmCreatedEvent(savedPost.getId()));
 
         return true;
     }
-
 
     @Transactional
     public boolean createWeatherPostV2(String email, PostRequest.CreatePostAndTagParameters params) {

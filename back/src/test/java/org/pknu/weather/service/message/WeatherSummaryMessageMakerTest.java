@@ -42,7 +42,7 @@ class WeatherSummaryMessageMakerTest {
                 .maxUvValue(2)
                 .build();
 
-        WeatherSummaryAlarmInfo alarmInfo =new WeatherSummaryAlarmInfo(weatherDTO, extraDTO, memberDTO);
+        WeatherSummaryAlarmInfo alarmInfo = new WeatherSummaryAlarmInfo(weatherDTO, extraDTO, memberDTO);
 
         // when
         FcmMessage result = maker.createAlarmMessage(alarmInfo);
