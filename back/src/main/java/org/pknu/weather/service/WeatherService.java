@@ -41,6 +41,7 @@ public class WeatherService {
     private final ExtraWeatherApiUtils extraWeatherApiUtils;
     private final LocationRepository locationRepository;
 
+
     /**
      * TODO: 성능 개선 필요
      * 현재 ~ +24시간 까지의 날씨 정보를 불러옵니다.
@@ -73,18 +74,31 @@ public class WeatherService {
      * 날씨 정보를 저장합니다. 비동기적으로 동작합니다.
      *
      * @param locationId
-     * @param forecast   공공데이터 API에서 받아온 단기날씨예보 값 list
+     * @param newForecast 공공데이터 API에서 받아온 단기날씨예보 값 list
      */
     @Async("WeatherCUDExecutor")
     @Transactional
-    public void saveWeathersAsync(Long locationId, List<Weather> forecast) {
+    public void saveWeathersAsync(Long locationId, List<Weather> newForecast) {
         Location location = locationRepository.safeFindById(locationId);
 
-        List<Weather> weatherList = new ArrayList<>(forecast).stream()
+        List<Weather> weatherList = new ArrayList<>(newForecast).stream()
                 .peek(weather -> weather.addLocation(location))
                 .toList();
 
         weatherRepository.saveAll(weatherList);
+    }
+
+    /**
+     * 날씨 정보를 저장합니다. 비동기적으로 동작합니다.
+     *
+     * @param locationId
+     * @param newForecast 공공데이터 API에서 받아온 단기날씨예보 값 list
+     */
+    @Async("WeatherCUDExecutor")
+    @Transactional
+    public void bulkSaveWeathersAsync(Long locationId, List<Weather> newForecast) {
+        Location location = locationRepository.safeFindById(locationId);
+        weatherRepository.batchSave(newForecast, location);
     }
 
     /**
@@ -95,22 +109,43 @@ public class WeatherService {
      */
     @Async("WeatherCUDExecutor")
     @Transactional
+    @Deprecated
     public void updateWeathersAsync(Long locationId) {
         Location location = locationRepository.safeFindById(locationId);
         Map<LocalDateTime, Weather> oldWeatherMap = weatherRepository.findAllByLocationAfterNow(location);
-
-        List<Weather> weatherList = weatherFeignClientUtils.getVillageShortTermForecast(location).stream()
-                .peek(newWeather -> {
-                    LocalDateTime presentationTime = newWeather.getPresentationTime();
-                    if (oldWeatherMap.containsKey(presentationTime)) {
-                        Weather oldWeather = oldWeatherMap.get(presentationTime);
-                        oldWeather.updateWeather(newWeather);
-                    }
-                    newWeather.addLocation(location);
-                }).toList();
-
-        weatherRepository.saveAll(weatherList);
+        List<Weather> newWeatherList = weatherFeignClientUtils.getVillageShortTermForecast(location);
+        List<Weather> weathersList = updateWeathers(oldWeatherMap, newWeatherList, location);
+        weatherRepository.saveAll(weathersList);
     }
+
+    @Async("WeatherCUDExecutor")
+    @Transactional
+    public void bulkUpdateWeathersAsync(Long locationId) {
+        Location location = locationRepository.safeFindById(locationId);
+        Map<LocalDateTime, Weather> oldWeatherMap = weatherRepository.findAllByLocationAfterNow(location);
+        List<Weather> newWeatherList = weatherFeignClientUtils.getVillageShortTermForecast(location);
+        List<Weather> weathersList = updateWeathers(oldWeatherMap, newWeatherList, location);
+        weatherRepository.batchUpdate(weathersList, location);
+    }
+
+    private List<Weather> updateWeathers(Map<LocalDateTime, Weather> oldWeatherMap, List<Weather> newWeatherList,
+                                         Location location) {
+        log.debug("oldWeatherMap size: " + oldWeatherMap.size());
+        newWeatherList.forEach(newWeather -> {
+            LocalDateTime presentationTime = newWeather.getPresentationTime();
+            if (oldWeatherMap.containsKey(presentationTime)) {
+                Weather oldWeather = oldWeatherMap.get(presentationTime);
+                oldWeather.updateWeather(newWeather);
+            } else {
+                newWeather.addLocation(location); // 새 데이터만 추가
+                oldWeatherMap.put(newWeather.getPresentationTime(), newWeather);
+            }
+        });
+
+        log.debug("oldWeatherMap size: " + oldWeatherMap.size());
+        return oldWeatherMap.values().stream().toList();
+    }
+
 
     /**
      * 예보 시간이 현재 보다 과거이면 모두 삭제합니다.v

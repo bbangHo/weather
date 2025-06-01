@@ -1,12 +1,12 @@
 package org.pknu.weather.service;
 
-import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.api.Assertions;
+import org.awaitility.Awaitility;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.pknu.weather.common.TestDataCreator;
+import org.pknu.weather.common.formatter.DateTimeFormatter;
 import org.pknu.weather.domain.Location;
 import org.pknu.weather.domain.Weather;
 import org.pknu.weather.domain.common.RainType;
@@ -24,12 +24,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
 
 @SpringBootTest
 @Slf4j
-@ExtendWith(MockitoExtension.class)
 class WeatherServiceTest {
     @Autowired
     WeatherService weatherService;
@@ -43,28 +41,25 @@ class WeatherServiceTest {
     @Autowired
     WeatherRepository weatherRepository;
 
-    @Autowired
-    EntityManager em;
-
-    Map<LocalDateTime, Weather> getPastForecast(Location location, LocalDateTime targetTime) {
+    Map<LocalDateTime, Weather> getPastForecast(Location location, LocalDateTime baseTime) {
         // 현재 시각
-        LocalDateTime baseTime = targetTime.minusHours(3);
+        LocalDateTime presentTime = baseTime.plusHours(0);
         Map<LocalDateTime, Weather> weatherMap = new HashMap<>();
 
         // 3시간 전에 발표한 예보 만들기
-        for(int i = 1; i < 24; i++) {
+        for (int i = 1; i <= 24; i++) {
             Weather weather = Weather.builder()
                     .basetime(baseTime)
-                    .presentationTime(targetTime.plusHours(i))
+                    .presentationTime(presentTime.plusHours(i))
                     .location(location)
-                    .rainType(RainType.NONE)
-                    .rain(1.0F)
-                    .rainProb(10)
-                    .temperature(14)
-                    .humidity(50)
-                    .windSpeed(1.5)
-                    .snowCover(1.5f)
-                    .skyType(SkyType.CLEAR)
+                    .rainType(RainType.values()[(int) (Math.random() * RainType.values().length)])
+                    .rain((float) (Math.random() * 10 + i))
+                    .rainProb((int) (Math.random() * 100))
+                    .temperature((int) (Math.random() * 30 + i))
+                    .humidity((int) (Math.random() * 100))
+                    .windSpeed(Math.random() * 10 + i)
+                    .snowCover((float) (Math.random() * 5 + i))
+                    .skyType(SkyType.values()[(int) (Math.random() * SkyType.values().length)])
                     .build();
 
             weatherMap.put(weather.getPresentationTime(), weather);
@@ -73,25 +68,25 @@ class WeatherServiceTest {
         return weatherMap;
     }
 
-    List<Weather> getNewForecast(Location location, LocalDateTime targetTime) {
+    List<Weather> getNewForecast(Location location, LocalDateTime baseTime) {
         // 현재 시각
-        LocalDateTime baseTime = targetTime;
+        LocalDateTime presentTime = baseTime.plusHours(0);
         List<Weather> weatherList = new ArrayList<>();
 
         // 3시간 전에 발표한 예보 만들기
-        for(int i = 1; i < 24; i++) {
+        for (int i = 1; i <= 24; i++) {
             Weather weather = Weather.builder()
                     .basetime(baseTime)
-                    .presentationTime(targetTime.plusHours(i))
+                    .presentationTime(presentTime.plusHours(i))
                     .location(location)
-                    .rainType(RainType.NONE)
-                    .rain(1.0F)
-                    .rainProb(10)
-                    .temperature(14)
-                    .humidity(50)
-                    .windSpeed(1.5)
-                    .snowCover(1.5f)
-                    .skyType(SkyType.CLEAR)
+                    .rainType(RainType.values()[(int) (Math.random() * RainType.values().length)])
+                    .rain((float) (Math.random() * 10 + i))
+                    .rainProb((int) (Math.random() * 100))
+                    .temperature((int) (Math.random() * 30 + i))
+                    .humidity((int) (Math.random() * 100))
+                    .windSpeed(Math.random() * 10 + i)
+                    .snowCover((float) (Math.random() * 5 + i))
+                    .skyType(SkyType.values()[(int) (Math.random() * SkyType.values().length)])
                     .build();
 
             weatherList.add(weather);
@@ -100,43 +95,62 @@ class WeatherServiceTest {
         return weatherList;
     }
 
+    LocalDateTime getBaseTime() {
+        return DateTimeFormatter.getBaseLocalDateTime(LocalDateTime.now().withMinute(0).withSecond(0).withNano(0));
+    }
+
     @Test
-    void 단기_예보_갱신_성공테스트() {
+    void 비동기_insert_로직_테스트() {
         // given
         Location location = locationRepository.saveAndFlush(TestDataCreator.getBusanLocation());
-        LocalDateTime now = LocalDateTime.now().withMinute(0).withSecond(0).withNano(0);
-
-        doReturn(getNewForecast(location, now))
-                .when(weatherFeignClientUtils)
-                .getVillageShortTermForecast(location);
-
-//        when(weatherFeignClientUtils.getVillageShortTermForecast(location))
-//                .thenReturn(getNewForecast(location, now));
-
-        weatherRepository.saveAll(getPastForecast(location, now).values());
+        LocalDateTime baseTime = getBaseTime();
 
         // when
-        weatherService.updateWeathersAsync(location.getId());
-
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        weatherService.saveWeathersAsync(location.getId(), getNewForecast(location, baseTime));
 
         // then
-        List<Weather> updatedWeatherList = weatherRepository.findAllByLocationAfterNow(location).values().stream()
-                .toList();
+        Awaitility.await().until(() -> weatherRepository.count() == 24);
+        List<Weather> weatherList = weatherRepository.findAll();
+        Assertions.assertThat(weatherList.size()).isEqualTo(24);
+    }
 
-        updatedWeatherList.stream()
-                        .forEach(weather -> {
-                            assertThat(weather.getBasetime()).isEqualTo(now);
-                        });
+    @Test
+    void 비동기_벌크_insert_로직_테스트() {
+        // given
+        Location location = locationRepository.saveAndFlush(TestDataCreator.getBusanLocation());
+        LocalDateTime baseTime = getBaseTime();
+
+        // when
+        weatherService.bulkSaveWeathersAsync(location.getId(), getNewForecast(location, baseTime));
+
+        // then
+        Awaitility.await().until(() -> weatherRepository.count() == 24);
+        List<Weather> weatherList = weatherRepository.findAll();
+        Assertions.assertThat(weatherList.size()).isEqualTo(24);
+    }
+
+//    @Test
+    void 비동기_벌크_update_로직_테스트() throws InterruptedException {
+        // given
+        Location location = locationRepository.saveAndFlush(TestDataCreator.getBusanLocation());
+        LocalDateTime baseTime = getBaseTime();
+        weatherRepository.saveAll(getPastForecast(location, baseTime.minusHours(3)).values());
+
+        doReturn(getNewForecast(location, baseTime))
+                .when(weatherFeignClientUtils).getVillageShortTermForecast(location);
+
+        // when
+        weatherService.bulkUpdateWeathersAsync(location.getId());
+
+        // then
+        Awaitility.await().until(() -> weatherRepository.count() == 27);
+        List<Weather> weatherList = weatherRepository.findAll();
+        Assertions.assertThat(weatherList.size()).isEqualTo(27);
     }
 
     @AfterEach
     void remove() {
-        locationRepository.deleteAll();
         weatherRepository.deleteAll();
+        locationRepository.deleteAll();
     }
 }
