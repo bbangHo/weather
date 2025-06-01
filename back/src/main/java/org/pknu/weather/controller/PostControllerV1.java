@@ -29,12 +29,9 @@ public class PostControllerV1 {
     @PostMapping("/post")
     public ApiResponse<Object> createWeatherPost(@RequestHeader("Authorization") String authorization,
                                                  @Valid @RequestBody PostRequest.Params params) {
-        long start = ExecutionTimerUtils.start();
         PostRequest.CreatePost createPost = PostRequestConverter.toCreatePost(params);
         String email = TokenConverter.getEmailByToken(authorization);
         boolean isSuccess = postService.createWeatherPost(email, createPost);
-        long end = ExecutionTimerUtils.end(start);
-        System.out.println("비동기 테스트: " + end + "ms");
         return ApiResponse.of(isSuccess);
     }
 
