@@ -72,7 +72,7 @@ class LiveRainAlarmMessageMakerTest {
         // When & Then
         assertThatThrownBy(() -> messageMaker.validate(wrongTypeInfo))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("LivaRainAlarmMessageMaker는 LivaRainAlarmInfo만 처리할 수 있습니다.");
+                .hasMessageContaining("LiveRainAlarmMessageMaker는 LiveRainAlarmInfo만 처리할 수 있습니다.");
     }
 
     @Test

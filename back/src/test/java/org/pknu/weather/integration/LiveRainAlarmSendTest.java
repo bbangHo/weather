@@ -1,8 +1,8 @@
 package org.pknu.weather.integration;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
@@ -34,12 +34,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @Transactional
 @Import(EmbeddedRedisConfig.class)
+@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 public class LiveRainAlarmSendTest {
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
@@ -117,8 +120,10 @@ public class LiveRainAlarmSendTest {
         TestTransaction.flagForCommit();
         TestTransaction.end();
 
-        verify(alarmCooldownService, times(1)).setCooldown(AlarmType.RAIN_ALERT, savedAlarm.getFcmToken());
-        verify(sender, times(1)).send(any(FcmMessage.class));
+        await().atMost(5, SECONDS).untilAsserted(() -> {
+            verify(alarmCooldownService, times(1)).setCooldown(AlarmType.RAIN_ALERT, savedAlarm.getFcmToken());
+            verify(sender, times(1)).send(any(FcmMessage.class));
+        });
 
     }
 
@@ -138,8 +143,10 @@ public class LiveRainAlarmSendTest {
         TestTransaction.flagForCommit();
         TestTransaction.end();
 
-        verify(alarmCooldownService, times(0)).setCooldown(AlarmType.RAIN_ALERT, savedAlarm.getFcmToken());
-        verify(sender, times(0)).send(any(FcmMessage.class));
+        await().atMost(5, SECONDS).untilAsserted(() -> {
+            verify(alarmCooldownService, times(0)).setCooldown(AlarmType.RAIN_ALERT, savedAlarm.getFcmToken());
+            verify(sender, times(0)).send(any(FcmMessage.class));
+        });
 
     }
 
@@ -160,9 +167,9 @@ public class LiveRainAlarmSendTest {
         TestTransaction.flagForCommit();
         TestTransaction.end();
 
-        // 맨 위에서 미리 저장한 쿨다운 호출 횟수 1번으로 실제 이벤트 과정에서는 호출되지 않습니다.
-        verify(alarmCooldownService, times(1)).setCooldown(AlarmType.RAIN_ALERT, savedAlarm.getFcmToken());
-        verify(sender, times(0)).send(any(FcmMessage.class));
-
+        await().atMost(5, SECONDS).untilAsserted(() -> {
+            verify(alarmCooldownService, times(1)).setCooldown(AlarmType.RAIN_ALERT, savedAlarm.getFcmToken());
+            verify(sender, times(0)).send(any(FcmMessage.class));
+        });
     }
 }
