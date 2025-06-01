@@ -12,7 +12,7 @@ import org.pknu.weather.domain.common.TermsType;
 public class Terms {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "terms_id")
     private Long id;
 

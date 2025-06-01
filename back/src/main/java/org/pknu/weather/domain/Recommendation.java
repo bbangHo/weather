@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 public class Recommendation extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "recommendation_id")
     private Long id;
 

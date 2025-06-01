@@ -11,7 +11,7 @@ import lombok.*;
 public class MemberTerms {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "member_terms_id")
     private Long id;
 
