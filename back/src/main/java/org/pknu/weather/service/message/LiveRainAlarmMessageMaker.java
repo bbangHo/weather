@@ -39,10 +39,10 @@ public class LiveRainAlarmMessageMaker implements AlarmMessageMaker {
     @Override
     public void validate(AlarmInfo alarmInfo) {
         if (!(alarmInfo instanceof LiveRainAlarmInfo liveRainAlarmInfo)) {
-            log.warn("유효성 검사 실패: LivaRainAlarmMessageMaker는 {} 타입만 처리 가능. 입력 타입: {}",
+            log.warn("유효성 검사 실패: LiveRainAlarmMessageMaker는 {} 타입만 처리 가능. 입력 타입: {}",
                     LiveRainAlarmMessageMaker.class.getSimpleName(),
                     alarmInfo != null ? alarmInfo.getClass().getName() : "null");
-            throw new IllegalArgumentException("LivaRainAlarmMessageMaker는 LivaRainAlarmInfo만 처리할 수 있습니다.");
+            throw new IllegalArgumentException("LiveRainAlarmMessageMaker는 LiveRainAlarmInfo만 처리할 수 있습니다.");
         }
 
         validateAlarmAgreement(liveRainAlarmInfo);

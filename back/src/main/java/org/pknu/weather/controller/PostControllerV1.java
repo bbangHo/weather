@@ -1,7 +1,9 @@
 package org.pknu.weather.controller;
 
 import jakarta.validation.Valid;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import org.pknu.weather.aop.util.ExecutionTimerUtils;
 import org.pknu.weather.apiPayload.ApiResponse;
 import org.pknu.weather.common.converter.TokenConverter;
 import org.pknu.weather.dto.PostRequest;
@@ -27,9 +29,12 @@ public class PostControllerV1 {
     @PostMapping("/post")
     public ApiResponse<Object> createWeatherPost(@RequestHeader("Authorization") String authorization,
                                                  @Valid @RequestBody PostRequest.Params params) {
+        long start = ExecutionTimerUtils.start();
         PostRequest.CreatePost createPost = PostRequestConverter.toCreatePost(params);
         String email = TokenConverter.getEmailByToken(authorization);
         boolean isSuccess = postService.createWeatherPost(email, createPost);
+        long end = ExecutionTimerUtils.end(start);
+        System.out.println("비동기 테스트: " + end + "ms");
         return ApiResponse.of(isSuccess);
     }
 
