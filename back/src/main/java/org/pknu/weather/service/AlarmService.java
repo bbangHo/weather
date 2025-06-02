@@ -3,8 +3,6 @@ package org.pknu.weather.service;
 
 import static org.pknu.weather.dto.converter.AlarmConverter.toAlarmResponseDto;
 
-import java.util.HashMap;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.apiPayload.code.status.ErrorStatus;
@@ -37,6 +35,11 @@ public class AlarmService {
         handler.handleRequest();
     }
 
+    public <T> void trigger(AlarmType alarmType, T args) {
+        ArgsAlarmHandler<T> handler = handlerFactory.getArgsAlarmHandler(alarmType, args);
+        handler.handleRequest(args);
+    }
+
     public void saveAlarm(String email, AlarmRequestDTO alarmRequestDTO) {
         Member member = memberRepository.safeFindByEmail(email);
         Alarm createdAlarm = Alarm.createDefaultAlarm(member, alarmRequestDTO);
@@ -60,9 +63,4 @@ public class AlarmService {
         return toAlarmResponseDto(foundAlarm);
     }
 
-    public void testAlarm(String email, String fcmToken) {
-        Map<String, String> payload = Map.of("email", email, "fcmToken", fcmToken);
-        ArgsAlarmHandler<Map> handler = handlerFactory.getArgsAlarmHandler(AlarmType.TEST_WEATHER_SUMMARY, Map.class);
-        handler.handleRequest(payload);
-    }
 }

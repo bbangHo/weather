@@ -18,6 +18,9 @@ import org.pknu.weather.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import org.springframework.test.annotation.DirtiesContext.MethodMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +45,7 @@ class CommunityControllerV1Test {
 
     @Test
     @Transactional
+    @DirtiesContext(methodMode = MethodMode.BEFORE_METHOD)
     void 게시글조회성공_작성자정보와레벨함꼐반환() throws Exception {
         // given
         Member member = memberRepository.save(TestDataCreator.getBusanMember("test1"));

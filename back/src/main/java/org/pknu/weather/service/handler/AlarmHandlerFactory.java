@@ -22,15 +22,16 @@ public class AlarmHandlerFactory {
                 .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 알람 타입: " + type));
     }
 
-    public <T> ArgsAlarmHandler<T> getArgsAlarmHandler(AlarmType type, Class<T> expectedArgsType) {
+    public <T> ArgsAlarmHandler<T> getArgsAlarmHandler(AlarmType type, T args) {
 
         ArgsAlarmHandler<?> argsAlarmHandler = argsAlarmHandlers.stream()
                 .filter(handler -> handler.getAlarmType() == type)
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 알람 타입: " + type));
 
-        if (expectedArgsType != type.getArgumentType()) {
-            throw new GeneralException(ErrorStatus._FCMTOKEN_NOT_FOUND);
+        if (!type.getArgumentType().isInstance(args)) {
+            throw new IllegalArgumentException("인자의 타입이 일치하지 않습니다. 기대 타입: "
+                    + type.getArgumentType().getName() + ", 실제 타입: " + args.getClass().getName());
         }
 
         try {

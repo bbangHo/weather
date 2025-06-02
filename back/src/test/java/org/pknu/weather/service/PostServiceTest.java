@@ -31,10 +31,13 @@ import org.pknu.weather.repository.RecommendationRepository;
 import org.pknu.weather.repository.WeatherRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
 @Slf4j
+@SpringBootTest
+@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 class PostServiceTest {
 
     @Autowired

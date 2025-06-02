@@ -57,7 +57,7 @@ class LocationRepositoryTest {
                     .presentationTime(
                             DateTimeFormatter.formattedDateTime2LocalDateTime(
                                     DateTimeFormatter.getFormattedLocalDate(
-                                            LocalDate.of(now.getYear(), now.getMonth(), now.getDayOfMonth() - 1)),
+                                            LocalDate.now().minusDays(1)),
                                     DateTimeFormatter.getFormattedTimeByOneHour(LocalTime.of(i, 0))))
                     .temperature(14)
                     .humidity(50)

@@ -10,7 +10,6 @@ import org.pknu.weather.dto.WeatherSummaryDTO;
 
 @Getter
 @Builder
-
 @RequiredArgsConstructor
 public class WeatherSummaryAlarmInfo implements AlarmInfo{
     private final WeatherSummaryDTO weatherSummaryDTO;

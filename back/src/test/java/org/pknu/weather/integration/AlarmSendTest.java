@@ -48,12 +48,12 @@ import org.pknu.weather.security.util.JWTUtil;
 import org.pknu.weather.service.AlarmService;
 import org.pknu.weather.service.dto.AlarmInfo;
 import org.pknu.weather.service.dto.WeatherSummaryAlarmInfo;
-import org.pknu.weather.service.message.AlarmMessageMaker;
+import org.pknu.weather.service.message.WeatherSummaryMessageMaker;
 import org.pknu.weather.service.sender.FcmMessage;
 import org.pknu.weather.service.sender.NotificationMessage;
 import org.pknu.weather.service.sender.NotificationSender;
 import org.pknu.weather.domain.common.AlarmType;
-import org.pknu.weather.service.supports.WeatherRefresherService;
+import org.pknu.weather.service.WeatherRefresherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -61,7 +61,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.annotation.DirtiesContext.MethodMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -99,7 +98,7 @@ class AlarmSendTest {
     private ExtraWeatherRepository extraWeatherRepository;
 
     @SpyBean
-    private AlarmMessageMaker weatherSummaryMessageMaker;
+    private WeatherSummaryMessageMaker weatherSummaryMessageMaker;
 
     @SpyBean
     private NotificationSender sender;
@@ -239,13 +238,13 @@ class AlarmSendTest {
         alarmService.trigger(AlarmType.WEATHER_SUMMARY);
 
         // Then
-        verify(weatherSummaryMessageMaker,times(DUMMY_DATA_SIZE)).createAlarmMessage(alarmInfoArgumentCaptor.capture());
+        verify(weatherSummaryMessageMaker, times(DUMMY_DATA_SIZE)).createAlarmMessage(alarmInfoArgumentCaptor.capture());
         for (AlarmInfo alarmInfo:alarmInfoArgumentCaptor.getAllValues()) {
             checkAlarmInfo(alarmInfo, memberIds, locationIds);
         }
 
         // 멤버들의 수(DUMMY_DATA_SIZE) 만큼 메시지 전송 시도
-        verify(sender,times(DUMMY_DATA_SIZE)).send(notificationMessageArgumentCaptor.capture());
+        verify(sender, times(DUMMY_DATA_SIZE)).send(notificationMessageArgumentCaptor.capture());
         for (NotificationMessage notificationMessage:notificationMessageArgumentCaptor.getAllValues()) {
             checkFcmMessage(notificationMessage, fcmTokens);
         }

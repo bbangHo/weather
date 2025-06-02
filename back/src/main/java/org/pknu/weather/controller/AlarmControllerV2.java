@@ -5,6 +5,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.pknu.weather.apiPayload.ApiResponse;
 import org.pknu.weather.common.converter.TokenConverter;
+import org.pknu.weather.domain.common.AlarmType;
 import org.pknu.weather.dto.AlarmRequestDTO;
 import org.pknu.weather.dto.AlarmResponseDTO;
 import org.pknu.weather.service.AlarmService;
@@ -53,7 +54,9 @@ public class AlarmControllerV2 {
                                          @RequestBody Map<String, String> payload) {
 
         String email = TokenConverter.getEmailByToken(authorization);
-        alarmService.testAlarm(email, payload.get("fcmToken"));
+        Map<String, String> testArgs = Map.of("email", email, "fcmToken", payload.get("fcmToken"));
+
+        alarmService.trigger(AlarmType.TEST_WEATHER_SUMMARY, testArgs);
         return ApiResponse.onSuccess();
     }
 }

@@ -47,7 +47,7 @@ import org.pknu.weather.service.message.AlarmMessageMaker;
 import org.pknu.weather.service.sender.NotificationMessage;
 import org.pknu.weather.service.sender.NotificationSender;
 import org.pknu.weather.service.supports.AlarmTimeUtil;
-import org.pknu.weather.service.supports.WeatherRefresherService;
+import org.pknu.weather.service.WeatherRefresherService;
 
 @ExtendWith(MockitoExtension.class)
 class WeatherSummaryAlarmHandlerTest {

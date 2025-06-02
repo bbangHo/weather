@@ -24,7 +24,7 @@ import org.pknu.weather.service.dto.WeatherSummaryAlarmInfo;
 import org.pknu.weather.service.message.AlarmMessageMaker;
 import org.pknu.weather.service.sender.NotificationMessage;
 import org.pknu.weather.service.sender.NotificationSender;
-import org.pknu.weather.service.supports.WeatherRefresherService;
+import org.pknu.weather.service.WeatherRefresherService;
 import org.springframework.stereotype.Component;
 
 @Component
