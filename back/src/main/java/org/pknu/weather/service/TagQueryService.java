@@ -1,10 +1,5 @@
 package org.pknu.weather.service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.common.mapper.EnumTagMapper;
@@ -15,15 +10,16 @@ import org.pknu.weather.domain.Weather;
 import org.pknu.weather.domain.tag.EnumTag;
 import org.pknu.weather.dto.TagDto;
 import org.pknu.weather.dto.TagQueryResult;
-import org.pknu.weather.dto.TagSelectedOrNotDto;
+import org.pknu.weather.dto.TagWithSelectedStatusDto;
 import org.pknu.weather.dto.TotalWeatherDto;
 import org.pknu.weather.dto.WeatherResponse.ExtraWeatherInfo;
 import org.pknu.weather.dto.converter.TagResponseConverter;
 import org.pknu.weather.repository.MemberRepository;
 import org.pknu.weather.repository.TagRepository;
-import org.pknu.weather.repository.WeatherRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
 
 @Service
 @Slf4j
@@ -32,9 +28,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class TagQueryService {
     private final TagRepository tagRepository;
     private final MemberRepository memberRepository;
-    private final WeatherRepository weatherRepository;
     private final WeatherService weatherService;
     private final EnumTagMapper enumTagMapper;
+    private final WeatherQueryService weatherQueryService;
 
     /**
      * 간단 날씨 보기 기능에서 태그 정보를 불러온다.
@@ -71,16 +67,16 @@ public class TagQueryService {
 
     }
 
-    public Map<String, List<TagSelectedOrNotDto>> getSelectedOrNotTags(String email) {
+    public Map<String, List<TagWithSelectedStatusDto>> getTagsWithSelectionStatus(String email) {
         Member member = memberRepository.safeFindByEmail(email);
         Location location = member.getLocation();
-        Weather weather = weatherRepository.findByLocationClosePresentationTime(location);
+        Weather weather = weatherQueryService.getNearestWeatherForecastToNow(location);
         ExtraWeatherInfo extraWeatherInfo = weatherService.extraWeatherInfo(member.getEmail(), location.getId());
         TotalWeatherDto totalWeatherDto = new TotalWeatherDto(weather, extraWeatherInfo);
-        Map<String, List<TagSelectedOrNotDto>> map = new HashMap<>();
+        Map<String, List<TagWithSelectedStatusDto>> map = new HashMap<>();
 
         enumTagMapper.getAll().forEach((key, enumTag) -> {
-            TagSelectedOrNotDto tagSelectedOrNotDto = TagResponseConverter.toTagSelectedOrNotDto(enumTag,
+            TagWithSelectedStatusDto tagWithSelectedStatusDto = TagResponseConverter.toTagSelectedOrNotDto(enumTag,
                     totalWeatherDto);
 
             String tagName = enumTag.getTagName();
@@ -89,11 +85,11 @@ public class TagQueryService {
                 map.put(tagName, new ArrayList<>());
             }
 
-            map.get(tagName).add(tagSelectedOrNotDto);
+            map.get(tagName).add(tagWithSelectedStatusDto);
         });
 
         map.forEach((s, dtoList) -> {
-            dtoList.sort(Comparator.comparingInt(TagSelectedOrNotDto::getCode));
+            dtoList.sort(Comparator.comparingInt(TagWithSelectedStatusDto::getCode));
         });
 
         return map;
