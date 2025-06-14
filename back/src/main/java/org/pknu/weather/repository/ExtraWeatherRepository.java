@@ -17,4 +17,5 @@ public interface ExtraWeatherRepository extends JpaRepository<ExtraWeather, Long
     List<ExtraWeather> findExtraWeatherByLocations( @Param("locationIds") Set<Long> locationIds,
                                                     @Param("fourHoursAgo")LocalDateTime fourHoursAgo);
 
+
 }
