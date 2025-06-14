@@ -13,8 +13,8 @@ import org.springframework.data.repository.query.Param;
 public interface ExtraWeatherRepository extends JpaRepository<ExtraWeather, Long> {
 
     Optional<ExtraWeather> findByLocationId(Long locationId);
-    @Query("select ew from ExtraWeather ew where ew.location.id in :locationIds and ew.basetime > :threeHoursAgo")
+    @Query("select ew from ExtraWeather ew where ew.location.id in :locationIds and ew.basetime > :fourHoursAgo")
     List<ExtraWeather> findExtraWeatherByLocations( @Param("locationIds") Set<Long> locationIds,
-                                                    @Param("threeHoursAgo")LocalDateTime threeHoursAgo);
+                                                    @Param("threeHoursAgo")LocalDateTime fourHoursAgo);
 
 }

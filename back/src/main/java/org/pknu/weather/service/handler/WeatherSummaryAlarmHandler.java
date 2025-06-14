@@ -56,7 +56,7 @@ public class WeatherSummaryAlarmHandler implements NoArgsAlarmHandler {
     private List<AlarmMemberDTO> dispatchAlarmsForMembers(List<AlarmMemberDTO> members) {
         Set<Long> alarmLocations = extractLocationIds(members);
         List<WeatherSummaryDTO> weatherSummaries = weatherRepository.findWeatherSummary(alarmLocations);
-        List<ExtraWeather> extraWeathers = extraWeatherRepository.findExtraWeatherByLocations(alarmLocations, LocalDateTime.now().minusHours(3)); //자외선 수치는 3시간 단위로 저장되어 있음
+        List<ExtraWeather> extraWeathers = extraWeatherRepository.findExtraWeatherByLocations(alarmLocations, LocalDateTime.now().minusHours(4)); //자외선 수치는 3시간 단위로 저장되어 있음
 
         List<ExtraWeatherSummaryDTO> extraWeatherSummaries = extraWeathers.stream()
                 .map(ExtraWeatherConverter::toExtraWeatherSummaryDTO)
