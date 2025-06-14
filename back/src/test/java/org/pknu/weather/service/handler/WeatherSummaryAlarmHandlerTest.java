@@ -123,7 +123,7 @@ class WeatherSummaryAlarmHandlerTest {
 
             when(memberRepository.findMembersAndAlarmsByAlarmTime(currentAlarmTime)).thenReturn(initialMembers);
             when(weatherRepository.findWeatherSummary(anySet())).thenReturn(initialWeatherSummaries);
-            when(extraWeatherRepository.findExtraWeatherByLocations(anySet(), eq(fixedNow.minusHours(3))))
+            when(extraWeatherRepository.findExtraWeatherByLocations(anySet(), eq(fixedNow.minusHours(4))))
                     .thenReturn(initialRawExtraWeathers);
 
             checkMessageMakerArgs(dummyMessage);
@@ -135,7 +135,7 @@ class WeatherSummaryAlarmHandlerTest {
 
             // Then
             verify(memberRepository).findMembersAndAlarmsByAlarmTime(any(SummaryAlarmTime.class));
-            verify(extraWeatherRepository).findExtraWeatherByLocations(anySet(), eq(fixedNow.minusHours(3)));
+            verify(extraWeatherRepository).findExtraWeatherByLocations(anySet(), eq(fixedNow.minusHours(4)));
             verify(weatherSummaryMessageMaker, times(initialMembers.size())).createAlarmMessage(any());
             verify(sender, times(initialMembers.size())).send(any());
         }
@@ -231,7 +231,7 @@ class WeatherSummaryAlarmHandlerTest {
                     .thenReturn(retryWeatherSummariesFor);
 
             // extraWeatherRepository: 초기 호출 ({101, 102} 예상) -> 재시도 호출 ({102} 예상)
-            when(extraWeatherRepository.findExtraWeatherByLocations(anySet(), eq(fixedNow.minusHours(3))))
+            when(extraWeatherRepository.findExtraWeatherByLocations(anySet(), eq(fixedNow.minusHours(4))))
                     .thenReturn(initialRawExtraWeathers)
                     .thenReturn(retryRawExtraWeathers);
 
@@ -333,7 +333,7 @@ class WeatherSummaryAlarmHandlerTest {
                     .thenReturn(retryWeatherSummaries);
 
             // extraWeatherRepository: 초기 호출 ({101, 102} 예상) -> 재시도 호출 ({102} 예상)
-            when(extraWeatherRepository.findExtraWeatherByLocations(anySet(), eq(fixedNow.minusHours(3))))
+            when(extraWeatherRepository.findExtraWeatherByLocations(anySet(), eq(fixedNow.minusHours(4))))
                     .thenReturn(initialRawExtraWeathers)
                     .thenReturn(retryRawExtraWeathers);
 
