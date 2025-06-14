@@ -197,20 +197,11 @@ public class WeatherService {
      * @return 해당 위치의 날씨 데이터 List
      */
     public void updateWeathers(Long locationId) {
-
         Location location = locationRepository.safeFindById(locationId);
         Map<LocalDateTime, Weather> oldWeatherMap = weatherRepository.findAllByLocationAfterNow(location);
 
-        List<Weather> weatherList = weatherFeignClientUtils.getVillageShortTermForecast(location).stream()
-                .peek(newWeather -> {
-                    LocalDateTime presentationTime = newWeather.getPresentationTime();
-                    if (oldWeatherMap.containsKey(presentationTime)) {
-                        Weather oldWeather = oldWeatherMap.get(presentationTime);
-                        oldWeather.updateWeather(newWeather);
-                    }
-                    newWeather.addLocation(location);
-                }).toList();
-
+        List<Weather> newForecast = weatherFeignClientUtils.getVillageShortTermForecast(location);
+        List<Weather> weatherList = updateWeathers(oldWeatherMap, newForecast, location);
         weatherRepository.saveAll(weatherList);
     }
 }
