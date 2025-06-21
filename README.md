@@ -54,15 +54,6 @@ Spring Boot 기반의 날씨 예보 앱 서비스 백엔드입니다. (3인 프�
 
 ---
 
-## 🛠️ 실행 방법 (로컬)
-
-```bash
-# 1. .env 또는 application-local.yml 설정 (DB, API Key 등)
-# 2. 빌드 및 실행
-./gradlew build
-java -jar build/libs/weather-app.jar
-```
-
 # 날씨 톡톡이란?
 
 > **실시간 날씨 경험을 공유하는 커뮤니티 플랫폼**
