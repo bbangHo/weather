@@ -2,6 +2,66 @@
 
 > [IOS 다운로드](https://apps.apple.com/kr/app/%EB%82%A0%EC%94%A8%ED%86%A1%ED%86%A1/id6738004972)
 
+수정 중
+
+# 날씨 톡톡 (Back-End)
+
+Spring Boot 기반의 날씨 예보 앱 서비스 백엔드입니다. (3인 프로젝트 FE 1, BE 2)  
+기상청 데이터를 활용하여 실시간 날씨 정보를 제공하며, 사용자 피드백을 수집하고 날씨 기반 커뮤니티 기능을 제공합니다.  
+운영 중인 앱의 백엔드 성능 최적화, CI/CD 자동화, 인프라 구성까지 직접 수행한 실전 프로젝트입니다.
+
+---
+
+## 🙋‍♂️ 기여자
+| 이름 | 역할 |
+|------|------|
+| 손영호 |	백엔드 설계 / API 개발 / 인프라 설정 / CICD 파이프라인 구축
+| 성시영 |	백엔드 개발 (공동)
+| 고주리 |	프론트엔드 개발
+
+---
+
+## ⚙️ 성능 최적화
+
+- 비동기 저장 로직 도입 → API 응답 속도 **42% 개선** (1150ms → 664ms)
+- JdbcTemplate + 벌크 쿼리로 저장 성능 **55% 향상**
+- AOP 기반 로깅 및 슬로우 쿼리 파악
+- k6 기반 부하 테스트 스크립트 작성 및 결과 분석
+
+---
+
+## 🧰 기술 스택
+
+| 구분 | 사용 기술 |
+|------|-----------|
+| Language | Java 17 |
+| Framework | Spring Boot, Spring Data JPA, Spring Web |
+| DB | MySQL, RDS (AWS) |
+| Infra | AWS EC2, RDS, ALB, CloudWatch |
+| CI/CD | GitHub Actions + Docker |
+| 기타 | QueryDSL, AOP, k6 (성능 테스트) |
+
+:? 기술 선택의 이유
+
+---
+
+## 🛰️ 인프라 구성도
+
+- AWS EC2: Spring Boot 백엔드 서버
+- RDS: MySQL DB 운영
+- ALB + HTTPS: 사용자 요청 분산 처리
+- GitHub Actions: CI/CD 자동화 (Docker Build & Deploy)
+
+---
+
+## 🛠️ 실행 방법 (로컬)
+
+```bash
+# 1. .env 또는 application-local.yml 설정 (DB, API Key 등)
+# 2. 빌드 및 실행
+./gradlew build
+java -jar build/libs/weather-app.jar
+```
 
 # 날씨 톡톡이란?
 
@@ -33,27 +93,3 @@
 |---|---|---|---|---|
 
 
-# stacks (수정중)
-
-## front
-
-## backend
-<div> 
-  <img src="https://img.shields.io/badge/java-007396?style=for-the-badge&logo=java&logoColor=white"> 
-  <img src="https://img.shields.io/badge/springboot-6DB33F?style=for-the-badge&logo=spring&logoColor=white"> 
-  <img src="https://img.shields.io/badge/mysql-4479A1?style=for-the-badge&logo=mysql&logoColor=white"> 
-</div>
-
-## Envirement
-<div>
-  <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white">
-  <img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white">
-</div>
-
-## Config
-
-## Deployment
-docker
-
-## ~~Communication~~
-Notion, Pigma
