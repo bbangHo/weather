@@ -35,7 +35,7 @@ Spring Boot 기반의 날씨 예보 앱 서비스 백엔드입니다. (3인 프�
 | 구분 | 사용 기술 |
 |------|-----------|
 | Language | Java 17 |
-| Framework | Spring Boot, Spring Data JPA, Spring Web |
+| Framework | Spring Boot, Spring Data JPA |
 | DB | MySQL, RDS (AWS) |
 | Infra | AWS EC2, RDS, ALB, CloudWatch |
 | CI/CD | GitHub Actions + Docker |
