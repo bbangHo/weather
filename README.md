@@ -6,14 +6,14 @@
 
 Spring Boot 기반의 날씨 예보 앱 서비스 백엔드입니다. (3인 프로젝트 FE 1, BE 2)  
 기상청 데이터를 활용하여 실시간 날씨 정보를 제공하며, 사용자 피드백을 수집하고 날씨 기반 커뮤니티 기능을 제공합니다.  
-운영 중인 앱의 백엔드 성능 최적화, CI/CD 자동화, 인프라 구성까지 직접 수행한 실전 프로젝트입니다.
+운영 중인 앱의 백엔드 성능 최적화, Git Actions + docker 배포 자동화 구축, 인프라 구성까지 직접 수행한 실전 프로젝트입니다.
 
 ---
 
 ## 🙋‍♂️ 기여자
 | 이름 | 역할 |
 |------|------|
-| 손영호 |	백엔드 설계 및 개발 / 인프라 설정 / 배포 자동화 구축
+| 손영호 |	백엔드 설계 및 개발 / 인프라 구성 / 배포 자동화 구축
 | 성시영 |	백엔드 설계 및 개발 / 모니터링 설정
 | 고주리 |	프론트엔드 개발
 
@@ -21,7 +21,7 @@ Spring Boot 기반의 날씨 예보 앱 서비스 백엔드입니다. (3인 프�
 
 ## ⚙️ 성능 최적화
 
-- 비동기 저장 로직 도입 → API 응답 속도 **42% 개선** (1150ms → 664ms) [날씨 API 응답속도 개선: 비동기 저장 로직 도입 전후 성능 비교](https://github.com/bbangHo/weather/wiki/%EB%82%A0%EC%94%A8-API-%EC%9D%91%EB%8B%B5%EC%86%8D%EB%8F%84-%EA%B0%9C%EC%84%A0:-%EB%B9%84%EB%8F%99%EA%B8%B0-%EC%A0%80%EC%9E%A5-%EB%A1%9C%EC%A7%81-%EB%8F%84%EC%9E%85-%EC%A0%84%ED%9B%84-%EC%84%B1%EB%8A%A5-%EB%B9%84%EA%B5%90)
+- 비동기 저장 로직 도입 → API 응답 속도 **42% 개선** (1150ms → 664ms) [자세히](https://github.com/bbangHo/weather/wiki/%EB%82%A0%EC%94%A8-API-%EC%9D%91%EB%8B%B5%EC%86%8D%EB%8F%84-%EA%B0%9C%EC%84%A0:-%EB%B9%84%EB%8F%99%EA%B8%B0-%EC%A0%80%EC%9E%A5-%EB%A1%9C%EC%A7%81-%EB%8F%84%EC%9E%85-%EC%A0%84%ED%9B%84-%EC%84%B1%EB%8A%A5-%EB%B9%84%EA%B5%90)
 - JdbcTemplate + 벌크 쿼리로 저장 성능 **55% 향상**  
 - AOP 기반 로깅
 - k6 기반 부하 테스트 스크립트 작성 및 결과 분석
@@ -45,10 +45,10 @@ Spring Boot 기반의 날씨 예보 앱 서비스 백엔드입니다. (3인 프�
 
 ## 🛰️ 인프라 구성도
 
-- AWS EC2: Spring Boot 백엔드 서버
-- RDS: MySQL DB 운영
+- AWS EC2: Spring Boot
+- RDS: MySQL
 - ALB + HTTPS
-- GitHub Actions: CI/CD 자동화 (Docker Build & Deploy)
+- GitHub Actions + Docker 배포 자동화
 
 ---
 
