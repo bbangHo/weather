@@ -6,6 +6,7 @@ import {
   isSupported,
   getPermission,
   requestPermission,
+  AuthorizationStatus,
 } from '@react-native-firebase/messaging';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useEffect, useRef} from 'react';
@@ -16,13 +17,13 @@ export const requestUserPermission = async () => {
   if (Platform.OS === 'ios') {
     const authStatus = await requestPermission(messaging, {
       alert: true,
-      badge: true,
+      badge: false,
       sound: true,
     });
 
     const enabled =
-      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+      authStatus === AuthorizationStatus.AUTHORIZED ||
+      authStatus === AuthorizationStatus.PROVISIONAL;
 
     if (enabled) {
       console.log('iOS 알림 권한 허용됨:', authStatus);
@@ -53,10 +54,11 @@ export const getFcmToken = async () => {
   try {
     const messaging = getMessaging();
     await messaging.registerDeviceForRemoteMessages();
-    // const token = await getToken(messaging);
+    const token = await getToken(messaging);
 
     if (token) {
       console.log('FCM Token:', token);
+      await AsyncStorage.setItem('fcmToken', token);
     } else {
       console.log('토큰이 생성되지 않았습니다.');
     }

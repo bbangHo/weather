@@ -6,33 +6,47 @@ import org.aspectj.lang.annotation.Pointcut;
 @Aspect  // only Aspect annotation
 public class Pointcuts {
 
-    @Pointcut("mainPageControllerV1Pointcut() || getMemberDefaultLocationPointcut()")
-    public void doCheckLocationPointcut() {}
 
-    @Pointcut("execution(* org.pknu.weather.controller.MainPageControllerV1.*(..))")
-    public void mainPageControllerV1Pointcut() {}
+    @Pointcut("within(org.pknu.weather.infra.mornitoring.HealthCheckController)")
+    public void healthCheckController() {}
 
-    @Pointcut("execution(* org.pknu.weather.controller.LocationControllerV1.getMemberDefaultLocation(..))")
-    public void getMemberDefaultLocationPointcut() {}
-
-    @Pointcut("execution(* org.pknu.weather.controller..*.*(..))")
+    // Controller: @RestController 붙은 클래스 전부, 단 HealthCheckController는 제외
+    @Pointcut("@within(org.springframework.web.bind.annotation.RestController) && !healthCheckController()")
     public void controllerPointcut() {}
 
-    @Pointcut("execution(* org.pknu.weather.service.*.*(..))")
+    // Service: service 패키지 + @Service (둘 다 조건)
+    @Pointcut("within(org.pknu.weather..service..*) || @within(org.springframework.stereotype.Service)")
     public void servicePointcut() {}
 
-    @Pointcut("execution(* org.pknu.weather.repository.*.*(..))")
+    // Repository: repository 패키지 + @Repository
+    @Pointcut("within(org.pknu.weather..repository..*) || @within(org.springframework.stereotype.Repository)")
     public void repositoryPointcut() {}
 
-    @Pointcut("execution(* org.pknu.weather.dto.converter.*.*(..))")
-    public void converterPointcut() {}
+    @Pointcut("execution(* org.pknu.weather.weather.repository.WeatherRedisRepository.*.*(..))")
+    public void redisPointcut() {
+    }
 
-    @Pointcut("execution(* org.pknu.weather.feignClient..*.*(..))")
-    public void feignClientPointcut() {}
+    @Pointcut("execution(* org.pknu.weather.weather.scheduler.*.*(..))")
+    public void schedulerPointcut() {
+    }
+
+    @Pointcut("within(org.pknu.weather..converter..*)")
+    public void converterPointcut() {
+    }
+
+    @Pointcut("execution(* org.pknu.weather..feignClient..*.*(..))")
+    public void feignClientPointcut() {
+    }
 
     @Pointcut("@annotation(org.springframework.transaction.annotation.Transactional)")
-    public void transactionalPointcut(){}
+    public void transactionalPointcut() {
+    }
 
-    @Pointcut("controllerPointcut() || servicePointcut()")
-    public void integrationLoggingPointcut(){}
+    @Pointcut("controllerPointcut() || servicePointcut() || feignClientPointcut() || repositoryPointcut() || converterPointcut()")
+    public void devLoggingPointcut() {
+    }
+
+    @Pointcut("controllerPointcut()")
+    public void prodLoggingPointcut() {
+    }
 }
