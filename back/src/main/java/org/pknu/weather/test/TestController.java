@@ -24,7 +24,7 @@ public class TestController {
     private final MainPageService mainPageService;
     private final WeatherService weatherService;
 
-    @GetMapping("/test/api/v1/main/weather")
+    @GetMapping("/api/v1/test/main/weather")
     public ApiResponse<WeatherResponseDTO.MainPageWeatherData> getMainPageResourceV1(
             @RequestHeader("Authorization") String authorization,
             @RequestParam(required = false) Long locationId) {
@@ -35,7 +35,7 @@ public class TestController {
         return ApiResponse.onSuccess(weatherInfo);
     }
 
-    @GetMapping("/test/api/v2/main/weather")
+    @GetMapping("/api/v2/test/main/weather")
     public ApiResponse<WeatherResponseDTO.MainPageWeatherData> getMainPageResourceV2(
             @RequestHeader("Authorization") String authorization,
             @RequestParam(required = false) Long locationId) {
@@ -46,7 +46,7 @@ public class TestController {
         return ApiResponse.onSuccess(weatherInfo);
     }
 
-    @GetMapping("/test/api/v3/main/weather")
+    @GetMapping("/api/v3/test/main/weather")
     public ApiResponse<WeatherResponseDTO.MainPageWeatherData> getMainPageResourceV3(
             @RequestHeader("Authorization") String authorization,
             @RequestParam(required = false) Long locationId) {
@@ -57,7 +57,7 @@ public class TestController {
         return ApiResponse.onSuccess(weatherInfo);
     }
 
-    @GetMapping("/test/api/v4/main/weather")
+    @GetMapping("/api/v4/test/main/weather")
     public ApiResponse<WeatherResponseDTO.MainPageWeatherData> getMainPageResourceV4(
             @RequestHeader("Authorization") String authorization,
             @RequestParam(required = false) Long locationId) {

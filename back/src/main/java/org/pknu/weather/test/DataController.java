@@ -35,7 +35,7 @@ public class DataController {
     @DeleteMapping("/api/weather")
     public ApiResponse<Object> deleteCacheData(@RequestHeader("Authorization") String authorization) {
         List<Location> locationList = em.createQuery(
-                "select m.location from member m where m.id >= 1171", Location.class
+                "select m.location from member m where m.id between 1171 and 1670", Location.class
                 )
                 .getResultList();
 

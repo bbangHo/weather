@@ -23,7 +23,7 @@ public class WeatherRefreshListener {
         weatherService.bulkUpdateWeathersAsync(event.getLocationId());
     }
 
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void handel(WeatherCacheRefreshEvent event) {
         weatherCacheService.updateCachedWeathersForLocation(event.getLocationId());
     }

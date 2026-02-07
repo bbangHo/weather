@@ -1,5 +1,6 @@
 package org.pknu.weather.weather.repository;
 
+import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.weather.dto.WeatherRedisDTO;
@@ -57,12 +58,16 @@ public class WeatherRedisRepository {
     }
 
     public List<WeatherRedisDTO.WeatherData> getWeatherList(Long locationId) {
-        List<Object> objectList = opsForList().range(buildKey(locationId), 0, -1);
+        try {
+            List<Object> objectList = opsForList().range(buildKey(locationId), 0, -1);
 
-        return objectList.stream()
-                .filter(Objects::nonNull)
-                .map(obj -> (WeatherRedisDTO.WeatherData) obj)
-                .toList();
+            return objectList.stream()
+                    .filter(Objects::nonNull)
+                    .map(obj -> (WeatherRedisDTO.WeatherData) obj)
+                    .toList();
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
     }
 
     public void rightPushAll(Long locationId, List<WeatherRedisDTO.WeatherData> weatherDataList) {

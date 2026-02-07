@@ -57,7 +57,7 @@ public class TestMainPageService {
 
         // 해당 지역에 날씨 예보가 있는지 없는지 체크
         if (!weatherRepository.weatherHasBeenCreated(location)) {
-            weatherService.saveWeathers(location);
+            weatherList = weatherService.saveWeathers(location);
             return WeatherResponseConverter.toMainPageWeatherData(weatherList, member);
         }
 
