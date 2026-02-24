@@ -89,8 +89,6 @@ public class TestMainPageService {
 
         updateWeatherIfRequiredNotCached(location);
         weatherList = weatherQueryService.getWeathers(location.getId());
-
-        weatherList = weatherQueryService.getWeathers(location.getId());
         return WeatherResponseConverter.toMainPageWeatherData(weatherList, member);
     }
 

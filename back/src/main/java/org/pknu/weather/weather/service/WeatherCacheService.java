@@ -32,6 +32,7 @@ public class WeatherCacheService {
         Location location = locationRepository.safeFindById(locationId);
         List<Weather> weatherList = WeatherApi.getVillageShortTermForecast(location);
         List<WeatherRedisDTO.WeatherData> weatherDataList = WeatherConverter.toWeatherDataList(weatherList);
+        log.info("update cache locationId: " + locationId);
         weatherRedisRepository.updateWeatherList(locationId, weatherDataList);
     }
 }

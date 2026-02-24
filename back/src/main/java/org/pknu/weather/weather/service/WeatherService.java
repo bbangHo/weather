@@ -24,6 +24,7 @@ import org.pknu.weather.weather.feignclient.utils.ExtraWeatherApiUtils;
 import org.pknu.weather.weather.feignclient.weatherapi.target.WeatherApi;
 import org.pknu.weather.weather.repository.ExtraWeatherRepository;
 import org.pknu.weather.weather.repository.WeatherRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,10 +49,9 @@ public class WeatherService {
      */
     @Transactional
     public List<Weather> saveWeathers(Location location) {
-        List<Weather> values = weatherApi.getVillageShortTermForecast(location);
-        List<Weather> weatherList = new ArrayList<>(values);
-
+        List<Weather> weatherList = weatherApi.getVillageShortTermForecast(location);
         weatherList.forEach(w -> w.addLocation(location));
+
         return weatherRepository.saveAll(weatherList);
     }
 
@@ -109,6 +109,15 @@ public class WeatherService {
         Location location = locationRepository.safeFindById(locationId);
         Map<LocalDateTime, Weather> oldWeatherMap = weatherRepository.findAllByLocationAfterNow(location);
         List<Weather> newWeatherList = weatherApi.getVillageShortTermForecast(location);
+        List<Weather> weathersList = updateWeathers(oldWeatherMap, newWeatherList, location);
+        weatherRepository.batchUpdate(weathersList, location);
+    }
+
+    @Async("WeatherCUDExecutor")
+    @Transactional
+    public void bulkUpdateWeathersAsync(Long locationId, List<Weather> newWeatherList) {
+        Location location = locationRepository.safeFindById(locationId);
+        Map<LocalDateTime, Weather> oldWeatherMap = weatherRepository.findAllByLocationAfterNow(location);
         List<Weather> weathersList = updateWeathers(oldWeatherMap, newWeatherList, location);
         weatherRepository.batchUpdate(weathersList, location);
     }

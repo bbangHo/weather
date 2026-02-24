@@ -3,53 +3,53 @@ package org.pknu.weather.test;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.apipayload.ApiResponse;
 import org.pknu.weather.location.entity.Location;
 import org.pknu.weather.location.repository.LocationRepository;
 import org.pknu.weather.member.entity.Member;
+import org.pknu.weather.weather.Weather;
+import org.pknu.weather.weather.converter.WeatherConverter;
+import org.pknu.weather.weather.dto.WeatherRedisDTO;
+import org.pknu.weather.weather.feignclient.weatherapi.target.WeatherApi;
 import org.pknu.weather.weather.repository.WeatherRedisRepository;
 import org.pknu.weather.weather.repository.WeatherRepository;
+import org.pknu.weather.weather.service.WeatherService;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping
 @Slf4j
 public class DataController {
-    private final WeatherRepository weatherRepository;
-    private final LocationRepository locationRepository;
-    private final WeatherRedisRepository weatherRedisRepository;
-    private final RedisTemplate<String, Object> redisTemplate;
-    private final EntityManager em;
+    private final DataService dataService;
 
-    @Transactional
     @DeleteMapping("/api/weather")
     public ApiResponse<Object> deleteCacheData(@RequestHeader("Authorization") String authorization) {
-        List<Location> locationList = em.createQuery(
-                "select m.location from member m where m.id between 1171 and 1670", Location.class
-                )
-                .getResultList();
+        return dataService.deleteCacheData(authorization);
+    }
 
-        int deleteWeathers = em.createQuery(
-                        "delete from Weather w where w.location in :locationList"
-                )
-                .setParameter("locationList", locationList)
-                .executeUpdate();
+    @PostMapping("/api/weather")
+    public ApiResponse<Object> postCacheData(@RequestHeader("Authorization") String authorization) {
+        return dataService.postCacheData(authorization);
+    }
 
-        Set<String> keys = redisTemplate.keys("weather:location:*");
-        Long deleteKeys = redisTemplate.delete(keys);
-        Map<String, Object> result = new HashMap<>();
-        result.put("weather", deleteWeathers);
-        result.put("key", deleteKeys);
-        return ApiResponse.onSuccess(result);
+    @PatchMapping("/api/db/weather")
+    public ApiResponse<Object> weatherDataPatch(@RequestHeader("Authorization") String authorization) {
+        dataService.weatherDataPatch(authorization);
+        return ApiResponse.onSuccess();
+    }
+
+    @PostMapping("/api/db/weather")
+    public ApiResponse<Object> weatherDataPost(@RequestHeader("Authorization") String authorization) {
+        dataService.weatherDataPost(authorization);
+        return ApiResponse.onSuccess();
     }
 }

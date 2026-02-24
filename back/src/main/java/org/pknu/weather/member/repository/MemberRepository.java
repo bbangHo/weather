@@ -29,19 +29,19 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberCus
 
     Optional<Member> findMemberByEmail(@Param("email") String email);
 
-    @EntityGraph(attributePaths = {"location"})
+    @EntityGraph(attributePaths = {"roles", "location"})
     Optional<Member> findByEmail(String email);
 
     Optional<Member> findMemberWithLocationByEmail(@Param("email") String email);
 
-    @Cacheable(value = "memberCache", key = "#email")
+    @Cacheable(value = "memberWithRoleAndLocationCache", key = "#email")
     default Member safeFindByEmail(String email) {
         return findByEmail(email)
                 .orElseThrow(() -> new GeneralException(ErrorStatus._MEMBER_NOT_FOUND));
     }
 
     @EntityGraph(attributePaths = {"roles", "location"})
-    @Cacheable(value = "memberCache", key = "#email")
+    @Cacheable(value = "memberWithRoleAndLocationCache", key = "#email")
     Optional<Member> findMemberWithRolesByEmail(@Param("email") String email);
 
 }

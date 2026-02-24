@@ -23,6 +23,7 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: gradle
 
       # 환경변수 주입
       - name: Set yml value
@@ -59,7 +60,7 @@ jobs:
 
       - name: Build with Gradle Wrapper
         working-directory: back
-        run: ./gradlew test -i
+        run: ./gradlew test --no-daemon --build-cache
 
   build-and-push:
     runs-on: dev-self-hosted
@@ -74,6 +75,7 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: gradle
 
       - name: 권한
         run: chmod +x back/gradlew
@@ -104,24 +106,14 @@ jobs:
           apple.key.content: ${{ secrets.APPLE_KEY }}
           fcm.project-id: ${{secrets.FCM_ID}}
           fcm.service-account: ${{secrets.FCM_CREDENTIAL}}
-          log-option: dev
+          log-option: prod
           spring.data.redis.host: ${{secrets.REDIS_HOST_DEV}}
           spring.data.redis.port: ${{secrets.REDIS_PORT_DEV}}
           spring.data.redis.password: ${{secrets.REDIS_PASSWORD_DEV}}
 
-      - name: Gradle Caching
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
       - name: Build
         working-directory: back
-        run: ./gradlew build -x test -i
+        run: ./gradlew build -x test --no-daemon --build-cache
 
       - name: Build Docker image
         run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/github-actions-demo ./back

@@ -16,7 +16,7 @@ public class FeignClientConfig {
     // 연결 타임아웃 & 읽기 타임아웃 설정 (5초)
     @Bean
     public Request.Options feignOptions() {
-        return new Request.Options(5000, 5000);
+        return new Request.Options(5000, 15000);
     }
 
     @Bean

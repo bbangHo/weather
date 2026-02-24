@@ -38,7 +38,7 @@ public class CacheConfig {
                                 .maximumSize(500)
                                 .build()),
 
-                new CaffeineCache("memberCache",
+                new CaffeineCache("memberWithRoleAndLocationCache",
                         Caffeine.newBuilder()
                                 .expireAfterWrite(10, TimeUnit.MINUTES)
                                 .maximumSize(100)

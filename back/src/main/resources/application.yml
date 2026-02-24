@@ -8,7 +8,7 @@ spring:
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
-      maximum-pool-size: 10
+      maximum-pool-size: 20
       minimum-idle: 5
       idle-timeout: 30000     # 미사용 커넥션 30초 후 반환
       connection-timeout: 30000 # 커넥션 요청 대기 시간
@@ -57,6 +57,10 @@ spring:
 logging:
   level:
     root: info
+    com.zaxxer.hikari.pool.HikariPool: DEBUG
+    org:
+      springframework:
+        cache=TRACE:
 #    org.hibernate.SQL: debug
 #    org.hibernate.orm.jdbc.bind: trace
 #    org.pknu.weather: info
@@ -82,7 +86,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: [ "health", "prometheus" ]
+        include: [ "health", "prometheus", "metrics" ]
 
 cloud:
   aws:
