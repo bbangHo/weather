@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.pknu.weather.common.formatter.DateTimeFormatter;
 import org.pknu.weather.location.entity.Location;
 import org.pknu.weather.member.entity.Member;
 import org.pknu.weather.member.repository.MemberRepository;
@@ -76,18 +77,17 @@ public class WeatherQueryService {
      * @return true = 갱신되었음(3시간 안지남), false = 갱신되지 않았음(3시간 지남)
      */
     public boolean weatherHasBeenUpdated(Location location) {
-        Cache cache = cm.getCache(LOCATION_UPDATE_STORE);
-        if (cacheExist(cache, location.getId())) {
-            cache.put(location.getId(), true);
+        Cache cache = cm.getCache(LOCATION_CREATE_STORE);
+
+        LocalDateTime currentBaseTime = DateTimeFormatter.getBaseLocalDateTime(LocalDateTime.now());
+        LocalDateTime cachedBaseTime = cache.get(location.getId(), LocalDateTime.class);
+
+        if (cachedBaseTime != null && currentBaseTime.isEqual(cachedBaseTime)) {
             return true;
         }
 
-        boolean value = weatherRepository.weatherHasBeenUpdated(location);
-        if (value) {
-            cache.put(location.getId(), true);
-        }
-
-        return value;
+        cache.put(location.getId(), currentBaseTime);
+        return false;
     }
 
 
