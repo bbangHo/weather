@@ -15,7 +15,7 @@ public class AsyncConfig {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(2);
         executor.setMaxPoolSize(2);
-        executor.setQueueCapacity(500);
+        executor.setQueueCapacity(600);
         executor.setThreadNamePrefix("Weather Executor-");
         executor.initialize();
         return executor;
@@ -24,9 +24,9 @@ public class AsyncConfig {
     @Bean(name = "ExpCUDExecutor")
     public Executor getExpAsyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(1);
-        executor.setMaxPoolSize(1);
-        executor.setQueueCapacity(10);
+        executor.setCorePoolSize(2);
+        executor.setMaxPoolSize(2);
+        executor.setQueueCapacity(200);
         executor.setThreadNamePrefix("Exp Executor-");
         executor.initialize();
         return executor;
@@ -35,7 +35,7 @@ public class AsyncConfig {
     @Bean(name = "AlarmExecutor")
     public Executor getAlarmAsyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(1);
+        executor.setCorePoolSize(2);
         executor.setMaxPoolSize(2);
         executor.setQueueCapacity(200);
         executor.setThreadNamePrefix("Alarm Executor-");

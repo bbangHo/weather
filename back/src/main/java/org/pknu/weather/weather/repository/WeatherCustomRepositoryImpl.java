@@ -22,10 +22,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.pknu.weather.weather.QWeather.weather;
@@ -200,6 +197,8 @@ public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
 
     @Override
     public void batchSave(List<Weather> newForecast, Location location) {
+        newForecast.sort(Comparator.comparing(Weather::getBasetime));
+
         String query =
                 "INSERT INTO weather(basetime, location_id, wind_speed, humidity, rain_prob, rain, rain_type, temperature, sensible_temperature, snow_cover, sky_type, presentation_time) "
                         + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -209,11 +208,14 @@ public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
 
     @Override
     public void batchUpdate(List<Weather> weatherList, Location location) {
+        weatherList.sort(Comparator.comparing(Weather::getBasetime));
+
         String query =
                 "INSERT INTO weather(basetime, location_id, wind_speed, humidity, rain_prob, rain, rain_type, temperature, sensible_temperature, snow_cover, sky_type, presentation_time) "
                         + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
                         + "ON DUPLICATE KEY UPDATE "
                         + "basetime = VALUES(basetime), wind_speed = VALUES(wind_speed), humidity = VALUES(humidity), rain_prob = VALUES(rain_prob), rain = VALUES(rain), rain_type = VALUES(rain_type), sensible_temperature = VALUES(sensible_temperature), snow_cover = VALUES(snow_cover), sky_type = VALUES(sky_type), presentation_time = VALUES(presentation_time)";
+
         batchUpdateWeathers(query, weatherList, location);
         em.clear();
     }

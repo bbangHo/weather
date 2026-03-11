@@ -16,7 +16,6 @@ import org.pknu.weather.common.TestDataCreator;
 import org.pknu.weather.common.formatter.DateTimeFormatter;
 import org.pknu.weather.config.DataJpaTestConfig;
 import org.pknu.weather.location.entity.Location;
-import org.pknu.weather.location.repository.LocationRepository;
 import org.pknu.weather.weather.Weather;
 import org.pknu.weather.weather.repository.WeatherRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,7 +83,7 @@ class LocationRepositoryTest {
         Location location = locationRepository.findAll().get(0);
 
         // when
-        List<Weather> weathers = weatherRepository.findAllWithLocation(location.getId(),
+        List<Weather> weathers = weatherRepository.findAllInLocationSorted(location.getId(),
                 LocalDateTime.now().plusHours(24));
 
         // then

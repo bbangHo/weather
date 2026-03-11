@@ -62,7 +62,7 @@ public class DataService {
                 .getResultList();
 
         for (Location location : locationList) {
-            List<Weather> weatherList = weatherRepository.findAllWithLocation(location.getId(), LocalDateTime.now().plusHours(24)).stream()
+            List<Weather> weatherList = weatherRepository.findAllInLocationSorted(location.getId(), LocalDateTime.now().plusHours(24)).stream()
                     .sorted(Comparator.comparing(Weather::getPresentationTime))
                     .toList();
 

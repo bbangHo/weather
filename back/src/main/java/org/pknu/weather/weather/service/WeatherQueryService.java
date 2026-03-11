@@ -46,7 +46,7 @@ public class WeatherQueryService {
      * @return
      */
     public List<Weather> getWeathers(Long locationId) {
-        return weatherRepository.findAllWithLocation(locationId, LocalDateTime.now().plusHours(24)).stream()
+        return weatherRepository.findAllInLocationSorted(locationId, LocalDateTime.now().plusHours(24)).stream()
                 .sorted(Comparator.comparing(Weather::getPresentationTime))
                 .toList();
     }

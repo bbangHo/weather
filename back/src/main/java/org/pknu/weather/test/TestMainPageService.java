@@ -172,6 +172,7 @@ public class TestMainPageService {
     }
 
     private void updateWeatherIfRequired(Location location) {
+        log.info("updateWeatherIfRequired lid:" + location.getId());
         if (!weatherQueryService.weatherHasBeenUpdated(location)) {
             eventPublisher.publishEvent(new WeatherUpdateEvent(location.getId()));
             eventPublisher.publishEvent(new WeatherCacheRefreshEvent(location.getId()));
