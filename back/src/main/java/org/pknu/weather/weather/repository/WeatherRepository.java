@@ -15,9 +15,10 @@ public interface WeatherRepository extends JpaRepository<Weather, Long>, Weather
             + "join fetch w.location "
             + "where w.location.id = :locationId "
             + "and w.presentationTime >= now() "
-            + "and w.presentationTime < :end"
+            + "and w.presentationTime < :end " +
+            "order by w.presentationTime"
     )
-    List<Weather> findAllWithLocation(@Param("locationId") Long locationId, @Param("end") LocalDateTime end);
+    List<Weather> findAllInLocationSorted(@Param("locationId") Long locationId, @Param("end") LocalDateTime end);
 
     @Modifying
     @Query("delete from Weather w where w.presentationTime < now()")
