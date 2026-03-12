@@ -72,7 +72,7 @@ public class WeatherRedisRepository {
 
     public void rightPushAll(Long locationId, List<WeatherRedisDTO.WeatherData> weatherDataList) {
         for (WeatherRedisDTO.WeatherData weatherData : weatherDataList) {
-            opsForList().rightPush(buildKey(locationId), weatherData);
+            opsForList().rightPushAll(buildKey(locationId), weatherData);
         }
         redisTemplate.expire(buildKey(locationId), DEFAULT_DURATION);
     }
