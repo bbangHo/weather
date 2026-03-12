@@ -135,11 +135,14 @@ public class TestMainPageService {
         }
 
         List<Weather> weatherList = createWeatherIfRequired(location);
+        log.info("createWeatherIfRequired down");
         if (weatherList != null) {
             return WeatherResponseConverter.toMainPageWeatherData(weatherList, member);
         }
 
         updateWeatherIfRequired(location);
+        log.info("updateWeatherIfRequired down");
+
         weatherList = weatherQueryService.getWeathers(location.getId());
 
         return WeatherResponseConverter.toMainPageWeatherData(weatherList, member);

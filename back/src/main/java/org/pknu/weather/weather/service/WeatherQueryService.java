@@ -77,7 +77,8 @@ public class WeatherQueryService {
      * @return true = 갱신되었음(3시간 안지남), false = 갱신되지 않았음(3시간 지남)
      */
     public boolean weatherHasBeenUpdated(Location location) {
-        Cache cache = cm.getCache(LOCATION_CREATE_STORE);
+        log.info("weatherHasBeenUpdated lid:" + location.getId());
+        Cache cache = cm.getCache(LOCATION_UPDATE_STORE);
 
         LocalDateTime currentBaseTime = DateTimeFormatter.getBaseLocalDateTime(LocalDateTime.now());
         LocalDateTime cachedBaseTime = cache.get(location.getId(), LocalDateTime.class);
@@ -98,18 +99,18 @@ public class WeatherQueryService {
      * @return true = 존재함, false = 존재 하지 않음
      */
     public boolean weatherHasBeenCreated(Location location) {
+        log.info("weatherHasBeenCreated lid:" + location.getId());
         Cache cache = cm.getCache(LOCATION_CREATE_STORE);
-        if (cacheExist(cache, location.getId())) {
-            cache.put(location.getId(), true);
+
+        LocalDateTime currentBaseTime = DateTimeFormatter.getBaseLocalDateTime(LocalDateTime.now());
+        LocalDateTime cachedBaseTime = cache.get(location.getId(), LocalDateTime.class);
+
+        if (cachedBaseTime != null && currentBaseTime.isEqual(cachedBaseTime)) {
             return true;
         }
 
-        boolean value = weatherRepository.weatherHasBeenCreated(location);
-        if (value) {
-            cache.put(location.getId(), true);
-        }
-
-        return value;
+        cache.put(location.getId(), currentBaseTime);
+        return false;
     }
 
     private boolean cacheExist(Cache cache, Long locationId) {
