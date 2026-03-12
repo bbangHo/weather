@@ -1,6 +1,7 @@
 package org.pknu.weather.weather.repository;
 
 import java.util.ArrayList;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.weather.dto.WeatherRedisDTO;
@@ -71,9 +72,7 @@ public class WeatherRedisRepository {
     }
 
     public void rightPushAll(Long locationId, List<WeatherRedisDTO.WeatherData> weatherDataList) {
-        for (WeatherRedisDTO.WeatherData weatherData : weatherDataList) {
-            opsForList().rightPushAll(buildKey(locationId), weatherData);
-        }
+        opsForList().rightPushAll(buildKey(locationId), weatherDataList);
         redisTemplate.expire(buildKey(locationId), DEFAULT_DURATION);
     }
 

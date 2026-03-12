@@ -16,7 +16,7 @@ public interface WeatherRepository extends JpaRepository<Weather, Long>, Weather
             + "where w.location.id = :locationId "
             + "and w.presentationTime >= now() "
             + "and w.presentationTime < :end " +
-            "order by w.presentationTime"
+            "order by w.presentationTime asc"
     )
     List<Weather> findAllInLocationSorted(@Param("locationId") Long locationId, @Param("end") LocalDateTime end);
 

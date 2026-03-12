@@ -85,8 +85,8 @@ public class RedisConfig {
         // Connection Pool을 사용할 경우 이 설정 사용
         GenericObjectPoolConfig genericObjectPoolConfig = new GenericObjectPoolConfig();
         genericObjectPoolConfig.setMaxTotal(50);
-        genericObjectPoolConfig.setMaxIdle(20);
-        genericObjectPoolConfig.setMinIdle(5);
+        genericObjectPoolConfig.setMaxIdle(50);
+        genericObjectPoolConfig.setMinIdle(20);
 
         genericObjectPoolConfig.setTestOnBorrow(false);
         genericObjectPoolConfig.setTestOnReturn(false);
@@ -102,7 +102,7 @@ public class RedisConfig {
                 .build();
 
         LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(redisConfig, clientConfig);
-        connectionFactory.setShareNativeConnection(false);
+        connectionFactory.setShareNativeConnection(true);
         return connectionFactory;
     }
 

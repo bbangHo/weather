@@ -131,17 +131,18 @@ public class TestMainPageService {
 
         List<Weather> cachedWeatherList = weatherCacheService.getCachedWeathers(location.getId());
         if (!cachedWeatherList.isEmpty()) {
+            log.info("cache hit");
             return WeatherResponseConverter.toMainPageWeatherData(cachedWeatherList, member);
         }
 
         List<Weather> weatherList = createWeatherIfRequired(location);
-        log.info("createWeatherIfRequired down");
         if (weatherList != null) {
+            log.info("cache miss");
             return WeatherResponseConverter.toMainPageWeatherData(weatherList, member);
         }
 
         updateWeatherIfRequired(location);
-        log.info("updateWeatherIfRequired down");
+        log.info("cache miss and update");
 
         weatherList = weatherQueryService.getWeathers(location.getId());
 

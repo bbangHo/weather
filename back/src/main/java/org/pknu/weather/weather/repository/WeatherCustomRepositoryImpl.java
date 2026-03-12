@@ -140,6 +140,7 @@ public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
                         weather.location.id.eq(locationEntity.getId()),
                         weather.presentationTime.after(now)
                 )
+                .orderBy(weather.presentationTime.asc())
                 .fetch();
 
         return weatherList.stream()
@@ -197,7 +198,7 @@ public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
 
     @Override
     public void batchSave(List<Weather> newForecast, Location location) {
-        newForecast.sort(Comparator.comparing(Weather::getBasetime));
+        newForecast.sort(Comparator.comparing(Weather::getPresentationTime));
 
         String query =
                 "INSERT INTO weather(basetime, location_id, wind_speed, humidity, rain_prob, rain, rain_type, temperature, sensible_temperature, snow_cover, sky_type, presentation_time) "
@@ -208,7 +209,7 @@ public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
 
     @Override
     public void batchUpdate(List<Weather> weatherList, Location location) {
-        weatherList.sort(Comparator.comparing(Weather::getBasetime));
+        weatherList.sort(Comparator.comparing(Weather::getPresentationTime));
 
         String query =
                 "INSERT INTO weather(basetime, location_id, wind_speed, humidity, rain_prob, rain, rain_type, temperature, sensible_temperature, snow_cover, sky_type, presentation_time) "

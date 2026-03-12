@@ -61,6 +61,8 @@ logging:
     org:
       springframework:
         cache=TRACE:
+    # Redis 커넥션 풀(commons-pool2)의 상세 동작 로그
+    org.apache.commons.pool2: DEBUG
 #    org.hibernate.SQL: debug
 #    org.hibernate.orm.jdbc.bind: trace
 #    org.pknu.weather: info
