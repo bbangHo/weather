@@ -24,6 +24,7 @@ public class WeatherCacheService {
 
     public List<Weather> getCachedWeathers(Long locationId) {
         List<WeatherRedisDTO.WeatherData> weathers = weatherRedisRepository.getWeatherList(locationId);
+        log.info("v3 getCachedWeathers isEmpty?: " + weathers.isEmpty());
         return WeatherConverter.toWeatherList(weathers);
     }
 
@@ -32,7 +33,6 @@ public class WeatherCacheService {
         Location location = locationRepository.safeFindById(locationId);
         List<Weather> weatherList = WeatherApi.getVillageShortTermForecast(location);
         List<WeatherRedisDTO.WeatherData> weatherDataList = WeatherConverter.toWeatherDataList(weatherList);
-        log.info("update cache locationId: " + locationId);
         weatherRedisRepository.updateWeatherList(locationId, weatherDataList);
     }
 }

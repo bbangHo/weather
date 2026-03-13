@@ -83,6 +83,8 @@ public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
                 )
                 .fetchFirst();
 
+        log.info("[weatherHasBeenUpdated] lid: " + location.getId() + " lbt: " + weatherBaseTime + " b: " + (weatherBaseTime != null && weatherBaseTime.isEqual(baseTime)));
+
         return weatherBaseTime != null && weatherBaseTime.isEqual(baseTime);
     }
 
@@ -107,6 +109,8 @@ public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
                         weather.location.eq(location)
                 )
                 .fetchFirst();
+
+        log.info("[weatherHasBeenCreated] lid: " + location.getId() + " lbt: " + w.getBasetime() + " b: " + (w != null));
 
         return w != null;
     }
@@ -260,6 +264,7 @@ public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
     /**
      * weather의 예보 시간이 24시간 이내인지 검사
      * ex) weather.presentationTIme이 01-01 00:00:00 ~ yyyy-MM-02 00:00:00 사이의 값
+     *
      * @param weather
      * @return
      */

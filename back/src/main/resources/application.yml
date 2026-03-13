@@ -57,15 +57,17 @@ spring:
 logging:
   level:
     root: info
-    com.zaxxer.hikari.pool.HikariPool: DEBUG
-    org:
-      springframework:
-        cache=TRACE:
-    # Redis 커넥션 풀(commons-pool2)의 상세 동작 로그
-    org.apache.commons.pool2: DEBUG
-#    org.hibernate.SQL: debug
-#    org.hibernate.orm.jdbc.bind: trace
-#    org.pknu.weather: info
+    org.pknu.weather: info
+
+    # Spring Cache 동작 확인용 (오타 수정)
+#    org.springframework.cache: trace
+
+    # DB 및 커넥션 풀 확인용
+    com.zaxxer.hikari.pool.HikariPool: debug
+    org.apache.commons.pool2: debug
+
+    # 만약 SQL 쿼리도 보고 싶다면 주석 해제
+    # org.hibernate.SQL: debug
 
 log:
   config:

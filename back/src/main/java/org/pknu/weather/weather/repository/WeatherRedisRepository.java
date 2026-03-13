@@ -1,6 +1,6 @@
 package org.pknu.weather.weather.repository;
 
-import java.util.ArrayList;
+import java.util.*;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,10 +12,6 @@ import org.springframework.stereotype.Repository;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static org.pknu.weather.weather.utils.WeatherRedisKeyUtils.buildKey;
@@ -60,13 +56,15 @@ public class WeatherRedisRepository {
 
     public List<WeatherRedisDTO.WeatherData> getWeatherList(Long locationId) {
         try {
+            log.info("getWeatherList start");
             List<Object> objectList = opsForList().range(buildKey(locationId), 0, -1);
-
+            log.info("obj list: " + objectList);
             return objectList.stream()
                     .filter(Objects::nonNull)
                     .map(obj -> (WeatherRedisDTO.WeatherData) obj)
                     .toList();
         } catch (Exception e) {
+            log.info(Arrays.toString(e.getStackTrace()));
             return Collections.emptyList();
         }
     }

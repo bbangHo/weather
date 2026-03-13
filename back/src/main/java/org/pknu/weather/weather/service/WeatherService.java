@@ -137,7 +137,7 @@ public class WeatherService {
         });
 
         log.debug("oldWeatherMap size: " + oldWeatherMap.size());
-        return oldWeatherMap.values().stream().toList();
+        return new ArrayList<>(oldWeatherMap.values());
     }
 
 

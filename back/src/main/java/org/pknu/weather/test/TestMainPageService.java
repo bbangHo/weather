@@ -104,16 +104,20 @@ public class TestMainPageService {
         Location location = resolveLocation(member, locationId);
 
         List<Weather> cachedWeatherList = weatherCacheService.getCachedWeathers(location.getId());
+
         if (!cachedWeatherList.isEmpty()) {
+            log.info("v3 cache hit");
             return WeatherResponseConverter.toMainPageWeatherData(cachedWeatherList, member);
         }
 
         List<Weather> weatherList = createWeatherIfRequiredNotCached(location);
         if (weatherList != null) {
+            log.info("v3 cache miss");
             return WeatherResponseConverter.toMainPageWeatherData(weatherList, member);
         }
 
         updateWeatherIfRequiredNotCached(location);
+        log.info("v3 cache miss and update");
         weatherList = weatherQueryService.getWeathers(location.getId());
 
         return WeatherResponseConverter.toMainPageWeatherData(weatherList, member);
@@ -131,18 +135,18 @@ public class TestMainPageService {
 
         List<Weather> cachedWeatherList = weatherCacheService.getCachedWeathers(location.getId());
         if (!cachedWeatherList.isEmpty()) {
-            log.info("cache hit");
+            log.info("v4 cache hit");
             return WeatherResponseConverter.toMainPageWeatherData(cachedWeatherList, member);
         }
 
         List<Weather> weatherList = createWeatherIfRequired(location);
         if (weatherList != null) {
-            log.info("cache miss");
+            log.info("v4 cache miss");
             return WeatherResponseConverter.toMainPageWeatherData(weatherList, member);
         }
 
         updateWeatherIfRequired(location);
-        log.info("cache miss and update");
+        log.info("v4 cache miss and update");
 
         weatherList = weatherQueryService.getWeathers(location.getId());
 
