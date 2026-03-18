@@ -2,11 +2,14 @@ package org.pknu.weather.weather.repository;
 
 import java.util.*;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.weather.dto.WeatherRedisDTO;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Repository;
 
@@ -22,6 +25,8 @@ import static org.pknu.weather.weather.utils.WeatherRedisKeyUtils.generateHourly
 @Repository
 public class WeatherRedisRepository {
     private final RedisTemplate<String, Object> redisTemplate;
+    private final StringRedisTemplate stringRedisTemplate;
+    private final ObjectMapper objectMapper;
     private final Duration DEFAULT_DURATION = Duration.ofHours(24);
     private final Integer DEFAULT_HOURS = 24;
 
@@ -56,15 +61,30 @@ public class WeatherRedisRepository {
 
     public List<WeatherRedisDTO.WeatherData> getWeatherList(Long locationId) {
         try {
-            log.info("getWeatherList start");
-            List<Object> objectList = opsForList().range(buildKey(locationId), 0, -1);
-            log.info("obj list: " + objectList);
-            return objectList.stream()
+            // 1. Redis에서 순수 JSON 문자열 리스트로 가져오기 (타입 검사 없이 무조건 String으로 가져옴)
+            List<String> jsonList = stringRedisTemplate.opsForList().range(buildKey(locationId), 0, -1);
+
+            if (jsonList == null || jsonList.isEmpty()) {
+                log.info("Redis에 데이터가 없습니다. Key: {}", buildKey(locationId));
+                return Collections.emptyList();
+            }
+
+            // 2. Jackson을 이용해 DTO로 파싱
+            return jsonList.stream()
+                    .filter(str -> str != null && !str.isBlank())
+                    .map(jsonStr -> {
+                        try {
+                            return objectMapper.readValue(jsonStr, WeatherRedisDTO.WeatherData.class);
+                        } catch (JsonProcessingException e) {
+                            log.error("JSON 파싱 에러 (데이터 손상): {}", jsonStr, e);
+                            return null;
+                        }
+                    })
                     .filter(Objects::nonNull)
-                    .map(obj -> (WeatherRedisDTO.WeatherData) obj)
                     .toList();
+
         } catch (Exception e) {
-            log.info(Arrays.toString(e.getStackTrace()));
+            log.error("Redis 통신 에러: ", e);
             return Collections.emptyList();
         }
     }
