@@ -1,20 +1,18 @@
 package org.pknu.weather.weather.repository;
 
-import java.util.*;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pknu.weather.weather.dto.WeatherRedisDTO;
-import org.springframework.data.redis.core.ListOperations;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.pknu.weather.weather.utils.WeatherRedisConverter;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Repository;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static org.pknu.weather.weather.utils.WeatherRedisKeyUtils.buildKey;
@@ -24,44 +22,50 @@ import static org.pknu.weather.weather.utils.WeatherRedisKeyUtils.generateHourly
 @Slf4j
 @Repository
 public class WeatherRedisRepository {
-    private final RedisTemplate<String, Object> redisTemplate;
+
     private final StringRedisTemplate stringRedisTemplate;
-    private final ObjectMapper objectMapper;
+    private final WeatherRedisConverter weatherRedisConverter;
+
     private final Duration DEFAULT_DURATION = Duration.ofHours(24);
     private final Integer DEFAULT_HOURS = 24;
 
-    public List<WeatherRedisDTO.WeatherData> getWeathers(Long locationId, LocalDateTime localDateTime) {
-        List<Object> result = Optional.ofNullable(
-                opsForValue().multiGet(generateHourlyWeatherKeys(locationId, localDateTime, DEFAULT_HOURS))
+    // 다건 조회 로직
+    public List<WeatherRedisDTO.WeatherData> multiGetWeathers(Long locationId, LocalDateTime localDateTime) {
+        List<String> result = Optional.ofNullable(
+                stringRedisTemplate.opsForValue().multiGet(generateHourlyWeatherKeys(locationId, localDateTime, DEFAULT_HOURS))
         ).orElse(Collections.emptyList());
 
         return result.stream()
+                .filter(str -> str != null && !str.isBlank())
+                .map(weatherRedisConverter::fromJson)
                 .filter(Objects::nonNull)
-                .map(obj -> (WeatherRedisDTO.WeatherData) obj)
                 .toList();
     }
 
     public void saveWeather(Long locationId, WeatherRedisDTO.WeatherData weatherData, Duration duration) {
-        opsForValue().set(buildKey(locationId, weatherData.getPresentationTime()), weatherData, duration);
+        String jsonStr = weatherRedisConverter.toJson(weatherData);
+        if (jsonStr != null) {
+            stringRedisTemplate.opsForValue().set(buildKey(locationId, weatherData.getPresentationTime()), jsonStr, duration);
+        }
     }
 
     public void saveWeatherList(Long locationId, List<WeatherRedisDTO.WeatherData> weatherDataList) {
         for (WeatherRedisDTO.WeatherData weatherData : weatherDataList) {
-            opsForValue().set(buildKey(locationId, weatherData.getPresentationTime()), weatherData, DEFAULT_DURATION);
+            saveWeather(locationId, weatherData, DEFAULT_DURATION);
         }
     }
 
     public void updateWeather(Long locationId, WeatherRedisDTO.WeatherData weatherData) {
-        opsForValue().set(buildKey(locationId, weatherData.getPresentationTime()), weatherData, DEFAULT_DURATION);
+        saveWeather(locationId, weatherData, DEFAULT_DURATION);
     }
 
     public void deleteValues(Long locationId, LocalDateTime presentationTime) {
-        redisTemplate.delete(buildKey(locationId, presentationTime));
+        stringRedisTemplate.delete(buildKey(locationId, presentationTime));
     }
 
+    // 리스트 조회
     public List<WeatherRedisDTO.WeatherData> getWeatherList(Long locationId) {
         try {
-            // 1. Redis에서 순수 JSON 문자열 리스트로 가져오기 (타입 검사 없이 무조건 String으로 가져옴)
             List<String> jsonList = stringRedisTemplate.opsForList().range(buildKey(locationId), 0, -1);
 
             if (jsonList == null || jsonList.isEmpty()) {
@@ -69,17 +73,9 @@ public class WeatherRedisRepository {
                 return Collections.emptyList();
             }
 
-            // 2. Jackson을 이용해 DTO로 파싱
             return jsonList.stream()
                     .filter(str -> str != null && !str.isBlank())
-                    .map(jsonStr -> {
-                        try {
-                            return objectMapper.readValue(jsonStr, WeatherRedisDTO.WeatherData.class);
-                        } catch (JsonProcessingException e) {
-                            log.error("JSON 파싱 에러 (데이터 손상): {}", jsonStr, e);
-                            return null;
-                        }
-                    })
+                    .map(weatherRedisConverter::fromJson)
                     .filter(Objects::nonNull)
                     .toList();
 
@@ -90,41 +86,27 @@ public class WeatherRedisRepository {
     }
 
     public void rightPushAll(Long locationId, List<WeatherRedisDTO.WeatherData> weatherDataList) {
-        opsForList().rightPushAll(buildKey(locationId), weatherDataList);
-        redisTemplate.expire(buildKey(locationId), DEFAULT_DURATION);
+        List<String> jsonList = weatherDataList.stream()
+                .map(weatherRedisConverter::toJson)
+                .filter(Objects::nonNull)
+                .toList();
+
+        if (!jsonList.isEmpty()) {
+            stringRedisTemplate.opsForList().rightPushAll(buildKey(locationId), jsonList);
+            stringRedisTemplate.expire(buildKey(locationId), DEFAULT_DURATION);
+        }
     }
 
     public void updateWeatherList(Long locationId, List<WeatherRedisDTO.WeatherData> weatherDataList) {
-        redisTemplate.delete(buildKey(locationId));
+        stringRedisTemplate.delete(buildKey(locationId));
         rightPushAll(locationId, weatherDataList);
     }
 
     public void deleteWeatherList(Long locationId) {
-        redisTemplate.delete(buildKey(locationId));
+        stringRedisTemplate.delete(buildKey(locationId));
     }
 
-    /**
-     * TTL을 지금부터 timeout만큼 지난 후에 만료되도록 재설정합니다.
-     * <p>
-     * ex.
-     * TTL 5초 설정
-     * redisTemplate.expire("user:1", 5, TimeUnit.SECONDS);
-     * TTL 다시 10초로 설정 (늘어남)
-     * redisTemplate.expire("user:1", 10, TimeUnit.SECONDS);
-     *
-     * @param locationId
-     * @param presentationTime 날씨 예보 시각 (1시간 단위)
-     * @param timeout
-     */
     public void expireWeather(Long locationId, LocalDateTime presentationTime, int timeout) {
-        redisTemplate.expire(buildKey(locationId, presentationTime), timeout, TimeUnit.HOURS);
-    }
-
-    private ValueOperations<String, Object> opsForValue() {
-        return redisTemplate.opsForValue();
-    }
-
-    private ListOperations<String, Object> opsForList() {
-        return redisTemplate.opsForList();
+        stringRedisTemplate.expire(buildKey(locationId, presentationTime), timeout, TimeUnit.HOURS);
     }
 }
