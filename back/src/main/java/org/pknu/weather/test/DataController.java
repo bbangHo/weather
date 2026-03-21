@@ -33,23 +33,29 @@ public class DataController {
 
     @DeleteMapping("/api/weather")
     public ApiResponse<Object> deleteCacheData(@RequestHeader("Authorization") String authorization) {
-        return dataService.deleteCacheData(authorization);
+        return dataService.deleteCacheData();
     }
 
     @PostMapping("/api/weather")
     public ApiResponse<Object> postCacheData(@RequestHeader("Authorization") String authorization) {
-        return dataService.postCacheData(authorization);
+        return dataService.postCacheData();
     }
 
     @PatchMapping("/api/db/weather")
     public ApiResponse<Object> weatherDataPatch(@RequestHeader("Authorization") String authorization) {
-        dataService.weatherDataPatch(authorization);
+        dataService.weatherDataPatch();
+        return ApiResponse.onSuccess();
+    }
+
+    @PatchMapping("/api/db/weather400")
+    public ApiResponse<Object> weatherDataPatch400(@RequestHeader("Authorization") String authorization) {
+        dataService.postCacheData400();
         return ApiResponse.onSuccess();
     }
 
     @PostMapping("/api/db/weather")
     public ApiResponse<Object> weatherDataPost(@RequestHeader("Authorization") String authorization) {
-        dataService.weatherDataPost(authorization);
+        dataService.weatherDataPost();
         return ApiResponse.onSuccess();
     }
 }

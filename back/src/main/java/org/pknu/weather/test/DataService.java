@@ -34,7 +34,7 @@ public class DataService {
     private final EntityManager em;
 
     @Transactional
-    public ApiResponse<Object> deleteCacheData(@RequestHeader("Authorization") String authorization) {
+    public ApiResponse<Object> deleteCacheData() {
         List<Location> locationList = em.createQuery(
                         "select m.location from member m where m.id between 1171 and 1670", Location.class
                 )
@@ -55,7 +55,7 @@ public class DataService {
     }
 
     @Transactional
-    public ApiResponse<Object> postCacheData(@RequestHeader("Authorization") String authorization) {
+    public ApiResponse<Object> postCacheData() {
         List<Location> locationList = em.createQuery(
                         "select m.location from member m where m.id between 1171 and 1670", Location.class
                 )
@@ -75,7 +75,28 @@ public class DataService {
         return ApiResponse.onSuccess(keys.size());
     }
 
-    public void weatherDataPatch(@RequestHeader("Authorization") String authorization) {
+    @Transactional
+    public ApiResponse<Object> postCacheData400() {
+        List<Location> locationList = em.createQuery(
+                        "select m.location from member m where m.id between 1171 and 1570", Location.class
+                )
+                .getResultList();
+
+        for (Location location : locationList) {
+            List<Weather> weatherList = weatherRepository.findAllInLocationSorted(location.getId(), LocalDateTime.now().plusHours(24)).stream()
+                    .sorted(Comparator.comparing(Weather::getPresentationTime))
+                    .toList();
+
+            List<WeatherRedisDTO.WeatherData> weatherDataList = WeatherConverter.toWeatherDataList(weatherList);
+            weatherRedisRepository.updateWeatherList(location.getId(), weatherDataList);
+            log.info("test postCacheData locationId: " + location.getId());
+        }
+
+        Set<String> keys = redisTemplate.keys("weather:location:*");
+        return ApiResponse.onSuccess(keys.size());
+    }
+
+    public void weatherDataPatch() {
         List<Location> locationList = em.createQuery(
                         "select m.location from member m where m.id between 1171 and 1670", Location.class
                 )
@@ -95,7 +116,7 @@ public class DataService {
         ApiResponse.onSuccess();
     }
 
-    public void weatherDataPost(@RequestHeader("Authorization") String authorization) {
+    public void weatherDataPost() {
         List<Location> locationList = em.createQuery(
                         "select m.location from member m where m.id between 1171 and 1670", Location.class
                 )

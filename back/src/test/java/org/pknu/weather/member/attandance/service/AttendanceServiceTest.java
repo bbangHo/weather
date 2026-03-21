@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.pknu.weather.apipayload.code.status.ErrorStatus;
 import org.pknu.weather.exception.GeneralException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
@@ -93,5 +94,23 @@ class AttendanceServiceTest {
 
         // 예외가 발생했으므로 Redis에서 키를 삭제하는 보상 로직이 실행되어야 함
         verify(stringRedisTemplate, times(1)).delete(expectedRedisKey);
+    }
+
+    @Test
+    @DisplayName("DB 프로세스 실패: redis에는 값이 없지만 DB에 값이 있을 경우, 비즈니스 예외를 발생시킵니다.")
+    void checkInV2_DbProcessFails_DuplicateData() {
+        // given
+        when(valueOperations.setIfAbsent(eq(expectedRedisKey), eq("Y"), any(Duration.class)))
+                .thenReturn(true);
+
+        // DB 로직에서 런타임 예외 발생 시뮬레이션
+        doThrow(new DataIntegrityViolationException("데이터 중복 발생"))
+                .when(attendanceDbProcessor).processCheckInDbLogic(testEmail);
+
+        // when & then
+        assertThrows(GeneralException.class, () -> attendanceService.checkInV2(testEmail));
+
+        // 예외가 발생했으므로 Redis에서 키를 삭제하는 보상 로직이 실행되어야 함
+        verify(stringRedisTemplate, never()).delete(expectedRedisKey);
     }
 }
