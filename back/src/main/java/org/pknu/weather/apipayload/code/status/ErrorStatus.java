@@ -85,7 +85,9 @@ public enum ErrorStatus implements BaseErrorCode {
 
     //alarm
     _FCMTOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "ALARM_404_1", "Fcm토큰을 찾을 수 없습니다."),
-    _ALARM_NOT_FOUND(HttpStatus.NOT_FOUND, "ALARM_404_2", "알람을 찾을 수 없습니다.");
+    _ALARM_NOT_FOUND(HttpStatus.NOT_FOUND, "ALARM_404_2", "알람을 찾을 수 없습니다."),
+
+    _ALREADY_ATTENDED(HttpStatus.OK, "200", "이미 출석체크를 한 유저입니다.");
 
 
     private final HttpStatus httpStatus;
