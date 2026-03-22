@@ -24,23 +24,23 @@ public class TagCustomRepositoryImpl implements TagCustomRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     public List<TagQueryResult> rankingTags(Location locationEntity) {
+        BoundingBox box = BoundingBox.calculateBoundingBox(locationEntity);
+        LocalDateTime threeHoursAgo = LocalDateTime.now().minusHours(3);
+
         List<TagQueryResult> tagQueryResultList = new ArrayList<>();
 
-        tagQueryResultList.add(getTagTuple(locationEntity, tag.temperTag));
-        tagQueryResultList.add(getTagTuple(locationEntity, tag.windTag));
-        tagQueryResultList.add(getTagTuple(locationEntity, tag.humidityTag));
-        tagQueryResultList.add(getTagTuple(locationEntity, tag.skyTag));
-        tagQueryResultList.add(getTagTuple(locationEntity, tag.dustTag));
+        tagQueryResultList.add(getTagTuple(box, threeHoursAgo, tag.temperTag));
+        tagQueryResultList.add(getTagTuple(box, threeHoursAgo, tag.windTag));
+        tagQueryResultList.add(getTagTuple(box, threeHoursAgo, tag.humidityTag));
+        tagQueryResultList.add(getTagTuple(box, threeHoursAgo, tag.skyTag));
+        tagQueryResultList.add(getTagTuple(box, threeHoursAgo, tag.dustTag));
 
         return tagQueryResultList.stream()
                 .sorted((o1, o2) -> Math.toIntExact(o1.getCount() - o2.getCount()))
                 .toList();
     }
 
-    private TagQueryResult getTagTuple(Location locationEntity, EnumPath<? extends EnumTag> pTag) {
-        BoundingBox box = BoundingBox.calculateBoundingBox(locationEntity);
-        LocalDateTime threeHoursAgo = LocalDateTime.now().minusHours(3);
-
+    private TagQueryResult getTagTuple(BoundingBox box, LocalDateTime threeHoursAgo, EnumPath<? extends EnumTag> pTag) {
         Tuple tuple = jpaQueryFactory
                 .select(pTag.count(), pTag)
                 .from(tag)
