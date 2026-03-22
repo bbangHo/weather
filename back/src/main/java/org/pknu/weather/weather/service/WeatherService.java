@@ -83,6 +83,7 @@ public class WeatherService {
     @Transactional
     public void bulkSaveWeathersAsync(Long locationId, List<Weather> newForecast) {
         Location location = locationRepository.safeFindById(locationId);
+        log.info("bulkSaveWeathersAsync"+location.getId());
         weatherRepository.batchSave(newForecast, location);
     }
 
@@ -107,6 +108,7 @@ public class WeatherService {
     @Transactional
     public void bulkUpdateWeathersAsync(Long locationId) {
         Location location = locationRepository.safeFindById(locationId);
+        log.info("bulkUpdateWeathersAsync"+location.getId());
         Map<LocalDateTime, Weather> oldWeatherMap = weatherRepository.findAllByLocationAfterNow(location);
         List<Weather> newWeatherList = weatherApi.getVillageShortTermForecast(location);
         List<Weather> weathersList = updateWeathers(oldWeatherMap, newWeatherList, location);

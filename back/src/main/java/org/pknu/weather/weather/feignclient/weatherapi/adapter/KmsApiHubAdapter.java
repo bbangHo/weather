@@ -45,7 +45,6 @@ public class KmsApiHubAdapter implements WeatherApi {
 
         PointDTO pointDTO = GeometryUtils.coordinateToPoint(lon, lat);
         LocalDateTime baseLocalDateTime = LocalDateTime.now();
-
         return retryTemplate.execute(context -> {
             int retryCount = context.getRetryCount();
 
