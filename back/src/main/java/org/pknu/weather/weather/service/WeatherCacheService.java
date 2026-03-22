@@ -24,7 +24,6 @@ public class WeatherCacheService {
 
     public List<Weather> getCachedWeathers(Long locationId) {
         List<WeatherRedisDTO.WeatherData> weathers = weatherRedisRepository.getWeatherList(locationId);
-        log.info("v3 getCachedWeathers isEmpty?: " + weathers.isEmpty());
         return WeatherConverter.toWeatherList(weathers);
     }
 
