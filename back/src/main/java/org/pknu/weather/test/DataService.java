@@ -116,6 +116,26 @@ public class DataService {
         ApiResponse.onSuccess();
     }
 
+    public void weatherDataPatch400() {
+        List<Location> locationList = em.createQuery(
+                        "select m.location from member m where m.id between 1171 and 1570", Location.class
+                )
+                .getResultList();
+
+        for (Location location : locationList) {
+            List<Weather> weatherList = new ArrayList<>();
+            try {
+                weatherList = weatherApi.getVillageShortTermForecast(location);
+            } catch (Exception e) {
+
+            }
+
+            weatherService.bulkUpdateWeathersAsync(location.getId(), weatherList);
+        }
+
+        ApiResponse.onSuccess();
+    }
+
     public void weatherDataPost() {
         List<Location> locationList = em.createQuery(
                         "select m.location from member m where m.id between 1171 and 1670", Location.class

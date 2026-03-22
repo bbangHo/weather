@@ -47,9 +47,10 @@ public class DataController {
         return ApiResponse.onSuccess();
     }
 
-    @PatchMapping("/api/db/weather400")
+    @PatchMapping("/api/weather400")
     public ApiResponse<Object> weatherDataPatch400(@RequestHeader("Authorization") String authorization) {
         dataService.postCacheData400();
+        dataService.weatherDataPatch400();
         return ApiResponse.onSuccess();
     }
 
