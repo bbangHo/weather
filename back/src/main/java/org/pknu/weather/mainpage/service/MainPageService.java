@@ -75,6 +75,7 @@ public class MainPageService {
 
     private List<Weather> createWeatherIfRequired(Location location) {
         if (!weatherQueryService.weatherHasBeenCreated(location)) {
+            log.info("createWeatherIfRequired");
             List<Weather> newForecast = weatherApi.getVillageShortTermForecast(location);
             eventPublisher.publishEvent(new WeatherCreateEvent(location.getId(), newForecast));
             eventPublisher.publishEvent(new WeatherCacheRefreshEvent(location.getId()));
@@ -85,6 +86,7 @@ public class MainPageService {
 
     private void updateWeatherIfRequired(Location location) {
         if (!weatherQueryService.weatherHasBeenUpdated(location)) {
+            log.info("updateWeatherIfRequired");
             eventPublisher.publishEvent(new WeatherUpdateEvent(location.getId()));
             eventPublisher.publishEvent(new WeatherCacheRefreshEvent(location.getId()));
         }
