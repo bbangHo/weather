@@ -13,6 +13,8 @@ import org.pknu.weather.member.event.AttendanceCheckedEvent;
 import org.pknu.weather.member.repository.MemberRepository;
 import org.springframework.context.ApplicationEventPublisher;
 
+import java.time.LocalDate;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -41,7 +43,7 @@ class AttendanceDbProcessorTest {
         when(memberRepository.safeFindByEmail(testEmail)).thenReturn(mockMember);
 
         // when
-        attendanceDbProcessor.processCheckInDbLogic(testEmail);
+        attendanceDbProcessor.processCheckInDbLogic(testEmail, any(LocalDate.class));
 
         // then
         // 1. 멤버 조회가 일어났는지 검증

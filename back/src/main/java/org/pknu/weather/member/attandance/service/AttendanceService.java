@@ -42,7 +42,7 @@ public class AttendanceService {
         }
 
         try {
-            attendanceDbProcessor.processCheckInDbLogic(email);
+            attendanceDbProcessor.processCheckInDbLogic(email, LocalDate.now());
         } catch (DataIntegrityViolationException e) {
             // DB에 이미 데이터가 있음이 확인되었으므로, 다음 요청 방어를 위해 Redis 키를 유지해야 함 (delete 호출 안 함)
             throw new GeneralException(ErrorStatus._ALREADY_ATTENDED);

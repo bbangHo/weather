@@ -57,7 +57,7 @@ class AttendanceServiceTest {
         attendanceService.checkInV2(testEmail);
 
         // then
-        verify(attendanceDbProcessor, times(1)).processCheckInDbLogic(testEmail);
+        verify(attendanceDbProcessor, times(1)).processCheckInDbLogic(testEmail, LocalDate.now());
         verify(stringRedisTemplate, never()).delete(expectedRedisKey);
     }
 
@@ -75,7 +75,7 @@ class AttendanceServiceTest {
 
         // then
         // 핵심 검증: DB 로직이 절대 호출되지 않아야 함
-        verify(attendanceDbProcessor, never()).processCheckInDbLogic(anyString());
+        verify(attendanceDbProcessor, never()).processCheckInDbLogic(anyString(), any(LocalDate.class));
     }
 
     @Test
@@ -87,7 +87,7 @@ class AttendanceServiceTest {
 
         // DB 로직에서 런타임 예외 발생 시뮬레이션
         doThrow(new RuntimeException("DB Connection Error"))
-                .when(attendanceDbProcessor).processCheckInDbLogic(testEmail);
+                .when(attendanceDbProcessor).processCheckInDbLogic(testEmail, LocalDate.now());
 
         // when & then
         assertThrows(RuntimeException.class, () -> attendanceService.checkInV2(testEmail));
@@ -105,7 +105,7 @@ class AttendanceServiceTest {
 
         // DB 로직에서 런타임 예외 발생 시뮬레이션
         doThrow(new DataIntegrityViolationException("데이터 중복 발생"))
-                .when(attendanceDbProcessor).processCheckInDbLogic(testEmail);
+                .when(attendanceDbProcessor).processCheckInDbLogic(testEmail, LocalDate.now());
 
         // when & then
         assertThrows(GeneralException.class, () -> attendanceService.checkInV2(testEmail));

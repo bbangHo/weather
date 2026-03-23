@@ -8,8 +8,9 @@ import org.pknu.weather.member.attandance.service.AttendanceDbProcessor;
 import org.pknu.weather.member.attandance.service.AttendanceService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDate;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,7 +21,7 @@ public class AttendanceControllerV1 {
 
     @PostMapping("/api/v1/attendance/check-in")
     public ApiResponse<Boolean> checkIn(@RequestHeader("Authorization") String authorization) {
-        attendanceDbProcessor.processCheckInDbLogic(getEmailByToken(authorization));
+        attendanceDbProcessor.processCheckInDbLogic(getEmailByToken(authorization), LocalDate.now());
         return ApiResponse.onSuccess();
     }
 
