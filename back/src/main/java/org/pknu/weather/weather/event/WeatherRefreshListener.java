@@ -13,12 +13,12 @@ public class WeatherRefreshListener {
     private final WeatherService weatherService;
     private final WeatherCacheService weatherCacheService;
 
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void handle(WeatherCreateEvent event) {
         weatherService.bulkSaveWeathersAsync(event.getLocationId(), event.getNewForecast());
     }
 
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void handle(WeatherUpdateEvent event) {
         weatherService.bulkUpdateWeathersAsync(event.getLocationId());
     }
