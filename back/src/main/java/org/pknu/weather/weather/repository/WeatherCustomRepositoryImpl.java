@@ -211,7 +211,7 @@ public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
 
 
     @Override
-    public void batchUpdate(List<Weather> newForecast, Location location) {
+    public void batchUpsert(List<Weather> newForecast, Location location) {
         List<Weather> mutableForecast = new ArrayList<>(newForecast);
         mutableForecast.sort(Comparator.comparing(Weather::getPresentationTime));
 

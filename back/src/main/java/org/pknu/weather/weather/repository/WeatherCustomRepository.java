@@ -24,7 +24,7 @@ public interface WeatherCustomRepository {
 
     List<WeatherSummaryDTO> findWeatherSummary(Set<Long> locationIds);
 
-    void batchUpdate(List<Weather> weatherList, Location location);
+    void batchUpsert(List<Weather> weatherList, Location location);
 
     void batchSave(List<Weather> newForecast, Location location);
 }
