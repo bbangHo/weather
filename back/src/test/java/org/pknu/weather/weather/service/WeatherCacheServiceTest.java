@@ -21,13 +21,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
+import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -49,7 +51,7 @@ class WeatherCacheServiceTest {
     WeatherCacheService weatherCacheService;
 
     @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    private StringRedisTemplate stringRedisTemplate;
 
     private Location location;
     private final LocalDateTime now = LocalDateTime.of(2025, 1, 1, 2, 0);
@@ -57,7 +59,7 @@ class WeatherCacheServiceTest {
 
     @BeforeEach
     void clearRedis() {
-        Objects.requireNonNull(redisTemplate.getConnectionFactory())
+        Objects.requireNonNull(stringRedisTemplate.getConnectionFactory())
                 .getConnection()
                 .serverCommands()
                 .flushAll(); // 모든 데이터 삭제
@@ -94,16 +96,18 @@ class WeatherCacheServiceTest {
         weatherCacheService.updateCachedWeathersForLocation(location.getId());
 
         // then
-        List<String> keyList = new ArrayList<>();
-        for (int i = 0; i < weatherList.size(); i++) {
-            String key = WeatherRedisKeyUtils.buildKey(weatherList.get(0).getLocation().getId(), now.plusHours(i));
-            keyList.add(key);
-        }
-        List<Object> objects = redisTemplate.opsForValue().multiGet(keyList);
-        Assertions.assertThat(objects.isEmpty()).isEqualTo(false);
-        Assertions.assertThat(objects.size()).isEqualTo(24);
+        String listKey = WeatherRedisKeyUtils.buildKey(location.getId());
 
-        verify(weatherApi, times(1)).getVillageShortTermForecast(location);
+        await().atMost(3, TimeUnit.SECONDS).untilAsserted(() -> {
+            List<String> objects = stringRedisTemplate.opsForList().range(listKey, 0, -1);
+
+            Assertions.assertThat(objects)
+                    .isNotEmpty()
+                    .doesNotContainNull();
+            Assertions.assertThat(objects.size()).isEqualTo(24);
+
+            verify(weatherApi, times(1)).getVillageShortTermForecast(location);
+        });
     }
 
 }
