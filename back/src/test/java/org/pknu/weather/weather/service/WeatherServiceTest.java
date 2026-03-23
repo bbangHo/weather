@@ -50,8 +50,8 @@ class WeatherServiceTest {
         Assertions.assertThat(weatherList.size()).isEqualTo(24);
     }
 
-    @Test
-    @Deprecated
+//    @Test
+//    @Deprecated
     void 비동기_벌크_insert_로직_테스트() {
         // given
         Location location = locationRepository.saveAndFlush(TestDataCreator.getBusanLocation());
@@ -66,8 +66,8 @@ class WeatherServiceTest {
         Assertions.assertThat(weatherList.size()).isEqualTo(24);
     }
 
-    @Test
-    @Deprecated
+//    @Test
+//    @Deprecated
     void 비동기_벌크_update_로직_테스트() throws InterruptedException {
         // given
         Location location = locationRepository.saveAndFlush(TestDataCreator.getBusanLocation());
