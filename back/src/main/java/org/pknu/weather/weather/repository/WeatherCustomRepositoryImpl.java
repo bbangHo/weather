@@ -200,18 +200,20 @@ public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
 
     @Override
     public void batchSave(List<Weather> newForecast, Location location) {
-        newForecast.sort(Comparator.comparing(Weather::getPresentationTime));
+        List<Weather> mutableForecast = new ArrayList<>(newForecast);
+        mutableForecast.sort(Comparator.comparing(Weather::getPresentationTime));
 
         String query =
                 "INSERT INTO weather(basetime, location_id, wind_speed, humidity, rain_prob, rain, rain_type, temperature, sensible_temperature, snow_cover, sky_type, presentation_time) "
                         + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        batchUpdateWeathers(query, newForecast, location);
+        batchUpdateWeathers(query, mutableForecast, location);
     }
 
 
     @Override
-    public void batchUpdate(List<Weather> weatherList, Location location) {
-        weatherList.sort(Comparator.comparing(Weather::getPresentationTime));
+    public void batchUpdate(List<Weather> newForecast, Location location) {
+        List<Weather> mutableForecast = new ArrayList<>(newForecast);
+        mutableForecast.sort(Comparator.comparing(Weather::getPresentationTime));
 
         String query =
                 "INSERT INTO weather(basetime, location_id, wind_speed, humidity, rain_prob, rain, rain_type, temperature, sensible_temperature, snow_cover, sky_type, presentation_time) "
@@ -219,7 +221,7 @@ public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
                         + "ON DUPLICATE KEY UPDATE "
                         + "basetime = VALUES(basetime), wind_speed = VALUES(wind_speed), humidity = VALUES(humidity), rain_prob = VALUES(rain_prob), rain = VALUES(rain), rain_type = VALUES(rain_type), sensible_temperature = VALUES(sensible_temperature), snow_cover = VALUES(snow_cover), sky_type = VALUES(sky_type), presentation_time = VALUES(presentation_time)";
 
-        batchUpdateWeathers(query, weatherList, location);
+        batchUpdateWeathers(query, mutableForecast, location);
         em.clear();
     }
 
