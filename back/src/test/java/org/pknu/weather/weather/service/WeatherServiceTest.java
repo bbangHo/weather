@@ -4,6 +4,7 @@ import static org.mockito.Mockito.doReturn;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.awaitility.Awaitility;
@@ -50,6 +51,7 @@ class WeatherServiceTest {
     }
 
     @Test
+    @Deprecated
     void 비동기_벌크_insert_로직_테스트() {
         // given
         Location location = locationRepository.saveAndFlush(TestDataCreator.getBusanLocation());
@@ -64,7 +66,8 @@ class WeatherServiceTest {
         Assertions.assertThat(weatherList.size()).isEqualTo(24);
     }
 
-    //    @Test
+    @Test
+    @Deprecated
     void 비동기_벌크_update_로직_테스트() throws InterruptedException {
         // given
         Location location = locationRepository.saveAndFlush(TestDataCreator.getBusanLocation());
