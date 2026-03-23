@@ -110,8 +110,6 @@ public class WeatherCustomRepositoryImpl implements WeatherCustomRepository {
                 )
                 .fetchFirst();
 
-        log.info("[weatherHasBeenCreated] lid: " + location.getId() + " lbt: " + w.getBasetime() + " b: " + (w != null));
-
         return w != null;
     }
 
