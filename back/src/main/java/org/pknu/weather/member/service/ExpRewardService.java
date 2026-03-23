@@ -19,7 +19,7 @@ public class ExpRewardService {
     private final MemberRepository memberRepository;
     private final Map<ExpEvent, ExpRewardLimitPolicy> policyMap;
 
-    @Async
+    @Async("ExpCUDExecutor")
     @Transactional
     public void rewardExp(String email, ExpEvent expEvent) {
         Member member = memberRepository.safeFindByEmail(email);
