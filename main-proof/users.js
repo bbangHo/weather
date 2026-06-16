@@ -1824,3 +1824,7 @@ export const users = [
         longitude: 129.05017183602774
     }
 ];
+
+// Ordered split for k6: first 400 users are hot, last 100 users are cold.
+export const hotUsers = users.slice(0, 400);
+export const coldUsers = users.slice(400, 500);

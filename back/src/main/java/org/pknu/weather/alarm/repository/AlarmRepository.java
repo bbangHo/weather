@@ -19,4 +19,11 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
             "WHERE l.id = :locationId AND a.agreeLiveRainAlarm = true")
     List<String> findLiveRainAlarmInfo(@Param("locationId") Long locationId);
 
+    /**
+     * 알림을 등록한 사용자의 지역을 스케줄 갱신 우선 후보로 사용한다.
+     */
+    @Query("SELECT DISTINCT l.id " +
+            "FROM Alarm a JOIN a.member m JOIN m.location l")
+    List<Long> findAlarmTargetLocationIds();
+
 }

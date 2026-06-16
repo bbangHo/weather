@@ -10,9 +10,11 @@ import org.springframework.stereotype.Repository;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static org.pknu.weather.weather.utils.WeatherRedisKeyUtils.buildKey;
@@ -28,6 +30,8 @@ public class WeatherRedisRepository {
 
     private final Duration DEFAULT_DURATION = Duration.ofHours(24);
     private final Integer DEFAULT_HOURS = 24;
+    private final String REQUESTED_LOCATION_KEY = "weather:active:requested-locations";
+    private final String CACHED_LOCATION_KEY = "weather:active:cached-locations";
 
     // 다건 조회 로직
     public List<WeatherRedisDTO.WeatherData> multiGetWeathers(Long locationId, LocalDateTime localDateTime) {
@@ -100,6 +104,7 @@ public class WeatherRedisRepository {
     public void updateWeatherList(Long locationId, List<WeatherRedisDTO.WeatherData> weatherDataList) {
         stringRedisTemplate.delete(buildKey(locationId));
         rightPushAll(locationId, weatherDataList);
+        markCachedLocation(locationId);
     }
 
     public void deleteWeatherList(Long locationId) {
@@ -108,5 +113,78 @@ public class WeatherRedisRepository {
 
     public void expireWeather(Long locationId, LocalDateTime presentationTime, int timeout) {
         stringRedisTemplate.expire(buildKey(locationId, presentationTime), timeout, TimeUnit.HOURS);
+    }
+
+    /**
+     * 사용자 조회가 발생한 지역을 최근 요청 활성 지역으로 기록한다.
+     */
+    public void markRequestedLocation(Long locationId) {
+        if (locationId == null) {
+            return;
+        }
+
+        stringRedisTemplate.opsForZSet().add(REQUESTED_LOCATION_KEY, String.valueOf(locationId), System.currentTimeMillis());
+        stringRedisTemplate.expire(REQUESTED_LOCATION_KEY, DEFAULT_DURATION);
+    }
+
+    /**
+     * 설정된 window 밖의 요청 기록은 제거하고, 최신 요청 순으로 지역 ID를 반환한다.
+     * 즉, ${weather.update.recent-request-window-hours} 시간 이내에 조회된 활성 지역을 ${weather.update.limitSize}만큼 가져온다.
+     */
+    public List<Long> getRecentlyRequestedLocationIds(Duration window, int limitSize) {
+        long cutoffMillis = System.currentTimeMillis() - window.toMillis();
+        stringRedisTemplate.opsForZSet().removeRangeByScore(REQUESTED_LOCATION_KEY, 0, cutoffMillis);
+
+        Set<String> values = limitSize > 0
+                ? stringRedisTemplate.opsForZSet().reverseRange(REQUESTED_LOCATION_KEY, 0, limitSize - 1L)
+                : stringRedisTemplate.opsForZSet().reverseRange(REQUESTED_LOCATION_KEY, 0, -1);
+
+        return toLongList(values);
+    }
+
+    /**
+     * Redis에 날씨 캐시가 적재된 지역을 별도 set에 기록해 스케줄 갱신 후보로 유지한다.
+     */
+    public void markCachedLocation(Long locationId) {
+        if (locationId == null) {
+            return;
+        }
+
+        stringRedisTemplate.opsForSet().add(CACHED_LOCATION_KEY, String.valueOf(locationId));
+        stringRedisTemplate.expire(CACHED_LOCATION_KEY, DEFAULT_DURATION);
+    }
+
+    /**
+     * 현재 Redis 캐시를 가진 지역 ID를 가져와 활성 지역 후보로 사용한다.
+     * 즉, 캐시에 존재하는 활성 지역을 ${weather.update.limitSize}만큼 가져온다.
+     */
+    public List<Long> getCachedLocationIds(int limitSize) {
+        Set<String> values = Optional.ofNullable(stringRedisTemplate.opsForSet().members(CACHED_LOCATION_KEY))
+                .orElse(Collections.emptySet());
+
+        return toLongList(values).stream()
+                .limit(limitSize > 0 ? limitSize : Long.MAX_VALUE)
+                .toList();
+    }
+
+    private List<Long> toLongList(Set<String> values) {
+        if (values == null || values.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        LinkedHashSet<Long> locationIds = new LinkedHashSet<>();
+        for (String value : values) {
+            if (value == null) {
+                continue;
+            }
+
+            try {
+                locationIds.add(Long.valueOf(value));
+            } catch (NumberFormatException e) {
+                log.warn("Invalid locationId in weather redis active set. value={}", value);
+            }
+        }
+
+        return locationIds.stream().toList();
     }
 }

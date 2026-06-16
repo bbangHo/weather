@@ -54,7 +54,8 @@ class TagQueryServiceTest {
             extraWeatherRepository,
             memberRepository,
             mockextraweatherapiutils,
-            locationRepository)
+            locationRepository,
+            mock(WeatherQueryService.class))
     );
 
     WeatherQueryService weatherQueryService = spy(new WeatherQueryService(

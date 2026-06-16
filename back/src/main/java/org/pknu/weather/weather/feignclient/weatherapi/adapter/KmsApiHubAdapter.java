@@ -13,6 +13,7 @@ import org.pknu.weather.weather.feignclient.weatherapi.KmaApiHubFeignClient;
 import org.pknu.weather.weather.feignclient.weatherapi.dto.Item;
 import org.pknu.weather.weather.feignclient.weatherapi.dto.KmsApiHubParamDTO;
 import org.pknu.weather.weather.feignclient.weatherapi.dto.KmsApiHubResponseDTO;
+import org.pknu.weather.weather.feignclient.weatherapi.exception.ForecastNotAvailableException;
 import org.pknu.weather.weather.feignclient.weatherapi.target.WeatherApi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.support.RetryTemplate;
@@ -31,6 +32,9 @@ public class KmsApiHubAdapter implements WeatherApi {
     @Value("${api.weather.kmshub-service-key}")
     private String weatherServiceKey;
 
+    @Value("${api.weather.base-time-fallback-attempts:3}")
+    private int baseTimeFallbackAttempts;
+
     private final RetryTemplate retryTemplate;
 
     /**
@@ -45,35 +49,71 @@ public class KmsApiHubAdapter implements WeatherApi {
 
         PointDTO pointDTO = GeometryUtils.coordinateToPoint(lon, lat);
         LocalDateTime baseLocalDateTime = LocalDateTime.now();
-        return retryTemplate.execute(context -> {
-            int retryCount = context.getRetryCount();
 
-            LocalDateTime newBaseLocalDateTime = baseLocalDateTime;
-            if (retryCount > 0) {
-                newBaseLocalDateTime = baseLocalDateTime.minusHours(3L * retryCount);
+        for (int fallbackAttempt = 0; fallbackAttempt < fallbackAttempts(); fallbackAttempt++) {
+            int currentFallbackAttempt = fallbackAttempt;
+            LocalDateTime requestBaseTime = baseLocalDateTime.minusHours(3L * fallbackAttempt);
+            try {
+                return retryTemplate.execute(context ->
+                        requestForecast(location, pointDTO, requestBaseTime, context.getRetryCount(), currentFallbackAttempt)
+                );
+            } catch (ForecastNotAvailableException e) {
+                log.warn("Forecast baseTime is not available. locationId={}, fallbackAttempt={}",
+                        location.getId(), fallbackAttempt, e);
             }
+        }
 
-            String date = DateTimeFormatter.getFormattedBaseDate(newBaseLocalDateTime);
-            String time = DateTimeFormatter.getFormattedBaseTime(newBaseLocalDateTime);
+        throw new GeneralException(ErrorStatus._API_SERVER_ERROR);
+    }
 
-            KmsApiHubParamDTO kmsApiHubParamDTO = createParam(weatherServiceKey, date, time, pointDTO);
+    private List<Weather> requestForecast(
+            Location location,
+            PointDTO pointDTO,
+            LocalDateTime requestBaseTime,
+            int retryCount,
+            int fallbackAttempt
+    ) {
+        String date = DateTimeFormatter.getFormattedBaseDate(requestBaseTime);
+        String time = DateTimeFormatter.getFormattedBaseTime(requestBaseTime);
 
-            log.info(String.format("Retry Forecast API x:%s y:%s date:%s time:%s",
-                    pointDTO.getX() != null ? String.valueOf(pointDTO.getX()) : "N/A",
-                    pointDTO.getY() != null ? String.valueOf(pointDTO.getY()) : "N/A",
-                    date != null ? date : "N/A",
-                    time != null ? time : "N/A"));
+        KmsApiHubParamDTO kmsApiHubParamDTO = createParam(weatherServiceKey, date, time, pointDTO);
 
-            KmsApiHubResponseDTO kmsApiHubResponseDTO = kmaApiHubFeignClient.getVillageShortTermForecast(kmsApiHubParamDTO);
-            log.info("locationId={}, res={}", location.getId(), kmsApiHubResponseDTO);
-            List<Item> itemList = Optional.ofNullable(kmsApiHubResponseDTO.getResponse()
-                            .getBody()
-                            .getItems()
-                            .getItemList())
-                    .orElseThrow(() -> new GeneralException(ErrorStatus._API_SERVER_ERROR));
+        log.info("Forecast API locationId={}, x={}, y={}, date={}, time={}, retryCount={}, fallbackAttempt={}",
+                location.getId(),
+                pointDTO.getX() != null ? pointDTO.getX() : "N/A",
+                pointDTO.getY() != null ? pointDTO.getY() : "N/A",
+                date,
+                time,
+                retryCount,
+                fallbackAttempt);
 
-            return toWeatherList(itemList, date, time);
-        });
+        KmsApiHubResponseDTO kmsApiHubResponseDTO = kmaApiHubFeignClient.getVillageShortTermForecast(kmsApiHubParamDTO);
+        List<Item> itemList = extractItems(kmsApiHubResponseDTO, location.getId(), date, time);
+
+        return toWeatherList(itemList, date, time);
+    }
+
+    private List<Item> extractItems(KmsApiHubResponseDTO response, Long locationId, String date, String time) {
+        List<Item> itemList = Optional.ofNullable(response)
+                .map(KmsApiHubResponseDTO::getResponse)
+                .map(KmsApiHubResponseDTO.Response::getBody)
+                .map(KmsApiHubResponseDTO.Body::getItems)
+                .map(KmsApiHubResponseDTO.Body.Items::getItemList)
+                .orElseThrow(() -> new ForecastNotAvailableException(
+                        "Forecast data is not available. locationId=" + locationId + ", date=" + date + ", time=" + time
+                ));
+
+        if (itemList.isEmpty()) {
+            throw new ForecastNotAvailableException(
+                    "Forecast data is empty. locationId=" + locationId + ", date=" + date + ", time=" + time
+            );
+        }
+
+        return itemList;
+    }
+
+    private int fallbackAttempts() {
+        return Math.max(baseTimeFallbackAttempts, 1);
     }
 
     /**

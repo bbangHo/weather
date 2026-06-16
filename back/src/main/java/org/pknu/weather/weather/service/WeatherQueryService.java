@@ -80,14 +80,9 @@ public class WeatherQueryService {
         Cache cache = cm.getCache(LOCATION_UPDATE_STORE);
 
         LocalDateTime currentBaseTime = DateTimeFormatter.getBaseLocalDateTime(LocalDateTime.now());
-        LocalDateTime cachedBaseTime = cache.get(location.getId(), LocalDateTime.class);
+        LocalDateTime cachedBaseTime = cache != null ? cache.get(location.getId(), LocalDateTime.class) : null;
 
-        if (cachedBaseTime != null && currentBaseTime.isEqual(cachedBaseTime)) {
-            return true;
-        }
-
-        cache.put(location.getId(), currentBaseTime);
-        return false;
+        return cachedBaseTime != null && currentBaseTime.isEqual(cachedBaseTime);
     }
 
 
@@ -101,14 +96,25 @@ public class WeatherQueryService {
         Cache cache = cm.getCache(LOCATION_CREATE_STORE);
 
         LocalDateTime currentBaseTime = DateTimeFormatter.getBaseLocalDateTime(LocalDateTime.now());
-        LocalDateTime cachedBaseTime = cache.get(location.getId(), LocalDateTime.class);
+        LocalDateTime cachedBaseTime = cache != null ? cache.get(location.getId(), LocalDateTime.class) : null;
 
-        if (cachedBaseTime != null && currentBaseTime.isEqual(cachedBaseTime)) {
-            return true;
+        return cachedBaseTime != null && currentBaseTime.isEqual(cachedBaseTime);
+    }
+
+    public void markWeatherCreated(Long locationId) {
+        putCurrentBaseTime(LOCATION_CREATE_STORE, locationId);
+        putCurrentBaseTime(LOCATION_UPDATE_STORE, locationId);
+    }
+
+    public void markWeatherUpdated(Long locationId) {
+        putCurrentBaseTime(LOCATION_UPDATE_STORE, locationId);
+    }
+
+    private void putCurrentBaseTime(String cacheName, Long locationId) {
+        Cache cache = cm.getCache(cacheName);
+        if (cache != null) {
+            cache.put(locationId, DateTimeFormatter.getBaseLocalDateTime(LocalDateTime.now()));
         }
-
-        cache.put(location.getId(), currentBaseTime);
-        return false;
     }
 
     private boolean cacheExist(Cache cache, Long locationId) {

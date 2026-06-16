@@ -44,6 +44,20 @@ api:
   weather:
     service-key: ${SHORT_TERM_FORECAST_API_KEY}
     data-type: JSON
+    connect-timeout-millis: 5000
+    read-timeout-millis: 15000
+    base-time-fallback-attempts: 3
+    retry:
+      max-attempts: 3
+      initial-interval-millis: 300
+      multiplier: 2.0
+      max-interval-millis: 2000
+
+weather:
+  update:
+    limit-size: 100
+    dispatch-interval-millis: 100
+    recent-request-window-hours: 24
 
 management:
   health:

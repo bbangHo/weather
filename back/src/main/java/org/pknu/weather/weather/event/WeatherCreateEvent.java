@@ -10,6 +10,10 @@ public class WeatherCreateEvent implements WeatherEvent {
     private Long locationId;
     private List<Weather> newForecast;
 
+    public WeatherCreateEvent(Long locationId) {
+        this.locationId = locationId;
+    }
+
     public WeatherCreateEvent(Long locationId, List<Weather> newForecast) {
         this.locationId = locationId;
         this.newForecast = newForecast;

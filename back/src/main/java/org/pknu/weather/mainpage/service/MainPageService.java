@@ -14,10 +14,10 @@ import org.pknu.weather.tag.service.TagQueryService;
 import org.pknu.weather.weather.Weather;
 import org.pknu.weather.weather.converter.WeatherResponseConverter;
 import org.pknu.weather.weather.dto.WeatherResponseDTO;
-import org.pknu.weather.weather.event.WeatherCacheRefreshEvent;
 import org.pknu.weather.weather.event.WeatherCreateEvent;
 import org.pknu.weather.weather.event.WeatherUpdateEvent;
 import org.pknu.weather.weather.feignclient.weatherapi.target.WeatherApi;
+import org.pknu.weather.weather.service.ActiveWeatherLocationService;
 import org.pknu.weather.weather.service.WeatherCacheService;
 import org.pknu.weather.weather.service.WeatherQueryService;
 import org.springframework.context.ApplicationEventPublisher;
@@ -37,9 +37,10 @@ public class MainPageService {
     private final LocationRepository locationRepository;
     private final PostQueryService postQueryService;
     private final TagQueryService tagQueryService;
-    private final WeatherApi weatherApi;
-    private final ApplicationEventPublisher eventPublisher;
     private final WeatherCacheService weatherCacheService;
+    private final WeatherApi weatherApi;
+    private final ActiveWeatherLocationService activeWeatherLocationService;
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * 메인 페이지에 날씨와 관련된 데이터를 반환한다. 만약 해당 지역의 날씨의 갱신 시간이 지났다면 갱신을 시도하고 반환한다. 만약 해당 지역의 날씨 정보가 없다면 저장하고 반환한다.
@@ -50,19 +51,7 @@ public class MainPageService {
     public WeatherResponseDTO.MainPageWeatherData getWeatherInfo(String email, Long locationId) {
         Member member = memberRepository.safeFindByEmail(email);
         Location location = resolveLocation(member, locationId);
-
-        List<Weather> cachedWeatherList = weatherCacheService.getCachedWeathers(location.getId());
-        if (!cachedWeatherList.isEmpty()) {
-            return WeatherResponseConverter.toMainPageWeatherData(cachedWeatherList, member);
-        }
-
-        List<Weather> weatherList = createWeatherIfRequired(location);
-        if (weatherList != null) {
-            return WeatherResponseConverter.toMainPageWeatherData(weatherList, member);
-        }
-
-        updateWeatherIfRequired(location);
-        weatherList = weatherQueryService.getWeathers(location.getId());
+        List<Weather> weatherList = getWeatherInfo(location);
 
         return WeatherResponseConverter.toMainPageWeatherData(weatherList, member);
     }
@@ -73,23 +62,45 @@ public class MainPageService {
                 : member.getLocation();
     }
 
-    private List<Weather> createWeatherIfRequired(Location location) {
-        if (!weatherQueryService.weatherHasBeenCreated(location)) {
-            log.info("createWeatherIfRequired");
-            List<Weather> newForecast = weatherApi.getVillageShortTermForecast(location);
-            eventPublisher.publishEvent(new WeatherCreateEvent(location.getId(), newForecast));
-            eventPublisher.publishEvent(new WeatherCacheRefreshEvent(location.getId()));
-            return newForecast;
+    /**
+     * 조회된 지역을 활성 지역으로 기록한 뒤, 캐시가 없거나 갱신이 필요하면 외부 API 값을 즉시 반환한다.
+     * 외부 API 응답은 이벤트에 함께 넘겨 비동기 DB 저장과 Redis 캐시 갱신에 재사용한다.
+     */
+    private List<Weather> getWeatherInfo(Location location) {
+        activeWeatherLocationService.markRequestedLocation(location.getId());
+
+        List<Weather> cachedWeatherList = weatherCacheService.getCachedWeathers(location.getId());
+        if (!cachedWeatherList.isEmpty()) {
+            return cachedWeatherList;
         }
-        return null;
+
+        if (!weatherQueryService.weatherHasBeenCreated(location)) {
+            return createWeather(location);
+        }
+
+        if (!weatherQueryService.weatherHasBeenUpdated(location)) {
+            updateWeather(location);
+        }
+
+        return weatherQueryService.getWeathers(location.getId());
     }
 
-    private void updateWeatherIfRequired(Location location) {
-        if (!weatherQueryService.weatherHasBeenUpdated(location)) {
-            log.info("updateWeatherIfRequired");
-            eventPublisher.publishEvent(new WeatherUpdateEvent(location.getId()));
-            eventPublisher.publishEvent(new WeatherCacheRefreshEvent(location.getId()));
-        }
+    /**
+     * 최초 조회 지역은 요청 스레드에서 외부 API를 호출해 바로 응답하고, 저장은 비동기 이벤트로 위임한다.
+     */
+    private List<Weather> createWeather(Location location) {
+        log.info("createWeather locationId: {}", location.getId());
+        List<Weather> forecast = weatherApi.getVillageShortTermForecast(location);
+        eventPublisher.publishEvent(new WeatherCreateEvent(location.getId(), forecast));
+        return forecast;
+    }
+
+    /**
+     * stale 상태의 지역은 최신 외부 API 값을 바로 응답하고, 같은 forecast로 비동기 저장/캐시 갱신을 수행한다.
+     */
+    private void updateWeather(Location location) {
+        log.info("updateWeather locationId: {}", location.getId());
+        eventPublisher.publishEvent(new WeatherUpdateEvent(location.getId()));
     }
 
     /**

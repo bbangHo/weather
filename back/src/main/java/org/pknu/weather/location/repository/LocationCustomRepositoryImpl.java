@@ -1,6 +1,7 @@
 package org.pknu.weather.location.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.querydsl.jpa.impl.JPAQuery;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -20,12 +21,16 @@ public class LocationCustomRepositoryImpl implements LocationCustomRepository {
      */
     @Override
     public List<Long> findLocationIdsWithRecentlyUpdatedWeather(Integer limitSize) {
-        return jpaQueryFactory
+        JPAQuery<Long> query = jpaQueryFactory
                 .select(weather.location.id)
                 .from(weather)
                 .groupBy(weather.location.id)
-                .orderBy(weather.updatedAt.max().desc())
-                .limit(100)
-                .fetch();
+                .orderBy(weather.updatedAt.max().desc());
+
+        if (limitSize != null && limitSize > 0) {
+            query.limit(limitSize);
+        }
+
+        return query.fetch();
     }
 }

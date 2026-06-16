@@ -1,25 +1,35 @@
 package org.pknu.weather.config;
 
+import java.util.HashMap;
+import java.util.Map;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.retry.backoff.FixedBackOffPolicy;
+import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
+import org.pknu.weather.weather.feignclient.weatherapi.exception.ForecastNotAvailableException;
 
 @Configuration
 public class RetryConfig {
 
     @Bean
-    public RetryTemplate retryTemplate() {
+    public RetryTemplate retryTemplate(
+            @Value("${api.weather.retry.max-attempts:3}") int maxAttempts,
+            @Value("${api.weather.retry.initial-interval-millis:300}") long initialIntervalMillis,
+            @Value("${api.weather.retry.multiplier:2.0}") double multiplier,
+            @Value("${api.weather.retry.max-interval-millis:2000}") long maxIntervalMillis
+    ) {
         RetryTemplate retryTemplate = new RetryTemplate();
 
-        // 간단한 재시도 정책 설정 (최대 3번 재시도)
-        SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy();
-        retryPolicy.setMaxAttempts(3);  // 최대 3번 재시도
+        Map<Class<? extends Throwable>, Boolean> retryableExceptions = new HashMap<>();
+        retryableExceptions.put(ForecastNotAvailableException.class, false);
+        SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy(maxAttempts, retryableExceptions, true, true);
 
-        // FixedBackOffPolicy로 일정 시간 간격을 두고 재시도하도록 설정 (재시도 간격을 0으로 설정)
-        FixedBackOffPolicy backOffPolicy = new FixedBackOffPolicy();
-        backOffPolicy.setBackOffPeriod(0);  // 재시도 간격은 0으로 설정하여 바로 재시도하도록 함
+        ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
+        backOffPolicy.setInitialInterval(initialIntervalMillis);
+        backOffPolicy.setMultiplier(multiplier);
+        backOffPolicy.setMaxInterval(maxIntervalMillis);
 
         retryTemplate.setRetryPolicy(retryPolicy);
         retryTemplate.setBackOffPolicy(backOffPolicy);

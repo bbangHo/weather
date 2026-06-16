@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class WeatherCacheService {
     private final WeatherRedisRepository weatherRedisRepository;
-    private final WeatherApi WeatherApi;
+    private final WeatherApi weatherApi;
     private final LocationRepository locationRepository;
 
     public List<Weather> getCachedWeathers(Long locationId) {
@@ -30,7 +30,11 @@ public class WeatherCacheService {
     @Async("WeatherCUDExecutor")
     public void updateCachedWeathersForLocation(Long locationId) {
         Location location = locationRepository.safeFindById(locationId);
-        List<Weather> weatherList = WeatherApi.getVillageShortTermForecast(location);
+        List<Weather> weatherList = weatherApi.getVillageShortTermForecast(location);
+        updateCachedWeathersForLocation(locationId, weatherList);
+    }
+
+    public void updateCachedWeathersForLocation(Long locationId, List<Weather> weatherList) {
         List<WeatherRedisDTO.WeatherData> weatherDataList = WeatherConverter.toWeatherDataList(weatherList);
         weatherRedisRepository.updateWeatherList(locationId, weatherDataList);
     }

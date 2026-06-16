@@ -39,6 +39,7 @@ public class WeatherService {
     private final MemberRepository memberRepository;
     private final ExtraWeatherApiUtils extraWeatherApiUtils;
     private final LocationRepository locationRepository;
+    private final WeatherQueryService weatherQueryService;
 
 
     /**
@@ -51,7 +52,9 @@ public class WeatherService {
         List<Weather> weatherList = weatherApi.getVillageShortTermForecast(location);
         weatherList.forEach(w -> w.addLocation(location));
 
-        return weatherRepository.saveAll(weatherList);
+        List<Weather> savedWeatherList = weatherRepository.saveAll(weatherList);
+        weatherQueryService.markWeatherCreated(location.getId());
+        return savedWeatherList;
     }
 
     /**
@@ -70,6 +73,7 @@ public class WeatherService {
                 .toList();
 
         weatherRepository.saveAll(weatherList);
+        weatherQueryService.markWeatherCreated(locationId);
     }
 
     /**
@@ -84,6 +88,7 @@ public class WeatherService {
         Location location = locationRepository.safeFindById(locationId);
         log.info("bulkSaveWeathersAsync"+location.getId());
         weatherRepository.batchUpsert(newForecast, location);
+        weatherQueryService.markWeatherCreated(locationId);
     }
 
     /**
@@ -101,6 +106,7 @@ public class WeatherService {
         List<Weather> newWeatherList = weatherApi.getVillageShortTermForecast(location);
         List<Weather> weathersList = updateWeathers(oldWeatherMap, newWeatherList, location);
         weatherRepository.saveAll(weathersList);
+        weatherQueryService.markWeatherUpdated(locationId);
     }
 
     @Async("WeatherCUDExecutor")
@@ -112,6 +118,7 @@ public class WeatherService {
         List<Weather> newWeatherList = weatherApi.getVillageShortTermForecast(location);
         List<Weather> weathersList = updateWeathers(oldWeatherMap, newWeatherList, location);
         weatherRepository.batchUpsert(weathersList, location);
+        weatherQueryService.markWeatherUpdated(locationId);
     }
 
     @Async("WeatherCUDExecutor")
@@ -121,6 +128,7 @@ public class WeatherService {
         Map<LocalDateTime, Weather> oldWeatherMap = weatherRepository.findAllByLocationAfterNow(location);
         List<Weather> weathersList = updateWeathers(oldWeatherMap, newWeatherList, location);
         weatherRepository.batchUpsert(weathersList, location);
+        weatherQueryService.markWeatherUpdated(locationId);
     }
 
     private List<Weather> updateWeathers(Map<LocalDateTime, Weather> oldWeatherMap, List<Weather> newWeatherList,
@@ -213,5 +221,6 @@ public class WeatherService {
         List<Weather> newForecast = weatherApi.getVillageShortTermForecast(location);
         List<Weather> weatherList = updateWeathers(oldWeatherMap, newForecast, location);
         weatherRepository.saveAll(weatherList);
+        weatherQueryService.markWeatherUpdated(locationId);
     }
 }
